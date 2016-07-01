@@ -22,6 +22,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.teavm:teavm-classlib:1.0.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.teavm:teavm-jso:1.0.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="teavm-classlib" scope="PROVIDED" />
     <orderEntry type="module" module-name="teavm-platform" scope="PROVIDED" />
     <orderEntry type="module" module-name="teavm-core" scope="PROVIDED" />
