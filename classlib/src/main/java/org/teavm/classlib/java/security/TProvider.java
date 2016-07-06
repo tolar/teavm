@@ -41,6 +41,8 @@ import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReference;
 import org.teavm.classlib.java.lang.ref.TWeakReference;
+import org.teavm.classlib.java.lang.reflect.TConstructor;
+import org.teavm.classlib.java.util.TArrayList;
 import org.teavm.classlib.java.util.TCollection;
 import org.teavm.classlib.java.util.TCollections;
 import org.teavm.classlib.java.util.TEnumeration;
@@ -67,7 +69,7 @@ public abstract class TProvider extends TProperties {
     private transient boolean initialized;
     private transient boolean legacyChanged;
     private transient boolean servicesChanged;
-    private transient TMap<String, String> legacyStrings;
+    private transient TMap<TString, TString> legacyStrings;
     private transient TMap<org.teavm.classlib.java.security.TProvider.ServiceKey, org.teavm.classlib.java.security.TProvider.Service> serviceMap;
     private transient TMap<org.teavm.classlib.java.security.TProvider.ServiceKey, org.teavm.classlib.java.security.TProvider.Service> legacyMap;
     private transient TSet<org.teavm.classlib.java.security.TProvider.Service> serviceSet;
@@ -116,9 +118,6 @@ public abstract class TProvider extends TProperties {
 
     public synchronized void putAll(Map<?, ?> var1) {
         this.check("putProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("Put all " + this.name + " provider properties");
-        }
 
         this.implPutAll(var1);
     }
@@ -130,7 +129,7 @@ public abstract class TProvider extends TProperties {
                 return super.entrySet();
             }
 
-            this.entrySet = Collections.unmodifiableMap(this).entrySet();
+            this.entrySet = TCollections.unmodifiableMap(this).entrySet();
         }
 
         if(this.entrySetCallCount != 2) {
@@ -142,73 +141,52 @@ public abstract class TProvider extends TProperties {
 
     public TSet<Object> keySet() {
         this.checkInitialized();
-        return Collections.unmodifiableSet(super.keySet());
+        return TCollections.unmodifiableSet(super.keySet());
     }
 
     public TCollection<Object> values() {
         this.checkInitialized();
-        return Collections.unmodifiableCollection(super.values());
+        return TCollections.unmodifiableCollection(super.values());
     }
 
     public synchronized Object put(Object var1, Object var2) {
         this.check("putProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("Set " + this.name + " provider property [" + var1 + "/" + var2 + "]");
-        }
 
         return this.implPut(var1, var2);
     }
 
     public synchronized Object putIfAbsent(Object var1, Object var2) {
         this.check("putProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("Set " + this.name + " provider property [" + var1 + "/" + var2 + "]");
-        }
 
         return this.implPutIfAbsent(var1, var2);
     }
 
     public synchronized Object remove(Object var1) {
         this.check("removeProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("Remove " + this.name + " provider property " + var1);
-        }
 
         return this.implRemove(var1);
     }
 
     public synchronized boolean remove(Object var1, Object var2) {
         this.check("removeProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("Remove " + this.name + " provider property " + var1);
-        }
 
         return this.implRemove(var1, var2);
     }
 
     public synchronized boolean replace(Object var1, Object var2, Object var3) {
         this.check("putProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("Replace " + this.name + " provider property " + var1);
-        }
 
         return this.implReplace(var1, var2, var3);
     }
 
     public synchronized Object replace(Object var1, Object var2) {
         this.check("putProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("Replace " + this.name + " provider property " + var1);
-        }
 
         return this.implReplace(var1, var2);
     }
 
     public synchronized void replaceAll(BiFunction<? super Object, ? super Object, ? extends Object> var1) {
         this.check("putProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println("ReplaceAll " + this.name + " provider property ");
-        }
 
         this.implReplaceAll(var1);
     }
@@ -216,9 +194,6 @@ public abstract class TProvider extends TProperties {
     public synchronized Object compute(Object var1, BiFunction<? super Object, ? super Object, ? extends Object> var2) {
         this.check("putProviderProperty." + this.name);
         this.check("removeProviderProperty" + this.name);
-        if(debug != null) {
-            debug.println("Compute " + this.name + " provider property " + var1);
-        }
 
         return this.implCompute(var1, var2);
     }
@@ -226,9 +201,6 @@ public abstract class TProvider extends TProperties {
     public synchronized Object computeIfAbsent(Object var1, Function<? super Object, ? extends Object> var2) {
         this.check("putProviderProperty." + this.name);
         this.check("removeProviderProperty" + this.name);
-        if(debug != null) {
-            debug.println("ComputeIfAbsent " + this.name + " provider property " + var1);
-        }
 
         return this.implComputeIfAbsent(var1, var2);
     }
@@ -236,9 +208,6 @@ public abstract class TProvider extends TProperties {
     public synchronized Object computeIfPresent(Object var1, BiFunction<? super Object, ? super Object, ? extends Object> var2) {
         this.check("putProviderProperty." + this.name);
         this.check("removeProviderProperty" + this.name);
-        if(debug != null) {
-            debug.println("ComputeIfPresent " + this.name + " provider property " + var1);
-        }
 
         return this.implComputeIfPresent(var1, var2);
     }
@@ -246,9 +215,6 @@ public abstract class TProvider extends TProperties {
     public synchronized Object merge(Object var1, Object var2, BiFunction<? super Object, ? super Object, ? extends Object> var3) {
         this.check("putProviderProperty." + this.name);
         this.check("removeProviderProperty" + this.name);
-        if(debug != null) {
-            debug.println("Merge " + this.name + " provider property " + var1);
-        }
 
         return this.implMerge(var1, var2, var3);
     }
@@ -322,8 +288,8 @@ public abstract class TProvider extends TProperties {
     }
 
     private boolean checkLegacy(Object var1) {
-        String var2 = (String)var1;
-        if(var2.startsWith("Provider.")) {
+        TString var2 = (TString)var1;
+        if(var2.startsWith(TString.wrap("Provider."))) {
             return false;
         } else {
             this.legacyChanged = true;
@@ -370,12 +336,12 @@ public abstract class TProvider extends TProperties {
     }
 
     private boolean implReplace(Object var1, Object var2, Object var3) {
-        if(var1 instanceof String && var2 instanceof String && var3 instanceof String) {
+        if(var1 instanceof TString && var2 instanceof TString && var3 instanceof TString) {
             if(!this.checkLegacy(var1)) {
                 return false;
             }
 
-            this.legacyStrings.replace((String)var1, (String)var2, (String)var3);
+            this.legacyStrings.replace((TString)var1, (TString)var2, (TString)var3);
         }
 
         return super.replace(var1, var2, var3);
@@ -709,10 +675,10 @@ public abstract class TProvider extends TProperties {
     }
 
     private void removePropertyStrings(org.teavm.classlib.java.security.TProvider.Service var1) {
-        String var2 = var1.getType();
-        String var3 = var1.getAlgorithm();
+        TString var2 = var1.getType();
+        TString var3 = var1.getAlgorithm();
         super.remove(var2 + "." + var3);
-        Iterator var4 = var1.getAliases().iterator();
+        TIterator var4 = var1.getAliases().iterator();
 
         while(var4.hasNext()) {
             String var5 = (String)var4.next();
@@ -731,9 +697,6 @@ public abstract class TProvider extends TProperties {
 
     protected synchronized void removeService(org.teavm.classlib.java.security.TProvider.Service var1) {
         this.check("removeProviderProperty." + this.name);
-        if(debug != null) {
-            debug.println(this.name + ".removeService(): " + var1);
-        }
 
         if(var1 == null) {
             throw new NullPointerException();
@@ -860,7 +823,7 @@ public abstract class TProvider extends TProperties {
 
         private void addAlias(String var1) {
             if(this.aliases.isEmpty()) {
-                this.aliases = new ArrayList(2);
+                this.aliases = new TArrayList(2);
             }
 
             this.aliases.add(var1);
@@ -881,9 +844,9 @@ public abstract class TProvider extends TProperties {
                 this.algorithm = var3;
                 this.className = var4;
                 if(var5 == null) {
-                    this.aliases = Collections.emptyList();
+                    this.aliases = TCollections.emptyList();
                 } else {
-                    this.aliases = new ArrayList(var5);
+                    this.aliases = new TArrayList(var5);
                 }
 
                 if(var6 == null) {

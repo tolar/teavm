@@ -78,7 +78,7 @@ public final class TConstructor<T> extends Executable {
     //
     // If this branching structure would ever contain cycles, deadlocks can
     // occur in annotation code.
-    private java.lang.reflect.Constructor<T> root;
+    private org.teavm.classlib.java.lang.reflect.TConstructor<T> root;
 
     /**
      * Used by Excecutable for annotation sharing.
@@ -93,7 +93,7 @@ public final class TConstructor<T> extends Executable {
      * instantiation of these objects in Java code from the java.lang
      * package via sun.reflect.LangReflectAccess.
      */
-    Constructor(Class<T> declaringClass,
+    TConstructor(Class<T> declaringClass,
             Class<?>[] parameterTypes,
             Class<?>[] checkedExceptions,
             int modifiers,
@@ -119,7 +119,7 @@ public final class TConstructor<T> extends Executable {
     java.lang.reflect.Constructor<T> copy() {
         // This routine enables sharing of ConstructorAccessor objects
         // among Constructor objects which refer to the same underlying
-        // method in the VM. (All of this contortion is only necessary
+        // method in the TVM. (All of this contortion is only necessary
         // because of the "accessibility" bit in AccessibleObject,
         // which implicitly requires that new java.lang.reflect
         // objects be fabricated for each reflective call on Class

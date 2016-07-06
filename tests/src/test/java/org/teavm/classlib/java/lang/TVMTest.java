@@ -15,8 +15,8 @@
  */
 package org.teavm.classlib.java.lang;
 
-import static org.junit.Assert.*;
-import java.lang.annotation.Retention;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.teavm.junit.TeaVMTestRunner;
@@ -26,7 +26,7 @@ import org.teavm.junit.TeaVMTestRunner;
  * @author Alexey Andreev
  */
 @RunWith(TeaVMTestRunner.class)
-public class VMTest {
+public class TVMTest {
     @Test
     public void multiArrayCreated() {
         int[][] array = new int[2][3];
