@@ -27,15 +27,15 @@
 /*    */ 
 /*    */ 
 /*    */ 
-/*    */ public class TMethodTypeTSignature
+/*    */ public class TMethodTypeSignature
 /*    */   implements TSignature
 /*    */ {
 /*    */   private final TFormalTypeParameter[] formalTypeParams;
-/*    */   private final TypeSignature[] parameterTypes;
-/*    */   private final ReturnType returnType;
-/*    */   private final TFieldTypeSignatureT[] exceptionTypes;
+/*    */   private final TTypeSignature[] parameterTypes;
+/*    */   private final TReturnType returnType;
+/*    */   private final TFieldTypeSignature[] exceptionTypes;
 /*    */   
-/*    */   private TMethodTypeTSignature(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TypeSignature[] paramArrayOfTypeSignature, ReturnType paramReturnType, TFieldTypeSignatureT[] paramArrayOfFieldTypeSignature)
+/*    */   private TMethodTypeSignature(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TTypeSignature[] paramArrayOfTypeSignature, TReturnType paramReturnType, TFieldTypeSignature[] paramArrayOfFieldTypeSignature)
 /*    */   {
 /* 40 */     this.formalTypeParams = paramArrayOfTFormalTypeParameter;
 /* 41 */     this.parameterTypes = paramArrayOfTypeSignature;
@@ -45,17 +45,17 @@
 /*    */   
 /*    */ 
 /*    */ 
-/*    */   public static TMethodTypeTSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TypeSignature[] paramArrayOfTypeSignature, ReturnType paramReturnType, TFieldTypeSignatureT[] paramArrayOfFieldTypeSignature)
+/*    */   public static TMethodTypeSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TypeSignature[] paramArrayOfTypeSignature, ReturnType paramReturnType, TFieldTypeSignatureT[] paramArrayOfFieldTypeSignature)
 /*    */   {
-/* 50 */     return new TMethodTypeTSignature(paramArrayOfTFormalTypeParameter, paramArrayOfTypeSignature, paramReturnType, paramArrayOfFieldTypeSignature);
+/* 50 */     return new TMethodTypeSignature(paramArrayOfTFormalTypeParameter, paramArrayOfTypeSignature, paramReturnType, paramArrayOfFieldTypeSignature);
 /*    */   }
 /*    */   
 /*    */ 
 /* 54 */   public TFormalTypeParameter[] getFormalTypeParameters() { return this.formalTypeParams; }
 /*    */   
-/* 56 */   public TypeSignature[] getParameterTypes() { return this.parameterTypes; }
-/* 57 */   public ReturnType getReturnType() { return this.returnType; }
-/* 58 */   public TFieldTypeSignatureT[] getExceptionTypes() { return this.exceptionTypes; }
+/* 56 */   public TTypeSignature[] getParameterTypes() { return this.parameterTypes; }
+/* 57 */   public TReturnType getReturnType() { return this.returnType; }
+/* 58 */   public TFieldTypeSignature[] getExceptionTypes() { return this.exceptionTypes; }
 /*    */   
 /* 60 */   public void accept(Visitor<?> paramVisitor) { paramVisitor.visitMethodTypeSignature(this); }
 /*    */ }

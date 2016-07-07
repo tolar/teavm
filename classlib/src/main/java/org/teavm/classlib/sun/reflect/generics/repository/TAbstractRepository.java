@@ -15,20 +15,19 @@
  */
 package org.teavm.classlib.sun.reflect.generics.repository;
 
+import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.reflect.generics.tree.TTree;
 
-import sun.reflect.generics.factory.GenericsFactory;
-import sun.reflect.generics.visitor.Reifier;
 
 /**
  * @author: Vaclav Tolar, (vaclav_tolar@kb.cz, vaclav.tolar@cleverlance.com, vaclav.tolar@gmail.com)
  * Date: 2016-07-07
  */
 public abstract class TAbstractRepository<T extends TTree> {
-    private final GenericsFactory factory;
+    private final TGenericsFactory factory;
     private final T tree;
 
-    private GenericsFactory getFactory() {
+    private TGenericsFactory getFactory() {
         return this.factory;
     }
 

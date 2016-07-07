@@ -18,11 +18,11 @@ package org.teavm.classlib.java.lang.reflect;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Objects;
-
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.reflect.TFieldAccessor;
 import org.teavm.classlib.sun.reflect.generics.repository.TFieldRepository;
+import org.teavm.classlib.sun.reflect.generics.scope.TClassScope;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -66,11 +66,11 @@ class TField extends TAccessibleObject implements TMember {
     }
 
     // Accessor for generic info repository
-    private FieldRepository getGenericInfo() {
+    private TFieldRepository getGenericInfo() {
         // lazily initialize repository if necessary
         if (genericInfo == null) {
             // create and cache generic info repository
-            genericInfo = FieldRepository.make(getGenericSignature(),
+            genericInfo = TFieldRepository.make(getGenericSignature(),
                     getFactory());
         }
         return genericInfo; //return cached repository

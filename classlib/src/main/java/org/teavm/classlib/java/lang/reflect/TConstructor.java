@@ -25,16 +25,7 @@ import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-
-import sun.reflect.CallerSensitive;
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.Reflection;
-import sun.reflect.annotation.TypeAnnotation;
-import sun.reflect.annotation.TypeAnnotationParser;
-import sun.reflect.generics.factory.CoreReflectionFactory;
-import sun.reflect.generics.factory.GenericsFactory;
-import sun.reflect.generics.repository.ConstructorRepository;
-import sun.reflect.generics.scope.TConstructorScope;
+import org.teavm.classlib.sun.reflect.generics.repository.TConstructorRepository;
 
 /**
  * Created by vasek on 30. 6. 2016.
@@ -48,7 +39,7 @@ public final class TConstructor<T> extends Executable {
     // Generics and annotations support
     private transient String    signature;
     // generic info repository; lazily initialized
-    private transient ConstructorRepository genericInfo;
+    private transient TConstructorRepository genericInfo;
     private byte[]              annotations;
     private byte[]              parameterAnnotations;
 

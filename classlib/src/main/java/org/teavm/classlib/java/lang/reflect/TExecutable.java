@@ -29,11 +29,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Objects;
-import sun.reflect.annotation.AnnotationParser;
-import sun.reflect.annotation.AnnotationSupport;
-import sun.reflect.annotation.TypeAnnotation;
-import sun.reflect.annotation.TypeAnnotationParser;
-import sun.reflect.generics.repository.ConstructorRepository;
 
 /**
  * Created by vasek on 4. 7. 2016.

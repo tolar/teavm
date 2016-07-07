@@ -25,17 +25,11 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
-
 import org.teavm.classlib.java.lang.TClass;
-
-import sun.reflect.CallerSensitive;
-import sun.reflect.MethodAccessor;
-import sun.reflect.Reflection;
-import sun.reflect.annotation.AnnotationParser;
-import sun.reflect.annotation.AnnotationType;
-import sun.reflect.generics.factory.CoreReflectionFactory;
-import sun.reflect.generics.factory.GenericsFactory;
-import sun.reflect.generics.repository.MethodRepository;
+import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
+import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.reflect.TMethodAccessor;
+import org.teavm.classlib.sun.reflect.generics.repository.TMethodRepository;
 import sun.reflect.generics.scope.TMethodScope;
 
 /**
@@ -54,11 +48,11 @@ public final class TMethod extends TExecutable {
     // Generics and annotations support
     private transient String              signature;
     // generic info repository; lazily initialized
-    private transient MethodRepository genericInfo;
+    private transient TMethodRepository genericInfo;
     private byte[]              annotations;
     private byte[]              parameterAnnotations;
     private byte[]              annotationDefault;
-    private volatile MethodAccessor methodAccessor;
+    private volatile TMethodAccessor methodAccessor;
     // For sharing of MethodAccessors. This branching structure is
     // currently only two levels deep (i.e., one root Method and
     // potentially many Method objects pointing to it.)
@@ -71,18 +65,18 @@ public final class TMethod extends TExecutable {
     private String getGenericSignature() {return signature;}
 
     // Accessor for factory
-    private GenericsFactory getFactory() {
+    private TGenericsFactory getFactory() {
         // create scope and factory
-        return CoreReflectionFactory.make(this, TMethodScope.make(this));
+        return TCoreReflectionFactory.make(this, TMethodScope.make(this));
     }
 
     // Accessor for generic info repository
     @Override
-    MethodRepository getGenericInfo() {
+    TMethodRepository getGenericInfo() {
         // lazily initialize repository if necessary
         if (genericInfo == null) {
             // create and cache generic info repository
-            genericInfo = MethodRepository.make(getGenericSignature(),
+            genericInfo = TMethodRepository.make(getGenericSignature(),
                     getFactory());
         }
         return genericInfo; //return cached repository
@@ -233,7 +227,7 @@ public final class TMethod extends TExecutable {
      *     type that cannot be instantiated for any reason
      * @since 1.5
      */
-    public Type getGenericReturnType() {
+    public TType getGenericReturnType() {
         if (getGenericSignature() != null) {
             return getGenericInfo().getReturnType();
         } else { return getReturnType();}

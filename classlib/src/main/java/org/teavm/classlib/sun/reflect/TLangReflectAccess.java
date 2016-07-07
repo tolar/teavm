@@ -16,7 +16,9 @@
 package org.teavm.classlib.sun.reflect;
 
 import org.teavm.classlib.java.lang.reflect.TConstructor;
+import org.teavm.classlib.java.lang.reflect.TExecutable;
 import org.teavm.classlib.java.lang.reflect.TField;
+import org.teavm.classlib.java.lang.reflect.TMethod;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -30,25 +32,25 @@ public interface TLangReflectAccess {
 
     TMethodAccessor getMethodAccessor(TMethod var1);
 
-    void setMethodAccessor(Method var1, TMethodAccessor var2);
+    void setMethodAccessor(TMethod var1, TMethodAccessor var2);
 
-    TConstructorAccessor getConstructorAccessor(Constructor<?> var1);
+    TConstructorAccessor getConstructorAccessor(TConstructor<?> var1);
 
-    void setConstructorAccessor(Constructor<?> var1, TConstructorAccessor var2);
+    void setConstructorAccessor(TConstructor<?> var1, TConstructorAccessor var2);
 
-    byte[] getExecutableTypeAnnotationBytes(Executable var1);
+    byte[] getExecutableTypeAnnotationBytes(TExecutable var1);
 
-    int getConstructorSlot(Constructor<?> var1);
+    int getConstructorSlot(TConstructor<?> var1);
 
-    String getConstructorSignature(Constructor<?> var1);
+    String getConstructorSignature(TConstructor<?> var1);
 
-    byte[] getConstructorAnnotations(Constructor<?> var1);
+    byte[] getConstructorAnnotations(TConstructor<?> var1);
 
-    byte[] getConstructorParameterAnnotations(Constructor<?> var1);
+    byte[] getConstructorParameterAnnotations(TConstructor<?> var1);
 
-    Method copyMethod(Method var1);
+    TMethod copyMethod(TMethod var1);
 
-    Field copyField(Field var1);
+    TField copyField(TField var1);
 
-    <T> Constructor<T> copyConstructor(Constructor<T> var1);
+    <T> TConstructor<T> copyConstructor(TConstructor<T> var1);
 }
