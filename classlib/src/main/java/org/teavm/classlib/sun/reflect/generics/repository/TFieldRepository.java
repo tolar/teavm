@@ -15,14 +15,16 @@
  */
 package org.teavm.classlib.sun.reflect.generics.repository;
 
+import org.teavm.classlib.java.lang.reflect.TType;
+import org.teavm.classlib.sun.reflect.generics.tree.TTypeSignature;
 
 /**
  * Created by vasek on 6. 7. 2016.
  */
-public class FieldRepository extends AbstractRepository<TypeSignature> {
-    private Type genericType;
+public class TFieldRepository extends TAbstractRepository<TTypeSignature> {
+    private TType genericType;
 
-    protected FieldRepository(String var1, GenericsFactory var2) {
+    protected TFieldRepository(String var1, GenericsFactory var2) {
         super(var1, var2);
     }
 

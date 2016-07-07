@@ -15,12 +15,11 @@
  */
 package org.teavm.classlib.sun.reflect.generics.tree;
 
-import sun.reflect.generics.tree.Tree;
-import sun.reflect.generics.visitor.TypeTreeVisitor;
+import org.teavm.classlib.sun.reflect.generics.visitor.TTypeTreeVisitor;
 
 /**
  * Created by vasek on 6. 7. 2016.
  */
-public interface TTypeTree extends Tree {
-    void accept(TypeTreeVisitor<?> var1);
+public interface TTypeTree extends TTree {
+    void accept(TTypeTreeVisitor<?> var1);
 }

@@ -25,6 +25,7 @@ import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+
 import sun.reflect.CallerSensitive;
 import sun.reflect.ConstructorAccessor;
 import sun.reflect.Reflection;
@@ -33,7 +34,7 @@ import sun.reflect.annotation.TypeAnnotationParser;
 import sun.reflect.generics.factory.CoreReflectionFactory;
 import sun.reflect.generics.factory.GenericsFactory;
 import sun.reflect.generics.repository.ConstructorRepository;
-import sun.reflect.generics.scope.ConstructorScope;
+import sun.reflect.generics.scope.TConstructorScope;
 
 /**
  * Created by vasek on 30. 6. 2016.
@@ -55,7 +56,7 @@ public final class TConstructor<T> extends Executable {
     // Accessor for factory
     private GenericsFactory getFactory() {
         // create scope and factory
-        return CoreReflectionFactory.make(this, ConstructorScope.make(this));
+        return CoreReflectionFactory.make(this, TConstructorScope.make(this));
     }
 
     // Accessor for generic info repository

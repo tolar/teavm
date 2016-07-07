@@ -15,10 +15,9 @@
  */
 package org.teavm.classlib.sun.reflect.generics.tree;
 
-import sun.reflect.generics.tree.ReturnType;
 
 /**
  * Created by vasek on 6. 7. 2016.
  */
-public interface TTypeSignature extends ReturnType {
+public interface TTypeSignature extends TReturnType {
 }

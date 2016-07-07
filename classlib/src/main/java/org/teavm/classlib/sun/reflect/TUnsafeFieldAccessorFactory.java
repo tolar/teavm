@@ -17,7 +17,6 @@ package org.teavm.classlib.sun.reflect;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import sun.reflect.FieldAccessor;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -26,7 +25,7 @@ class TUnsafeFieldAccessorFactory {
     TUnsafeFieldAccessorFactory() {
     }
 
-    static FieldAccessor newFieldAccessor(Field var0, boolean var1) {
+    static TFieldAccessor newFieldAccessor(Field var0, boolean var1) {
         Class var2 = var0.getType();
         boolean var3 = Modifier.isStatic(var0.getModifiers());
         boolean var4 = Modifier.isFinal(var0.getModifiers());
@@ -35,7 +34,7 @@ class TUnsafeFieldAccessorFactory {
         boolean var7 = var4 && (var3 || !var1);
         if(var3) {
             TUnsafeFieldAccessorImpl.T_UNSAFE.ensureClassInitialized(var0.getDeclaringClass());
-            return (FieldAccessor)(!var6?(var2 == Boolean.TYPE?new UnsafeStaticBooleanFieldAccessorImpl(var0):
+            return (TFieldAccessor)(!var6?(var2 == Boolean.TYPE?new UnsafeStaticBooleanFieldAccessorImpl(var0):
                     (var2 == Byte.TYPE?new TUnsafeStaticByteFieldAccessorImpl(var0):
                             (var2 == Short.TYPE?new TUnsafeStaticShortFieldAccessorImpl(var0):
                                     (var2 == Character.TYPE?new TUnsafeStaticCharacterFieldAccessorImpl(var0):
@@ -54,7 +53,7 @@ class TUnsafeFieldAccessorFactory {
                                                                             (var2 == Double.TYPE?new TUnsafeQualifiedStaticDoubleFieldAccessorImpl(var0, var7):
                                                                                     new TUnsafeQualifiedStaticObjectFieldAccessorImpl(var0, var7))))))))));
         } else {
-            return (FieldAccessor)(!var6?(var2 == Boolean.TYPE?new TUnsafeBooleanFieldAccessorImpl(var0):
+            return (TFieldAccessor)(!var6?(var2 == Boolean.TYPE?new TUnsafeBooleanFieldAccessorImpl(var0):
                     (var2 == Byte.TYPE?new TUnsafeByteFieldAccessorImpl(var0):
                             (var2 == Short.TYPE?new TUnsafeShortFieldAccessorImpl(var0):
                                     (var2 == Character.TYPE?new TUnsafeCharacterFieldAccessorImpl(var0):
@@ -71,7 +70,7 @@ class TUnsafeFieldAccessorFactory {
                                                             (var2 == Long.TYPE?new TUnsafeQualifiedLongFieldAccessorImpl(var0, var7):
                                                                     (var2 == Float.TYPE?new TUnsafeQualifiedFloatFieldAccessorImpl(var0, var7):
                                                                             (var2 == Double.TYPE?new TUnsafeQualifiedDoubleFieldAccessorImpl(var0, var7):
-                                                                                    new UnsafeQualifiedObjectFieldAccessorImpl(var0, var7))))))))));
+                                                                                    new TUnsafeQualifiedObjectFieldAccessorImpl(var0, var7))))))))));
         }
     }
 }

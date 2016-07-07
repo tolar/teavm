@@ -20,6 +20,8 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ReflectPermission;
 import java.security.AccessController;
+
+import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.reflect.TReflectionFactory;
 
 /**
@@ -264,7 +266,7 @@ public class TAccessibleObject implements AnnotatedElement {
             Class<?> targetClass)
             throws IllegalAccessException
     {
-        Reflection.ensureMemberAccess(caller, clazz, obj, modifiers);
+        TReflection.ensureMemberAccess(caller, clazz, obj, modifiers);
 
         // Success: Update the cache.
         Object cache = ((targetClass == clazz)

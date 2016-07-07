@@ -25,7 +25,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
+
 import org.teavm.classlib.java.lang.TClass;
+
 import sun.reflect.CallerSensitive;
 import sun.reflect.MethodAccessor;
 import sun.reflect.Reflection;
@@ -34,7 +36,7 @@ import sun.reflect.annotation.AnnotationType;
 import sun.reflect.generics.factory.CoreReflectionFactory;
 import sun.reflect.generics.factory.GenericsFactory;
 import sun.reflect.generics.repository.MethodRepository;
-import sun.reflect.generics.scope.MethodScope;
+import sun.reflect.generics.scope.TMethodScope;
 
 /**
  * Created by vasek on 6. 7. 2016.
@@ -71,7 +73,7 @@ public final class TMethod extends TExecutable {
     // Accessor for factory
     private GenericsFactory getFactory() {
         // create scope and factory
-        return CoreReflectionFactory.make(this, MethodScope.make(this));
+        return CoreReflectionFactory.make(this, TMethodScope.make(this));
     }
 
     // Accessor for generic info repository

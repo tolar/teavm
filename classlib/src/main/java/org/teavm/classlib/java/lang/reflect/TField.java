@@ -19,11 +19,16 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Objects;
 
+import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
+import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.reflect.TFieldAccessor;
+import org.teavm.classlib.sun.reflect.generics.repository.TFieldRepository;
+
 /**
  * Created by vasek on 4. 7. 2016.
  */
 public final
-class TField extends TAccessibleObject implements Member {
+class TField extends TAccessibleObject implements TMember {
 
     private Class<?>            clazz;
     private int                 slot;
@@ -35,12 +40,12 @@ class TField extends TAccessibleObject implements Member {
     // Generics and annotations support
     private transient String    signature;
     // generic info repository; lazily initialized
-    private transient FieldRepository genericInfo;
+    private transient TFieldRepository genericInfo;
     private byte[]              annotations;
     // Cached field accessor created without override
-    private FieldAccessor fieldAccessor;
+    private TFieldAccessor fieldAccessor;
     // Cached field accessor created with override
-    private FieldAccessor overrideFieldAccessor;
+    private TFieldAccessor overrideFieldAccessor;
     // For sharing of FieldAccessors. This branching structure is
     // currently only two levels deep (i.e., one root Field and
     // potentially many Field objects pointing to it.)
@@ -54,10 +59,10 @@ class TField extends TAccessibleObject implements Member {
     private String getGenericSignature() {return signature;}
 
     // Accessor for factory
-    private GenericsFactory getFactory() {
+    private TGenericsFactory getFactory() {
         Class<?> c = getDeclaringClass();
         // create scope and factory
-        return CoreReflectionFactory.make(c, ClassScope.make(c));
+        return TCoreReflectionFactory.make(c, TClassScope.make(c));
     }
 
     // Accessor for generic info repository
@@ -206,7 +211,7 @@ class TField extends TAccessibleObject implements Member {
      *     that cannot be instantiated for any reason
      * @since 1.5
      */
-    public Type getGenericType() {
+    public TType getGenericType() {
         if (getGenericSignature() != null)
             return getGenericInfo().getGenericType();
         else
@@ -290,7 +295,7 @@ class TField extends TAccessibleObject implements Member {
      */
     public String toGenericString() {
         int mod = getModifiers();
-        Type fieldType = getGenericType();
+        TType fieldType = getGenericType();
         return (((mod == 0) ? "" : (java.lang.reflect.Modifier.toString(mod) + " "))
                 + fieldType.getTypeName() + " "
                 + getDeclaringClass().getTypeName() + "."

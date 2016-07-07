@@ -9,6 +9,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-debug-all:5.0.4" level="project" />
+    <orderEntry type="library" name="Maven: com.carrotsearch:hppc:0.6.1" level="project" />
+    <orderEntry type="library" name="Maven: org.objenesis:objenesis:2.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.2" level="project" />
     <orderEntry type="module" module-name="teavm-tooling" />
     <orderEntry type="module" module-name="teavm-core" />
     <orderEntry type="module" module-name="teavm-metaprogramming-api" />

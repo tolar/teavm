@@ -38,6 +38,16 @@
       <property name="caretWidth" class="java.lang.Integer" />
     </properties>
   </component>
+  <component name="EclipseCodeFormatter">
+    <option name="defaultSettings" value="true" />
+    <option name="formatOtherFileTypesWithIntelliJ" value="false" />
+    <option name="formatter" value="ECLIPSE" />
+    <option name="id" value="1444027515602" />
+    <option name="name" value="default" />
+    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../dcs/git_repo/dcs/formatter.java.kb.dcs.xml" />
+    <option name="selectedJavaProfile" value="formatter.java.kb.dcs" />
+    <option name="useOldEclipseJavaFormatter" value="true" />
+  </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>

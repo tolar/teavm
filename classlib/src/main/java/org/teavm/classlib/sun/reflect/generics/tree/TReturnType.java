@@ -15,10 +15,9 @@
  */
 package org.teavm.classlib.sun.reflect.generics.tree;
 
-import sun.reflect.generics.tree.TypeTree;
 
 /**
  * Created by vasek on 6. 7. 2016.
  */
-public interface TReturnType extends TypeTree {
+public interface TReturnType extends TTypeTree {
 }
