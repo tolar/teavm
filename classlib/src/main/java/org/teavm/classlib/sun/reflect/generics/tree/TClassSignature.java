@@ -26,14 +26,14 @@
 /*    */ 
 /*    */ 
 /*    */ 
-/*    */ public class TClassTSignature
+/*    */ public class TClassSignature
 /*    */   implements TSignature
 /*    */ {
 /*    */   private final TFormalTypeParameter[] formalTypeParams;
 /*    */   private final TClassTypeSignature superclass;
 /*    */   private final TClassTypeSignature[] superInterfaces;
 /*    */   
-/*    */   private TClassTSignature(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TClassTypeSignature paramClassTypeSignature, TClassTypeSignature[] paramArrayOfClassTypeSignature)
+/*    */   private TClassSignature(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TClassTypeSignature paramClassTypeSignature, TClassTypeSignature[] paramArrayOfClassTypeSignature)
 /*    */   {
 /* 38 */     this.formalTypeParams = paramArrayOfTFormalTypeParameter;
 /* 39 */     this.superclass = paramClassTypeSignature;
@@ -41,9 +41,9 @@
 /*    */   }
 /*    */   
 /*    */ 
-/*    */   public static TClassTSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TClassTypeSignature paramClassTypeSignature, TClassTypeSignature[] paramArrayOfClassTypeSignature)
+/*    */   public static TClassSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TClassTypeSignature paramClassTypeSignature, TClassTypeSignature[] paramArrayOfClassTypeSignature)
 /*    */   {
-/* 46 */     return new TClassTSignature(paramArrayOfTFormalTypeParameter, paramClassTypeSignature, paramArrayOfClassTypeSignature);
+/* 46 */     return new TClassSignature(paramArrayOfTFormalTypeParameter, paramClassTypeSignature, paramArrayOfClassTypeSignature);
 /*    */   }
 /*    */   
 /*    */ 

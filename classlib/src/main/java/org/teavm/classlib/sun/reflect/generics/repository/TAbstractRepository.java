@@ -17,7 +17,7 @@ package org.teavm.classlib.sun.reflect.generics.repository;
 
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.reflect.generics.tree.TTree;
-
+import org.teavm.classlib.sun.reflect.generics.visitor.TReifier;
 
 /**
  * @author: Vaclav Tolar, (vaclav_tolar@kb.cz, vaclav.tolar@cleverlance.com, vaclav.tolar@gmail.com)
@@ -35,11 +35,11 @@ public abstract class TAbstractRepository<T extends TTree> {
         return this.tree;
     }
 
-    protected Reifier getReifier() {
-        return Reifier.make(this.getFactory());
+    protected TReifier getReifier() {
+        return TReifier.make(this.getFactory());
     }
 
-    protected TAbstractRepository(String var1, GenericsFactory var2) {
+    protected TAbstractRepository(String var1, TGenericsFactory var2) {
         this.tree = this.parse(var1);
         this.factory = var2;
     }

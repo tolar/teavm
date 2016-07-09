@@ -17,11 +17,10 @@ package org.teavm.classlib.sun.reflect.generics.repository;
 
 import java.lang.reflect.TypeVariable;
 import org.teavm.classlib.java.lang.reflect.TTypeVariable;
+import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.reflect.generics.tree.TFormalTypeParameter;
 import org.teavm.classlib.sun.reflect.generics.tree.TSignature;
-import sun.reflect.generics.factory.GenericsFactory;
-import sun.reflect.generics.tree.FormalTypeParameter;
-import sun.reflect.generics.tree.Signature;
-import sun.reflect.generics.visitor.Reifier;
+import org.teavm.classlib.sun.reflect.generics.visitor.TReifier;
 
 /**
  * Created by vasek on 7. 7. 2016.
@@ -29,18 +28,18 @@ import sun.reflect.generics.visitor.Reifier;
 public abstract class TGenericDeclRepository<S extends TSignature> extends TAbstractRepository<S> {
     private volatile TypeVariable<?>[] typeParams;
 
-    protected TGenericDeclRepository(String var1, GenericsFactory var2) {
+    protected TGenericDeclRepository(String var1, TGenericsFactory var2) {
         super(var1, var2);
     }
 
     public TTypeVariable<?>[] getTypeParameters() {
         TypeVariable[] var1 = this.typeParams;
         if(var1 == null) {
-            FormalTypeParameter[] var2 = ((Signature)this.getTree()).getFormalTypeParameters();
+            TFormalTypeParameter[] var2 = ((TSignature)this.getTree()).getFormalTypeParameters();
             var1 = new TypeVariable[var2.length];
 
             for(int var3 = 0; var3 < var2.length; ++var3) {
-                Reifier var4 = this.getReifier();
+                TReifier var4 = this.getReifier();
                 var2[var3].accept(var4);
                 var1[var3] = (TypeVariable)var4.getResult();
             }

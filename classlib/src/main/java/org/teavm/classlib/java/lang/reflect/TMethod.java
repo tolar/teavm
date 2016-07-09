@@ -29,6 +29,7 @@ import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.reflect.TMethodAccessor;
+import org.teavm.classlib.sun.reflect.annotation.TAnnotationType;
 import org.teavm.classlib.sun.reflect.generics.repository.TMethodRepository;
 import sun.reflect.generics.scope.TMethodScope;
 
@@ -529,10 +530,10 @@ public final class TMethod extends TExecutable {
     // (though not efficient) to generate more than one MethodAccessor
     // for a given Method. However, avoiding synchronization will
     // probably make the implementation more scalable.
-    private MethodAccessor acquireMethodAccessor() {
+    private TMethodAccessor acquireMethodAccessor() {
         // First check to see if one has been created yet, and take it
         // if so
-        MethodAccessor tmp = null;
+        TMethodAccessor tmp = null;
         if (root != null) tmp = root.getMethodAccessor();
         if (tmp != null) {
             methodAccessor = tmp;
@@ -547,13 +548,13 @@ public final class TMethod extends TExecutable {
 
     // Returns MethodAccessor for this Method object, not looking up
     // the chain to the root
-    MethodAccessor getMethodAccessor() {
+    TMethodAccessor getMethodAccessor() {
         return methodAccessor;
     }
 
     // Sets the MethodAccessor for this Method object and
     // (recursively) its root
-    void setMethodAccessor(MethodAccessor accessor) {
+    void setMethodAccessor(TMethodAccessor accessor) {
         methodAccessor = accessor;
         // Propagate up
         if (root != null) {
@@ -578,9 +579,9 @@ public final class TMethod extends TExecutable {
     public Object getDefaultValue() {
         if  (annotationDefault == null)
             return null;
-        TClass<?> memberType = AnnotationType.invocationHandlerReturnType(
+        TClass<?> memberType = TAnnotationType.invocationHandlerReturnType(
                 getReturnType());
-        Object result = AnnotationParser.parseMemberValue(
+        Object result = TAnnotationParser.parseMemberValue(
                 memberType, ByteBuffer.wrap(annotationDefault),
                 sun.misc.SharedSecrets.getJavaLangAccess().
                         getConstantPool(getDeclaringClass()),

@@ -34,7 +34,7 @@ class TUnsafeFieldAccessorFactory {
         boolean var7 = var4 && (var3 || !var1);
         if(var3) {
             TUnsafeFieldAccessorImpl.T_UNSAFE.ensureClassInitialized(var0.getDeclaringClass());
-            return (TFieldAccessor)(!var6?(var2 == Boolean.TYPE?new UnsafeStaticBooleanFieldAccessorImpl(var0):
+            return (TFieldAccessor)(!var6?(var2 == Boolean.TYPE?new TUnsafeStaticBooleanFieldAccessorImpl(var0):
                     (var2 == Byte.TYPE?new TUnsafeStaticByteFieldAccessorImpl(var0):
                             (var2 == Short.TYPE?new TUnsafeStaticShortFieldAccessorImpl(var0):
                                     (var2 == Character.TYPE?new TUnsafeStaticCharacterFieldAccessorImpl(var0):

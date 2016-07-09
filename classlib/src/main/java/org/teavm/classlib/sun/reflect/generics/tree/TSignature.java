@@ -1,7 +1,7 @@
 package org.teavm.classlib.sun.reflect.generics.tree;
 
 public abstract interface TSignature
-  extends Tree
+  extends TTree
 {
   public abstract TFormalTypeParameter[] getFormalTypeParameters();
 }

@@ -16,29 +16,29 @@
 package org.teavm.classlib.sun.reflect.generics.repository;
 
 import java.lang.reflect.Type;
-import sun.reflect.generics.factory.GenericsFactory;
-import sun.reflect.generics.repository.ConstructorRepository;
-import sun.reflect.generics.tree.MethodTypeSignature;
-import sun.reflect.generics.visitor.Reifier;
+import org.teavm.classlib.java.lang.reflect.TType;
+import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.reflect.generics.tree.TMethodTypeSignature;
+import org.teavm.classlib.sun.reflect.generics.visitor.TReifier;
 
 /**
  * Created by vasek on 7. 7. 2016.
  */
-public class TMethodRepository extends ConstructorRepository {
+public class TMethodRepository extends TConstructorRepository {
     private Type returnType;
 
-    private TMethodRepository(String var1, GenericsFactory var2) {
+    private TMethodRepository(String var1, TGenericsFactory var2) {
         super(var1, var2);
     }
 
-    public static TMethodRepository make(String var0, GenericsFactory var1) {
+    public static TMethodRepository make(String var0, TGenericsFactory var1) {
         return new TMethodRepository(var0, var1);
     }
 
-    public Type getReturnType() {
+    public TType getReturnType() {
         if(this.returnType == null) {
-            Reifier var1 = this.getReifier();
-            ((MethodTypeSignature)this.getTree()).getReturnType().accept(var1);
+            TReifier var1 = this.getReifier();
+            ((TMethodTypeSignature)this.getTree()).getReturnType().accept(var1);
             this.returnType = var1.getResult();
         }
 

@@ -20,7 +20,9 @@ import java.util.Map;
 import java.util.Objects;
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.misc.TCallerSensitive;
 import org.teavm.classlib.sun.reflect.TFieldAccessor;
+import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.reflect.generics.repository.TFieldRepository;
 import org.teavm.classlib.sun.reflect.generics.scope.TClassScope;
 
@@ -1016,13 +1018,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setDouble(Object obj, double d)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                Class<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -1030,11 +1032,11 @@ class TField extends TAccessibleObject implements TMember {
     }
 
     // security check is done before calling this method
-    private FieldAccessor getFieldAccessor(Object obj)
+    private TFieldAccessor getFieldAccessor(Object obj)
             throws IllegalAccessException
     {
         boolean ov = override;
-        FieldAccessor a = (ov) ? overrideFieldAccessor : fieldAccessor;
+        TFieldAccessor a = (ov) ? overrideFieldAccessor : fieldAccessor;
         return (a != null) ? a : acquireFieldAccessor(ov);
     }
 
@@ -1042,10 +1044,10 @@ class TField extends TAccessibleObject implements TMember {
     // (though not efficient) to generate more than one FieldAccessor
     // for a given Field. However, avoiding synchronization will
     // probably make the implementation more scalable.
-    private FieldAccessor acquireFieldAccessor(boolean overrideFinalCheck) {
+    private TFieldAccessor acquireFieldAccessor(boolean overrideFinalCheck) {
         // First check to see if one has been created yet, and take it
         // if so
-        FieldAccessor tmp = null;
+        TFieldAccessor tmp = null;
         if (root != null) tmp = root.getFieldAccessor(overrideFinalCheck);
         if (tmp != null) {
             if (overrideFinalCheck)
@@ -1063,13 +1065,13 @@ class TField extends TAccessibleObject implements TMember {
 
     // Returns FieldAccessor for this Field object, not looking up
     // the chain to the root
-    private FieldAccessor getFieldAccessor(boolean overrideFinalCheck) {
+    private TFieldAccessor getFieldAccessor(boolean overrideFinalCheck) {
         return (overrideFinalCheck)? overrideFieldAccessor : fieldAccessor;
     }
 
     // Sets the FieldAccessor for this Field object and
     // (recursively) its root
-    private void setFieldAccessor(FieldAccessor accessor, boolean overrideFinalCheck) {
+    private void setFieldAccessor(TFieldAccessor accessor, boolean overrideFinalCheck) {
         if (overrideFinalCheck)
             overrideFieldAccessor = accessor;
         else
@@ -1135,13 +1137,13 @@ class TField extends TAccessibleObject implements TMember {
      *
      * @since 1.8
      */
-    public AnnotatedType getAnnotatedType() {
-        return TypeAnnotationParser.buildAnnotatedType(getTypeAnnotationBytes0(),
+    public TAnnotatedType getAnnotatedType() {
+        return TTypeAnnotationParser.buildAnnotatedType(getTypeAnnotationBytes0(),
                 sun.misc.SharedSecrets.getJavaLangAccess().
                         getConstantPool(getDeclaringClass()),
                 this,
                 getDeclaringClass(),
                 getGenericType(),
-                TypeAnnotation.TypeAnnotationTarget.FIELD);
+                TTypeAnnotation.TypeAnnotationTarget.FIELD);
     }
 }

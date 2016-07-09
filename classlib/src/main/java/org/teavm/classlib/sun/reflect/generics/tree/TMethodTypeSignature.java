@@ -1,7 +1,6 @@
 /*    */ package org.teavm.classlib.sun.reflect.generics.tree;
 /*    */ 
-/*    */ import sun.reflect.generics.visitor.Visitor;
-/*    */ 
+/*    */
 /*    */ 
 /*    */ 
 /*    */ 
@@ -45,7 +44,7 @@
 /*    */   
 /*    */ 
 /*    */ 
-/*    */   public static TMethodTypeSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TypeSignature[] paramArrayOfTypeSignature, ReturnType paramReturnType, TFieldTypeSignatureT[] paramArrayOfFieldTypeSignature)
+/*    */   public static TMethodTypeSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TTypeSignature[] paramArrayOfTypeSignature, ReturnType paramReturnType, TFieldTypeSignatureT[] paramArrayOfFieldTypeSignature)
 /*    */   {
 /* 50 */     return new TMethodTypeSignature(paramArrayOfTFormalTypeParameter, paramArrayOfTypeSignature, paramReturnType, paramArrayOfFieldTypeSignature);
 /*    */   }

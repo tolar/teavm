@@ -13,22 +13,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.sun.reflect;
+package org.teavm.classlib.sun.reflect.generics.visitor;
 
-import java.lang.reflect.Field;
+import org.teavm.classlib.sun.reflect.generics.tree.TClassSignature;
+import org.teavm.classlib.sun.reflect.generics.tree.TMethodTypeSignature;
 
 /**
- * Created by vasek on 4. 7. 2016.
+ * Created by vasek on 9. 7. 2016.
  */
-abstract class TUnsafeStaticFieldAccessorImpl extends TUnsafeFieldAccessorImpl {
-    protected final Object base;
+public interface TVisitor<T> extends TTypeTreeVisitor<T> {
+    void visitClassSignature(TClassSignature var1);
 
-    TUnsafeStaticFieldAccessorImpl(Field var1) {
-        super(var1);
-        this.base = T_UNSAFE.staticFieldBase(var1);
-    }
-
-    static {
-        TReflection.registerFieldsToFilter(TUnsafeStaticFieldAccessorImpl.class, new String[]{"base"});
-    }
+    void visitMethodTypeSignature(TMethodTypeSignature var1);
 }
