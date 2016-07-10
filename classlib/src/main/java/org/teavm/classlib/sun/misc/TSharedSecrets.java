@@ -24,29 +24,15 @@ import java.security.AccessController;
 import java.security.ProtectionDomain;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
-import sun.misc.JavaAWTAccess;
-import sun.misc.JavaIOAccess;
-import sun.misc.JavaIOFileDescriptorAccess;
-import sun.misc.JavaLangAccess;
-import sun.misc.JavaLangRefAccess;
-import sun.misc.JavaNetAccess;
-import sun.misc.JavaNetHttpCookieAccess;
-import sun.misc.JavaNioAccess;
-import sun.misc.JavaObjectInputStreamAccess;
-import sun.misc.JavaSecurityAccess;
-import sun.misc.JavaSecurityProtectionDomainAccess;
-import sun.misc.JavaUtilJarAccess;
-import sun.misc.JavaUtilZipFileAccess;
-import sun.misc.Unsafe;
 
 /**
  * Created by vasek on 6. 7. 2016.
  */
 public class TSharedSecrets {
-    private static final Unsafe unsafe = Unsafe.getUnsafe();
+    private static final TUnsafe unsafe = TUnsafe.getUnsafe();
     private static JavaUtilJarAccess javaUtilJarAccess;
-    private static JavaLangAccess javaLangAccess;
-    private static JavaLangRefAccess javaLangRefAccess;
+    private static TJavaLangAccess javaLangAccess;
+    private static TJavaLangRefAccess javaLangRefAccess;
     private static JavaIOAccess javaIOAccess;
     private static JavaNetAccess javaNetAccess;
     private static JavaNetHttpCookieAccess javaNetHttpCookieAccess;
@@ -77,7 +63,7 @@ public class TSharedSecrets {
         javaLangAccess = var0;
     }
 
-    public static JavaLangAccess getJavaLangAccess() {
+    public static TJavaLangAccess getJavaLangAccess() {
         return javaLangAccess;
     }
 

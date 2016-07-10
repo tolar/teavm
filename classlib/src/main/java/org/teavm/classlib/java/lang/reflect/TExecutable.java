@@ -29,6 +29,8 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Objects;
+import org.teavm.classlib.sun.reflect.annotation.TAnnotationParser;
+import org.teavm.classlib.sun.reflect.generics.repository.TConstructorRepository;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -55,7 +57,7 @@ public abstract class TExecutable extends AccessibleObject
      */
     abstract boolean hasGenericInformation();
 
-    abstract ConstructorRepository getGenericInfo();
+    abstract TConstructorRepository getGenericInfo();
 
     boolean equalParamTypes(Class<?>[] params1, Class<?>[] params2) {
         /* Avoid unnecessary cloning */
@@ -70,9 +72,9 @@ public abstract class TExecutable extends AccessibleObject
     }
 
     Annotation[][] parseParameterAnnotations(byte[] parameterAnnotations) {
-        return AnnotationParser.parseParameterAnnotations(
+        return TAnnotationParser.parseParameterAnnotations(
                 parameterAnnotations,
-                sun.misc.SharedSecrets.getJavaLangAccess().
+                org.teavm.classlib.sun.misc.TSharedSecrets.getJavaLangAccess().
                         getConstantPool(getDeclaringClass()),
                 getDeclaringClass());
     }
