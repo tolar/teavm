@@ -19,19 +19,20 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.security.AccessControlContext;
 import java.util.Map;
-import sun.nio.ch.Interruptible;
-import sun.reflect.ConstantPool;
-import sun.reflect.annotation.AnnotationType;
+
+import org.teavm.classlib.sun.nio.ch.TInterruptible;
+import org.teavm.classlib.sun.reflect.TConstantPool;
+import org.teavm.classlib.sun.reflect.annotation.TAnnotationType;
 
 /**
  * Created by vasek on 9. 7. 2016.
  */
 public interface TJavaLangAccess {
-    ConstantPool getConstantPool(Class<?> var1);
+    TConstantPool getConstantPool(Class<?> var1);
 
-    boolean casAnnotationType(Class<?> var1, AnnotationType var2, AnnotationType var3);
+    boolean casAnnotationType(Class<?> var1, TAnnotationType var2, TAnnotationType var3);
 
-    AnnotationType getAnnotationType(Class<?> var1);
+    TAnnotationType getAnnotationType(Class<?> var1);
 
     Map<Class<? extends Annotation>, Annotation> getDeclaredAnnotationMap(Class<?> var1);
 
@@ -43,7 +44,7 @@ public interface TJavaLangAccess {
 
     <E extends Enum<E>> E[] getEnumConstantsShared(Class<E> var1);
 
-    void blockedOn(Thread var1, Interruptible var2);
+    void blockedOn(Thread var1, TInterruptible var2);
 
     void registerShutdownHook(int var1, boolean var2, Runnable var3);
 

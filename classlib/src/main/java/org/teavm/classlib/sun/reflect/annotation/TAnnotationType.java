@@ -24,10 +24,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.teavm.classlib.sun.misc.TJavaLangAccess;
 import org.teavm.classlib.sun.misc.TSharedSecrets;
-import sun.misc.JavaLangAccess;
-import sun.misc.SharedSecrets;
-import sun.reflect.annotation.AnnotationParser;
 
 /**
  * Created by vasek on 9. 7. 2016.
@@ -39,12 +38,12 @@ public class TAnnotationType {
     private final RetentionPolicy retention;
     private final boolean inherited;
 
-    public static sun.reflect.annotation.AnnotationType getInstance(Class<? extends Annotation> var0) {
-        JavaLangAccess var1 = TSharedSecrets.getJavaLangAccess();
+    public static TAnnotationType getInstance(Class<? extends Annotation> var0) {
+        TJavaLangAccess var1 = TSharedSecrets.getJavaLangAccess();
         org.teavm.classlib.sun.reflect.annotation.TAnnotationType var2 = var1.getAnnotationType(var0);
         if(var2 == null) {
             var2 = new org.teavm.classlib.sun.reflect.annotation.TAnnotationType(var0);
-            if(!var1.casAnnotationType(var0, (sun.reflect.annotation.AnnotationType)null, var2)) {
+            if(!var1.casAnnotationType(var0, (TAnnotationType)null, var2)) {
                 var2 = var1.getAnnotationType(var0);
 
                 assert var2 != null;
@@ -86,8 +85,8 @@ public class TAnnotationType {
             }
 
             if(var1 != Retention.class && var1 != Inherited.class) {
-                JavaLangAccess var10 = SharedSecrets.getJavaLangAccess();
-                Map var11 = AnnotationParser
+                TJavaLangAccess var10 = TSharedSecrets.getJavaLangAccess();
+                Map var11 = TAnnotationParser
                         .parseSelectAnnotations(var10.getRawClassAnnotations(var1), var10.getConstantPool(var1), var1, new Class[]{Retention.class, Inherited.class});
                 Retention var12 = (Retention)var11.get(Retention.class);
                 this.retention = var12 == null?RetentionPolicy.CLASS:var12.value();

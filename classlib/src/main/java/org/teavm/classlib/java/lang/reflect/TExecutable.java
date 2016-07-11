@@ -29,7 +29,11 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Objects;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.sun.reflect.annotation.TAnnotationParser;
+import org.teavm.classlib.sun.reflect.annotation.TAnnotationSupport;
 import org.teavm.classlib.sun.reflect.generics.repository.TConstructorRepository;
 
 /**
@@ -570,17 +574,17 @@ public abstract class TExecutable extends AccessibleObject
      * @throws NullPointerException {@inheritDoc}
      */
     @Override
-    public <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass) {
+    public <T extends Annotation> T[] getAnnotationsByType(TClass<T> annotationClass) {
         Objects.requireNonNull(annotationClass);
 
-        return AnnotationSupport.getDirectlyAndIndirectlyPresent(declaredAnnotations(), annotationClass);
+        return TAnnotationSupport.getDirectlyAndIndirectlyPresent(declaredAnnotations(), annotationClass);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Annotation[] getDeclaredAnnotations()  {
-        return AnnotationParser.toArray(declaredAnnotations());
+    public TAnnotation[] getDeclaredAnnotations()  {
+        return TAnnotationParser.toArray(declaredAnnotations());
     }
 
     private transient Map<Class<? extends Annotation>, Annotation> declaredAnnotations;

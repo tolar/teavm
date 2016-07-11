@@ -1,11 +1,8 @@
-/*    */ package sun.reflect.generics.scope;
+/*    */ package org.teavm.classlib.sun.reflect.generics.scope;
 /*    */ 
 /*    */
 
-import java.lang.reflect.Method;
-
-import org.teavm.classlib.sun.reflect.generics.scope.TAbstractScope;
-import org.teavm.classlib.sun.reflect.generics.scope.TScope;
+import org.teavm.classlib.java.lang.reflect.TMethod;
 
 /*    */
 /*    */ 
@@ -38,9 +35,9 @@ import org.teavm.classlib.sun.reflect.generics.scope.TScope;
 /*    */ 
 /*    */ 
 /*    */ public class TMethodScope
-/*    */   extends TAbstractScope<Method>
+/*    */   extends TAbstractScope<TMethod>
 /*    */ {
-/*    */   private TMethodScope(Method paramMethod)
+/*    */   private TMethodScope(TMethod paramMethod)
 /*    */   {
 /* 39 */     super(paramMethod);
 /*    */   }
@@ -48,7 +45,7 @@ import org.teavm.classlib.sun.reflect.generics.scope.TScope;
 /*    */ 
 /*    */   private Class<?> getEnclosingClass()
 /*    */   {
-/* 45 */     return ((Method)getRecvr()).getDeclaringClass();
+/* 45 */     return ((TMethod)getRecvr()).getDeclaringClass();
 /*    */   }
 /*    */   
 /*    */ 
@@ -58,7 +55,7 @@ import org.teavm.classlib.sun.reflect.generics.scope.TScope;
 /*    */ 
 /*    */   protected TScope computeEnclosingScope()
 /*    */   {
-/* 55 */     return sun.reflect.generics.scope.TClassScope.make(getEnclosingClass());
+/* 55 */     return TClassScope.make(getEnclosingClass());
 /*    */   }
 /*    */   
 /*    */ 
@@ -66,7 +63,7 @@ import org.teavm.classlib.sun.reflect.generics.scope.TScope;
 /*    */ 
 /*    */ 
 /*    */ 
-/*    */   public static TMethodScope make(Method paramMethod)
+/*    */   public static TMethodScope make(TMethod paramMethod)
 /*    */   {
 /* 65 */     return new TMethodScope(paramMethod);
 /*    */   }

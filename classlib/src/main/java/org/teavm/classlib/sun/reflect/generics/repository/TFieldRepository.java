@@ -16,7 +16,9 @@
 package org.teavm.classlib.sun.reflect.generics.repository;
 
 import org.teavm.classlib.java.lang.reflect.TType;
+import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.reflect.generics.tree.TTypeSignature;
+import org.teavm.classlib.sun.reflect.generics.visitor.TReifier;
 
 /**
  * Created by vasek on 6. 7. 2016.
@@ -24,22 +26,22 @@ import org.teavm.classlib.sun.reflect.generics.tree.TTypeSignature;
 public class TFieldRepository extends TAbstractRepository<TTypeSignature> {
     private TType genericType;
 
-    protected TFieldRepository(String var1, GenericsFactory var2) {
+    protected TFieldRepository(String var1, TGenericsFactory var2) {
         super(var1, var2);
     }
 
-    protected TypeSignature parse(String var1) {
-        return SignatureParser.make().parseTypeSig(var1);
+    protected TTypeSignature parse(String var1) {
+        return TSignatureParser.make().parseTypeSig(var1);
     }
 
-    public static sun.reflect.generics.repository.FieldRepository make(String var0, GenericsFactory var1) {
-        return new sun.reflect.generics.repository.FieldRepository(var0, var1);
+    public static TFieldRepository make(String var0, TGenericsFactory var1) {
+        return new TFieldRepository(var0, var1);
     }
 
-    public Type getGenericType() {
+    public TType getGenericType() {
         if(this.genericType == null) {
-            Reifier var1 = this.getReifier();
-            ((TypeSignature)this.getTree()).accept(var1);
+            TReifier var1 = this.getReifier();
+            ((TTypeSignature)this.getTree()).accept(var1);
             this.genericType = var1.getResult();
         }
 

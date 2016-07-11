@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.teavm.classlib.sun.reflect.TConstantPool;
+
 /**
  * Created by vasek on 9. 7. 2016.
  */
@@ -57,7 +59,7 @@ public class TAnnotationParser {
     }
 
     @SafeVarargs
-    static Map<Class<? extends Annotation>, Annotation> parseSelectAnnotations(byte[] var0, ConstantPool var1, Class<?> var2, Class... var3) {
+    static Map<Class<? extends Annotation>, Annotation> parseSelectAnnotations(byte[] var0, TConstantPool var1, Class<?> var2, Class... var3) {
         if(var0 == null) {
             return Collections.emptyMap();
         } else {
@@ -71,7 +73,7 @@ public class TAnnotationParser {
         }
     }
 
-    private static Map<Class<? extends Annotation>, Annotation> parseAnnotations2(byte[] var0, ConstantPool var1, Class<?> var2, Class<? extends Annotation>[] var3) {
+    private static Map<Class<? extends Annotation>, Annotation> parseAnnotations2(byte[] var0, TConstantPool var1, Class<?> var2, Class<? extends Annotation>[] var3) {
         LinkedHashMap var4 = new LinkedHashMap();
         ByteBuffer var5 = ByteBuffer.wrap(var0);
         int var6 = var5.getShort() & '\uffff';
@@ -80,7 +82,7 @@ public class TAnnotationParser {
             Annotation var8 = parseAnnotation2(var5, var1, var2, false, var3);
             if(var8 != null) {
                 Class var9 = var8.annotationType();
-                if(AnnotationType.getInstance(var9).retention() == RetentionPolicy.RUNTIME && var4.put(var9, var8) != null) {
+                if(TAnnotationType.getInstance(var9).retention() == RetentionPolicy.RUNTIME && var4.put(var9, var8) != null) {
                     throw new AnnotationFormatError("Duplicate annotation for class: " + var9 + ": " + var8);
                 }
             }
@@ -124,11 +126,11 @@ public class TAnnotationParser {
         return var5;
     }
 
-    static Annotation parseAnnotation(ByteBuffer var0, ConstantPool var1, Class<?> var2, boolean var3) {
+    static Annotation parseAnnotation(ByteBuffer var0, TConstantPool var1, Class<?> var2, boolean var3) {
         return parseAnnotation2(var0, var1, var2, var3, (Class[])null);
     }
 
-    private static Annotation parseAnnotation2(ByteBuffer var0, ConstantPool var1, Class<?> var2, boolean var3, Class<? extends Annotation>[] var4) {
+    private static Annotation parseAnnotation2(ByteBuffer var0, TConstantPool var1, Class<?> var2, boolean var3, Class<? extends Annotation>[] var4) {
         int var5 = var0.getShort() & '\uffff';
         Class var6 = null;
         String var7 = "[unknown]";
@@ -160,10 +162,10 @@ public class TAnnotationParser {
             skipAnnotation(var0, false);
             return null;
         } else {
-            AnnotationType var8 = null;
+            TAnnotationType var8 = null;
 
             try {
-                var8 = AnnotationType.getInstance(var6);
+                var8 = TAnnotationType.getInstance(var6);
             } catch (IllegalArgumentException var17) {
                 skipAnnotation(var0, false);
                 return null;
@@ -202,7 +204,7 @@ public class TAnnotationParser {
         });
     }
 
-    public static Object parseMemberValue(Class<?> var0, ByteBuffer var1, ConstantPool var2, Class<?> var3) {
+    public static Object parseMemberValue(Class<?> var0, ByteBuffer var1, TConstantPool var2, Class<?> var3) {
         Object var4 = null;
         byte var5 = var1.get();
         switch(var5) {
@@ -227,7 +229,7 @@ public class TAnnotationParser {
         return var4;
     }
 
-    private static Object parseConst(int var0, ByteBuffer var1, ConstantPool var2) {
+    private static Object parseConst(int var0, ByteBuffer var1, TConstantPool var2) {
         int var3 = var1.getShort() & '\uffff';
         switch(var0) {
             case 66:

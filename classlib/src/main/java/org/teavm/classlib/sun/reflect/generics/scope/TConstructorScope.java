@@ -2,7 +2,7 @@
 /*    */ 
 /*    */
 
-import java.lang.reflect.Constructor;
+import org.teavm.classlib.java.lang.reflect.TConstructor;
 
 /*    */
 /*    */ 
@@ -35,9 +35,9 @@ import java.lang.reflect.Constructor;
 /*    */ 
 /*    */ 
 /*    */ public class TConstructorScope
-/*    */   extends TAbstractScope<Constructor<?>>
+/*    */   extends TAbstractScope<TConstructor<?>>
 /*    */ {
-/*    */   private TConstructorScope(Constructor<?> paramConstructor)
+/*    */   private TConstructorScope(TConstructor<?> paramConstructor)
 /*    */   {
 /* 39 */     super(paramConstructor);
 /*    */   }
@@ -45,7 +45,7 @@ import java.lang.reflect.Constructor;
 /*    */ 
 /*    */   private Class<?> getEnclosingClass()
 /*    */   {
-/* 45 */     return ((Constructor)getRecvr()).getDeclaringClass();
+/* 45 */     return ((TConstructor)getRecvr()).getDeclaringClass();
 /*    */   }
 /*    */   
 /*    */ 
@@ -63,7 +63,7 @@ import java.lang.reflect.Constructor;
 /*    */ 
 /*    */ 
 /*    */ 
-/*    */   public static TConstructorScope make(Constructor<?> paramConstructor)
+/*    */   public static TConstructorScope make(TConstructor<?> paramConstructor)
 /*    */   {
 /* 65 */     return new TConstructorScope(paramConstructor);
 /*    */   }

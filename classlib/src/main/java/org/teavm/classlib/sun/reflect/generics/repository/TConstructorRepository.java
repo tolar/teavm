@@ -17,8 +17,11 @@ package org.teavm.classlib.sun.reflect.generics.repository;
 
 import org.teavm.classlib.java.lang.reflect.TType;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.reflect.generics.parser.TSignatureParser;
+import org.teavm.classlib.sun.reflect.generics.tree.TFieldTypeSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TMethodTypeSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TTypeSignature;
+import org.teavm.classlib.sun.reflect.generics.visitor.TReifier;
 
 /**
  * Created by vasek on 7. 7. 2016.
@@ -32,20 +35,20 @@ public class TConstructorRepository extends TGenericDeclRepository<TMethodTypeSi
     }
 
     protected TMethodTypeSignature parse(String var1) {
-        return SignatureParser.make().parseMethodSig(var1);
+        return TSignatureParser.make().parseMethodSig(var1);
     }
 
-    public static sun.reflect.generics.repository.ConstructorRepository make(String var0, TGenericsFactory var1) {
-        return new sun.reflect.generics.repository.ConstructorRepository(var0, var1);
+    public static TConstructorRepository make(String var0, TGenericsFactory var1) {
+        return new TConstructorRepository(var0, var1);
     }
 
     public TType[] getParameterTypes() {
         if(this.paramTypes == null) {
-            TTypeSignature[] var1 = ((MethodTypeSignature)this.getTree()).getParameterTypes();
-            Type[] var2 = new Type[var1.length];
+            TTypeSignature[] var1 = ((TMethodTypeSignature)this.getTree()).getParameterTypes();
+            TType[] var2 = new TType[var1.length];
 
             for(int var3 = 0; var3 < var1.length; ++var3) {
-                Reifier var4 = this.getReifier();
+                TReifier var4 = this.getReifier();
                 var1[var3].accept(var4);
                 var2[var3] = var4.getResult();
             }
@@ -53,16 +56,16 @@ public class TConstructorRepository extends TGenericDeclRepository<TMethodTypeSi
             this.paramTypes = var2;
         }
 
-        return (Type[])this.paramTypes.clone();
+        return (TType[])this.paramTypes.clone();
     }
 
-    public Type[] getExceptionTypes() {
+    public TType[] getExceptionTypes() {
         if(this.exceptionTypes == null) {
-            FieldTypeSignature[] var1 = ((MethodTypeSignature)this.getTree()).getExceptionTypes();
-            Type[] var2 = new Type[var1.length];
+            TFieldTypeSignature[] var1 = ((TMethodTypeSignature)this.getTree()).getExceptionTypes();
+            TType[] var2 = new TType[var1.length];
 
             for(int var3 = 0; var3 < var1.length; ++var3) {
-                Reifier var4 = this.getReifier();
+                TReifier var4 = this.getReifier();
                 var1[var3].accept(var4);
                 var2[var3] = var4.getResult();
             }
@@ -70,6 +73,6 @@ public class TConstructorRepository extends TGenericDeclRepository<TMethodTypeSi
             this.exceptionTypes = var2;
         }
 
-        return (Type[])this.exceptionTypes.clone();
+        return (TType[])this.exceptionTypes.clone();
     }
 }

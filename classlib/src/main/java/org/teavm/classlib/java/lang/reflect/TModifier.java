@@ -16,6 +16,9 @@
 package org.teavm.classlib.java.lang.reflect;
 
 import java.security.AccessController;
+
+import org.teavm.classlib.sun.reflect.TReflectionFactory;
+
 import sun.reflect.ReflectionFactory;
 
 /**
@@ -28,7 +31,7 @@ public class TModifier {
      *  packages
      */
     static {
-        sun.reflect.ReflectionFactory factory =
+        TReflectionFactory factory =
                 AccessController.doPrivileged(
                         new ReflectionFactory.GetReflectionFactoryAction());
         factory.setLangReflectAccess(new org.teavm.classlib.java.lang.reflect.TReflectAccess());

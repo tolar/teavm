@@ -25,13 +25,13 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
+
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.reflect.TMethodAccessor;
 import org.teavm.classlib.sun.reflect.annotation.TAnnotationType;
 import org.teavm.classlib.sun.reflect.generics.repository.TMethodRepository;
-import sun.reflect.generics.scope.TMethodScope;
 
 /**
  * Created by vasek on 6. 7. 2016.
@@ -586,7 +586,7 @@ public final class TMethod extends TExecutable {
                 sun.misc.SharedSecrets.getJavaLangAccess().
                         getConstantPool(getDeclaringClass()),
                 getDeclaringClass());
-        if (result instanceof sun.reflect.annotation.ExceptionProxy)
+        if (result instanceof TExceptionProxy)
             throw new AnnotationFormatError("Invalid default: " + this);
         return result;
     }

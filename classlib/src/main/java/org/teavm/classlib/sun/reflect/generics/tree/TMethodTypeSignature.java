@@ -1,5 +1,8 @@
 /*    */ package org.teavm.classlib.sun.reflect.generics.tree;
-/*    */ 
+
+import org.teavm.classlib.sun.reflect.generics.visitor.TVisitor;
+
+/*    */
 /*    */
 /*    */ 
 /*    */ 
@@ -44,7 +47,7 @@
 /*    */   
 /*    */ 
 /*    */ 
-/*    */   public static TMethodTypeSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TTypeSignature[] paramArrayOfTypeSignature, ReturnType paramReturnType, TFieldTypeSignatureT[] paramArrayOfFieldTypeSignature)
+/*    */   public static TMethodTypeSignature make(TFormalTypeParameter[] paramArrayOfTFormalTypeParameter, TTypeSignature[] paramArrayOfTypeSignature, TReturnType paramReturnType, TFieldTypeSignature[] paramArrayOfFieldTypeSignature)
 /*    */   {
 /* 50 */     return new TMethodTypeSignature(paramArrayOfTFormalTypeParameter, paramArrayOfTypeSignature, paramReturnType, paramArrayOfFieldTypeSignature);
 /*    */   }
@@ -56,7 +59,7 @@
 /* 57 */   public TReturnType getReturnType() { return this.returnType; }
 /* 58 */   public TFieldTypeSignature[] getExceptionTypes() { return this.exceptionTypes; }
 /*    */   
-/* 60 */   public void accept(Visitor<?> paramVisitor) { paramVisitor.visitMethodTypeSignature(this); }
+/* 60 */   public void accept(TVisitor<?> paramVisitor) { paramVisitor.visitMethodTypeSignature(this); }
 /*    */ }
 
 

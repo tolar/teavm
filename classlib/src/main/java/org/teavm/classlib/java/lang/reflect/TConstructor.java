@@ -18,19 +18,24 @@ package org.teavm.classlib.java.lang.reflect;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Executable;
 import java.lang.reflect.GenericSignatureFormatError;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+
+import org.teavm.classlib.java.lang.annotation.TAnnotation;
+import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
+import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.reflect.TConstructorAccessor;
 import org.teavm.classlib.sun.reflect.generics.repository.TConstructorRepository;
+import org.teavm.classlib.sun.reflect.generics.scope.TConstructorScope;
 
 /**
  * Created by vasek on 30. 6. 2016.
  */
-public final class TConstructor<T> extends Executable {
+public final class TConstructor<T> extends TExecutable implements TGenericDeclaration {
     private Class<T>            clazz;
     private int                 slot;
     private Class<?>[]          parameterTypes;
@@ -45,25 +50,25 @@ public final class TConstructor<T> extends Executable {
 
     // Generics infrastructure
     // Accessor for factory
-    private GenericsFactory getFactory() {
+    private TGenericsFactory getFactory() {
         // create scope and factory
-        return CoreReflectionFactory.make(this, TConstructorScope.make(this));
+        return TCoreReflectionFactory.make(this, TConstructorScope.make(this));
     }
 
     // Accessor for generic info repository
     @Override
-    ConstructorRepository getGenericInfo() {
+    TConstructorRepository getGenericInfo() {
         // lazily initialize repository if necessary
         if (genericInfo == null) {
             // create and cache generic info repository
             genericInfo =
-                    ConstructorRepository.make(getSignature(),
+                    TConstructorRepository.make(getSignature(),
                             getFactory());
         }
         return genericInfo; //return cached repository
     }
 
-    private volatile ConstructorAccessor constructorAccessor;
+    private volatile TConstructorAccessor constructorAccessor;
     // For sharing of ConstructorAccessors. This branching structure
     // is currently only two levels deep (i.e., one root Constructor
     // and potentially many Constructor objects pointing to it.)
@@ -76,7 +81,7 @@ public final class TConstructor<T> extends Executable {
      * Used by Excecutable for annotation sharing.
      */
     @Override
-    Executable getRoot() {
+    TExecutable getRoot() {
         return root;
     }
 
@@ -108,7 +113,7 @@ public final class TConstructor<T> extends Executable {
      * ReflectAccess) which returns a copy of this Constructor. The copy's
      * "root" field points to this Constructor.
      */
-    java.lang.reflect.Constructor<T> copy() {
+    TConstructor<T> copy() {
         // This routine enables sharing of ConstructorAccessor objects
         // among Constructor objects which refer to the same underlying
         // method in the TVM. (All of this contortion is only necessary
@@ -119,7 +124,7 @@ public final class TConstructor<T> extends Executable {
         if (this.root != null)
             throw new IllegalArgumentException("Can not copy a non-root Constructor");
 
-        java.lang.reflect.Constructor<T> res = new java.lang.reflect.Constructor<>(clazz,
+        TConstructor<T> res = new TConstructor<>(clazz,
                 parameterTypes,
                 exceptionTypes, modifiers, slot,
                 signature,
@@ -421,10 +426,10 @@ public final class TConstructor<T> extends Executable {
     // ConstructorAccessor for a given Constructor. However, avoiding
     // synchronization will probably make the implementation more
     // scalable.
-    private ConstructorAccessor acquireConstructorAccessor() {
+    private TConstructorAccessor acquireConstructorAccessor() {
         // First check to see if one has been created yet, and take it
         // if so.
-        ConstructorAccessor tmp = null;
+        TConstructorAccessor tmp = null;
         if (root != null) tmp = root.getConstructorAccessor();
         if (tmp != null) {
             constructorAccessor = tmp;
@@ -439,13 +444,13 @@ public final class TConstructor<T> extends Executable {
 
     // Returns ConstructorAccessor for this Constructor object, not
     // looking up the chain to the root
-    ConstructorAccessor getConstructorAccessor() {
+    TConstructorAccessor getConstructorAccessor() {
         return constructorAccessor;
     }
 
     // Sets the ConstructorAccessor for this Constructor object and
     // (recursively) its root
-    void setConstructorAccessor(ConstructorAccessor accessor) {
+    void setConstructorAccessor(TConstructorAccessor accessor) {
         constructorAccessor = accessor;
         // Propagate up
         if (root != null) {
@@ -483,7 +488,7 @@ public final class TConstructor<T> extends Executable {
      * {@inheritDoc}
      * @since 1.5
      */
-    public Annotation[] getDeclaredAnnotations()  {
+    public TAnnotation[] getDeclaredAnnotations()  {
         return super.getDeclaredAnnotations();
     }
 
@@ -540,6 +545,6 @@ public final class TConstructor<T> extends Executable {
                 this,
                 getDeclaringClass(),
                 getDeclaringClass().getEnclosingClass(),
-                TypeAnnotation.TypeAnnotationTarget.METHOD_RECEIVER);
+                TTypeAnnotation.TypeAnnotationTarget.METHOD_RECEIVER);
     }
 }
