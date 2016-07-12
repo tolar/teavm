@@ -16,31 +16,26 @@
 package org.teavm.classlib.java.lang.reflect;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.GenericSignatureFormatError;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.MalformedParametersException;
-import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Objects;
 
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
-import org.teavm.classlib.sun.reflect.annotation.TAnnotationParser;
-import org.teavm.classlib.sun.reflect.annotation.TAnnotationSupport;
 import org.teavm.classlib.sun.reflect.generics.repository.TConstructorRepository;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
-public abstract class TExecutable extends AccessibleObject
-        implements Member, GenericDeclaration {
+public abstract class TExecutable extends TAccessibleObject
+        implements TMember, TGenericDeclaration {
     /*
      * Only grant package-visibility to the constructor.
      */
@@ -63,7 +58,7 @@ public abstract class TExecutable extends AccessibleObject
 
     abstract TConstructorRepository getGenericInfo();
 
-    boolean equalParamTypes(Class<?>[] params1, Class<?>[] params2) {
+    boolean equalParamTypes(TClass<?>[] params1, TClass<?>[] params2) {
         /* Avoid unnecessary cloning */
         if (params1.length == params2.length) {
             for (int i = 0; i < params1.length; i++) {
@@ -75,15 +70,11 @@ public abstract class TExecutable extends AccessibleObject
         return false;
     }
 
-    Annotation[][] parseParameterAnnotations(byte[] parameterAnnotations) {
-        return TAnnotationParser.parseParameterAnnotations(
-                parameterAnnotations,
-                org.teavm.classlib.sun.misc.TSharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                getDeclaringClass());
+    TAnnotation[][] parseParameterAnnotations(byte[] parameterAnnotations) {
+        return null;
     }
 
-    void separateWithCommas(Class<?>[] types, StringBuilder sb) {
+    void separateWithCommas(TClass<?>[] types, StringBuilder sb) {
         for (int j = 0; j < types.length; j++) {
             sb.append(types[j].getTypeName());
             if (j < (types.length - 1))
@@ -111,8 +102,8 @@ public abstract class TExecutable extends AccessibleObject
 
     String sharedToString(int modifierMask,
             boolean isDefault,
-            Class<?>[] parameterTypes,
-            Class<?>[] exceptionTypes) {
+            TClass<?>[] parameterTypes,
+            TClass<?>[] exceptionTypes) {
         try {
             StringBuilder sb = new StringBuilder();
 
@@ -139,54 +130,7 @@ public abstract class TExecutable extends AccessibleObject
     abstract void specificToStringHeader(StringBuilder sb);
 
     String sharedToGenericString(int modifierMask, boolean isDefault) {
-        try {
-            StringBuilder sb = new StringBuilder();
-
-            printModifiersIfNonzero(sb, modifierMask, isDefault);
-
-            TypeVariable<?>[] typeparms = getTypeParameters();
-            if (typeparms.length > 0) {
-                boolean first = true;
-                sb.append('<');
-                for(TypeVariable<?> typeparm: typeparms) {
-                    if (!first)
-                        sb.append(',');
-                    // Class objects can't occur here; no need to test
-                    // and call Class.getName().
-                    sb.append(typeparm.toString());
-                    first = false;
-                }
-                sb.append("> ");
-            }
-
-            specificToGenericStringHeader(sb);
-
-            sb.append('(');
-            Type[] params = getGenericParameterTypes();
-            for (int j = 0; j < params.length; j++) {
-                String param = params[j].getTypeName();
-                if (isVarArgs() && (j == params.length - 1)) // replace T[] with T...
-                    param = param.replaceFirst("\\[\\]$", "...");
-                sb.append(param);
-                if (j < (params.length - 1))
-                    sb.append(',');
-            }
-            sb.append(')');
-            Type[] exceptions = getGenericExceptionTypes();
-            if (exceptions.length > 0) {
-                sb.append(" throws ");
-                for (int k = 0; k < exceptions.length; k++) {
-                    sb.append((exceptions[k] instanceof Class)?
-                            ((Class)exceptions[k]).getName():
-                            exceptions[k].toString());
-                    if (k < (exceptions.length - 1))
-                        sb.append(',');
-                }
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            return "<" + e + ">";
-        }
+        return null;
     }
 
     /**
@@ -199,12 +143,12 @@ public abstract class TExecutable extends AccessibleObject
      * Returns the {@code Class} object representing the class or interface
      * that declares the executable represented by this object.
      */
-    public abstract Class<?> getDeclaringClass();
+    public abstract TClass<?> getDeclaringClass();
 
     /**
      * Returns the name of the executable represented by this object.
      */
-    public abstract String getName();
+    public abstract TString getName();
 
     /**
      * Returns the Java language {@linkplain Modifier modifiers} for
@@ -226,7 +170,7 @@ public abstract class TExecutable extends AccessibleObject
      *     the format specified in
      *     <cite>The Java&trade; Virtual Machine Specification</cite>
      */
-    public abstract TypeVariable<?>[] getTypeParameters();
+    public abstract TTypeVariable<?>[] getTypeParameters();
 
     /**
      * Returns an array of {@code Class} objects that represent the formal
@@ -237,7 +181,7 @@ public abstract class TExecutable extends AccessibleObject
      * @return the parameter types for the executable this object
      * represents
      */
-    public abstract Class<?>[] getParameterTypes();
+    public abstract TClass<?>[] getParameterTypes();
 
     /**
      * Returns the number of formal parameters (whether explicitly
@@ -277,7 +221,7 @@ public abstract class TExecutable extends AccessibleObject
      *     the underlying executable's parameter types refer to a parameterized
      *     type that cannot be instantiated for any reason
      */
-    public Type[] getGenericParameterTypes() {
+    public TType[] getGenericParameterTypes() {
         if (hasGenericInformation())
             return getGenericInfo().getParameterTypes();
         else
@@ -288,7 +232,7 @@ public abstract class TExecutable extends AccessibleObject
      * Behaves like {@code getGenericParameterTypes}, but returns type
      * information for all parameters, including synthetic parameters.
      */
-    Type[] getAllGenericParameterTypes() {
+    TType[] getAllGenericParameterTypes() {
         final boolean genericInfo = hasGenericInformation();
 
         // Easy case: we don't have generic parameter information.  In
@@ -298,9 +242,9 @@ public abstract class TExecutable extends AccessibleObject
             return getParameterTypes();
         } else {
             final boolean realParamData = hasRealParameterData();
-            final Type[] genericParamTypes = getGenericParameterTypes();
-            final Type[] nonGenericParamTypes = getParameterTypes();
-            final Type[] out = new Type[nonGenericParamTypes.length];
+            final TType[] genericParamTypes = getGenericParameterTypes();
+            final TType[] nonGenericParamTypes = getParameterTypes();
+            final TType[] out = new TType[nonGenericParamTypes.length];
             final Parameter[] params = getParameters();
             int fromidx = 0;
             // If we have real parameter data, then we use the
@@ -357,39 +301,10 @@ public abstract class TExecutable extends AccessibleObject
     }
 
     private Parameter[] synthesizeAllParams() {
-        final int realparams = getParameterCount();
-        final Parameter[] out = new Parameter[realparams];
-        for (int i = 0; i < realparams; i++)
-            // TODO: is there a way to synthetically derive the
-            // modifiers?  Probably not in the general case, since
-            // we'd have no way of knowing about them, but there
-            // may be specific cases.
-            out[i] = new Parameter("arg" + i, 0, this, i);
-        return out;
+        return null;
     }
 
     private void verifyParameters(final Parameter[] parameters) {
-        final int mask = Modifier.FINAL | Modifier.SYNTHETIC | Modifier.MANDATED;
-
-        if (getParameterTypes().length != parameters.length)
-            throw new MalformedParametersException("Wrong number of parameters in MethodParameters attribute");
-
-        for (Parameter parameter : parameters) {
-            final String name = parameter.getRealName();
-            final int mods = parameter.getModifiers();
-
-            if (name != null) {
-                if (name.isEmpty() || name.indexOf('.') != -1 ||
-                        name.indexOf(';') != -1 || name.indexOf('[') != -1 ||
-                        name.indexOf('/') != -1) {
-                    throw new MalformedParametersException("Invalid parameter name \"" + name + "\"");
-                }
-            }
-
-            if (mods != (mods & mask)) {
-                throw new MalformedParametersException("Invalid parameter modifiers");
-            }
-        }
     }
 
     private Parameter[] privateGetParameters() {
@@ -451,7 +366,7 @@ public abstract class TExecutable extends AccessibleObject
      * @return the exception types declared as being thrown by the
      * executable this object represents
      */
-    public abstract Class<?>[] getExceptionTypes();
+    public abstract TClass<?>[] getExceptionTypes();
 
     /**
      * Returns an array of {@code Type} objects that represent the
@@ -474,8 +389,8 @@ public abstract class TExecutable extends AccessibleObject
      *     the underlying executable's {@code throws} clause refers to a
      *     parameterized type that cannot be instantiated for any reason
      */
-    public Type[] getGenericExceptionTypes() {
-        Type[] result;
+    public TType[] getGenericExceptionTypes() {
+        TType[] result;
         if (hasGenericInformation() &&
                 ((result = getGenericInfo().getExceptionTypes()).length > 0))
             return result;
@@ -499,7 +414,7 @@ public abstract class TExecutable extends AccessibleObject
      * to take a variable number of arguments.
      */
     public boolean isVarArgs()  {
-        return (getModifiers() & Modifier.VARARGS) != 0;
+        return (getModifiers() & TModifier.VARARGS) != 0;
     }
 
     /**
@@ -512,7 +427,7 @@ public abstract class TExecutable extends AccessibleObject
      * @jls 13.1 The Form of a Binary
      */
     public boolean isSynthetic() {
-        return Modifier.isSynthetic(getModifiers());
+        return TModifier.isSynthetic(getModifiers());
     }
 
     /**
@@ -545,13 +460,13 @@ public abstract class TExecutable extends AccessibleObject
      */
     public abstract Annotation[][] getParameterAnnotations();
 
-    Annotation[][] sharedGetParameterAnnotations(Class<?>[] parameterTypes,
+    TAnnotation[][] sharedGetParameterAnnotations(TClass<?>[] parameterTypes,
             byte[] parameterAnnotations) {
         int numParameters = parameterTypes.length;
         if (parameterAnnotations == null)
-            return new Annotation[numParameters][0];
+            return new TAnnotation[numParameters][0];
 
-        Annotation[][] result = parseParameterAnnotations(parameterAnnotations);
+        TAnnotation[][] result = parseParameterAnnotations(parameterAnnotations);
 
         if (result.length != numParameters)
             handleParameterNumberMismatch(result.length, numParameters);
@@ -569,39 +484,17 @@ public abstract class TExecutable extends AccessibleObject
         return annotationClass.cast(declaredAnnotations().get(annotationClass));
     }
 
-    /**
-     * {@inheritDoc}
-     * @throws NullPointerException {@inheritDoc}
-     */
-    @Override
-    public <T extends Annotation> T[] getAnnotationsByType(TClass<T> annotationClass) {
-        Objects.requireNonNull(annotationClass);
-
-        return TAnnotationSupport.getDirectlyAndIndirectlyPresent(declaredAnnotations(), annotationClass);
-    }
 
     /**
      * {@inheritDoc}
      */
     public TAnnotation[] getDeclaredAnnotations()  {
-        return TAnnotationParser.toArray(declaredAnnotations());
+        return null;
     }
 
-    private transient Map<Class<? extends Annotation>, Annotation> declaredAnnotations;
+    private transient Map<Class<? extends TAnnotation>, TAnnotation> declaredAnnotations;
 
-    private synchronized  Map<Class<? extends Annotation>, Annotation> declaredAnnotations() {
-        if (declaredAnnotations == null) {
-            java.lang.reflect.Executable root = getRoot();
-            if (root != null) {
-                declaredAnnotations = root.declaredAnnotations();
-            } else {
-                declaredAnnotations = AnnotationParser.parseAnnotations(
-                        getAnnotationBytes(),
-                        sun.misc.SharedSecrets.getJavaLangAccess().
-                                getConstantPool(getDeclaringClass()),
-                        getDeclaringClass());
-            }
-        }
+    private synchronized  Map<Class<? extends TAnnotation>, TAnnotation> declaredAnnotations() {
         return declaredAnnotations;
     }
 
@@ -629,13 +522,7 @@ public abstract class TExecutable extends AccessibleObject
      * Executable.
      */
     AnnotatedType getAnnotatedReturnType0(Type returnType) {
-        return TypeAnnotationParser.buildAnnotatedType(getTypeAnnotationBytes0(),
-                sun.misc.SharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                this,
-                getDeclaringClass(),
-                returnType,
-                TypeAnnotation.TypeAnnotationTarget.METHOD_RETURN);
+        return null;
     }
 
     /**
@@ -660,13 +547,7 @@ public abstract class TExecutable extends AccessibleObject
     public AnnotatedType getAnnotatedReceiverType() {
         if (Modifier.isStatic(this.getModifiers()))
             return null;
-        return TypeAnnotationParser.buildAnnotatedType(getTypeAnnotationBytes0(),
-                sun.misc.SharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                this,
-                getDeclaringClass(),
-                getDeclaringClass(),
-                TypeAnnotation.TypeAnnotationTarget.METHOD_RECEIVER);
+        return null;
     }
 
     /**
@@ -684,13 +565,7 @@ public abstract class TExecutable extends AccessibleObject
      * {@code Executable}
      */
     public AnnotatedType[] getAnnotatedParameterTypes() {
-        return TypeAnnotationParser.buildAnnotatedTypes(getTypeAnnotationBytes0(),
-                sun.misc.SharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                this,
-                getDeclaringClass(),
-                getAllGenericParameterTypes(),
-                TypeAnnotation.TypeAnnotationTarget.METHOD_FORMAL_PARAMETER);
+        return null;
     }
 
     /**
@@ -708,13 +583,7 @@ public abstract class TExecutable extends AccessibleObject
      * Executable}
      */
     public AnnotatedType[] getAnnotatedExceptionTypes() {
-        return TypeAnnotationParser.buildAnnotatedTypes(getTypeAnnotationBytes0(),
-                sun.misc.SharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                this,
-                getDeclaringClass(),
-                getGenericExceptionTypes(),
-                TypeAnnotation.TypeAnnotationTarget.THROWS);
+        return null;
     }
 
 }

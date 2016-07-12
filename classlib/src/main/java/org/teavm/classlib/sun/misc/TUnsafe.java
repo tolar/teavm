@@ -15,9 +15,12 @@
  */
 package org.teavm.classlib.sun.misc;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.reflect.TField;
+import org.teavm.classlib.sun.reflect.TReflection;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -50,14 +53,9 @@ public final class TUnsafe {
     private TUnsafe() {
     }
 
-    @CallerSensitive
+    @TCallerSensitive
     public static TUnsafe getUnsafe() {
-        Class var0 = Reflection.getCallerClass();
-        if(!TVM.isSystemDomainLoader(var0.getClassLoader())) {
-            throw new SecurityException("TUnsafe");
-        } else {
-            return THE_T_UNSAFE;
-        }
+        return THE_T_UNSAFE;
     }
 
     public native int getInt(Object var1, long var2);
@@ -256,33 +254,26 @@ public final class TUnsafe {
 
     /** @deprecated */
     @Deprecated
-    public int fieldOffset(Field var1) {
+    public int fieldOffset(TField var1) {
         return Modifier.isStatic(var1.getModifiers())?(int)this.staticFieldOffset(var1):(int)this.objectFieldOffset(var1);
     }
 
     /** @deprecated */
     @Deprecated
-    public Object staticFieldBase(Class<?> var1) {
-        Field[] var2 = var1.getDeclaredFields();
-
-        for(int var3 = 0; var3 < var2.length; ++var3) {
-            if(Modifier.isStatic(var2[var3].getModifiers())) {
-                return this.staticFieldBase(var2[var3]);
-            }
-        }
+    public Object staticFieldBase(TClass<?> var1) {
 
         return null;
     }
 
-    public native long staticFieldOffset(Field var1);
+    public native long staticFieldOffset(TField var1);
 
-    public native long objectFieldOffset(Field var1);
+    public native long objectFieldOffset(TField var1);
 
-    public native Object staticFieldBase(Field var1);
+    public native Object staticFieldBase(TField var1);
 
     public native boolean shouldBeInitialized(Class<?> var1);
 
-    public native void ensureClassInitialized(Class<?> var1);
+    public native void ensureClassInitialized(TClass<?> var1);
 
     public native int arrayBaseOffset(Class<?> var1);
 
@@ -423,7 +414,7 @@ public final class TUnsafe {
 
     static {
         registerNatives();
-        Reflection.registerMethodsToFilter(sun.misc.Unsafe.class, new String[]{"getUnsafe"});
+        TReflection.registerMethodsToFilter(TUnsafe.class, new String[]{"getUnsafe"});
         THE_T_UNSAFE = new TUnsafe();
         ARRAY_BOOLEAN_BASE_OFFSET = THE_T_UNSAFE.arrayBaseOffset(boolean[].class);
         ARRAY_BYTE_BASE_OFFSET = THE_T_UNSAFE.arrayBaseOffset(byte[].class);

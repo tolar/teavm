@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.misc;
 
-import sun.io.Win32ErrorMode;
 
 /**
  * Created by vasek on 5. 7. 2016.
@@ -25,6 +24,5 @@ public class TOSEnvironment {
     }
 
     public static void initialize() {
-        Win32ErrorMode.initialize();
     }
 }

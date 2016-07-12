@@ -15,13 +15,13 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.Field;
+import org.teavm.classlib.java.lang.reflect.TField;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
 class TUnsafeQualifiedStaticLongFieldAccessorImpl extends TUnsafeQualifiedStaticFieldAccessorImpl {
-    TUnsafeQualifiedStaticLongFieldAccessorImpl(Field var1, boolean var2) {
+    TUnsafeQualifiedStaticLongFieldAccessorImpl(TField var1, boolean var2) {
         super(var1, var2);
     }
 

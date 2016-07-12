@@ -80,18 +80,7 @@ public final class TSecurityConstants {
         }
 
         private static TPermissionFactory<?> permissionFactory() {
-            Class var0;
-            try {
-                var0 = Class.forName("sun.awt.AWTPermissionFactory", false, sun.security.util.SecurityConstants.AWT.class.getClassLoader());
-            } catch (ClassNotFoundException var3) {
-                return null;
-            }
-
-            try {
-                return (TPermissionFactory)var0.newInstance();
-            } catch (ReflectiveOperationException var2) {
-                throw new InternalError(var2);
-            }
+            return null;
         }
 
         private static Permission newAWTPermission(String var0) {

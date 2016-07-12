@@ -15,33 +15,28 @@
  */
 package org.teavm.classlib.java.lang.reflect;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.GenericSignatureFormatError;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.MalformedParameterizedTypeException;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.nio.ByteBuffer;
 
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TException;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.misc.TCallerSensitive;
 import org.teavm.classlib.sun.reflect.TMethodAccessor;
-import org.teavm.classlib.sun.reflect.annotation.TAnnotationType;
 import org.teavm.classlib.sun.reflect.generics.repository.TMethodRepository;
+import org.teavm.classlib.sun.reflect.generics.scope.TMethodScope;
 
 /**
  * Created by vasek on 6. 7. 2016.
  */
-public final class TMethod extends TExecutable {
+public final class TMethod extends TExecutable implements TGenericDeclaration {
     private TClass<?> clazz;
     private int                 slot;
     // This is guaranteed to be interned by the VM in the 1.4
     // reflection implementation
-    private String              name;
+    private TString              name;
     private TClass<?>            returnType;
     private TClass<?>[]          parameterTypes;
     private TClass<?>[]          exceptionTypes;
@@ -89,7 +84,7 @@ public final class TMethod extends TExecutable {
      * package via sun.reflect.LangReflectAccess.
      */
     TMethod(TClass<?> declaringClass,
-            String name,
+            TString name,
             TClass<?>[] parameterTypes,
             TClass<?> returnType,
             TClass<?>[] checkedExceptions,
@@ -168,7 +163,7 @@ public final class TMethod extends TExecutable {
      * object, as a {@code String}.
      */
     @Override
-    public String getName() {
+    public TString getName() {
         return name;
     }
 
@@ -180,18 +175,13 @@ public final class TMethod extends TExecutable {
         return modifiers;
     }
 
-    /**
-     * {@inheritDoc}
-     * @throws GenericSignatureFormatError {@inheritDoc}
-     * @since 1.5
-     */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public TypeVariable<java.lang.reflect.Method>[] getTypeParameters() {
+    public TTypeVariable<TMethod>[] getTypeParameters() {
         if (getGenericSignature() != null)
-            return (TypeVariable<java.lang.reflect.Method>[])getGenericInfo().getTypeParameters();
+            return (TTypeVariable<TMethod>[])getGenericInfo().getTypeParameters();
         else
-            return (TypeVariable<java.lang.reflect.Method>[])new TypeVariable[0];
+            return (TTypeVariable<TMethod>[])new TTypeVariable[0];
     }
 
     /**
@@ -204,30 +194,6 @@ public final class TMethod extends TExecutable {
         return returnType;
     }
 
-    /**
-     * Returns a {@code Type} object that represents the formal return
-     * type of the method represented by this {@code Method} object.
-     *
-     * <p>If the return type is a parameterized type,
-     * the {@code Type} object returned must accurately reflect
-     * the actual type parameters used in the source code.
-     *
-     * <p>If the return type is a type variable or a parameterized type, it
-     * is created. Otherwise, it is resolved.
-     *
-     * @return  a {@code Type} object that represents the formal return
-     *     type of the underlying  method
-     * @throws GenericSignatureFormatError
-     *     if the generic method signature does not conform to the format
-     *     specified in
-     *     <cite>The Java&trade; Virtual Machine Specification</cite>
-     * @throws TypeNotPresentException if the underlying method's
-     *     return type refers to a non-existent type declaration
-     * @throws MalformedParameterizedTypeException if the
-     *     underlying method's return typed refers to a parameterized
-     *     type that cannot be instantiated for any reason
-     * @since 1.5
-     */
     public TType getGenericReturnType() {
         if (getGenericSignature() != null) {
             return getGenericInfo().getReturnType();
@@ -249,15 +215,8 @@ public final class TMethod extends TExecutable {
     public int getParameterCount() { return parameterTypes.length; }
 
 
-    /**
-     * {@inheritDoc}
-     * @throws GenericSignatureFormatError {@inheritDoc}
-     * @throws TypeNotPresentException {@inheritDoc}
-     * @throws MalformedParameterizedTypeException {@inheritDoc}
-     * @since 1.5
-     */
     @Override
-    public Type[] getGenericParameterTypes() {
+    public TType[] getGenericParameterTypes() {
         return super.getGenericParameterTypes();
     }
 
@@ -269,15 +228,8 @@ public final class TMethod extends TExecutable {
         return exceptionTypes.clone();
     }
 
-    /**
-     * {@inheritDoc}
-     * @throws GenericSignatureFormatError {@inheritDoc}
-     * @throws TypeNotPresentException {@inheritDoc}
-     * @throws MalformedParameterizedTypeException {@inheritDoc}
-     * @since 1.5
-     */
     @Override
-    public Type[] getGenericExceptionTypes() {
+    public TType[] getGenericExceptionTypes() {
         return super.getGenericExceptionTypes();
     }
 
@@ -288,8 +240,8 @@ public final class TMethod extends TExecutable {
      * and formal parameter types and return type.
      */
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof java.lang.reflect.Method) {
-            java.lang.reflect.Method other = (java.lang.reflect.Method)obj;
+        if (obj != null && obj instanceof TMethod) {
+            TMethod other = (TMethod)obj;
             if ((getDeclaringClass() == other.getDeclaringClass())
                     && (getName() == other.getName())) {
                 if (!returnType.equals(other.getReturnType()))
@@ -336,10 +288,7 @@ public final class TMethod extends TExecutable {
      * @jls 8.4.3 Method Modifiers
      */
     public String toString() {
-        return sharedToString(Modifier.methodModifiers(),
-                isDefault(),
-                parameterTypes,
-                exceptionTypes);
+        return null;
     }
 
     @Override
@@ -390,86 +339,23 @@ public final class TMethod extends TExecutable {
      */
     @Override
     public String toGenericString() {
-        return sharedToGenericString(Modifier.methodModifiers(), isDefault());
+        return sharedToGenericString(TModifier.methodModifiers(), isDefault());
     }
 
     @Override
     void specificToGenericStringHeader(StringBuilder sb) {
-        Type genRetType = getGenericReturnType();
+        TType genRetType = getGenericReturnType();
         sb.append(genRetType.getTypeName()).append(' ');
         sb.append(getDeclaringClass().getTypeName()).append('.');
         sb.append(getName());
     }
 
-    /**
-     * Invokes the underlying method represented by this {@code Method}
-     * object, on the specified object with the specified parameters.
-     * Individual parameters are automatically unwrapped to match
-     * primitive formal parameters, and both primitive and reference
-     * parameters are subject to method invocation conversions as
-     * necessary.
-     *
-     * <p>If the underlying method is static, then the specified {@code obj}
-     * argument is ignored. It may be null.
-     *
-     * <p>If the number of formal parameters required by the underlying method is
-     * 0, the supplied {@code args} array may be of length 0 or null.
-     *
-     * <p>If the underlying method is an instance method, it is invoked
-     * using dynamic method lookup as documented in The Java Language
-     * Specification, Second Edition, section 15.12.4.4; in particular,
-     * overriding based on the runtime type of the target object will occur.
-     *
-     * <p>If the underlying method is static, the class that declared
-     * the method is initialized if it has not already been initialized.
-     *
-     * <p>If the method completes normally, the value it returns is
-     * returned to the caller of invoke; if the value has a primitive
-     * type, it is first appropriately wrapped in an object. However,
-     * if the value has the type of an array of a primitive type, the
-     * elements of the array are <i>not</i> wrapped in objects; in
-     * other words, an array of primitive type is returned.  If the
-     * underlying method return type is void, the invocation returns
-     * null.
-     *
-     * @param obj  the object the underlying method is invoked from
-     * @param args the arguments used for the method call
-     * @return the result of dispatching the method represented by
-     * this object on {@code obj} with parameters
-     * {@code args}
-     *
-     * @exception IllegalAccessException    if this {@code Method} object
-     *              is enforcing Java language access control and the underlying
-     *              method is inaccessible.
-     * @exception IllegalArgumentException  if the method is an
-     *              instance method and the specified object argument
-     *              is not an instance of the class or interface
-     *              declaring the underlying method (or of a subclass
-     *              or implementor thereof); if the number of actual
-     *              and formal parameters differ; if an unwrapping
-     *              conversion for primitive arguments fails; or if,
-     *              after possible unwrapping, a parameter value
-     *              cannot be converted to the corresponding formal
-     *              parameter type by a method invocation conversion.
-     * @exception InvocationTargetException if the underlying method
-     *              throws an exception.
-     * @exception NullPointerException      if the specified object is null
-     *              and the method is an instance method.
-     * @exception ExceptionInInitializerError if the initialization
-     * provoked by this method fails.
-     */
-    @CallerSensitive
+    @TCallerSensitive
     public Object invoke(Object obj, Object... args)
-            throws IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException
+            throws TException
+
     {
-        if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                TClass<?> caller = Reflection.getCallerClass();
-                checkAccess(caller, clazz, obj, modifiers);
-            }
-        }
-        MethodAccessor ma = methodAccessor;             // read volatile
+        TMethodAccessor ma = methodAccessor;             // read volatile
         if (ma == null) {
             ma = acquireMethodAccessor();
         }
@@ -485,7 +371,7 @@ public final class TMethod extends TExecutable {
      * @since 1.5
      */
     public boolean isBridge() {
-        return (getModifiers() & Modifier.BRIDGE) != 0;
+        return (getModifiers() & TModifier.BRIDGE) != 0;
     }
 
     /**
@@ -522,8 +408,8 @@ public final class TMethod extends TExecutable {
     public boolean isDefault() {
         // Default methods are public non-abstract instance methods
         // declared in an interface.
-        return ((getModifiers() & (Modifier.ABSTRACT | Modifier.PUBLIC | Modifier.STATIC)) ==
-                Modifier.PUBLIC) && getDeclaringClass().isInterface();
+        return ((getModifiers() & (TModifier.ABSTRACT | TModifier.PUBLIC | TModifier.STATIC)) ==
+                TModifier.PUBLIC);
     }
 
     // NOTE that there is no synchronization used here. It is correct
@@ -577,18 +463,7 @@ public final class TMethod extends TExecutable {
      * @since  1.5
      */
     public Object getDefaultValue() {
-        if  (annotationDefault == null)
-            return null;
-        TClass<?> memberType = TAnnotationType.invocationHandlerReturnType(
-                getReturnType());
-        Object result = TAnnotationParser.parseMemberValue(
-                memberType, ByteBuffer.wrap(annotationDefault),
-                sun.misc.SharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                getDeclaringClass());
-        if (result instanceof TExceptionProxy)
-            throw new AnnotationFormatError("Invalid default: " + this);
-        return result;
+        return null;
     }
 
     /**
@@ -596,7 +471,7 @@ public final class TMethod extends TExecutable {
      * @throws NullPointerException  {@inheritDoc}
      * @since 1.5
      */
-    public <T extends Annotation> T getAnnotation(TClass<T> annotationClass) {
+    public <T extends TAnnotation> T getAnnotation(TClass<T> annotationClass) {
         return super.getAnnotation(annotationClass);
     }
 
@@ -604,8 +479,13 @@ public final class TMethod extends TExecutable {
      * {@inheritDoc}
      * @since 1.5
      */
-    public Annotation[] getDeclaredAnnotations()  {
+    public TAnnotation[] getDeclaredAnnotations()  {
         return super.getDeclaredAnnotations();
+    }
+
+    @Override
+    public AnnotatedType getAnnotatedReturnType() {
+        return null;
     }
 
     /**
@@ -613,21 +493,14 @@ public final class TMethod extends TExecutable {
      * @since 1.5
      */
     @Override
-    public Annotation[][] getParameterAnnotations() {
+    public TAnnotation[][] getParameterAnnotations() {
         return sharedGetParameterAnnotations(parameterTypes, parameterAnnotations);
     }
 
-    /**
-     * {@inheritDoc}
-     * @since 1.8
-     */
-    @Override
-    public AnnotatedType getAnnotatedReturnType() {
-        return getAnnotatedReturnType0(getGenericReturnType());
-    }
+
 
     @Override
     void handleParameterNumberMismatch(int resultLength, int numParameters) {
-        throw new AnnotationFormatError("Parameter annotations don't match number of parameters");
+        throw new TException(TString.wrap("Parameter annotations don't match number of parameters"));
     }
 }

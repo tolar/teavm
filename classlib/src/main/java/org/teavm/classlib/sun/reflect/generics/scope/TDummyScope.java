@@ -1,7 +1,10 @@
-/*    */ package sun.reflect.generics.scope;
+/*    */ package org.teavm.classlib.sun.reflect.generics.scope;
 /*    */ 
-/*    */ import java.lang.reflect.TypeVariable;
-/*    */ 
+/*    */
+
+import org.teavm.classlib.java.lang.reflect.TTypeVariable;
+
+/*    */
 /*    */ 
 /*    */ 
 /*    */ 
@@ -36,7 +39,7 @@
 /*    */ 
 /*    */ 
 /*    */ public class TDummyScope
-/*    */   implements Scope
+/*    */   implements TScope
 /*    */ {
 /* 41 */   private static final TDummyScope singleton = new TDummyScope();
 /*    */   
@@ -55,7 +58,7 @@
 /*    */ 
 /*    */ 
 /*    */ 
-/*    */   public TypeVariable<?> lookup(String paramString)
+/*    */   public TTypeVariable<?> lookup(String paramString)
 /*    */   {
 /* 60 */     return null;
 /*    */   }

@@ -19,7 +19,11 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.sun.reflect.TReflection;
+import org.teavm.classlib.sun.security.util.TSecurityConstants;
 
 /**
  * Created by vasek on 5. 7. 2016.
@@ -40,7 +44,7 @@ public final class TReflectUtil {
         return var0.newInstance();
     }
 
-    public static void ensureMemberAccess(Class<?> var0, Class<?> var1, Object var2, int var3) throws IllegalAccessException {
+    public static void ensureMemberAccess(TClass<?> var0, TClass<?> var1, TObject var2, int var3) throws IllegalAccessException {
         if(var2 == null && Modifier.isProtected(var3)) {
             int var4 = var3 & -5;
             var4 |= 1;
@@ -59,7 +63,7 @@ public final class TReflectUtil {
         }
     }
 
-    private static boolean isSubclassOf(Class<?> var0, Class<?> var1) {
+    private static boolean isSubclassOf(TClass<?> var0, TClass<?> var1) {
         while(var0 != null) {
             if(var0 == var1) {
                 return true;
@@ -77,7 +81,7 @@ public final class TReflectUtil {
             Class var2 = var0.getDeclaringClass();
             checkPackageAccess(var2);
             if(!Modifier.isPublic(var0.getModifiers()) || !Modifier.isPublic(var2.getModifiers())) {
-                var1.checkPermission(SecurityConstants.CHECK_MEMBER_ACCESS_PERMISSION);
+                var1.checkPermission(TSecurityConstants.CHECK_MEMBER_ACCESS_PERMISSION);
             }
         }
     }

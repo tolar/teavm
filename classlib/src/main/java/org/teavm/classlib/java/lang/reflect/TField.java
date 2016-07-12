@@ -17,7 +17,9 @@ package org.teavm.classlib.java.lang.reflect;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
-import java.util.Objects;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.misc.TCallerSensitive;
@@ -32,12 +34,12 @@ import org.teavm.classlib.sun.reflect.generics.scope.TClassScope;
 public final
 class TField extends TAccessibleObject implements TMember {
 
-    private Class<?>            clazz;
+    private TClass<?>            clazz;
     private int                 slot;
     // This is guaranteed to be interned by the TVM in the 1.4
     // reflection implementation
     private String              name;
-    private Class<?>            type;
+    private TClass<?>            type;
     private int                 modifiers;
     // Generics and annotations support
     private transient String    signature;
@@ -62,7 +64,7 @@ class TField extends TAccessibleObject implements TMember {
 
     // Accessor for factory
     private TGenericsFactory getFactory() {
-        Class<?> c = getDeclaringClass();
+        TClass<?> c = getDeclaringClass();
         // create scope and factory
         return TCoreReflectionFactory.make(c, TClassScope.make(c));
     }
@@ -84,9 +86,9 @@ class TField extends TAccessibleObject implements TMember {
      * instantiation of these objects in Java code from the java.lang
      * package via sun.reflect.LangReflectAccess.
      */
-    TField(Class<?> declaringClass,
+    TField(TClass<?> declaringClass,
             String name,
-            Class<?> type,
+            TClass<?> type,
             int modifiers,
             int slot,
             String signature,
@@ -131,7 +133,7 @@ class TField extends TAccessibleObject implements TMember {
      * Returns the {@code Class} object representing the class or interface
      * that declares the field represented by this {@code Field} object.
      */
-    public Class<?> getDeclaringClass() {
+    public TClass<?> getDeclaringClass() {
         return clazz;
     }
 
@@ -162,7 +164,7 @@ class TField extends TAccessibleObject implements TMember {
      * @since 1.5
      */
     public boolean isEnumConstant() {
-        return (getModifiers() & java.lang.reflect.Modifier.ENUM) != 0;
+        return (getModifiers() & TModifier.ENUM) != 0;
     }
 
     /**
@@ -174,7 +176,7 @@ class TField extends TAccessibleObject implements TMember {
      * @since 1.5
      */
     public boolean isSynthetic() {
-        return java.lang.reflect.Modifier.isSynthetic(getModifiers());
+        return TModifier.isSynthetic(getModifiers());
     }
 
     /**
@@ -185,34 +187,10 @@ class TField extends TAccessibleObject implements TMember {
      * @return a {@code Class} object identifying the declared
      * type of the field represented by this object
      */
-    public Class<?> getType() {
+    public TClass<?> getType() {
         return type;
     }
 
-    /**
-     * Returns a {@code Type} object that represents the declared type for
-     * the field represented by this {@code Field} object.
-     *
-     * <p>If the {@code Type} is a parameterized type, the
-     * {@code Type} object returned must accurately reflect the
-     * actual type parameters used in the source code.
-     *
-     * <p>If the type of the underlying field is a type variable or a
-     * parameterized type, it is created. Otherwise, it is resolved.
-     *
-     * @return a {@code Type} object that represents the declared type for
-     *     the field represented by this {@code Field} object
-     * @throws GenericSignatureFormatError if the generic field
-     *     signature does not conform to the format specified in
-     *     <cite>The Java&trade; Virtual Machine Specification</cite>
-     * @throws TypeNotPresentException if the generic type
-     *     signature of the underlying field refers to a non-existent
-     *     type declaration
-     * @throws MalformedParameterizedTypeException if the generic
-     *     signature of the underlying field refers to a parameterized type
-     *     that cannot be instantiated for any reason
-     * @since 1.5
-     */
     public TType getGenericType() {
         if (getGenericSignature() != null)
             return getGenericInfo().getGenericType();
@@ -228,8 +206,8 @@ class TField extends TAccessibleObject implements TMember {
      * and type.
      */
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof java.lang.reflect.Field) {
-            java.lang.reflect.Field other = (java.lang.reflect.Field)obj;
+        if (obj != null && obj instanceof TField) {
+            TField other = (TField)obj;
             return (getDeclaringClass() == other.getDeclaringClass())
                     && (getName() == other.getName())
                     && (getType() == other.getType());
@@ -351,13 +329,13 @@ class TField extends TAccessibleObject implements TMember {
      * @exception ExceptionInInitializerError if the initialization provoked
      *              by this method fails.
      */
-    @CallerSensitive
+    @TCallerSensitive
     public Object get(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -386,13 +364,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public boolean getBoolean(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -421,13 +399,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public byte getByte(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -458,13 +436,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public char getChar(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -495,13 +473,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public short getShort(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -532,13 +510,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public int getInt(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -569,13 +547,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public long getLong(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -606,13 +584,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public float getFloat(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -643,13 +621,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#get
      */
-    @CallerSensitive
+    @TCallerSensitive
     public double getDouble(Object obj)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -722,13 +700,13 @@ class TField extends TAccessibleObject implements TMember {
      * @exception ExceptionInInitializerError if the initialization provoked
      *              by this method fails.
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void set(Object obj, Object value)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -759,13 +737,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setBoolean(Object obj, boolean z)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -796,13 +774,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setByte(Object obj, byte b)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -833,13 +811,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setChar(Object obj, char c)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -870,13 +848,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setShort(Object obj, short s)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -907,13 +885,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setInt(Object obj, int i)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -944,13 +922,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setLong(Object obj, long l)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -981,13 +959,13 @@ class TField extends TAccessibleObject implements TMember {
      *              by this method fails.
      * @see       java.lang.reflect.Field#set
      */
-    @CallerSensitive
+    @TCallerSensitive
     public void setFloat(Object obj, float f)
             throws IllegalArgumentException, IllegalAccessException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -1024,7 +1002,7 @@ class TField extends TAccessibleObject implements TMember {
     {
         if (!override) {
             if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = TReflection.getCallerClass();
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, obj, modifiers);
             }
         }
@@ -1087,8 +1065,7 @@ class TField extends TAccessibleObject implements TMember {
      * @since 1.5
      */
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        Objects.requireNonNull(annotationClass);
-        return annotationClass.cast(declaredAnnotations().get(annotationClass));
+        return null;
     }
 
     /**
@@ -1097,35 +1074,20 @@ class TField extends TAccessibleObject implements TMember {
      * @since 1.8
      */
     @Override
-    public <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass) {
-        Objects.requireNonNull(annotationClass);
-
-        return AnnotationSupport.getDirectlyAndIndirectlyPresent(declaredAnnotations(), annotationClass);
+    public <T extends TAnnotation> T[] getAnnotationsByType(TClass<T> annotationClass) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Annotation[] getDeclaredAnnotations()  {
-        return AnnotationParser.toArray(declaredAnnotations());
+    public TAnnotation[] getDeclaredAnnotations()  {
+        return null;
     }
 
-    private transient Map<Class<? extends Annotation>, Annotation> declaredAnnotations;
+    private transient Map<Class<? extends TAnnotation>, TAnnotation> declaredAnnotations;
 
-    private synchronized  Map<Class<? extends Annotation>, Annotation> declaredAnnotations() {
-        if (declaredAnnotations == null) {
-            java.lang.reflect.Field root = this.root;
-            if (root != null) {
-                declaredAnnotations = root.declaredAnnotations();
-            } else {
-                declaredAnnotations = AnnotationParser.parseAnnotations(
-                        annotations,
-                        sun.misc.SharedSecrets.getJavaLangAccess().getConstantPool(getDeclaringClass()),
-                        getDeclaringClass());
-            }
-        }
-        return declaredAnnotations;
-    }
+
 
     private native byte[] getTypeAnnotationBytes0();
 
@@ -1138,12 +1100,6 @@ class TField extends TAccessibleObject implements TMember {
      * @since 1.8
      */
     public TAnnotatedType getAnnotatedType() {
-        return TTypeAnnotationParser.buildAnnotatedType(getTypeAnnotationBytes0(),
-                sun.misc.SharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                this,
-                getDeclaringClass(),
-                getGenericType(),
-                TTypeAnnotation.TypeAnnotationTarget.FIELD);
+        return null;
     }
 }

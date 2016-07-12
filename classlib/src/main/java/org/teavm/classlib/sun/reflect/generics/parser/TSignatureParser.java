@@ -30,14 +30,17 @@ import org.teavm.classlib.sun.reflect.generics.tree.TClassTypeSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TDoubleSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TFieldTypeSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TFloatSignature;
+import org.teavm.classlib.sun.reflect.generics.tree.TFormalTypeParameter;
 import org.teavm.classlib.sun.reflect.generics.tree.TIntSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TLongSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TMethodTypeSignature;
+import org.teavm.classlib.sun.reflect.generics.tree.TReturnType;
 import org.teavm.classlib.sun.reflect.generics.tree.TShortSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TSimpleClassTypeSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TTypeArgument;
 import org.teavm.classlib.sun.reflect.generics.tree.TTypeSignature;
 import org.teavm.classlib.sun.reflect.generics.tree.TTypeVariableSignature;
+import org.teavm.classlib.sun.reflect.generics.tree.TVoidDescriptor;
 import org.teavm.classlib.sun.reflect.generics.tree.TWildcard;
 
 /**
@@ -129,14 +132,14 @@ public class TSignatureParser {
     private TClassSignature parseClassSignature() {
         assert this.index == 0;
 
-        return ClassSignature.make(this.parseZeroOrMoreFormalTypeParameters(), this.parseClassTypeSignature(), this.parseSuperInterfaces());
+        return TClassSignature.make(this.parseZeroOrMoreFormalTypeParameters(), this.parseClassTypeSignature(), this.parseSuperInterfaces());
     }
 
-    private FormalTypeParameter[] parseZeroOrMoreFormalTypeParameters() {
-        return this.current() == 60?this.parseFormalTypeParameters():new FormalTypeParameter[0];
+    private TFormalTypeParameter[] parseZeroOrMoreFormalTypeParameters() {
+        return this.current() == 60?this.parseFormalTypeParameters():new TFormalTypeParameter[0];
     }
 
-    private FormalTypeParameter[] parseFormalTypeParameters() {
+    private TFormalTypeParameter[] parseFormalTypeParameters() {
         ArrayList var1 = new ArrayList(3);
 
         assert this.current() == 60;
@@ -154,14 +157,14 @@ public class TSignatureParser {
             }
 
             this.advance();
-            return (FormalTypeParameter[])var1.toArray(new FormalTypeParameter[var1.size()]);
+            return (TFormalTypeParameter[])var1.toArray(new TFormalTypeParameter[var1.size()]);
         }
     }
 
-    private FormalTypeParameter parseFormalTypeParameter() {
+    private TFormalTypeParameter parseFormalTypeParameter() {
         String var1 = this.parseIdentifier();
-        FieldTypeSignature[] var2 = this.parseBounds();
-        return FormalTypeParameter.make(var1, var2);
+        TFieldTypeSignature[] var2 = this.parseBounds();
+        return TFormalTypeParameter.make(var1, var2);
     }
 
     private String parseIdentifier() {
@@ -222,12 +225,12 @@ public class TSignatureParser {
                 throw this.error("expected \';\' got \'" + this.current() + "\'");
             } else {
                 this.advance();
-                return ClassTypeSignature.make(var1);
+                return TClassTypeSignature.make(var1);
             }
         }
     }
 
-    private SimpleClassTypeSignature parsePackageNameAndSimpleClassTypeSignature() {
+    private TSimpleClassTypeSignature parsePackageNameAndSimpleClassTypeSignature() {
         String var1 = this.parseIdentifier();
         if(this.current() == 47) {
             StringBuilder var2 = new StringBuilder(var1);
@@ -243,29 +246,29 @@ public class TSignatureParser {
 
         switch(this.current()) {
             case ';':
-                return SimpleClassTypeSignature.make(var1, false, new TypeArgument[0]);
+                return TSimpleClassTypeSignature.make(var1, false, new TTypeArgument[0]);
             case '<':
-                return SimpleClassTypeSignature.make(var1, false, this.parseTypeArguments());
+                return TSimpleClassTypeSignature.make(var1, false, this.parseTypeArguments());
             default:
                 throw this.error("expected \'<\' or \';\' but got " + this.current());
         }
     }
 
-    private SimpleClassTypeSignature parseSimpleClassTypeSignature(boolean var1) {
+    private TSimpleClassTypeSignature parseSimpleClassTypeSignature(boolean var1) {
         String var2 = this.parseIdentifier();
         char var3 = this.current();
         switch(var3) {
             case '.':
             case ';':
-                return SimpleClassTypeSignature.make(var2, var1, new TypeArgument[0]);
+                return TSimpleClassTypeSignature.make(var2, var1, new TTypeArgument[0]);
             case '<':
-                return SimpleClassTypeSignature.make(var2, var1, this.parseTypeArguments());
+                return TSimpleClassTypeSignature.make(var2, var1, this.parseTypeArguments());
             default:
                 throw this.error("expected \'<\' or \';\' or \'.\', got \'" + var3 + "\'.");
         }
     }
 
-    private void parseClassTypeSignatureSuffix(List<SimpleClassTypeSignature> var1) {
+    private void parseClassTypeSignatureSuffix(List<TSimpleClassTypeSignature> var1) {
         while(this.current() == 46) {
             this.advance();
             var1.add(this.parseSimpleClassTypeSignature(true));
@@ -273,11 +276,11 @@ public class TSignatureParser {
 
     }
 
-    private TypeArgument[] parseTypeArgumentsOpt() {
-        return this.current() == 60?this.parseTypeArguments():new TypeArgument[0];
+    private TTypeArgument[] parseTypeArgumentsOpt() {
+        return this.current() == 60?this.parseTypeArguments():new TTypeArgument[0];
     }
 
-    private TypeArgument[] parseTypeArguments() {
+    private TTypeArgument[] parseTypeArguments() {
         ArrayList var1 = new ArrayList(3);
 
         assert this.current() == 60;
@@ -476,7 +479,7 @@ public class TSignatureParser {
             throw this.error("expected \'(\'");
         } else {
             this.advance();
-            TypeSignature[] var1 = this.parseZeroOrMoreTypeSignatures();
+            TTypeSignature[] var1 = this.parseZeroOrMoreTypeSignatures();
             if(this.current() != 41) {
                 throw this.error("expected \')\'");
             } else {
@@ -486,7 +489,7 @@ public class TSignatureParser {
         }
     }
 
-    private TypeSignature[] parseZeroOrMoreTypeSignatures() {
+    private TTypeSignature[] parseZeroOrMoreTypeSignatures() {
         ArrayList var1 = new ArrayList();
         boolean var2 = false;
 
@@ -525,29 +528,29 @@ public class TSignatureParser {
             }
         }
 
-        return (TypeSignature[])var1.toArray(new TypeSignature[var1.size()]);
+        return (TTypeSignature[])var1.toArray(new TTypeSignature[var1.size()]);
     }
 
-    private ReturnType parseReturnType() {
+    private TReturnType parseReturnType() {
         if(this.current() == 86) {
             this.advance();
-            return VoidDescriptor.make();
+            return TVoidDescriptor.make();
         } else {
             return this.parseTypeSignature();
         }
     }
 
-    private FieldTypeSignature[] parseZeroOrMoreThrowsSignatures() {
+    private TFieldTypeSignature[] parseZeroOrMoreThrowsSignatures() {
         ArrayList var1 = new ArrayList(3);
 
         while(this.current() == 94) {
             var1.add(this.parseThrowsSignature());
         }
 
-        return (FieldTypeSignature[])var1.toArray(new FieldTypeSignature[var1.size()]);
+        return (TFieldTypeSignature[])var1.toArray(new TFieldTypeSignature[var1.size()]);
     }
 
-    private FieldTypeSignature parseThrowsSignature() {
+    private TFieldTypeSignature parseThrowsSignature() {
         assert this.current() == 94;
 
         if(this.current() != 94) {

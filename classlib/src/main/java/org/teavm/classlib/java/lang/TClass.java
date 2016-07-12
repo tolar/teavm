@@ -18,9 +18,13 @@ package org.teavm.classlib.java.lang;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.teavm.classlib.impl.DeclaringClassMetadataGenerator;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.TAnnotatedElement;
+import org.teavm.classlib.java.lang.reflect.TGenericDeclaration;
+import org.teavm.classlib.java.lang.reflect.TType;
+import org.teavm.classlib.java.lang.reflect.TTypeVariable;
 import org.teavm.platform.Platform;
 import org.teavm.platform.PlatformClass;
 import org.teavm.platform.metadata.ClassResource;
@@ -31,7 +35,7 @@ import org.teavm.platform.metadata.ClassScopedMetadataProvider;
  * @author Alexey Andreev
  * @param <T> class type.
  */
-public class TClass<T> extends TObject implements TAnnotatedElement {
+public class TClass<T> extends TObject implements TAnnotatedElement,TType, TGenericDeclaration {
     TString name;
     TString simpleName;
     private TClass<?> componentType;
@@ -284,4 +288,11 @@ public class TClass<T> extends TObject implements TAnnotatedElement {
 
         return getClassLoader().getResourceAsStream(name);
     }
+
+    @Override
+    public TTypeVariable<?>[] getTypeParameters() {
+        return new TTypeVariable<?>[0];
+    }
+
+
 }

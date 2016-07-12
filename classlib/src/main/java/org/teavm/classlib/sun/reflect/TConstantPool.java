@@ -112,6 +112,6 @@ public class TConstantPool {
     private native String getUTF8At0(Object var1, int var2);
 
     static {
-        TReflection.registerFieldsToFilter(sun.reflect.ConstantPool.class, new String[]{"constantPoolOop"});
+        TReflection.registerFieldsToFilter(TConstantPool.class, new String[]{"constantPoolOop"});
     }
 }

@@ -15,11 +15,11 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.InvocationTargetException;
+import org.teavm.classlib.java.lang.TException;
 
 /**
  * Created by vasek on 5. 7. 2016.
  */
 public interface TMethodAccessor {
-    Object invoke(Object var1, Object[] var2) throws IllegalArgumentException, InvocationTargetException;
+    Object invoke(Object var1, Object[] var2) throws TException;
 }

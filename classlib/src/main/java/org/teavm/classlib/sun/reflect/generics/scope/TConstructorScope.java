@@ -2,6 +2,7 @@
 /*    */ 
 /*    */
 
+import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.reflect.TConstructor;
 
 /*    */
@@ -43,7 +44,7 @@ import org.teavm.classlib.java.lang.reflect.TConstructor;
 /*    */   }
 /*    */   
 /*    */ 
-/*    */   private Class<?> getEnclosingClass()
+/*    */   private TClass<?> getEnclosingClass()
 /*    */   {
 /* 45 */     return ((TConstructor)getRecvr()).getDeclaringClass();
 /*    */   }

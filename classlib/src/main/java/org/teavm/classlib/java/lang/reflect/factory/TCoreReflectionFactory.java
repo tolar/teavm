@@ -15,24 +15,18 @@
  */
 package org.teavm.classlib.java.lang.reflect.factory;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TClassLoader;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.reflect.TConstructor;
 import org.teavm.classlib.java.lang.reflect.TGenericDeclaration;
 import org.teavm.classlib.java.lang.reflect.TMethod;
+import org.teavm.classlib.java.lang.reflect.TParameterizedType;
 import org.teavm.classlib.java.lang.reflect.TType;
 import org.teavm.classlib.java.lang.reflect.TTypeVariable;
 import org.teavm.classlib.java.lang.reflect.TWildcardType;
-
-import sun.reflect.generics.reflectiveObjects.GenericArrayTypeImpl;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
-import sun.reflect.generics.reflectiveObjects.WildcardTypeImpl;
-import sun.reflect.generics.scope.Scope;
-import sun.reflect.generics.tree.FieldTypeSignature;
+import org.teavm.classlib.sun.reflect.generics.scope.TScope;
+import org.teavm.classlib.sun.reflect.generics.tree.TFieldTypeSignature;
 
 /**
  * @author: Vaclav Tolar, (vaclav_tolar@kb.cz, vaclav.tolar@cleverlance.com, vaclav.tolar@gmail.com)
@@ -40,9 +34,9 @@ import sun.reflect.generics.tree.FieldTypeSignature;
  */
 public class TCoreReflectionFactory implements TGenericsFactory {
     private final TGenericDeclaration decl;
-    private final Scope scope;
+    private final TScope scope;
 
-    private TCoreReflectionFactory(TGenericDeclaration var1, Scope var2) {
+    private TCoreReflectionFactory(TGenericDeclaration var1, TScope var2) {
         this.decl = var1;
         this.scope = var2;
     }
@@ -51,7 +45,7 @@ public class TCoreReflectionFactory implements TGenericsFactory {
         return this.decl;
     }
 
-    private Scope getScope() {
+    private TScope getScope() {
         return this.scope;
     }
 
@@ -67,71 +61,72 @@ public class TCoreReflectionFactory implements TGenericsFactory {
         }
     }
 
-    public static TCoreReflectionFactory make(TGenericDeclaration var0, Scope var1) {
+    public static TCoreReflectionFactory make(TGenericDeclaration var0, TScope var1) {
         return new TCoreReflectionFactory(var0, var1);
     }
 
-    public TTypeVariable<?> makeTypeVariable(String var1, FieldTypeSignature[] var2) {
-        return TTypeVariableImpl.make(this.getDecl(), var1, var2, this);
+    public TTypeVariable<?> makeTypeVariable(String var1, TFieldTypeSignature[] var2) {
+        return null;
     }
 
-    public TWildcardType makeWildcard(FieldTypeSignature[] var1, FieldTypeSignature[] var2) {
-        return WildcardTypeImpl.make(var1, var2, this);
+    public TWildcardType makeWildcard(TFieldTypeSignature[] var1, TFieldTypeSignature[] var2) {
+        return null;
     }
 
-    public ParameterizedType makeParameterizedType(Type var1, Type[] var2, Type var3) {
-        return ParameterizedTypeImpl.make((Class)var1, var2, var3);
+    @Override
+    public TType makeNamedType(String var1) {
+        return null;
+    }
+
+    public TParameterizedType makeParameterizedType(TType var1, TType[] var2, TType var3) {
+        return null;
     }
 
     public TTypeVariable<?> findTypeVariable(String var1) {
         return this.getScope().lookup(var1);
     }
 
-    public TType makeNamedType(String var1) {
-        try {
-            return Class.forName(var1, false, this.getDeclsLoader());
-        } catch (ClassNotFoundException var3) {
-            throw new TypeNotPresentException(var1, var3);
-        }
+    public TType makeNamedType(TString var1) {
+        return TClass.forName(var1, false, this.getDeclsLoader());
     }
 
-    public Type makeArrayType(Type var1) {
-        return (Type)(var1 instanceof Class? Array.newInstance((Class)var1, 0).getClass(): GenericArrayTypeImpl.make(var1));
+    public TType makeArrayType(TType var1) {
+        return null;
     }
 
-    public Type makeByte() {
-        return Byte.TYPE;
+    public TType makeByte() {
+        return null;
     }
 
-    public Type makeBool() {
-        return Boolean.TYPE;
+    public TType makeBool() {
+        return null;
     }
 
-    public Type makeShort() {
-        return Short.TYPE;
+    public TType makeShort() {
+        return null;
     }
 
-    public Type makeChar() {
-        return Character.TYPE;
+    public TType makeChar() {
+        return null;
     }
 
-    public Type makeInt() {
-        return Integer.TYPE;
+    public TType makeInt() {
+        return null;
     }
 
-    public Type makeLong() {
-        return Long.TYPE;
+    public TType makeLong() {
+        return null;
     }
 
-    public Type makeFloat() {
-        return Float.TYPE;
+    public TType makeFloat() {
+        return null;
     }
 
-    public Type makeDouble() {
-        return Double.TYPE;
+    public TType makeDouble() {
+        return null;
     }
 
-    public Type makeVoid() {
-        return Void.TYPE;
+    public TType makeVoid() {
+        return null;
     }
 }

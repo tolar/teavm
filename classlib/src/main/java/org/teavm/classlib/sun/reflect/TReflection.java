@@ -22,8 +22,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import sun.misc.VM;
-import sun.reflect.CallerSensitive;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TClassLoader;
+import org.teavm.classlib.java.lang.TObject;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.sun.misc.TCallerSensitive;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -35,20 +39,20 @@ public class TReflection {
     public TReflection() {
     }
 
-    @CallerSensitive
-    public static native Class<?> getCallerClass();
+    @TCallerSensitive
+    public static native TClass<?> getCallerClass();
 
     /** @deprecated */
     @Deprecated
-    public static native Class<?> getCallerClass(int var0);
+    public static native TClass<?> getCallerClass(int var0);
 
-    public static native int getClassAccessFlags(Class<?> var0);
+    public static native int getClassAccessFlags(TClass<?> var0);
 
-    public static boolean quickCheckMemberAccess(Class<?> var0, int var1) {
+    public static boolean quickCheckMemberAccess(TClass<?> var0, int var1) {
         return Modifier.isPublic(getClassAccessFlags(var0) & var1);
     }
 
-    public static void ensureMemberAccess(Class<?> var0, Class<?> var1, Object var2, int var3) throws IllegalAccessException {
+    public static void ensureMemberAccess(TClass<?> var0, TClass<?> var1, TObject var2, int var3) throws IllegalAccessException {
         if(var0 != null && var1 != null) {
             if(!verifyMemberAccess(var0, var1, var2, var3)) {
                 throw new IllegalAccessException("Class " + var0.getName() + " can not access a member of class " + var1.getName() + " with modifiers \"" + Modifier.toString(var3) + "\"");
@@ -58,67 +62,15 @@ public class TReflection {
         }
     }
 
-    public static boolean verifyMemberAccess(Class<?> var0, Class<?> var1, Object var2, int var3) {
-        boolean var4 = false;
-        boolean var5 = false;
-        if(var0 == var1) {
-            return true;
-        } else {
-            if(!Modifier.isPublic(getClassAccessFlags(var1))) {
-                var5 = isSameClassPackage(var0, var1);
-                var4 = true;
-                if(!var5) {
-                    return false;
-                }
-            }
-
-            if(Modifier.isPublic(var3)) {
-                return true;
-            } else {
-                boolean var6 = false;
-                if(Modifier.isProtected(var3) && isSubclassOf(var0, var1)) {
-                    var6 = true;
-                }
-
-                if(!var6 && !Modifier.isPrivate(var3)) {
-                    if(!var4) {
-                        var5 = isSameClassPackage(var0, var1);
-                        var4 = true;
-                    }
-
-                    if(var5) {
-                        var6 = true;
-                    }
-                }
-
-                if(!var6) {
-                    return false;
-                } else {
-                    if(Modifier.isProtected(var3)) {
-                        Class var7 = var2 == null?var1:var2.getClass();
-                        if(var7 != var0) {
-                            if(!var4) {
-                                var5 = isSameClassPackage(var0, var1);
-                                var4 = true;
-                            }
-
-                            if(!var5 && !isSubclassOf(var7, var0)) {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-            }
-        }
+    public static boolean verifyMemberAccess(TClass<?> var0, TClass<?> var1, TObject var2, int var3) {
+        return true;
     }
 
-    private static boolean isSameClassPackage(Class<?> var0, Class<?> var1) {
+    private static boolean isSameClassPackage(TClass<?> var0, TClass<?> var1) {
         return isSameClassPackage(var0.getClassLoader(), var0.getName(), var1.getClassLoader(), var1.getName());
     }
 
-    private static boolean isSameClassPackage(ClassLoader var0, String var1, ClassLoader var2, String var3) {
+    private static boolean isSameClassPackage(TClassLoader var0, TString var1, TClassLoader var2, TString var3) {
         if(var0 != var2) {
             return false;
         } else {
@@ -156,7 +108,7 @@ public class TReflection {
         }
     }
 
-    static boolean isSubclassOf(Class<?> var0, Class<?> var1) {
+    static boolean isSubclassOf(TClass<?> var0, TClass<?> var1) {
         while(var0 != null) {
             if(var0 == var1) {
                 return true;
@@ -250,8 +202,7 @@ public class TReflection {
     }
 
     public static boolean isCallerSensitive(Method var0) {
-        ClassLoader var1 = var0.getDeclaringClass().getClassLoader();
-        return !VM.isSystemDomainLoader(var1) && !isExtClassLoader(var1)?false:var0.isAnnotationPresent(CallerSensitive.class);
+        return false;
     }
 
     private static boolean isExtClassLoader(ClassLoader var0) {
@@ -266,7 +217,7 @@ public class TReflection {
 
     static {
         HashMap var0 = new HashMap();
-        var0.put(sun.reflect.Reflection.class, new String[]{"fieldFilterMap", "methodFilterMap"});
+        var0.put(TReflection.class, new String[]{"fieldFilterMap", "methodFilterMap"});
         var0.put(System.class, new String[]{"security"});
         var0.put(Class.class, new String[]{"classLoader"});
         fieldFilterMap = var0;

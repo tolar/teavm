@@ -234,7 +234,7 @@ public class TString extends TObject implements TSerializable, TComparable<TStri
         return startsWith(prefix, 0);
     }
 
-    public boolean regionMatches(boolean ignoreCase, int toffset, String other, int ooffset, int len) {
+    public boolean regionMatches(boolean ignoreCase, int toffset, TString other, int ooffset, int len) {
         if (toffset < 0 || ooffset < 0 || toffset + len > length() || ooffset + len > other.length()) {
             return false;
         }

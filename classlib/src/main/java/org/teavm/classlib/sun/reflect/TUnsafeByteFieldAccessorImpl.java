@@ -15,13 +15,13 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.Field;
+import org.teavm.classlib.java.lang.reflect.TField;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
 class TUnsafeByteFieldAccessorImpl extends TUnsafeFieldAccessorImpl {
-    TUnsafeByteFieldAccessorImpl(Field var1) {
+    TUnsafeByteFieldAccessorImpl(TField var1) {
         super(var1);
     }
 

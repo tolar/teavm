@@ -15,6 +15,7 @@
  */
 package org.teavm.classlib.sun.reflect;
 
+import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.reflect.TConstructor;
 import org.teavm.classlib.java.lang.reflect.TExecutable;
 import org.teavm.classlib.java.lang.reflect.TField;
@@ -24,9 +25,9 @@ import org.teavm.classlib.java.lang.reflect.TMethod;
  * Created by vasek on 4. 7. 2016.
  */
 public interface TLangReflectAccess {
-    TField newField(Class<?> var1, String var2, Class<?> var3, int var4, int var5, String var6, byte[] var7);
+    TField newField(TClass<?> var1, String var2, Class<?> var3, int var4, int var5, String var6, byte[] var7);
 
-    TMethod newMethod(Class<?> var1, String var2, Class<?>[] var3, Class<?> var4, Class<?>[] var5, int var6, int var7, String var8, byte[] var9, byte[] var10, byte[] var11);
+    TMethod newMethod(TClass<?> var1, String var2, Class<?>[] var3, Class<?> var4, Class<?>[] var5, int var6, int var7, String var8, byte[] var9, byte[] var10, byte[] var11);
 
     <T> TConstructor<T> newConstructor(Class<T> var1, Class<?>[] var2, Class<?>[] var3, int var4, int var5, String var6, byte[] var7, byte[] var8);
 

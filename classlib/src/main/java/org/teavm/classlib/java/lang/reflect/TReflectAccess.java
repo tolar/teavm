@@ -15,14 +15,18 @@
  */
 package org.teavm.classlib.java.lang.reflect;
 
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.sun.reflect.TConstructorAccessor;
+import org.teavm.classlib.sun.reflect.TMethodAccessor;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
 class TReflectAccess implements org.teavm.classlib.sun.reflect.TLangReflectAccess {
-    public TField newField(Class<?> declaringClass,
+    public TField newField(TClass<?> declaringClass,
             String name,
-            Class<?> type,
+            TClass<?> type,
             int modifiers,
             int slot,
             String signature,
@@ -37,11 +41,28 @@ class TReflectAccess implements org.teavm.classlib.sun.reflect.TLangReflectAcces
                 annotations);
     }
 
-    public Method newMethod(Class<?> declaringClass,
-            String name,
-            Class<?>[] parameterTypes,
-            Class<?> returnType,
-            Class<?>[] checkedExceptions,
+    @Override
+    public TField newField(TClass<?> var1, String var2, Class<?> var3, int var4, int var5, String var6, byte[] var7) {
+        return null;
+    }
+
+    @Override
+    public TMethod newMethod(TClass<?> var1, String var2, Class<?>[] var3, Class<?> var4, Class<?>[] var5, int var6,
+            int var7, String var8, byte[] var9, byte[] var10, byte[] var11) {
+        return null;
+    }
+
+    @Override
+    public <T> TConstructor<T> newConstructor(Class<T> var1, Class<?>[] var2, Class<?>[] var3, int var4, int var5,
+            String var6, byte[] var7, byte[] var8) {
+        return null;
+    }
+
+    public TMethod newMethod(TClass<?> declaringClass,
+            TString name,
+            TClass<?>[] parameterTypes,
+            TClass<?> returnType,
+            TClass<?>[] checkedExceptions,
             int modifiers,
             int slot,
             String signature,
@@ -49,7 +70,7 @@ class TReflectAccess implements org.teavm.classlib.sun.reflect.TLangReflectAcces
             byte[] parameterAnnotations,
             byte[] annotationDefault)
     {
-        return new Method(declaringClass,
+        return new TMethod(declaringClass,
                 name,
                 parameterTypes,
                 returnType,
@@ -62,16 +83,16 @@ class TReflectAccess implements org.teavm.classlib.sun.reflect.TLangReflectAcces
                 annotationDefault);
     }
 
-    public <T> Constructor<T> newConstructor(Class<T> declaringClass,
-            Class<?>[] parameterTypes,
-            Class<?>[] checkedExceptions,
+    public <T> TConstructor<T> newConstructor(TClass<T> declaringClass,
+            TClass<?>[] parameterTypes,
+            TClass<?>[] checkedExceptions,
             int modifiers,
             int slot,
             String signature,
             byte[] annotations,
             byte[] parameterAnnotations)
     {
-        return new Constructor<>(declaringClass,
+        return new TConstructor(declaringClass,
                 parameterTypes,
                 checkedExceptions,
                 modifiers,
@@ -81,57 +102,62 @@ class TReflectAccess implements org.teavm.classlib.sun.reflect.TLangReflectAcces
                 parameterAnnotations);
     }
 
-    public MethodAccessor getMethodAccessor(Method m) {
+    public TMethodAccessor getMethodAccessor(TMethod m) {
         return m.getMethodAccessor();
     }
 
-    public void setMethodAccessor(Method m, MethodAccessor accessor) {
+    public void setMethodAccessor(TMethod m, TMethodAccessor accessor) {
         m.setMethodAccessor(accessor);
     }
 
-    public ConstructorAccessor getConstructorAccessor(Constructor<?> c) {
+    public TConstructorAccessor getConstructorAccessor(TConstructor<?> c) {
         return c.getConstructorAccessor();
     }
 
-    public void setConstructorAccessor(Constructor<?> c,
-            ConstructorAccessor accessor)
+    public void setConstructorAccessor(TConstructor<?> c,
+            TConstructorAccessor accessor)
     {
         c.setConstructorAccessor(accessor);
     }
 
-    public int getConstructorSlot(Constructor<?> c) {
-        return c.getSlot();
+    @Override
+    public byte[] getExecutableTypeAnnotationBytes(TExecutable var1) {
+        return new byte[0];
     }
 
-    public String getConstructorSignature(Constructor<?> c) {
-        return c.getSignature();
+    @Override
+    public int getConstructorSlot(TConstructor<?> var1) {
+        return 0;
     }
 
-    public byte[] getConstructorAnnotations(Constructor<?> c) {
-        return c.getRawAnnotations();
+    @Override
+    public String getConstructorSignature(TConstructor<?> var1) {
+        return null;
     }
 
-    public byte[] getConstructorParameterAnnotations(Constructor<?> c) {
-        return c.getRawParameterAnnotations();
+    @Override
+    public byte[] getConstructorAnnotations(TConstructor<?> var1) {
+        return new byte[0];
     }
 
-    public byte[] getExecutableTypeAnnotationBytes(java.lang.reflect.Executable ex) {
-        return ex.getTypeAnnotationBytes();
+    @Override
+    public byte[] getConstructorParameterAnnotations(TConstructor<?> var1) {
+        return new byte[0];
     }
 
     //
     // Copying routines, needed to quickly fabricate new Field,
     // Method, and Constructor objects from templates
     //
-    public Method      copyMethod(Method arg) {
+    public TMethod      copyMethod(TMethod arg) {
         return arg.copy();
     }
 
-    public Field       copyField(Field arg) {
+    public TField       copyField(TField arg) {
         return arg.copy();
     }
 
-    public <T> Constructor<T> copyConstructor(Constructor<T> arg) {
+    public <T> TConstructor<T> copyConstructor(TConstructor<T> arg) {
         return arg.copy();
     }
 }

@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.reflect.generics.repository;
 
-import java.lang.reflect.Type;
 import org.teavm.classlib.java.lang.reflect.TType;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
 import org.teavm.classlib.sun.reflect.generics.tree.TMethodTypeSignature;
@@ -25,7 +24,7 @@ import org.teavm.classlib.sun.reflect.generics.visitor.TReifier;
  * Created by vasek on 7. 7. 2016.
  */
 public class TMethodRepository extends TConstructorRepository {
-    private Type returnType;
+    private TType returnType;
 
     private TMethodRepository(String var1, TGenericsFactory var2) {
         super(var1, var2);

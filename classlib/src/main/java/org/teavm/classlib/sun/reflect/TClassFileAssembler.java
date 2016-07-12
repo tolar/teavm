@@ -93,7 +93,7 @@ class TClassFileAssembler implements TClassFileConstants {
     }
 
     public void emitConstantPoolUTF8(String var1) {
-        byte[] var2 = UTF8.encode(var1);
+        byte[] var2 = var1.getBytes();
         this.emitByte((byte)1);
         this.emitShort((short)var2.length);
 

@@ -15,13 +15,14 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.Field;
+import org.teavm.classlib.java.lang.TObject;
+import org.teavm.classlib.java.lang.reflect.TField;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
 class TUnsafeStaticObjectFieldAccessorImpl extends TUnsafeStaticFieldAccessorImpl {
-    TUnsafeStaticObjectFieldAccessorImpl(Field var1) {
+    TUnsafeStaticObjectFieldAccessorImpl(TField var1) {
         super(var1);
     }
 
@@ -61,13 +62,14 @@ class TUnsafeStaticObjectFieldAccessorImpl extends TUnsafeStaticFieldAccessorImp
         throw this.newGetDoubleIllegalArgumentException();
     }
 
+    @Override
     public void set(Object var1, Object var2) throws IllegalArgumentException, IllegalAccessException {
+
+    }
+
+    public void set(Object var1, TObject var2) throws IllegalArgumentException, IllegalAccessException {
         if(this.isFinal) {
             this.throwFinalFieldIllegalAccessException(var2);
-        }
-
-        if(var2 != null && !this.field.getType().isAssignableFrom(var2.getClass())) {
-            this.throwSetIllegalArgumentException(var2);
         }
 
         T_UNSAFE.putObject(this.base, this.fieldOffset, var2);

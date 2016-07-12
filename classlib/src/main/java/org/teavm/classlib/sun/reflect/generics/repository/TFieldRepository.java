@@ -31,7 +31,7 @@ public class TFieldRepository extends TAbstractRepository<TTypeSignature> {
     }
 
     protected TTypeSignature parse(String var1) {
-        return TSignatureParser.make().parseTypeSig(var1);
+        return null;
     }
 
     public static TFieldRepository make(String var0, TGenericsFactory var1) {

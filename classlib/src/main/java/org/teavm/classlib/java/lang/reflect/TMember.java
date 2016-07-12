@@ -15,6 +15,8 @@
  */
 package org.teavm.classlib.java.lang.reflect;
 
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
 
 /**
  * @author: Vaclav Tolar, (vaclav_tolar@kb.cz, vaclav.tolar@cleverlance.com, vaclav.tolar@gmail.com)
@@ -42,7 +44,7 @@ interface TMember {
      * @return an object representing the declaring class of the
      * underlying member
      */
-    public Class<?> getDeclaringClass();
+    public TClass<?> getDeclaringClass();
 
     /**
      * Returns the simple name of the underlying member or constructor
@@ -50,17 +52,8 @@ interface TMember {
      *
      * @return the simple name of the underlying member
      */
-    public String getName();
+    public TString getName();
 
-    /**
-     * Returns the Java language modifiers for the member or
-     * constructor represented by this Member, as an integer.  The
-     * Modifier class should be used to decode the modifiers in
-     * the integer.
-     *
-     * @return the Java language modifiers for the underlying member
-     * @see Modifier
-     */
     public int getModifiers();
 
     /**

@@ -16,13 +16,14 @@
 package org.teavm.classlib.sun.reflect;
 
 import static org.teavm.classlib.sun.reflect.TAccessorGenerator.unsafe;
-import java.lang.reflect.Field;
+
+import org.teavm.classlib.java.lang.reflect.TField;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
 class TUnsafeStaticBooleanFieldAccessorImpl extends TUnsafeStaticFieldAccessorImpl {
-    TUnsafeStaticBooleanFieldAccessorImpl(Field var1) {
+    TUnsafeStaticBooleanFieldAccessorImpl(TField var1) {
         super(var1);
     }
 

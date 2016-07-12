@@ -15,7 +15,7 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.Field;
+import org.teavm.classlib.java.lang.reflect.TField;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 abstract class TUnsafeQualifiedStaticFieldAccessorImpl extends TUnsafeStaticFieldAccessorImpl {
     protected final boolean isReadOnly;
 
-    TUnsafeQualifiedStaticFieldAccessorImpl(Field var1, boolean var2) {
+    TUnsafeQualifiedStaticFieldAccessorImpl(TField var1, boolean var2) {
         super(var1);
         this.isReadOnly = var2;
     }

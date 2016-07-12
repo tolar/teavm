@@ -15,19 +15,18 @@
  */
 package org.teavm.classlib.java.lang.reflect;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ReflectPermission;
-import java.security.AccessController;
 
-import org.teavm.classlib.sun.reflect.TReflection;
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.annotation.TAnnotation;
+import org.teavm.classlib.java.security.TAccessController;
 import org.teavm.classlib.sun.reflect.TReflectionFactory;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
-public class TAccessibleObject implements AnnotatedElement {
+public class TAccessibleObject implements TAnnotatedElement {
 
     /**
      * The Permission object that is used to check whether a client
@@ -62,7 +61,7 @@ public class TAccessibleObject implements AnnotatedElement {
      * @see SecurityManager#checkPermission
      * @see java.lang.RuntimePermission
      */
-    public static void setAccessible(java.lang.reflect.AccessibleObject[] array, boolean flag)
+    public static void setAccessible(TAccessibleObject[] array, boolean flag)
             throws SecurityException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) sm.checkPermission(ACCESS_PERMISSION);
@@ -107,13 +106,6 @@ public class TAccessibleObject implements AnnotatedElement {
     private static void setAccessible0(org.teavm.classlib.java.lang.reflect.TAccessibleObject obj, boolean flag)
             throws SecurityException
     {
-        if (obj instanceof TConstructor && flag == true) {
-            Constructor<?> c = (TConstructor<?>)obj;
-            if (c.getDeclaringClass() == Class.class) {
-                throw new SecurityException("Cannot make a java.lang.Class" +
-                        " constructor accessible");
-            }
-        }
         obj.override = flag;
     }
 
@@ -143,14 +135,14 @@ public class TAccessibleObject implements AnnotatedElement {
     // method, and constructor accessors. Note that this is called
     // very early in the bootstrapping process.
     static final TReflectionFactory reflectionFactory =
-            AccessController.doPrivileged(
+            TAccessController.doPrivileged(
                     new TReflectionFactory.GetReflectionFactoryAction());
 
     /**
      * @throws NullPointerException {@inheritDoc}
      * @since 1.5
      */
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+    public <T extends TAnnotation> T getAnnotation(TClass<T> annotationClass) {
         throw new AssertionError("All subclasses should override this method");
     }
 
@@ -160,23 +152,22 @@ public class TAccessibleObject implements AnnotatedElement {
      * @since 1.5
      */
     @Override
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        return AnnotatedElement.super.isAnnotationPresent(annotationClass);
+    public boolean isAnnotationPresent(TClass<? extends TAnnotation> annotationClass) {
+        return false;
     }
 
     /**
      * @throws NullPointerException {@inheritDoc}
      * @since 1.8
      */
-    @Override
-    public <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass) {
+    public <T extends TAnnotation> T[] getAnnotationsByType(TClass<T> annotationClass) {
         throw new AssertionError("All subclasses should override this method");
     }
 
     /**
      * @since 1.5
      */
-    public Annotation[] getAnnotations() {
+    public TAnnotation[] getAnnotations() {
         return getDeclaredAnnotations();
     }
 
@@ -184,8 +175,7 @@ public class TAccessibleObject implements AnnotatedElement {
      * @throws NullPointerException {@inheritDoc}
      * @since 1.8
      */
-    @Override
-    public <T extends Annotation> T getDeclaredAnnotation(Class<T> annotationClass) {
+    public <T extends TAnnotation> T getDeclaredAnnotation(TClass<T> annotationClass) {
         // Only annotations on classes are inherited, for all other
         // objects getDeclaredAnnotation is the same as
         // getAnnotation.
@@ -196,8 +186,7 @@ public class TAccessibleObject implements AnnotatedElement {
      * @throws NullPointerException {@inheritDoc}
      * @since 1.8
      */
-    @Override
-    public <T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass) {
+    public <T extends TAnnotation> T[] getDeclaredAnnotationsByType(TClass<T> annotationClass) {
         // Only annotations on classes are inherited, for all other
         // objects getDeclaredAnnotationsByType is the same as
         // getAnnotationsByType.
@@ -207,7 +196,7 @@ public class TAccessibleObject implements AnnotatedElement {
     /**
      * @since 1.5
      */
-    public Annotation[] getDeclaredAnnotations()  {
+    public TAnnotation[] getDeclaredAnnotations()  {
         throw new AssertionError("All subclasses should override this method");
     }
 
@@ -231,34 +220,10 @@ public class TAccessibleObject implements AnnotatedElement {
     // In the 2-array case, the target is always different from the clazz.
     volatile Object securityCheckCache;
 
-    void checkAccess(Class<?> caller, Class<?> clazz, Object obj, int modifiers)
+    void checkAccess(TClass<?> caller, TClass<?> clazz, Object obj, int modifiers)
             throws IllegalAccessException
     {
-        if (caller == clazz) {  // quick check
-            return;             // ACCESS IS OK
-        }
-        Object cache = securityCheckCache;  // read volatile
-        Class<?> targetClass = clazz;
-        if (obj != null
-                && java.lang.reflect.Modifier.isProtected(modifiers)
-                && ((targetClass = obj.getClass()) != clazz)) {
-            // Must match a 2-list of { caller, targetClass }.
-            if (cache instanceof Class[]) {
-                Class<?>[] cache2 = (Class<?>[]) cache;
-                if (cache2[1] == targetClass &&
-                        cache2[0] == caller) {
-                    return;     // ACCESS IS OK
-                }
-                // (Test cache[1] first since range check for [1]
-                // subsumes range check for [0].)
-            }
-        } else if (cache == caller) {
-            // Non-protected case (or obj.class == this.clazz).
-            return;             // ACCESS IS OK
-        }
-
-        // If no return, fall through to the slow path.
-        slowCheckMemberAccess(caller, clazz, obj, modifiers, targetClass);
+        return;
     }
 
     // Keep all this slow stuff out of line:
@@ -266,7 +231,7 @@ public class TAccessibleObject implements AnnotatedElement {
             Class<?> targetClass)
             throws IllegalAccessException
     {
-        TReflection.ensureMemberAccess(caller, clazz, obj, modifiers);
+        //TReflection.ensureMemberAccess(caller, clazz, obj, modifiers);
 
         // Success: Update the cache.
         Object cache = ((targetClass == clazz)

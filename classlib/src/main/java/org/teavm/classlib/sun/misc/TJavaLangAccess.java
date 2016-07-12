@@ -16,10 +16,13 @@
 package org.teavm.classlib.sun.misc;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Executable;
-import java.security.AccessControlContext;
 import java.util.Map;
 
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TRunnable;
+import org.teavm.classlib.java.lang.TThread;
+import org.teavm.classlib.java.lang.reflect.TExecutable;
+import org.teavm.classlib.java.security.TAccessControlContext;
 import org.teavm.classlib.sun.nio.ch.TInterruptible;
 import org.teavm.classlib.sun.reflect.TConstantPool;
 import org.teavm.classlib.sun.reflect.annotation.TAnnotationType;
@@ -28,25 +31,25 @@ import org.teavm.classlib.sun.reflect.annotation.TAnnotationType;
  * Created by vasek on 9. 7. 2016.
  */
 public interface TJavaLangAccess {
-    TConstantPool getConstantPool(Class<?> var1);
+    TConstantPool getConstantPool(TClass<?> var1);
 
-    boolean casAnnotationType(Class<?> var1, TAnnotationType var2, TAnnotationType var3);
+    boolean casAnnotationType(TClass<?> var1, TAnnotationType var2, TAnnotationType var3);
 
-    TAnnotationType getAnnotationType(Class<?> var1);
+    TAnnotationType getAnnotationType(TClass<?> var1);
 
-    Map<Class<? extends Annotation>, Annotation> getDeclaredAnnotationMap(Class<?> var1);
+    Map<Class<? extends Annotation>, Annotation> getDeclaredAnnotationMap(TClass<?> var1);
 
-    byte[] getRawClassAnnotations(Class<?> var1);
+    byte[] getRawClassAnnotations(TClass<?> var1);
 
-    byte[] getRawClassTypeAnnotations(Class<?> var1);
+    byte[] getRawClassTypeAnnotations(TClass<?> var1);
 
-    byte[] getRawExecutableTypeAnnotations(Executable var1);
+    byte[] getRawExecutableTypeAnnotations(TExecutable var1);
 
-    <E extends Enum<E>> E[] getEnumConstantsShared(Class<E> var1);
+    <E extends Enum<E>> E[] getEnumConstantsShared(TClass<E> var1);
 
-    void blockedOn(Thread var1, TInterruptible var2);
+    void blockedOn(TThread var1, TInterruptible var2);
 
-    void registerShutdownHook(int var1, boolean var2, Runnable var3);
+    void registerShutdownHook(int var1, boolean var2, TRunnable var3);
 
     int getStackTraceDepth(Throwable var1);
 
@@ -54,7 +57,7 @@ public interface TJavaLangAccess {
 
     String newStringUnsafe(char[] var1);
 
-    Thread newThreadWithAcc(Runnable var1, AccessControlContext var2);
+    Thread newThreadWithAcc(TRunnable var1, TAccessControlContext var2);
 
     void invokeFinalize(Object var1) throws Throwable;
 }

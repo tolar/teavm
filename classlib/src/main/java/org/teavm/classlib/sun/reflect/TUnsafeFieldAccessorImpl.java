@@ -15,8 +15,9 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+
+import org.teavm.classlib.java.lang.reflect.TField;
 import org.teavm.classlib.sun.misc.TUnsafe;
 
 /**
@@ -24,11 +25,11 @@ import org.teavm.classlib.sun.misc.TUnsafe;
  */
 abstract class TUnsafeFieldAccessorImpl extends TFieldAccessorImpl {
     static final TUnsafe T_UNSAFE = TUnsafe.getUnsafe();
-    protected final Field field;
+    protected final TField field;
     protected final long fieldOffset;
     protected final boolean isFinal;
 
-    TUnsafeFieldAccessorImpl(Field var1) {
+    TUnsafeFieldAccessorImpl(TField var1) {
         this.field = var1;
         if(Modifier.isStatic(var1.getModifiers())) {
             this.fieldOffset = T_UNSAFE.staticFieldOffset(var1);

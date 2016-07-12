@@ -91,7 +91,7 @@ public class TBoolean extends TObject implements TSerializable, TComparable<TBoo
         return obj instanceof TBoolean && ((TBoolean) obj).value == value;
     }
 
-    public boolean getBoolean(TString key) {
+    public static boolean getBoolean(TString key) {
         return valueOf(TSystem.getProperty(key)).booleanValue();
     }
 }

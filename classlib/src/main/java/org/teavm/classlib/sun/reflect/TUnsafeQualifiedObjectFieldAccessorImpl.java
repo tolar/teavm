@@ -15,13 +15,14 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.Field;
+import org.teavm.classlib.java.lang.TObject;
+import org.teavm.classlib.java.lang.reflect.TField;
 
 /**
  * Created by vasek on 4. 7. 2016.
  */
 class TUnsafeQualifiedObjectFieldAccessorImpl extends TUnsafeQualifiedFieldAccessorImpl {
-    TUnsafeQualifiedObjectFieldAccessorImpl(Field var1, boolean var2) {
+    TUnsafeQualifiedObjectFieldAccessorImpl(TField var1, boolean var2) {
         super(var1, var2);
     }
 
@@ -62,15 +63,17 @@ class TUnsafeQualifiedObjectFieldAccessorImpl extends TUnsafeQualifiedFieldAcces
         throw this.newGetDoubleIllegalArgumentException();
     }
 
+    @Override
     public void set(Object var1, Object var2) throws IllegalArgumentException, IllegalAccessException {
+
+    }
+
+    public void set(Object var1, TObject var2) throws IllegalArgumentException, IllegalAccessException {
         this.ensureObj(var1);
         if(this.isReadOnly) {
             this.throwFinalFieldIllegalAccessException(var2);
         }
 
-        if(var2 != null && !this.field.getType().isAssignableFrom(var2.getClass())) {
-            this.throwSetIllegalArgumentException(var2);
-        }
 
         T_UNSAFE.putObjectVolatile(var1, this.fieldOffset, var2);
     }

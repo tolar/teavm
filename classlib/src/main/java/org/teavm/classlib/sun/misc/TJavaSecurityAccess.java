@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,22 +13,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.sun.reflect;
+package org.teavm.classlib.sun.misc;
 
-import org.teavm.classlib.java.lang.reflect.TField;
+import org.teavm.classlib.java.security.TAccessControlContext;
+import org.teavm.classlib.java.security.TPrivilegedAction;
 
 /**
- * Created by vasek on 4. 7. 2016.
+ * @author: Vaclav Tolar, (vaclav_tolar@kb.cz, vaclav.tolar@cleverlance.com, vaclav.tolar@gmail.com)
+ * Date: 2016-07-12
  */
-abstract class TUnsafeStaticFieldAccessorImpl extends TUnsafeFieldAccessorImpl {
-    protected final Object base;
+public interface TJavaSecurityAccess {
+    <T> T doIntersectionPrivilege(TPrivilegedAction<T> var1, TAccessControlContext var2, TAccessControlContext var3);
 
-    TUnsafeStaticFieldAccessorImpl(TField var1) {
-        super(var1);
-        this.base = T_UNSAFE.staticFieldBase(var1);
-    }
-
-    static {
-        TReflection.registerFieldsToFilter(TUnsafeStaticFieldAccessorImpl.class, new String[]{"base"});
-    }
+    <T> T doIntersectionPrivilege(TPrivilegedAction<T> var1, TAccessControlContext var2);
 }

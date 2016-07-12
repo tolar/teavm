@@ -15,8 +15,18 @@
  */
 package org.teavm.classlib.sun.reflect;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+
+import org.teavm.classlib.java.lang.TBoolean;
+import org.teavm.classlib.java.lang.TByte;
+import org.teavm.classlib.java.lang.TCharacter;
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TDouble;
+import org.teavm.classlib.java.lang.TFloat;
+import org.teavm.classlib.java.lang.TInteger;
+import org.teavm.classlib.java.lang.TLong;
+import org.teavm.classlib.java.lang.TShort;
+import org.teavm.classlib.java.lang.reflect.TField;
 
 /**
  * Created by vasek on 4. 7. 2016.
@@ -25,8 +35,8 @@ class TUnsafeFieldAccessorFactory {
     TUnsafeFieldAccessorFactory() {
     }
 
-    static TFieldAccessor newFieldAccessor(Field var0, boolean var1) {
-        Class var2 = var0.getType();
+    static TFieldAccessor newFieldAccessor(TField var0, boolean var1) {
+        TClass var2 = var0.getType();
         boolean var3 = Modifier.isStatic(var0.getModifiers());
         boolean var4 = Modifier.isFinal(var0.getModifiers());
         boolean var5 = Modifier.isVolatile(var0.getModifiers());
@@ -34,42 +44,42 @@ class TUnsafeFieldAccessorFactory {
         boolean var7 = var4 && (var3 || !var1);
         if(var3) {
             TUnsafeFieldAccessorImpl.T_UNSAFE.ensureClassInitialized(var0.getDeclaringClass());
-            return (TFieldAccessor)(!var6?(var2 == Boolean.TYPE?new TUnsafeStaticBooleanFieldAccessorImpl(var0):
-                    (var2 == Byte.TYPE?new TUnsafeStaticByteFieldAccessorImpl(var0):
-                            (var2 == Short.TYPE?new TUnsafeStaticShortFieldAccessorImpl(var0):
-                                    (var2 == Character.TYPE?new TUnsafeStaticCharacterFieldAccessorImpl(var0):
-                                            (var2 == Integer.TYPE?new TUnsafeStaticIntegerFieldAccessorImpl(var0):
-                                                    (var2 == Long.TYPE?new TUnsafeStaticLongFieldAccessorImpl(var0):
-                                                            (var2 == Float.TYPE?new TUnsafeStaticFloatFieldAccessorImpl(var0):
-                                                                    (var2 == Double.TYPE?new TUnsafeStaticDoubleFieldAccessorImpl(var0):
+            return (TFieldAccessor)(!var6?(var2 == TBoolean.TYPE?new TUnsafeStaticBooleanFieldAccessorImpl(var0):
+                    (var2 == TByte.TYPE?new TUnsafeStaticByteFieldAccessorImpl(var0):
+                            (var2 == TShort.TYPE?new TUnsafeStaticShortFieldAccessorImpl(var0):
+                                    (var2 == TCharacter.TYPE?new TUnsafeStaticCharacterFieldAccessorImpl(var0):
+                                            (var2 == TInteger.TYPE?new TUnsafeStaticIntegerFieldAccessorImpl(var0):
+                                                    (var2 == TLong.TYPE?new TUnsafeStaticLongFieldAccessorImpl(var0):
+                                                            (var2 == TFloat.TYPE?new TUnsafeStaticFloatFieldAccessorImpl(var0):
+                                                                    (var2 == TDouble.TYPE?new TUnsafeStaticDoubleFieldAccessorImpl(var0):
                                                                             new TUnsafeStaticObjectFieldAccessorImpl(var0))))))))):
-                    (var2 == Boolean.TYPE?new TUnsafeQualifiedStaticBooleanFieldAccessorImpl(var0, var7):
-                            (var2 == Byte.TYPE?new TUnsafeQualifiedStaticByteFieldAccessorImpl(var0, var7):
-                                    (var2 == Short.TYPE?new TUnsafeQualifiedStaticShortFieldAccessorImpl(var0, var7):
-                                            (var2 == Character.TYPE?new TUnsafeQualifiedStaticCharacterFieldAccessorImpl(var0, var7):
-                                                    (var2 == Integer.TYPE?new TUnsafeQualifiedStaticIntegerFieldAccessorImpl(var0, var7):
-                                                            (var2 == Long.TYPE?new TUnsafeQualifiedStaticLongFieldAccessorImpl(var0, var7):
-                                                                    (var2 == Float.TYPE?new TUnsafeQualifiedStaticFloatFieldAccessorImpl(var0, var7):
-                                                                            (var2 == Double.TYPE?new TUnsafeQualifiedStaticDoubleFieldAccessorImpl(var0, var7):
+                    (var2 == TBoolean.TYPE?new TUnsafeQualifiedStaticBooleanFieldAccessorImpl(var0, var7):
+                            (var2 == TByte.TYPE?new TUnsafeQualifiedStaticByteFieldAccessorImpl(var0, var7):
+                                    (var2 == TShort.TYPE?new TUnsafeQualifiedStaticShortFieldAccessorImpl(var0, var7):
+                                            (var2 == TCharacter.TYPE?new TUnsafeQualifiedStaticCharacterFieldAccessorImpl(var0, var7):
+                                                    (var2 == TInteger.TYPE?new TUnsafeQualifiedStaticIntegerFieldAccessorImpl(var0, var7):
+                                                            (var2 == TLong.TYPE?new TUnsafeQualifiedStaticLongFieldAccessorImpl(var0, var7):
+                                                                    (var2 == TFloat.TYPE?new TUnsafeQualifiedStaticFloatFieldAccessorImpl(var0, var7):
+                                                                            (var2 == TDouble.TYPE?new TUnsafeQualifiedStaticDoubleFieldAccessorImpl(var0, var7):
                                                                                     new TUnsafeQualifiedStaticObjectFieldAccessorImpl(var0, var7))))))))));
         } else {
-            return (TFieldAccessor)(!var6?(var2 == Boolean.TYPE?new TUnsafeBooleanFieldAccessorImpl(var0):
-                    (var2 == Byte.TYPE?new TUnsafeByteFieldAccessorImpl(var0):
-                            (var2 == Short.TYPE?new TUnsafeShortFieldAccessorImpl(var0):
-                                    (var2 == Character.TYPE?new TUnsafeCharacterFieldAccessorImpl(var0):
-                                            (var2 == Integer.TYPE?new TUnsafeIntegerFieldAccessorImpl(var0):
-                                                    (var2 == Long.TYPE?new TUnsafeLongFieldAccessorImpl(var0):
-                                                            (var2 == Float.TYPE?new TUnsafeFloatFieldAccessorImpl(var0):
-                                                                    (var2 == Double.TYPE?new TUnsafeDoubleFieldAccessorImpl(var0):
+            return (TFieldAccessor)(!var6?(var2 == TBoolean.TYPE?new TUnsafeBooleanFieldAccessorImpl(var0):
+                    (var2 == TByte.TYPE?new TUnsafeByteFieldAccessorImpl(var0):
+                            (var2 == TShort.TYPE?new TUnsafeShortFieldAccessorImpl(var0):
+                                    (var2 == TCharacter.TYPE?new TUnsafeCharacterFieldAccessorImpl(var0):
+                                            (var2 == TInteger.TYPE?new TUnsafeIntegerFieldAccessorImpl(var0):
+                                                    (var2 == TLong.TYPE?new TUnsafeLongFieldAccessorImpl(var0):
+                                                            (var2 == TFloat.TYPE?new TUnsafeFloatFieldAccessorImpl(var0):
+                                                                    (var2 == TDouble.TYPE?new TUnsafeDoubleFieldAccessorImpl(var0):
                                                                             new TUnsafeObjectFieldAccessorImpl(var0))))))))):
-                    (var2 == Boolean.TYPE?new TUnsafeQualifiedBooleanFieldAccessorImpl(var0, var7):
-                            (var2 == Byte.TYPE?new TUnsafeQualifiedByteFieldAccessorImpl(var0, var7):
-                                    (var2 == Short.TYPE?new TUnsafeQualifiedShortFieldAccessorImpl(var0, var7):
-                                            (var2 == Character.TYPE?new TUnsafeQualifiedCharacterFieldAccessorImpl(var0, var7):
-                                                    (var2 == Integer.TYPE?new TUnsafeQualifiedIntegerFieldAccessorImpl(var0, var7):
-                                                            (var2 == Long.TYPE?new TUnsafeQualifiedLongFieldAccessorImpl(var0, var7):
-                                                                    (var2 == Float.TYPE?new TUnsafeQualifiedFloatFieldAccessorImpl(var0, var7):
-                                                                            (var2 == Double.TYPE?new TUnsafeQualifiedDoubleFieldAccessorImpl(var0, var7):
+                    (var2 == TBoolean.TYPE?new TUnsafeQualifiedBooleanFieldAccessorImpl(var0, var7):
+                            (var2 == TByte.TYPE?new TUnsafeQualifiedByteFieldAccessorImpl(var0, var7):
+                                    (var2 == TShort.TYPE?new TUnsafeQualifiedShortFieldAccessorImpl(var0, var7):
+                                            (var2 == TCharacter.TYPE?new TUnsafeQualifiedCharacterFieldAccessorImpl(var0, var7):
+                                                    (var2 == TInteger.TYPE?new TUnsafeQualifiedIntegerFieldAccessorImpl(var0, var7):
+                                                            (var2 == TLong.TYPE?new TUnsafeQualifiedLongFieldAccessorImpl(var0, var7):
+                                                                    (var2 == TFloat.TYPE?new TUnsafeQualifiedFloatFieldAccessorImpl(var0, var7):
+                                                                            (var2 == TDouble.TYPE?new TUnsafeQualifiedDoubleFieldAccessorImpl(var0, var7):
                                                                                     new TUnsafeQualifiedObjectFieldAccessorImpl(var0, var7))))))))));
         }
     }

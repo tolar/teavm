@@ -16,19 +16,20 @@
 package org.teavm.classlib.java.lang.reflect;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.GenericSignatureFormatError;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
+import org.teavm.classlib.sun.misc.TCallerSensitive;
 import org.teavm.classlib.sun.reflect.TConstructorAccessor;
+import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.reflect.generics.repository.TConstructorRepository;
 import org.teavm.classlib.sun.reflect.generics.scope.TConstructorScope;
 
@@ -36,10 +37,10 @@ import org.teavm.classlib.sun.reflect.generics.scope.TConstructorScope;
  * Created by vasek on 30. 6. 2016.
  */
 public final class TConstructor<T> extends TExecutable implements TGenericDeclaration {
-    private Class<T>            clazz;
+    private TClass<T>            clazz;
     private int                 slot;
-    private Class<?>[]          parameterTypes;
-    private Class<?>[]          exceptionTypes;
+    private TClass<?>[]          parameterTypes;
+    private TClass<?>[]          exceptionTypes;
     private int                 modifiers;
     // Generics and annotations support
     private transient String    signature;
@@ -90,9 +91,9 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * instantiation of these objects in Java code from the java.lang
      * package via sun.reflect.LangReflectAccess.
      */
-    TConstructor(Class<T> declaringClass,
-            Class<?>[] parameterTypes,
-            Class<?>[] checkedExceptions,
+    TConstructor(TClass<T> declaringClass,
+            TClass<?>[] parameterTypes,
+            TClass<?>[] checkedExceptions,
             int modifiers,
             int slot,
             String signature,
@@ -150,7 +151,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * {@inheritDoc}
      */
     @Override
-    public Class<T> getDeclaringClass() {
+    public TClass<T> getDeclaringClass() {
         return clazz;
     }
 
@@ -159,7 +160,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * the binary name of the constructor's declaring class.
      */
     @Override
-    public String getName() {
+    public TString getName() {
         return getDeclaringClass().getName();
     }
 
@@ -178,11 +179,11 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public TypeVariable<java.lang.reflect.Constructor<T>>[] getTypeParameters() {
+    public TTypeVariable<TConstructor<T>>[] getTypeParameters() {
         if (getSignature() != null) {
-            return (TypeVariable<java.lang.reflect.Constructor<T>>[])getGenericInfo().getTypeParameters();
+            return (TTypeVariable<TConstructor<T>>[])getGenericInfo().getTypeParameters();
         } else
-            return (TypeVariable<java.lang.reflect.Constructor<T>>[])new TypeVariable[0];
+            return (TTypeVariable<TConstructor<T>>[])new TTypeVariable[0];
     }
 
 
@@ -190,7 +191,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * {@inheritDoc}
      */
     @Override
-    public Class<?>[] getParameterTypes() {
+    public TClass<?>[] getParameterTypes() {
         return parameterTypes.clone();
     }
 
@@ -208,7 +209,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * @since 1.5
      */
     @Override
-    public Type[] getGenericParameterTypes() {
+    public TType[] getGenericParameterTypes() {
         return super.getGenericParameterTypes();
     }
 
@@ -216,7 +217,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * {@inheritDoc}
      */
     @Override
-    public Class<?>[] getExceptionTypes() {
+    public TClass<?>[] getExceptionTypes() {
         return exceptionTypes.clone();
     }
 
@@ -229,7 +230,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * @since 1.5
      */
     @Override
-    public Type[] getGenericExceptionTypes() {
+    public TType[] getGenericExceptionTypes() {
         return super.getGenericExceptionTypes();
     }
 
@@ -240,8 +241,8 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * same formal parameter types.
      */
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof java.lang.reflect.Constructor) {
-            java.lang.reflect.Constructor<?> other = (java.lang.reflect.Constructor<?>)obj;
+        if (obj != null && obj instanceof TConstructor) {
+            TConstructor<?> other = (TConstructor<?>)obj;
             if (getDeclaringClass() == other.getDeclaringClass()) {
                 return equalParamTypes(parameterTypes, other.parameterTypes);
             }
@@ -277,7 +278,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * @jls 8.8.3. Constructor Modifiers
      */
     public String toString() {
-        return sharedToString(Modifier.constructorModifiers(),
+        return sharedToString(TModifier.constructorModifiers(),
                 false,
                 parameterTypes,
                 exceptionTypes);
@@ -380,20 +381,18 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      * @exception ExceptionInInitializerError if the initialization provoked
      *              by this method fails.
      */
-    @CallerSensitive
+    @TCallerSensitive
     public T newInstance(Object ... initargs)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException
     {
         if (!override) {
-            if (!Reflection.quickCheckMemberAccess(clazz, modifiers)) {
-                Class<?> caller = Reflection.getCallerClass();
+            if (!TReflection.quickCheckMemberAccess(clazz, modifiers)) {
+                TClass<?> caller = TReflection.getCallerClass();
                 checkAccess(caller, clazz, null, modifiers);
             }
         }
-        if ((clazz.getModifiers() & Modifier.ENUM) != 0)
-            throw new IllegalArgumentException("Cannot reflectively create enum objects");
-        ConstructorAccessor ca = constructorAccessor;   // read volatile
+        TConstructorAccessor ca = constructorAccessor;   // read volatile
         if (ca == null) {
             ca = acquireConstructorAccessor();
         }
@@ -503,22 +502,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
 
     @Override
     void handleParameterNumberMismatch(int resultLength, int numParameters) {
-        Class<?> declaringClass = getDeclaringClass();
-        if (declaringClass.isEnum() ||
-                declaringClass.isAnonymousClass() ||
-                declaringClass.isLocalClass() )
-            return ; // Can't do reliable parameter counting
-        else {
-            if (!declaringClass.isMemberClass() || // top-level
-                    // Check for the enclosing instance parameter for
-                    // non-static member classes
-                    (declaringClass.isMemberClass() &&
-                            ((declaringClass.getModifiers() & Modifier.STATIC) == 0)  &&
-                            resultLength + 1 != numParameters) ) {
-                throw new AnnotationFormatError(
-                        "Parameter annotations don't match number of parameters");
-            }
-        }
+
     }
 
     /**
@@ -527,7 +511,7 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      */
     @Override
     public AnnotatedType getAnnotatedReturnType() {
-        return getAnnotatedReturnType0(getDeclaringClass());
+        return null;
     }
 
     /**
@@ -536,15 +520,6 @@ public final class TConstructor<T> extends TExecutable implements TGenericDeclar
      */
     @Override
     public AnnotatedType getAnnotatedReceiverType() {
-        if (getDeclaringClass().getEnclosingClass() == null)
-            return super.getAnnotatedReceiverType();
-
-        return TypeAnnotationParser.buildAnnotatedType(getTypeAnnotationBytes0(),
-                sun.misc.SharedSecrets.getJavaLangAccess().
-                        getConstantPool(getDeclaringClass()),
-                this,
-                getDeclaringClass(),
-                getDeclaringClass().getEnclosingClass(),
-                TTypeAnnotation.TypeAnnotationTarget.METHOD_RECEIVER);
+        return null;
     }
 }

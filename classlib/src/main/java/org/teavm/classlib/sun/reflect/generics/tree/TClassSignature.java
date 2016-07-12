@@ -1,7 +1,9 @@
 /*    */ package org.teavm.classlib.sun.reflect.generics.tree;
-/*    */ 
-/*    */ import sun.reflect.generics.visitor.Visitor;
-/*    */ 
+
+import org.teavm.classlib.sun.reflect.generics.visitor.TVisitor;
+
+/*    */
+/*    */
 /*    */ 
 /*    */ 
 /*    */ 
@@ -52,7 +54,7 @@
 /* 52 */   public TClassTypeSignature getSuperclass() { return this.superclass; }
 /* 53 */   public TClassTypeSignature[] getSuperInterfaces() { return this.superInterfaces; }
 /*    */   
-/* 55 */   public void accept(Visitor<?> paramVisitor) { paramVisitor.visitClassSignature(this); }
+/* 55 */   public void accept(TVisitor<?> paramVisitor) { paramVisitor.visitClassSignature(this); }
 /*    */ }
 
 
