@@ -16,9 +16,9 @@
 package org.teavm.classlib.java.lang;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.teavm.classlib.impl.DeclaringClassMetadataGenerator;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.TAnnotatedElement;
@@ -294,5 +294,11 @@ public class TClass<T> extends TObject implements TAnnotatedElement,TType, TGene
         return new TTypeVariable<?>[0];
     }
 
+    public boolean isAnnotation() {
+        return false;
+    }
 
+    public Method[] getDeclaredMethods() {
+        return new Method[0];
+    }
 }

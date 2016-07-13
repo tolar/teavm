@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.reflect;
 
 import java.lang.reflect.Modifier;
-
 import org.teavm.classlib.java.lang.reflect.TField;
 import org.teavm.classlib.sun.misc.TUnsafe;
 
@@ -41,9 +40,6 @@ abstract class TUnsafeFieldAccessorImpl extends TFieldAccessorImpl {
     }
 
     protected void ensureObj(Object var1) {
-        if(!this.field.getDeclaringClass().isAssignableFrom(var1.getClass())) {
-            this.throwSetIllegalArgumentException(var1);
-        }
 
     }
 

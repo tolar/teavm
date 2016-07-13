@@ -15,16 +15,14 @@
  */
 package org.teavm.classlib.sun.reflect.annotation;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
-
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.sun.misc.TJavaLangAccess;
 import org.teavm.classlib.sun.misc.TSharedSecrets;
 
@@ -35,10 +33,8 @@ public class TAnnotationType {
     private final Map<String, Class<?>> memberTypes;
     private final Map<String, Object> memberDefaults;
     private final Map<String, Method> members;
-    private final RetentionPolicy retention;
-    private final boolean inherited;
 
-    public static TAnnotationType getInstance(Class<? extends Annotation> var0) {
+    public static TAnnotationType getInstance(TClass<? extends TAnnotation> var0) {
         TJavaLangAccess var1 = TSharedSecrets.getJavaLangAccess();
         org.teavm.classlib.sun.reflect.annotation.TAnnotationType var2 = var1.getAnnotationType(var0);
         if(var2 == null) {
@@ -53,7 +49,7 @@ public class TAnnotationType {
         return var2;
     }
 
-    private TAnnotationType(final Class<? extends Annotation> var1) {
+    private TAnnotationType(final TClass<? extends TAnnotation> var1) {
         if(!var1.isAnnotation()) {
             throw new IllegalArgumentException("Not an annotation type");
         } else {
@@ -84,17 +80,6 @@ public class TAnnotationType {
                 }
             }
 
-            if(var1 != Retention.class && var1 != Inherited.class) {
-                TJavaLangAccess var10 = TSharedSecrets.getJavaLangAccess();
-                Map var11 = TAnnotationParser
-                        .parseSelectAnnotations(var10.getRawClassAnnotations(var1), var10.getConstantPool(var1), var1, new Class[]{Retention.class, Inherited.class});
-                Retention var12 = (Retention)var11.get(Retention.class);
-                this.retention = var12 == null?RetentionPolicy.CLASS:var12.value();
-                this.inherited = var11.containsKey(Inherited.class);
-            } else {
-                this.retention = RetentionPolicy.RUNTIME;
-                this.inherited = false;
-            }
 
         }
     }
@@ -116,14 +101,14 @@ public class TAnnotationType {
     }
 
     public RetentionPolicy retention() {
-        return this.retention;
+        return null;
     }
 
     public boolean isInherited() {
-        return this.inherited;
+        return false;
     }
 
     public String toString() {
-        return "Annotation Type:\n   Member types: " + this.memberTypes + "\n" + "   Member defaults: " + this.memberDefaults + "\n" + "   Retention policy: " + this.retention + "\n" + "   Inherited: " + this.inherited;
+        return "Annotation Type:\n   Member types: " + this.memberTypes + "\n" + "   Member defaults: " + this.memberDefaults + "\n" + "   Retention policy: " + null + "\n" + "   Inherited: " + false;
     }
 }

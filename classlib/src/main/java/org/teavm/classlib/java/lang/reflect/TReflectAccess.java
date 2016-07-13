@@ -25,7 +25,7 @@ import org.teavm.classlib.sun.reflect.TMethodAccessor;
  */
 class TReflectAccess implements org.teavm.classlib.sun.reflect.TLangReflectAccess {
     public TField newField(TClass<?> declaringClass,
-            String name,
+            TString name,
             TClass<?> type,
             int modifiers,
             int slot,

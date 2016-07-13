@@ -15,6 +15,7 @@
  */
 package org.teavm.classlib.sun.reflect;
 
+import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.reflect.TField;
 import org.teavm.classlib.java.lang.reflect.TMember;
 
@@ -31,11 +32,11 @@ public class TConstantPool {
         return this.getSize0(this.constantPoolOop);
     }
 
-    public Class<?> getClassAt(int var1) {
+    public TClass<?> getClassAt(int var1) {
         return this.getClassAt0(this.constantPoolOop, var1);
     }
 
-    public Class<?> getClassAtIfLoaded(int var1) {
+    public TClass<?> getClassAtIfLoaded(int var1) {
         return this.getClassAtIfLoaded0(this.constantPoolOop, var1);
     }
 
@@ -85,9 +86,9 @@ public class TConstantPool {
 
     private native int getSize0(Object var1);
 
-    private native Class<?> getClassAt0(Object var1, int var2);
+    private native TClass<?> getClassAt0(Object var1, int var2);
 
-    private native Class<?> getClassAtIfLoaded0(Object var1, int var2);
+    private native TClass<?> getClassAtIfLoaded0(Object var1, int var2);
 
     private native TMember getMethodAt0(Object var1, int var2);
 

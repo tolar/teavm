@@ -17,8 +17,8 @@ package org.teavm.classlib.java.lang.reflect;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
-
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.factory.TCoreReflectionFactory;
 import org.teavm.classlib.java.lang.reflect.factory.TGenericsFactory;
@@ -38,7 +38,7 @@ class TField extends TAccessibleObject implements TMember {
     private int                 slot;
     // This is guaranteed to be interned by the TVM in the 1.4
     // reflection implementation
-    private String              name;
+    private TString              name;
     private TClass<?>            type;
     private int                 modifiers;
     // Generics and annotations support
@@ -87,7 +87,7 @@ class TField extends TAccessibleObject implements TMember {
      * package via sun.reflect.LangReflectAccess.
      */
     TField(TClass<?> declaringClass,
-            String name,
+            TString name,
             TClass<?> type,
             int modifiers,
             int slot,
@@ -140,7 +140,7 @@ class TField extends TAccessibleObject implements TMember {
     /**
      * Returns the name of the field represented by this {@code Field} object.
      */
-    public String getName() {
+    public TString getName() {
         return name;
     }
 

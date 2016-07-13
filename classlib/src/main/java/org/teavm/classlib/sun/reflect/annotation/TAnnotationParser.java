@@ -17,18 +17,12 @@ package org.teavm.classlib.sun.reflect.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.AnnotationFormatError;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Array;
-import java.lang.reflect.Proxy;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.sun.reflect.TConstantPool;
@@ -73,21 +67,7 @@ public class TAnnotationParser {
     }
 
     private static Map<Class<? extends Annotation>, Annotation> parseAnnotations2(byte[] var0, TConstantPool var1, TClass<?> var2, TClass<? extends TAnnotation>[] var3) {
-        LinkedHashMap var4 = new LinkedHashMap();
-        ByteBuffer var5 = ByteBuffer.wrap(var0);
-        int var6 = var5.getShort() & '\uffff';
-
-        for(int var7 = 0; var7 < var6; ++var7) {
-            Annotation var8 = parseAnnotation2(var5, var1, var2, false, var3);
-            if(var8 != null) {
-                Class var9 = var8.annotationType();
-                if(TAnnotationType.getInstance(var9).retention() == RetentionPolicy.RUNTIME && var4.put(var9, var8) != null) {
-                    throw new AnnotationFormatError("Duplicate annotation for class: " + var9 + ": " + var8);
-                }
-            }
-        }
-
-        return var4;
+        return null;
     }
 
     public static Annotation[][] parseParameterAnnotations(byte[] var0, TConstantPool var1, TClass<?> var2) {
@@ -105,22 +85,6 @@ public class TAnnotationParser {
         int var4 = var3.get() & 255;
         Annotation[][] var5 = new Annotation[var4][];
 
-        for(int var6 = 0; var6 < var4; ++var6) {
-            int var7 = var3.getShort() & '\uffff';
-            ArrayList var8 = new ArrayList(var7);
-
-            for(int var9 = 0; var9 < var7; ++var9) {
-                Annotation var10 = parseAnnotation(var3, var1, var2, false);
-                if(var10 != null) {
-                    TAnnotationType var11 = TAnnotationType.getInstance(var10.annotationType());
-                    if(var11.retention() == RetentionPolicy.RUNTIME) {
-                        var8.add(var10);
-                    }
-                }
-            }
-
-            var5[var6] = (Annotation[])var8.toArray(EMPTY_ANNOTATIONS_ARRAY);
-        }
 
         return var5;
     }
@@ -131,7 +95,7 @@ public class TAnnotationParser {
 
     private static Annotation parseAnnotation2(ByteBuffer var0, TConstantPool var1, TClass<?> var2, boolean var3, TClass<? extends Annotation>[] var4) {
         int var5 = var0.getShort() & '\uffff';
-        Class var6 = null;
+        TClass var6 = null;
         String var7 = "[unknown]";
 
         try {
@@ -190,13 +154,8 @@ public class TAnnotationParser {
         }
     }
 
-    public static Annotation annotationForMap(final Class<? extends Annotation> var0, final Map<String, Object> var1) {
-        return (Annotation) AccessController.doPrivileged(new PrivilegedAction() {
-            public Annotation run() {
-                return (Annotation) Proxy
-                        .newProxyInstance(var0.getClassLoader(), new Class[]{var0}, null);
-            }
-        });
+    public static Annotation annotationForMap(final TClass<? extends TAnnotation> var0, final Map<String, Object> var1) {
+        return null;
     }
 
     public static Object parseMemberValue(Class<?> var0, ByteBuffer var1, TConstantPool var2, TClass<?> var3) {
