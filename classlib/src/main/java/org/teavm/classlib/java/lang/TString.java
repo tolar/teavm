@@ -15,6 +15,7 @@
  */
 package org.teavm.classlib.java.lang;
 
+import java.util.Formatter;
 import org.teavm.classlib.java.io.TSerializable;
 import org.teavm.classlib.java.io.TUnsupportedEncodingException;
 import org.teavm.classlib.java.nio.TByteBuffer;
@@ -646,4 +647,10 @@ public class TString extends TObject implements TSerializable, TComparable<TStri
     public String replaceFirst(String regex, String replacement) {
         return TPattern.compile(regex).matcher(toString()).replaceFirst(replacement);
     }
+
+    public static String format(String format, Object... args) {
+        return new Formatter().format(format, args).toString();
+    }
+
+
 }
