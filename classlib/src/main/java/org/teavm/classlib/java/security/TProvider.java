@@ -16,6 +16,7 @@
 package org.teavm.classlib.java.security;
 
 import static java.util.Locale.ENGLISH;
+
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -32,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.teavm.classlib.java.util.TProperties;
 
 /**
@@ -54,6 +56,12 @@ public abstract class TProvider extends TProperties {
     // used for services added via putService(), initialized on demand
     private transient Map<TProvider.ServiceKey,TProvider.Service> serviceMap;
     private String name;
+
+    protected TProvider(String name, double version, String info) {
+        this.name = name;
+        initialized = true;
+    }
+
 
     private void checkInitialized() {
         if (!initialized) {

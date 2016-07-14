@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,13 +15,8 @@
  */
 package org.teavm.classlib.java.io;
 
-/**
- * Created by vasek on 14. 7. 2016.
- */
-public class TFileInputStream {
+public class TObjectStreamField {
 
-
-    public TFileInputStream(String name)  {
+    public TObjectStreamField(String name, Class<?> type) {
     }
-
 }

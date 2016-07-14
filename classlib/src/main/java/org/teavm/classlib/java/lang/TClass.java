@@ -16,13 +16,15 @@
 package org.teavm.classlib.java.lang;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.teavm.classlib.impl.DeclaringClassMetadataGenerator;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.TAnnotatedElement;
+import org.teavm.classlib.java.lang.reflect.TField;
 import org.teavm.classlib.java.lang.reflect.TGenericDeclaration;
+import org.teavm.classlib.java.lang.reflect.TMethod;
 import org.teavm.classlib.java.lang.reflect.TType;
 import org.teavm.classlib.java.lang.reflect.TTypeVariable;
 import org.teavm.platform.Platform;
@@ -298,7 +300,11 @@ public class TClass<T> extends TObject implements TAnnotatedElement,TType, TGene
         return false;
     }
 
-    public Method[] getDeclaredMethods() {
-        return new Method[0];
+    public TMethod[] getDeclaredMethods() {
+        return new TMethod[0];
+    }
+
+    public TField[] getDeclaredFields() throws SecurityException {
+        return new TField[0];
     }
 }

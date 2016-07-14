@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,15 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.io;
-
-/**
- * Created by vasek on 14. 7. 2016.
- */
-public class TFileInputStream {
+package org.teavm.classlib.java.security;
 
 
-    public TFileInputStream(String name)  {
-    }
+public abstract class TPermissionCollection {
+
+    public abstract void add(TPermission permission);
 
 }

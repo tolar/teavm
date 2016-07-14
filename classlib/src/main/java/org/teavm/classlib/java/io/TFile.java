@@ -28,4 +28,8 @@ public class TFile {
         return false;
     }
 
+    public boolean isDirectory() {
+        return false;
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,15 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.io;
+package org.teavm.classlib.java.security;
 
-/**
- * Created by vasek on 14. 7. 2016.
- */
-public class TFileInputStream {
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
+public class TAlgorithmParameters {
 
-    public TFileInputStream(String name)  {
+    public final void init(byte[] params, String format) throws IOException {
     }
 
+    public static TAlgorithmParameters getInstance(String algorithm,
+            String provider)
+            throws NoSuchAlgorithmException, NoSuchProviderException
+    {
+        return null;
+    }
 }

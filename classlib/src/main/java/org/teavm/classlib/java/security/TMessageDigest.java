@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,15 +13,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.io;
+package org.teavm.classlib.java.security;
 
-/**
- * Created by vasek on 14. 7. 2016.
- */
-public class TFileInputStream {
+import java.security.DigestException;
+
+public class TMessageDigest {
+
+    protected TMessageDigest(String algorithm) {
+
+    }
 
 
-    public TFileInputStream(String name)  {
+    public byte[] digest() {
+        return null;
+    }
+
+    public int digest(byte[] buf, int offset, int len) throws DigestException {
+        return -1;
+    }
+
+    public byte[] digest(byte[] input) {
+        return digest();
     }
 
 }

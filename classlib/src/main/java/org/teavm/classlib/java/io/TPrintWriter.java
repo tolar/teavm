@@ -19,4 +19,19 @@ package org.teavm.classlib.java.io;
  * Created by vasek on 14. 7. 2016.
  */
 public class TPrintWriter {
+
+    public TPrintWriter (TWriter out) {
+    }
+
+    public void flush() {
+    }
+
+    public void print(char c) {
+    }
+
+    public void print(String str) {
+    }
+
+    public void print(int i) {
+    }
 }

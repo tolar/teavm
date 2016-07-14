@@ -19,4 +19,10 @@ package org.teavm.classlib.java.security;
  * Created by vasek on 14. 7. 2016.
  */
 public class TGeneralSecurityException {
+
+    public TGeneralSecurityException(String msg) {
+    }
+
+    public void printStackTrace() {
+    }
 }
