@@ -20,6 +20,8 @@ package org.teavm.classlib.java.io;
  */
 public class TFileInputStream {
 
-    public TFileInputStream(String name) {
+
+    public TFileInputStream(String name)  {
     }
+
 }

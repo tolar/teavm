@@ -15,5 +15,8 @@
  */
 package org.teavm.classlib.java.security;
 
-public class TInvalidKeyException {
+public class TNoSuchAlgorithmException extends TGeneralSecurityException {
+    public TNoSuchAlgorithmException(String msg) {
+        super(msg);
+    }
 }

@@ -15,5 +15,25 @@
  */
 package org.teavm.classlib.java.security;
 
-public class TInvalidKeyException {
+import java.security.DigestException;
+
+public class TMessageDigest {
+
+    protected TMessageDigest(String algorithm) {
+
+    }
+
+
+    public byte[] digest() {
+        return null;
+    }
+
+    public int digest(byte[] buf, int offset, int len) throws DigestException {
+        return -1;
+    }
+
+    public byte[] digest(byte[] input) {
+        return digest();
+    }
+
 }

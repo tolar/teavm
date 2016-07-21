@@ -21,5 +21,4 @@ package org.teavm.classlib.java.security.cert;
 public abstract class TX509Certificate {
 
     public abstract byte[] getTBSCertificate();
-
 }

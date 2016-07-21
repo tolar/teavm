@@ -15,7 +15,7 @@
  */
 package org.teavm.classlib.java.net;
 
-import java.io.InputStream;
+import org.teavm.classlib.java.io.TInputStream;
 
 /**
  * Created by vasek on 14. 7. 2016.
@@ -25,7 +25,11 @@ public class TURL {
     public TURL(String spec) {
     }
 
-    public final InputStream openStream() {
+    public final TInputStream openStream()  {
+        return null;
+    }
+
+    public String toExternalForm() {
         return null;
     }
 }

@@ -17,6 +17,7 @@ package org.teavm.classlib.java.lang;
 
 import java.util.Formatter;
 import java.util.Locale;
+
 import org.teavm.classlib.java.io.TSerializable;
 import org.teavm.classlib.java.io.TUnsupportedEncodingException;
 import org.teavm.classlib.java.nio.TByteBuffer;
@@ -620,6 +621,98 @@ public class TString extends TObject implements TSerializable, TComparable<TStri
         return new TString(codePoints, 0, codePointCount);
     }
 
+    public TString toLowerCase(Locale locale) {
+        if (locale == null) {
+            throw new NullPointerException();
+        }
+
+        int firstUpper;
+        final int len = characters.length;
+
+        /* Now check if there are any characters that need to be changed. */
+        scan: {
+            for (firstUpper = 0 ; firstUpper < len; ) {
+                char c = characters[firstUpper];
+                if ((c >= Character.MIN_HIGH_SURROGATE)
+                        && (c <= Character.MAX_HIGH_SURROGATE)) {
+                    int supplChar = codePointAt(firstUpper);
+                    if (supplChar != Character.toLowerCase(supplChar)) {
+                        break scan;
+                    }
+                    firstUpper += Character.charCount(supplChar);
+                } else {
+                    if (c != Character.toLowerCase(c)) {
+                        break scan;
+                    }
+                    firstUpper++;
+                }
+            }
+            return this;
+        }
+
+        char[] result = new char[len];
+        int resultOffset = 0;  /* result may grow, so i+resultOffset
+                                * is the write location in result */
+
+        /* Just copy the first few lowerCase characters. */
+        System.arraycopy(characters, 0, result, 0, firstUpper);
+
+        String lang = locale.getLanguage();
+        boolean localeDependent =
+                (lang == "tr" || lang == "az" || lang == "lt");
+        char[] lowerCharArray;
+        int lowerChar;
+        int srcChar;
+        int srcCount;
+        for (int i = firstUpper; i < len; i += srcCount) {
+            srcChar = (int)characters[i];
+            if ((char)srcChar >= Character.MIN_HIGH_SURROGATE
+                    && (char)srcChar <= Character.MAX_HIGH_SURROGATE) {
+                srcChar = codePointAt(i);
+                srcCount = Character.charCount(srcChar);
+            } else {
+                srcCount = 1;
+            }
+
+            lowerChar = Character.toLowerCase(srcChar);
+
+            if (localeDependent ||
+                    srcChar == '\u03A3' || // GREEK CAPITAL LETTER SIGMA
+                    srcChar == '\u0130') { // LATIN CAPITAL LETTER I WITH DOT ABOVE
+                lowerChar = TConditionalSpecialCasing.toLowerCaseEx(this, i, locale);
+            } else {
+                lowerChar = TCharacter.toLowerCase(srcChar);
+            }
+            if ((lowerChar == TCharacter.ERROR)
+                    || (lowerChar >= Character.MIN_SUPPLEMENTARY_CODE_POINT)) {
+                if (lowerChar == TCharacter.ERROR) {
+                    lowerCharArray =
+                            TConditionalSpecialCasing.toLowerCaseCharArray(this, i, locale);
+                } else if (srcCount == 2) {
+                    resultOffset += Character.toChars(lowerChar, result, i + resultOffset) - srcCount;
+                    continue;
+                } else {
+                    lowerCharArray = Character.toChars(lowerChar);
+                }
+
+                /* Grow result if needed */
+                int mapLen = lowerCharArray.length;
+                if (mapLen > srcCount) {
+                    char[] result2 = new char[result.length + mapLen - srcCount];
+                    System.arraycopy(result, 0, result2, 0, i + resultOffset);
+                    result = result2;
+                }
+                for (int x = 0; x < mapLen; ++x) {
+                    result[i + resultOffset + x] = lowerCharArray[x];
+                }
+                resultOffset += (mapLen - srcCount);
+            } else {
+                result[i + resultOffset] = (char)lowerChar;
+            }
+        }
+        return new TString(result, 0, len + resultOffset);
+    }
+
     public TString intern() {
         TString interned = pool.get(this);
         if (interned == null) {
@@ -628,6 +721,7 @@ public class TString extends TObject implements TSerializable, TComparable<TStri
         }
         return interned;
     }
+
 
     public boolean matches(String regex) {
         return TPattern.matches(regex, this.toString());

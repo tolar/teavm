@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,8 +15,19 @@
  */
 package org.teavm.classlib.java.security;
 
-/**
- * Created by vasek on 21. 7. 2016.
- */
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
 public class TAlgorithmParameters {
+
+    public final void init(byte[] params, String format) throws IOException {
+    }
+
+    public static TAlgorithmParameters getInstance(String algorithm,
+            String provider)
+            throws NoSuchAlgorithmException, NoSuchProviderException
+    {
+        return null;
+    }
 }

@@ -13,7 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.security;
+package org.teavm.classlib.java.io;
 
-public class TInvalidKeyException {
+import java.io.OutputStream;
+
+public class TBufferedOutputStream {
+    public TBufferedOutputStream(OutputStream out) {
+    }
+
 }

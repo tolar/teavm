@@ -15,5 +15,9 @@
  */
 package org.teavm.classlib.java.security;
 
-public class TInvalidKeyException {
+
+public abstract class TPermissionCollection {
+
+    public abstract void add(TPermission permission);
+
 }
