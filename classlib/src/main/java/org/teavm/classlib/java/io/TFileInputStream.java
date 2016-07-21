@@ -19,4 +19,7 @@ package org.teavm.classlib.java.io;
  * Created by vasek on 14. 7. 2016.
  */
 public class TFileInputStream {
+
+    public TFileInputStream(String name) {
+    }
 }

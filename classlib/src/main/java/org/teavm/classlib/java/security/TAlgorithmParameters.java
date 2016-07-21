@@ -15,10 +15,8 @@
  */
 package org.teavm.classlib.java.security;
 
-import org.teavm.classlib.java.lang.TException;
-
 /**
- * Created by vasek on 14. 7. 2016.
+ * Created by vasek on 21. 7. 2016.
  */
-public class TGeneralSecurityException extends TException {
+public class TAlgorithmParameters {
 }
