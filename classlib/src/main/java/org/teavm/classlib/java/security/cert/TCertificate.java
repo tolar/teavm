@@ -15,6 +15,7 @@
  */
 package org.teavm.classlib.java.security.cert;
 
+import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.util.TArrays;
 
 import sun.security.x509.X509CertImpl;
@@ -189,7 +190,7 @@ public abstract class TCertificate {
      *
      * @return the public key.
      */
-    public abstract PublicKey getPublicKey();
+    public abstract TPublicKey getPublicKey();
 
     /**
      * Alternate Certificate class for serialization.

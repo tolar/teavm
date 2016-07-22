@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,38 +13,33 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.security;
+package org.teavm.classlib.java.security.cert;
 
-import org.teavm.classlib.java.lang.TException;
-import org.teavm.classlib.java.lang.TString;
-import org.teavm.classlib.java.lang.TThrowable;
+import org.teavm.classlib.java.security.TGeneralSecurityException;
 
-/**
- * Created by vasek on 14. 7. 2016.
- */
-public class TGeneralSecurityException extends TException {
+public class TCertificateException extends TGeneralSecurityException {
 
     /**
-     * Constructs a GeneralSecurityException with no detail message.
+     * Constructs a certificate exception with no detail message. A detail
+     * message is a String that describes this particular exception.
      */
-    public TGeneralSecurityException() {
+    public TCertificateException() {
         super();
     }
 
     /**
-     * Constructs a GeneralSecurityException with the specified detail
-     * message.
-     * A detail message is a String that describes this particular
-     * exception.
+     * Constructs a certificate exception with the given detail
+     * message. A detail message is a String that describes this
+     * particular exception.
      *
      * @param msg the detail message.
      */
-    public TGeneralSecurityException(TString msg) {
+    public TCertificateException(String msg) {
         super(msg);
     }
 
     /**
-     * Creates a {@code GeneralSecurityException} with the specified
+     * Creates a {@code CertificateException} with the specified
      * detail message and cause.
      *
      * @param message the detail message (which is saved for later retrieval
@@ -54,12 +49,12 @@ public class TGeneralSecurityException extends TException {
      *        and indicates that the cause is nonexistent or unknown.)
      * @since 1.5
      */
-    public TGeneralSecurityException(TString message, TThrowable cause) {
+    public TCertificateException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Creates a {@code GeneralSecurityException} with the specified cause
+     * Creates a {@code CertificateException} with the specified cause
      * and a detail message of {@code (cause==null ? null : cause.toString())}
      * (which typically contains the class and detail message of
      * {@code cause}).
@@ -69,7 +64,7 @@ public class TGeneralSecurityException extends TException {
      *        and indicates that the cause is nonexistent or unknown.)
      * @since 1.5
      */
-    public TGeneralSecurityException(TThrowable cause) {
+    public TCertificateException(Throwable cause) {
         super(cause);
     }
 

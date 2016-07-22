@@ -25,9 +25,7 @@ import java.util.Set;
 
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
-
-import sun.security.jca.GetInstance;
-import sun.security.jca.ServiceId;
+import org.teavm.classlib.sun.security.jca.TServiceId;
 
 public abstract class TSignature extends TSignatureSpi {
 
@@ -85,13 +83,13 @@ public abstract class TSignature extends TSignatureSpi {
     private final static String RSA_CIPHER = "RSA/ECB/PKCS1Padding";
 
     // all the services we need to lookup for compatibility with Cipher
-    private final static List<ServiceId> rsaIds = Arrays.asList(
-            new ServiceId[] {
-                    new ServiceId("Signature", "NONEwithRSA"),
-                    new ServiceId("Cipher", "RSA/ECB/PKCS1Padding"),
-                    new ServiceId("Cipher", "RSA/ECB"),
-                    new ServiceId("Cipher", "RSA//PKCS1Padding"),
-                    new ServiceId("Cipher", "RSA"),
+    private final static List<TServiceId> rsaIds = Arrays.asList(
+            new TServiceId[] {
+                    new TServiceId("Signature", "NONEwithRSA"),
+                    new TServiceId("Cipher", "RSA/ECB/PKCS1Padding"),
+                    new TServiceId("Cipher", "RSA/ECB"),
+                    new TServiceId("Cipher", "RSA//PKCS1Padding"),
+                    new TServiceId("Cipher", "RSA"),
             }
     );
 
@@ -126,9 +124,9 @@ public abstract class TSignature extends TSignatureSpi {
             throws NoSuchAlgorithmException {
         List<Provider.Service> list;
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
-            list = GetInstance.getServices(rsaIds);
+            list = TGetInstance.getServices(rsaIds);
         } else {
-            list = GetInstance.getServices("Signature", algorithm);
+            list = TGetInstance.getServices("Signature", algorithm);
         }
         Iterator<Provider.Service> t = list.iterator();
         if (t.hasNext() == false) {
@@ -257,7 +255,7 @@ public abstract class TSignature extends TSignatureSpi {
             if ((provider == null) || (provider.length() == 0)) {
                 throw new IllegalArgumentException("missing provider");
             }
-            Provider p = Security.getProvider(provider);
+            Provider p = TSecurity.getProvider(provider);
             if (p == null) {
                 throw new NoSuchProviderException
                         ("no such provider: " + provider);
