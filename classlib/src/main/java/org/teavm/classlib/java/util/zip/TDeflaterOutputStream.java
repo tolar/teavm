@@ -15,18 +15,34 @@
  */
 package org.teavm.classlib.java.util.zip;
 
-import com.jcraft.jzlib.DeflaterOutputStream;
-import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.util.zip.Deflater;
+
+import org.teavm.classlib.java.io.TFilterOutputStream;
+import org.teavm.classlib.java.io.TOutputStream;
 
 /**
  *
  * @author Alexey Andreev
  */
-public class TDeflaterOutputStream extends FilterOutputStream {
-    public TDeflaterOutputStream(OutputStream out) throws IOException {
+public class TDeflaterOutputStream extends TFilterOutputStream {
+
+    public TDeflaterOutputStream(TOutputStream out) {
         super(out);
-        this.out = new DeflaterOutputStream(out);
+    }
+
+    public TDeflaterOutputStream(TOutputStream out, Deflater def, int size) {
+        super(out);
+    }
+
+    public TDeflaterOutputStream(TOutputStream out, Deflater def) {
+        this(out);
+    }
+
+    public TDeflaterOutputStream(TOutputStream out, Deflater def, int i, boolean b) {
+        this(out);
+    }
+
+    public void finish() throws IOException {
     }
 }

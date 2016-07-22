@@ -63,6 +63,10 @@
     <orderEntry type="library" name="Maven: org.netbeans.html:net.java.html.boot:1.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.netbeans.html:net.java.html:1.2.3" level="project" />
   </component>
+  <component name="sonarModuleSettings">
+    <option name="localAnalysisScripName" value="&lt;PROJECT&gt;" />
+    <option name="serverName" value="&lt;PROJECT&gt;" />
+  </component>
   <component name="teavm">
     <option name="enabled" value="true" />
     <option name="mainClass" value="org.teavm.samples.benchmark.teavm.BenchmarkStarter" />

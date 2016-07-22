@@ -116,4 +116,12 @@ public final class TSystem extends TObject {
     public static TString lineSeparator() {
         return TString.wrap("\n");
     }
+
+    public static SecurityManager getSecurityManager() {
+        return null;
+    }
+
+    public static void exit(int status) {
+        TRuntime.getRuntime().exit(status);
+    }
 }

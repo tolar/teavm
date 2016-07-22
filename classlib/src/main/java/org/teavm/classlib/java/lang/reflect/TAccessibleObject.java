@@ -16,11 +16,11 @@
 package org.teavm.classlib.java.lang.reflect;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.ReflectPermission;
 
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.security.TAccessController;
+import org.teavm.classlib.java.security.TPermission;
 import org.teavm.classlib.sun.reflect.TReflectionFactory;
 
 /**
@@ -33,8 +33,8 @@ public class TAccessibleObject implements TAnnotatedElement {
      * has sufficient privilege to defeat Java language access
      * control checks.
      */
-    static final private java.security.Permission ACCESS_PERMISSION =
-            new ReflectPermission("suppressAccessChecks");
+    static final private TPermission ACCESS_PERMISSION =
+            new TReflectPermission("suppressAccessChecks");
 
     /**
      * Convenience method to set the {@code accessible} flag for an
@@ -64,7 +64,7 @@ public class TAccessibleObject implements TAnnotatedElement {
     public static void setAccessible(TAccessibleObject[] array, boolean flag)
             throws SecurityException {
         SecurityManager sm = System.getSecurityManager();
-        if (sm != null) sm.checkPermission(ACCESS_PERMISSION);
+        //if (sm != null) sm.checkPermission(ACCESS_PERMISSION);
         for (int i = 0; i < array.length; i++) {
             setAccessible0(array[i], flag);
         }
@@ -97,7 +97,7 @@ public class TAccessibleObject implements TAnnotatedElement {
      */
     public void setAccessible(boolean flag) throws SecurityException {
         SecurityManager sm = System.getSecurityManager();
-        if (sm != null) sm.checkPermission(ACCESS_PERMISSION);
+        //if (sm != null) sm.checkPermission(ACCESS_PERMISSION);
         setAccessible0(this, flag);
     }
 

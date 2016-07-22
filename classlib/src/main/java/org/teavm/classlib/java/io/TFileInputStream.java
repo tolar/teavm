@@ -15,13 +15,23 @@
  */
 package org.teavm.classlib.java.io;
 
+import org.teavm.classlib.java.nio.channels.TFileChannel;
+
 /**
  * Created by vasek on 14. 7. 2016.
  */
-public class TFileInputStream {
+public class TFileInputStream extends TInputStream {
 
 
     public TFileInputStream(String name)  {
     }
 
+    public TFileChannel getChannel() {
+        return null;
+    }
+
+    @Override
+    public int read() throws TIOException {
+        return 0;
+    }
 }

@@ -22,6 +22,7 @@ import java.util.Map;
 import org.teavm.classlib.impl.DeclaringClassMetadataGenerator;
 import org.teavm.classlib.java.lang.annotation.TAnnotation;
 import org.teavm.classlib.java.lang.reflect.TAnnotatedElement;
+import org.teavm.classlib.java.lang.reflect.TConstructor;
 import org.teavm.classlib.java.lang.reflect.TField;
 import org.teavm.classlib.java.lang.reflect.TGenericDeclaration;
 import org.teavm.classlib.java.lang.reflect.TMethod;
@@ -306,5 +307,15 @@ public class TClass<T> extends TObject implements TAnnotatedElement,TType, TGene
 
     public TField[] getDeclaredFields() throws SecurityException {
         return new TField[0];
+    }
+
+    public TPackage getPackage() {
+        return null;
+    }
+
+    public TConstructor<T> getConstructor(TClass<?>... parameterTypes)
+            throws NoSuchMethodException, SecurityException {
+
+        return null;
     }
 }

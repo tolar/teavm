@@ -15,14 +15,11 @@
  */
 package org.teavm.classlib.java.security;
 
+import org.teavm.classlib.java.lang.TException;
+
 /**
  * Created by vasek on 14. 7. 2016.
  */
-public class TGeneralSecurityException {
+public class TGeneralSecurityException extends TException {
 
-    public TGeneralSecurityException(String msg) {
-    }
-
-    public void printStackTrace() {
-    }
 }

@@ -42,6 +42,10 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: joda-time:joda-time:2.7" level="project" />
     <orderEntry type="module" module-name="teavm-jso-apis" scope="PROVIDED" />
   </component>
+  <component name="sonarModuleSettings">
+    <option name="localAnalysisScripName" value="&lt;PROJECT&gt;" />
+    <option name="serverName" value="&lt;PROJECT&gt;" />
+  </component>
   <component name="teavm">
     <option name="enabled" value="true" />
     <option name="mainClass" value="org.teavm.samples.kotlin.HelloKt" />

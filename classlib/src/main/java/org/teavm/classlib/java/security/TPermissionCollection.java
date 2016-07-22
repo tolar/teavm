@@ -20,4 +20,8 @@ public abstract class TPermissionCollection {
 
     public abstract void add(TPermission permission);
 
+    public boolean isReadOnly() {
+        return false;
+    }
+
 }

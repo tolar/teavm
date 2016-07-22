@@ -751,5 +751,9 @@ public class TString extends TObject implements TSerializable, TComparable<TStri
         return TString.wrap(new Formatter(l).format(format, args).toString());
     }
 
+    public TString toUpperCase(Locale locale) {
+        return intern();
+    }
+
 
 }

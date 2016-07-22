@@ -15,6 +15,8 @@
  */
 package org.teavm.classlib.java.io;
 
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by vasek on 14. 7. 2016.
@@ -30,6 +32,17 @@ public class TFile {
 
     public boolean isDirectory() {
         return false;
+    }
+
+    public static File createTempFile(String prefix, String suffix,
+            File directory)
+            throws IOException
+    {
+        return null;
+    }
+
+    public String getName() {
+        return null;
     }
 
 }

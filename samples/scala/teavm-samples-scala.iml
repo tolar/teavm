@@ -39,6 +39,10 @@
     <orderEntry type="module" module-name="teavm-jso" />
     <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.11.7" level="project" />
   </component>
+  <component name="sonarModuleSettings">
+    <option name="localAnalysisScripName" value="&lt;PROJECT&gt;" />
+    <option name="serverName" value="&lt;PROJECT&gt;" />
+  </component>
   <component name="teavm">
     <option name="enabled" value="true" />
     <option name="mainClass" value="org.teavm.samples.scala.Client" />

@@ -32,6 +32,12 @@ public class TPrintWriter {
     public void print(String s) {
     }
 
+    public void println(String x) {
+    }
+
     public void flush() {
+    }
+
+    public void println(char x) {
     }
 }

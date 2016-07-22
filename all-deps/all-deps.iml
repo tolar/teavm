@@ -22,4 +22,8 @@
     <orderEntry type="module" module-name="teavm-samples-storage" exported="" />
     <orderEntry type="module" module-name="teavm-samples-video" exported="" />
   </component>
+  <component name="sonarModuleSettings">
+    <option name="localAnalysisScripName" value="&lt;PROJECT&gt;" />
+    <option name="serverName" value="&lt;PROJECT&gt;" />
+  </component>
 </module>

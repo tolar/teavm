@@ -15,5 +15,6 @@
  */
 package org.teavm.classlib.java.security;
 
-public class TInvalidKeyException {
+public class TInvalidKeyException extends TKeyException {
+
 }

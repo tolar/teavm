@@ -16,11 +16,22 @@
 package org.teavm.classlib.java.security;
 
 import java.security.DigestException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 public class TMessageDigest {
 
     protected TMessageDigest(String algorithm) {
+    }
 
+    public static TMessageDigest getInstance(String algorithm) throws NoSuchAlgorithmException {
+        return null;
+    }
+
+    public static TMessageDigest getInstance(String algorithm, String provider)
+            throws NoSuchAlgorithmException, NoSuchProviderException
+    {
+        return null;
     }
 
 
@@ -34,6 +45,9 @@ public class TMessageDigest {
 
     public byte[] digest(byte[] input) {
         return digest();
+    }
+
+    public void update(byte[] input, int offset, int len) {
     }
 
 }

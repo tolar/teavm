@@ -167,4 +167,8 @@ public class TThrowable extends RuntimeException {
         suppressed = TArrays.copyOf(suppressed, suppressed.length + 1);
         suppressed[suppressed.length - 1] = exception;
     }
+
+    public String getMessage() {
+        return null;
+    }
 }
