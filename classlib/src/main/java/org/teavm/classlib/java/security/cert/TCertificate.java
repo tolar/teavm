@@ -15,10 +15,13 @@
  */
 package org.teavm.classlib.java.security.cert;
 
+import org.teavm.classlib.java.security.TInvalidKeyException;
+import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
+import org.teavm.classlib.java.security.TNoSuchProviderException;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.util.TArrays;
-
-import sun.security.x509.X509CertImpl;
+import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
+import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
 public abstract class TCertificate {
 
@@ -69,11 +72,11 @@ public abstract class TCertificate {
             return false;
         }
         try {
-            byte[] thisCert = X509CertImpl.getEncodedInternal(this);
-            byte[] otherCert = X509CertImpl.getEncodedInternal((Certificate)other);
+            byte[] thisCert = TX509CertImpl.getEncodedInternal(this);
+            byte[] otherCert = TX509CertImpl.getEncodedInternal((TCertificate)other);
 
             return TArrays.equals(thisCert, otherCert);
-        } catch (CertificateException e) {
+        } catch (TCertificateException e) {
             return false;
         }
     }
@@ -88,8 +91,8 @@ public abstract class TCertificate {
         int h = hash;
         if (h == -1) {
             try {
-                h = Arrays.hashCode(X509CertImpl.getEncodedInternal(this));
-            } catch (CertificateException e) {
+                h = TArrays.hashCode(TX509CertImpl.getEncodedInternal(this));
+            } catch (TCertificateException e) {
                 h = 0;
             }
             hash = h;
@@ -105,10 +108,10 @@ public abstract class TCertificate {
      *
      * @return the encoded form of this certificate
      *
-     * @exception CertificateEncodingException if an encoding error occurs.
+     * @exception TCertificateEncodingException if an encoding error occurs.
      */
     public abstract byte[] getEncoded()
-            throws CertificateEncodingException;
+            throws TCertificateEncodingException;
 
     /**
      * Verifies that this certificate was signed using the
@@ -116,16 +119,16 @@ public abstract class TCertificate {
      *
      * @param key the PublicKey used to carry out the verification.
      *
-     * @exception NoSuchAlgorithmException on unsupported signature
+     * @exception TNoSuchAlgorithmException on unsupported signature
      * algorithms.
-     * @exception InvalidKeyException on incorrect key.
-     * @exception NoSuchProviderException if there's no default provider.
+     * @exception TInvalidKeyException on incorrect key.
+     * @exception TNoSuchProviderException if there's no default provider.
      * @exception SignatureException on signature errors.
      * @exception CertificateException on encoding errors.
      */
-    public abstract void verify(PublicKey key)
-            throws CertificateException, NoSuchAlgorithmException,
-            InvalidKeyException, NoSuchProviderException,
+    public abstract void verify(TPublicKey key)
+            throws TCertificateException, TNoSuchAlgorithmException,
+            TInvalidKeyException,TNoSuchProviderException,
             SignatureException;
 
     /**

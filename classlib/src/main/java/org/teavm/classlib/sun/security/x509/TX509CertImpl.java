@@ -33,7 +33,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
@@ -55,7 +54,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.security.auth.x500.X500Principal;
 
 import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.TSignature;
+import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.TX509CertInfo;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 
 import sun.misc.HexDumpEncoder;
@@ -120,7 +122,7 @@ public class TX509CertImpl extends TX509Certificate {
     public static final String SIG = "x509.signature";
     private boolean readOnly = false;
     private byte[] signedCert = null;
-    protected X509CertInfo info = null;
+    protected TX509CertInfo info = null;
     protected AlgorithmId algId = null;
     protected byte[] signature = null;
     private static final String KEY_USAGE_OID = "2.5.29.15";
@@ -208,7 +210,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public TX509CertImpl(X509CertInfo var1) {
+    public TX509CertImpl(TX509CertInfo var1) {
         this.info = var1;
     }
 
@@ -270,11 +272,11 @@ public class TX509CertImpl extends TX509Certificate {
         } else if(this.signedCert == null) {
             throw new CertificateEncodingException("Uninitialized certificate");
         } else {
-            Signature var3 = null;
+            TSignature var3 = null;
             if(var2.length() == 0) {
-                var3 = Signature.getInstance(this.algId.getName());
+                var3 = TSignature.getInstance(this.algId.getName());
             } else {
-                var3 = Signature.getInstance(this.algId.getName(), var2);
+                var3 = TSignature.getInstance(this.algId.getName(), var2);
             }
 
             var3.initVerify(var1);
@@ -1253,11 +1255,11 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public static byte[] getEncodedInternal(Certificate var0) throws CertificateEncodingException {
-        return var0 instanceof X509CertImpl ?((X509CertImpl)var0).getEncodedInternal():var0.getEncoded();
+    public static byte[] getEncodedInternal(TCertificate var0) throws TCertificateEncodingException {
+        return var0 instanceof TX509CertImpl ?((TX509CertImpl)var0).getEncodedInternal():var0.getEncoded();
     }
 
-    public static X509CertImpl toImpl(X509Certificate var0) throws CertificateException {
+    public static X509CertImpl toImpl(X509Certificate var0) throws TCertificateException {
         return var0 instanceof X509CertImpl?(X509CertImpl)var0: X509Factory.intern(var0);
     }
 

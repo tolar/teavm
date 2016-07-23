@@ -20,9 +20,7 @@ import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
-import java.security.PrivateKey;
 import java.security.ProviderException;
-import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -45,8 +43,8 @@ public abstract class TSignatureSpi {
      * @exception InvalidKeyException if the key is improperly
      * encoded, parameters are missing, and so on.
      */
-    protected abstract void engineInitVerify(PublicKey publicKey)
-            throws InvalidKeyException;
+    protected abstract void engineInitVerify(TPublicKey publicKey)
+            throws TInvalidKeyException;
 
     /**
      * Initializes this signature object with the specified
@@ -58,8 +56,8 @@ public abstract class TSignatureSpi {
      * @exception InvalidKeyException if the key is improperly
      * encoded, parameters are missing, and so on.
      */
-    protected abstract void engineInitSign(PrivateKey privateKey)
-            throws InvalidKeyException;
+    protected abstract void engineInitSign(TPrivateKey privateKey)
+            throws TInvalidKeyException;
 
     /**
      * Initializes this signature object with the specified
@@ -75,7 +73,7 @@ public abstract class TSignatureSpi {
      * @exception InvalidKeyException if the key is improperly
      * encoded, parameters are missing, and so on.
      */
-    protected void engineInitSign(PrivateKey privateKey,
+    protected void engineInitSign(TPrivateKey privateKey,
             TSecureRandom random)
             throws InvalidKeyException {
         this.appRandom = random;

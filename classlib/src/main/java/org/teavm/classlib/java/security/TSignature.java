@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.jca.TGetInstance;
 import org.teavm.classlib.sun.security.jca.TServiceId;
 
 public abstract class TSignature extends TSignatureSpi {
@@ -104,7 +105,7 @@ public abstract class TSignature extends TSignatureSpi {
      * Provider that supports the specified algorithm is returned.
      *
      * <p> Note that the list of registered providers may be retrieved via
-     * the {@link Security#getProviders() Security.getProviders()} method.
+     * the {@link TSecurity#getProviders() Security.getProviders()} method.
      *
      * @param algorithm the standard name of the algorithm requested.
      * See the Signature section in the <a href=
@@ -356,15 +357,12 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @exception InvalidKeyException if the key is invalid.
      */
-    public final void initVerify(PublicKey publicKey)
-            throws InvalidKeyException {
+    public final void initVerify(TPublicKey publicKey)
+            throws TInvalidKeyException {
         engineInitVerify(publicKey);
         state = VERIFY;
 
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Signature." + algorithm +
-                    " verification algorithm from: " + this.provider.getName());
-        }
+
     }
 
     /**

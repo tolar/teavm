@@ -23,10 +23,9 @@ import java.util.List;
 
 import sun.security.jca.ProviderList;
 import sun.security.jca.Providers;
-import sun.security.jca.ServiceId;
 
-public class GetInstance {
-    private GetInstance() {
+public class TGetInstance {
+    private TGetInstance() {
     }
 
     public static Provider.Service getService(String var0, String var1) throws NoSuchAlgorithmException {
@@ -83,12 +82,12 @@ public class GetInstance {
         return var2.getServices(var0, var1);
     }
 
-    public static List<Provider.Service> getServices(List<ServiceId> var0) {
+    public static List<Provider.Service> getServices(List<TServiceId> var0) {
         ProviderList var1 = Providers.getProviderList();
         return var1.getServices(var0);
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(String var0, Class<?> var1, String var2) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2) throws NoSuchAlgorithmException {
         ProviderList var3 = Providers.getProviderList();
         Provider.Service var4 = var3.getService(var0, var2);
         if(var4 == null) {
@@ -120,7 +119,7 @@ public class GetInstance {
         }
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Object var3) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Object var3) throws NoSuchAlgorithmException {
         List var4 = getServices(var0, var2);
         NoSuchAlgorithmException var5 = null;
         Iterator var6 = var4.iterator();
@@ -142,32 +141,32 @@ public class GetInstance {
         }
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(String var0, Class<?> var1, String var2, String var3) throws NoSuchAlgorithmException, NoSuchProviderException {
+    public static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, String var3) throws NoSuchAlgorithmException, NoSuchProviderException {
         return getInstance(getService(var0, var2, var3), var1);
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Object var3, String var4) throws NoSuchAlgorithmException, NoSuchProviderException {
+    public static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Object var3, String var4) throws NoSuchAlgorithmException, NoSuchProviderException {
         return getInstance(getService(var0, var2, var4), var1, var3);
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Provider var3) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Provider var3) throws NoSuchAlgorithmException {
         return getInstance(getService(var0, var2, var3), var1);
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Object var3, Provider var4) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Object var3, Provider var4) throws NoSuchAlgorithmException {
         return getInstance(getService(var0, var2, var4), var1, var3);
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(Provider.Service var0, Class<?> var1) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(Provider.Service var0, Class<?> var1) throws NoSuchAlgorithmException {
         Object var2 = var0.newInstance((Object)null);
         checkSuperClass(var0, var2.getClass(), var1);
-        return new sun.security.jca.GetInstance.Instance(var0.getProvider(), var2);
+        return new TGetInstance.Instance(var0.getProvider(), var2);
     }
 
-    public static sun.security.jca.GetInstance.Instance getInstance(Provider.Service var0, Class<?> var1, Object var2) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(Provider.Service var0, Class<?> var1, Object var2) throws NoSuchAlgorithmException {
         Object var3 = var0.newInstance(var2);
         checkSuperClass(var0, var3.getClass(), var1);
-        return new sun.security.jca.GetInstance.Instance(var0.getProvider(), var3);
+        return new TGetInstance.Instance(var0.getProvider(), var3);
     }
 
     public static void checkSuperClass(Provider.Service var0, Class<?> var1, Class<?> var2) throws NoSuchAlgorithmException {
