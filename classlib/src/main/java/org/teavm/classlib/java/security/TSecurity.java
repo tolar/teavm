@@ -16,18 +16,21 @@
 package org.teavm.classlib.java.security;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.Provider;
-import java.util.Properties;
 
 import org.teavm.classlib.java.io.TBufferedInputStream;
+import org.teavm.classlib.java.io.TFile;
+import org.teavm.classlib.java.io.TFileInputStream;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.lang.reflect.TField;
 import org.teavm.classlib.java.net.TURL;
+import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.java.util.TLinkedHashSet;
+import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.java.util.TProperties;
 import org.teavm.classlib.sun.security.util.TPropertyExpander;
 
 public final class TSecurity {
@@ -35,12 +38,12 @@ public final class TSecurity {
 
 
     /* The java.security properties */
-    private static Properties props;
+    private static TProperties props;
 
     // An element in the cache
     private static class ProviderProperty {
         String className;
-        Provider provider;
+        TProvider provider;
     }
 
     static {
@@ -48,7 +51,7 @@ public final class TSecurity {
         // things in initialize that might require privs.
         // (the FileInputStream call and the File.exists call,
         // the securityPropFile call, etc)
-        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+        TAccessController.doPrivileged(new TPrivilegedAction<Void>() {
             public Void run() {
                 initialize();
                 return null;
@@ -57,23 +60,23 @@ public final class TSecurity {
     }
 
     private static void initialize() {
-        props = new Properties();
+        props = new TProperties();
         boolean loadedProps = false;
         boolean overrideAll = false;
 
         // first load the system properties file
         // to determine the value of security.overridePropertiesFile
-        File propFile = securityPropFile("java.security");
+        TFile propFile = securityPropFile("java.security");
         if (propFile.exists()) {
-            InputStream is = null;
+            TInputStream is = null;
             try {
-                FileInputStream fis = new FileInputStream(propFile);
+                TFileInputStream fis = new FileInputStream(propFile);
                 is = new BufferedInputStream(fis);
                 props.load(is);
                 loadedProps = true;
 
 
-            } catch (IOException e) {
+            } catch (TIOException e) {
             } finally {
                 if (is != null) {
                     try {
@@ -96,7 +99,7 @@ public final class TSecurity {
             }
 
             if (overrideAll) {
-                props = new Properties();
+                props = new TProperties();
                 if (sdebug != null) {
                     sdebug.println
                             ("overriding other security properties files!");
@@ -111,7 +114,7 @@ public final class TSecurity {
                     TURL propURL;
 
                     extraPropFile = TPropertyExpander.expand(extraPropFile);
-                    propFile = new File(extraPropFile);
+                    propFile = new TFile(extraPropFile);
                     if (propFile.exists()) {
                         propURL = new TURL
                                 ("file:" + propFile.getCanonicalPath());
@@ -128,7 +131,7 @@ public final class TSecurity {
                     if (bis != null) {
                         try {
                             bis.close();
-                        } catch (IOException ioe) {
+                        } catch (TIOException ioe) {
 
                         }
                     }
@@ -162,11 +165,11 @@ public final class TSecurity {
     private TSecurity() {
     }
 
-    private static File securityPropFile(String filename) {
+    private static TFile securityPropFile(String filename) {
         // maybe check for a system property which will specify where to
         // look. Someday.
-        String sep = File.separator;
-        return new File(System.getProperty("java.home") + sep + "lib" + sep +
+        String sep = TFile.separator;
+        return new TFile(System.getProperty("java.home") + sep + "lib" + sep +
                 "security" + sep + filename);
     }
 
@@ -180,17 +183,17 @@ public final class TSecurity {
     private static TSecurity.ProviderProperty getProviderProperty(String key) {
         TSecurity.ProviderProperty entry = null;
 
-        List<Provider> providers = Providers.getProviderList().providers();
+        TList<TProvider> providers = TProviders.getProviderList().providers();
         for (int i = 0; i < providers.size(); i++) {
 
             String matchKey = null;
-            Provider prov = providers.get(i);
+            TProvider prov = providers.get(i);
             String prop = prov.getProperty(key);
 
             if (prop == null) {
                 // Is there a match if we do a case-insensitive property name
                 // comparison? Let's try ...
-                for (Enumeration<Object> e = prov.keys();
+                for (TEnumeration<Object> e = prov.keys();
                      e.hasMoreElements() && prop == null; ) {
                     matchKey = (String)e.nextElement();
                     if (key.equalsIgnoreCase(matchKey)) {
@@ -214,12 +217,12 @@ public final class TSecurity {
     /**
      * Returns the property (if any) mapping the key for the given provider.
      */
-    private static String getProviderProperty(String key, Provider provider) {
+    private static String getProviderProperty(String key, TProvider provider) {
         String prop = provider.getProperty(key);
         if (prop == null) {
             // Is there a match if we do a case-insensitive property name
             // comparison? Let's try ...
-            for (Enumeration<Object> e = provider.keys();
+            for (TEnumeration<Object> e = provider.keys();
                  e.hasMoreElements() && prop == null; ) {
                 String matchKey = (String)e.nextElement();
                 if (key.equalsIgnoreCase(matchKey)) {
@@ -307,16 +310,16 @@ public final class TSecurity {
      * @see #removeProvider
      * @see java.security.SecurityPermission
      */
-    public static synchronized int insertProviderAt(Provider provider,
+    public static synchronized int insertProviderAt(TProvider provider,
             int position) {
         String providerName = provider.getName();
         checkInsertProvider(providerName);
-        ProviderList list = Providers.getFullProviderList();
-        ProviderList newList = ProviderList.insertAt(list, provider, position - 1);
+        TProviderList list = TProviders.getFullProviderList();
+        TProviderList newList = TProviderList.insertAt(list, provider, position - 1);
         if (list == newList) {
             return -1;
         }
-        Providers.setProviderList(newList);
+        TProviders.setProviderList(newList);
         return newList.getIndex(providerName) + 1;
     }
 
@@ -602,18 +605,18 @@ public final class TSecurity {
             return null;
 
         Object[] candidatesArray = candidates.toArray();
-        Provider[] result = new Provider[candidatesArray.length];
+        TProvider[] result = new TProvider[candidatesArray.length];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = (Provider)candidatesArray[i];
+            result[i] = (TProvider)candidatesArray[i];
         }
 
         return result;
     }
 
     // Map containing cached Spi Class objects of the specified type
-    private static final Map<String, Class<?>> spiMap =
-            new ConcurrentHashMap<>();
+    private static final TMap<String, Class<?>> spiMap =
+            new TConcurrentHashMap<>();
 
     /**
      * Return the Class object for the given engine type
@@ -764,13 +767,13 @@ public final class TSecurity {
         final boolean pd = key.equals("package.definition");
 
         if (pa || pd) {
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            TAccessController.doPrivileged(new PrivilegedAction<Void>() {
                 public Void run() {
                     try {
                         /* Get the class via the bootstrap class loader. */
                         Class<?> cl = Class.forName(
                                 "java.lang.SecurityManager", false, null);
-                        Field f = null;
+                        TField f = null;
                         boolean accessible = false;
 
                         if (pa) {
@@ -830,10 +833,10 @@ public final class TSecurity {
     * Returns all providers who satisfy the specified
     * criterion.
     */
-    private static LinkedHashSet<Provider> getAllQualifyingCandidates(
+    private static TLinkedHashSet<TProvider> getAllQualifyingCandidates(
             String filterKey,
             String filterValue,
-            Provider[] allProviders) {
+            TProvider[] allProviders) {
         String[] filterComponents = getFilterComponents(filterKey,
                 filterValue);
 
@@ -848,13 +851,13 @@ public final class TSecurity {
                 filterValue, allProviders);
     }
 
-    private static LinkedHashSet<Provider> getProvidersNotUsingCache(
+    private static TLinkedHashSet<TProvider> getProvidersNotUsingCache(
             String serviceName,
             String algName,
             String attrName,
             String filterValue,
-            Provider[] allProviders) {
-        LinkedHashSet<Provider> candidates = new LinkedHashSet<>(5);
+            TProvider[] allProviders) {
+        TLinkedHashSet<TProvider> candidates = new TLinkedHashSet<>(5);
         for (int i = 0; i < allProviders.length; i++) {
             if (isCriterionSatisfied(allProviders[i], serviceName,
                     algName,
@@ -869,7 +872,7 @@ public final class TSecurity {
      * Returns true if the given provider satisfies
      * the selection criterion key:value.
      */
-    private static boolean isCriterionSatisfied(Provider prov,
+    private static boolean isCriterionSatisfied(TProvider prov,
             String serviceName,
             String algName,
             String attrName,
