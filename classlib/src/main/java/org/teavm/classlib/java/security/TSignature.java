@@ -16,15 +16,26 @@
 package org.teavm.classlib.java.security;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import javax.crypto.Cipher;
+
+import org.teavm.classlib.java.io.TByteArrayOutputStream;
+import org.teavm.classlib.java.lang.TBoolean;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.nio.TByteBuffer;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
+import org.teavm.classlib.java.util.THashMap;
+import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.javax.crypto.TBadPaddingException;
+import org.teavm.classlib.javax.crypto.TIllegalBlockSizeException;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
 import org.teavm.classlib.sun.security.jca.TServiceId;
 
@@ -94,33 +105,6 @@ public abstract class TSignature extends TSignatureSpi {
             }
     );
 
-    /**
-     * Returns a Signature object that implements the specified signature
-     * algorithm.
-     *
-     * <p> This method traverses the list of registered security Providers,
-     * starting with the most preferred Provider.
-     * A new Signature object encapsulating the
-     * SignatureSpi implementation from the first
-     * Provider that supports the specified algorithm is returned.
-     *
-     * <p> Note that the list of registered providers may be retrieved via
-     * the {@link TSecurity#getProviders() Security.getProviders()} method.
-     *
-     * @param algorithm the standard name of the algorithm requested.
-     * See the Signature section in the <a href=
-     * "{@docRoot}/../technotes/guides/security/StandardNames.html#Signature">
-     * Java Cryptography Architecture Standard Algorithm Name Documentation</a>
-     * for information about standard algorithm names.
-     *
-     * @return the new Signature object.
-     *
-     * @exception NoSuchAlgorithmException if no Provider supports a
-     *          Signature implementation for the
-     *          specified algorithm.
-     *
-     * @see Provider
-     */
     public static TSignature getInstance(String algorithm)
             throws NoSuchAlgorithmException {
         List<Provider.Service> list;
@@ -143,8 +127,8 @@ public abstract class TSignature extends TSignatureSpi {
             } else {
                 // must be a subclass of Signature, disable dynamic selection
                 try {
-                    GetInstance.Instance instance =
-                            GetInstance.getInstance(s, TSignatureSpi.class);
+                    TGetInstance.Instance instance =
+                            TGetInstance.getInstance(s, TSignatureSpi.class);
                     return getInstance(instance, algorithm);
                 } catch (NoSuchAlgorithmException e) {
                     failure = e;
@@ -154,7 +138,7 @@ public abstract class TSignature extends TSignatureSpi {
         throw failure;
     }
 
-    private static TSignature getInstance(GetInstance.Instance instance, String algorithm) {
+    private static TSignature getInstance(TGetInstance.Instance instance, String algorithm) {
         TSignature sig;
         if (instance.impl instanceof TSignature) {
             sig = (TSignature)instance.impl;
@@ -167,45 +151,40 @@ public abstract class TSignature extends TSignatureSpi {
         return sig;
     }
 
-    private final static Map<String,Boolean> signatureInfo;
+    private final static TMap<TString,TBoolean> signatureInfo;
 
     static {
-        signatureInfo = new TConcurrentHashMap<String,Boolean>();
-        Boolean TRUE = Boolean.TRUE;
+        signatureInfo = new THashMap();
+        TBoolean TRUE = TBoolean.TRUE;
         // pre-initialize with values for our SignatureSpi implementations
-        signatureInfo.put("sun.security.provider.DSA$RawDSA", TRUE);
-        signatureInfo.put("sun.security.provider.DSA$SHA1withDSA", TRUE);
-        signatureInfo.put("sun.security.rsa.RSASignature$MD2withRSA", TRUE);
-        signatureInfo.put("sun.security.rsa.RSASignature$MD5withRSA", TRUE);
-        signatureInfo.put("sun.security.rsa.RSASignature$SHA1withRSA", TRUE);
-        signatureInfo.put("sun.security.rsa.RSASignature$SHA256withRSA", TRUE);
-        signatureInfo.put("sun.security.rsa.RSASignature$SHA384withRSA", TRUE);
-        signatureInfo.put("sun.security.rsa.RSASignature$SHA512withRSA", TRUE);
-        signatureInfo.put("com.sun.net.ssl.internal.ssl.RSASignature", TRUE);
-        signatureInfo.put("sun.security.pkcs11.P11Signature", TRUE);
+        signatureInfo.put(TString.wrap("sun.security.provider.DSA$RawDSA"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.provider.DSA$SHA1withDSA"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.rsa.RSASignature$MD2withRSA"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.rsa.RSASignature$MD5withRSA"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.rsa.RSASignature$SHA1withRSA"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.rsa.RSASignature$SHA256withRSA"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.rsa.RSASignature$SHA384withRSA"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.rsa.RSASignature$SHA512withRSA"), TRUE);
+        signatureInfo.put(TString.wrap("com.sun.net.ssl.internal.ssl.RSASignature"), TRUE);
+        signatureInfo.put(TString.wrap("sun.security.pkcs11.P11Signature"), TRUE);
     }
 
-    private static boolean isSpi(Provider.Service s) {
+    private static boolean isSpi(TProvider.Service s) {
         if (s.getType().equals("Cipher")) {
             // must be a CipherSpi, which we can wrap with the CipherAdapter
             return true;
         }
-        String className = s.getClassName();
-        Boolean result = signatureInfo.get(className);
+        TString className = s.getClassName();
+        TBoolean result = signatureInfo.get(className);
         if (result == null) {
             try {
                 Object instance = s.newInstance(null);
                 // Signature extends SignatureSpi
                 // so it is a "real" Spi if it is an
                 // instance of SignatureSpi but not Signature
-                boolean r = (instance instanceof SignatureSpi)
+                boolean r = (instance instanceof TSignatureSpi)
                         && (instance instanceof java.security.Signature == false);
-                if ((debug != null) && (r == false)) {
-                    debug.println("Not a SignatureSpi " + className);
-                    debug.println("Delayed provider selection may not be "
-                            + "available for algorithm " + s.getAlgorithm());
-                }
-                result = Boolean.valueOf(r);
+                result = TBoolean.valueOf(r);
                 signatureInfo.put(className, result);
             } catch (Exception e) {
                 // something is wrong, assume not an SPI
@@ -215,56 +194,22 @@ public abstract class TSignature extends TSignatureSpi {
         return result.booleanValue();
     }
 
-    /**
-     * Returns a Signature object that implements the specified signature
-     * algorithm.
-     *
-     * <p> A new Signature object encapsulating the
-     * SignatureSpi implementation from the specified provider
-     * is returned.  The specified provider must be registered
-     * in the security provider list.
-     *
-     * <p> Note that the list of registered providers may be retrieved via
-     * the {@link Security#getProviders() Security.getProviders()} method.
-     *
-     * @param algorithm the name of the algorithm requested.
-     * See the Signature section in the <a href=
-     * "{@docRoot}/../technotes/guides/security/StandardNames.html#Signature">
-     * Java Cryptography Architecture Standard Algorithm Name Documentation</a>
-     * for information about standard algorithm names.
-     *
-     * @param provider the name of the provider.
-     *
-     * @return the new Signature object.
-     *
-     * @exception NoSuchAlgorithmException if a SignatureSpi
-     *          implementation for the specified algorithm is not
-     *          available from the specified provider.
-     *
-     * @exception NoSuchProviderException if the specified provider is not
-     *          registered in the security provider list.
-     *
-     * @exception IllegalArgumentException if the provider name is null
-     *          or empty.
-     *
-     * @see Provider
-     */
     public static TSignature getInstance(String algorithm, String provider)
-            throws NoSuchAlgorithmException, NoSuchProviderException {
+            throws TNoSuchAlgorithmException, TNoSuchProviderException {
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             // exception compatibility with existing code
             if ((provider == null) || (provider.length() == 0)) {
                 throw new IllegalArgumentException("missing provider");
             }
-            Provider p = TSecurity.getProvider(provider);
+            TProvider p = TSecurity.getProvider(provider);
             if (p == null) {
-                throw new NoSuchProviderException
-                        ("no such provider: " + provider);
+                throw new TNoSuchProviderException
+                        (TString.wrap("no such provider: " + provider));
             }
             return getInstanceRSA(p);
         }
-        GetInstance.Instance instance = GetInstance.getInstance
-                ("Signature", SignatureSpi.class, algorithm, provider);
+        TGetInstance.Instance instance = TGetInstance.getInstance
+                (TString.wrap("Signature"), TSignatureSpi.class, algorithm, provider);
         return getInstance(instance, algorithm);
     }
 
@@ -297,7 +242,7 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @since 1.4
      */
-    public static TSignature getInstance(String algorithm, Provider provider)
+    public static TSignature getInstance(String algorithm, TProvider provider)
             throws NoSuchAlgorithmException {
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             // exception compatibility with existing code
@@ -306,14 +251,14 @@ public abstract class TSignature extends TSignatureSpi {
             }
             return getInstanceRSA(provider);
         }
-        GetInstance.Instance instance = GetInstance.getInstance
-                ("Signature", SignatureSpi.class, algorithm, provider);
+        TGetInstance.Instance instance = TGetInstance.getInstance
+                (TString.wrap("Signature"), TSignatureSpi.class, algorithm, provider);
         return getInstance(instance, algorithm);
     }
 
     // return an implementation for NONEwithRSA, which is a special case
     // because of the Cipher.RSA/ECB/PKCS1Padding compatibility wrapper
-    private static TSignature getInstanceRSA(Provider p)
+    private static TSignature getInstanceRSA(TProvider p)
             throws NoSuchAlgorithmException {
         // try Signature first
         Provider.Service s = p.getService("Signature", RSA_SIGNATURE);
@@ -424,15 +369,11 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @exception InvalidKeyException if the key is invalid.
      */
-    public final void initSign(PrivateKey privateKey)
-            throws InvalidKeyException {
+    public final void initSign(TPrivateKey privateKey)
+            throws TInvalidKeyException {
         engineInitSign(privateKey);
         state = SIGN;
 
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Signature." + algorithm +
-                    " signing algorithm from: " + this.provider.getName());
-        }
     }
 
     /**
@@ -447,15 +388,11 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @exception InvalidKeyException if the key is invalid.
      */
-    public final void initSign(PrivateKey privateKey, TSecureRandom random)
-            throws InvalidKeyException {
+    public final void initSign(TPrivateKey privateKey, TSecureRandom random)
+            throws TInvalidKeyException {
         engineInitSign(privateKey, random);
         state = SIGN;
 
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Signature." + algorithm +
-                    " signing algorithm from: " + this.provider.getName());
-        }
     }
 
     /**
@@ -476,11 +413,11 @@ public abstract class TSignature extends TSignatureSpi {
      * initialized properly or if this signature algorithm is unable to
      * process the input data provided.
      */
-    public final byte[] sign() throws SignatureException {
+    public final byte[] sign() throws TSignatureException {
         if (state == SIGN) {
             return engineSign();
         }
-        throw new SignatureException("object not initialized for " +
+        throw new TSignatureException("object not initialized for " +
                 "signing");
     }
 
@@ -513,7 +450,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @since 1.2
      */
     public final int sign(byte[] outbuf, int offset, int len)
-            throws SignatureException {
+            throws TSignatureException {
         if (outbuf == null) {
             throw new IllegalArgumentException("No output buffer given");
         }
@@ -525,7 +462,7 @@ public abstract class TSignature extends TSignatureSpi {
                     ("Output buffer too small for specified offset and length");
         }
         if (state != SIGN) {
-            throw new SignatureException("object not initialized for " +
+            throw new TSignatureException("object not initialized for " +
                     "signing");
         }
         return engineSign(outbuf, offset, len);
@@ -549,11 +486,11 @@ public abstract class TSignature extends TSignatureSpi {
      * encoded or of the wrong type, if this signature algorithm is unable to
      * process the input data provided, etc.
      */
-    public final boolean verify(byte[] signature) throws SignatureException {
+    public final boolean verify(byte[] signature) throws TSignatureException {
         if (state == VERIFY) {
             return engineVerify(signature);
         }
-        throw new SignatureException("object not initialized for " +
+        throw new TSignatureException("object not initialized for " +
                 "verification");
     }
 
@@ -586,7 +523,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @since 1.4
      */
     public final boolean verify(byte[] signature, int offset, int length)
-            throws SignatureException {
+            throws TSignatureException {
         if (state == VERIFY) {
             if (signature == null) {
                 throw new IllegalArgumentException("signature is null");
@@ -614,11 +551,11 @@ public abstract class TSignature extends TSignatureSpi {
      * @exception SignatureException if this signature object is not
      * initialized properly.
      */
-    public final void update(byte b) throws SignatureException {
+    public final void update(byte b) throws TSignatureException {
         if (state == VERIFY || state == SIGN) {
             engineUpdate(b);
         } else {
-            throw new SignatureException("object not initialized for "
+            throw new TSignatureException("object not initialized for "
                     + "signature or verification");
         }
     }
@@ -632,7 +569,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @exception SignatureException if this signature object is not
      * initialized properly.
      */
-    public final void update(byte[] data) throws SignatureException {
+    public final void update(byte[] data) throws TSignatureException {
         update(data, 0, data.length);
     }
 
@@ -648,7 +585,7 @@ public abstract class TSignature extends TSignatureSpi {
      * initialized properly.
      */
     public final void update(byte[] data, int off, int len)
-            throws SignatureException {
+            throws TSignatureException {
         if (state == SIGN || state == VERIFY) {
             if (data == null) {
                 throw new IllegalArgumentException("data is null");
@@ -662,7 +599,7 @@ public abstract class TSignature extends TSignatureSpi {
             }
             engineUpdate(data, off, len);
         } else {
-            throw new SignatureException("object not initialized for "
+            throw new TSignatureException("object not initialized for "
                     + "signature or verification");
         }
     }
@@ -680,9 +617,9 @@ public abstract class TSignature extends TSignatureSpi {
      * initialized properly.
      * @since 1.5
      */
-    public final void update(ByteBuffer data) throws SignatureException {
+    public final void update(TByteBuffer data) throws TSignatureException {
         if ((state != SIGN) && (state != VERIFY)) {
-            throw new SignatureException("object not initialized for "
+            throw new TSignatureException("object not initialized for "
                     + "signature or verification");
         }
         if (data == null) {
@@ -750,7 +687,7 @@ public abstract class TSignature extends TSignatureSpi {
      */
     @Deprecated
     public final void setParameter(String param, Object value)
-            throws InvalidParameterException {
+            throws TInvalidParameterException {
         engineSetParameter(param, value);
     }
 
@@ -764,8 +701,8 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @see #getParameters
      */
-    public final void setParameter(AlgorithmParameterSpec params)
-            throws InvalidAlgorithmParameterException {
+    public final void setParameter(TAlgorithmParameterSpec params)
+            throws TInvalidAlgorithmParameterException {
         engineSetParameter(params);
     }
 
@@ -784,7 +721,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @see #setParameter(AlgorithmParameterSpec)
      * @since 1.4
      */
-    public final AlgorithmParameters getParameters() {
+    public final TAlgorithmParameters getParameters() {
         return engineGetParameters();
     }
 
@@ -813,7 +750,7 @@ public abstract class TSignature extends TSignatureSpi {
      */
     @Deprecated
     public final Object getParameter(String param)
-            throws InvalidParameterException {
+            throws TInvalidParameterException {
         return engineGetParameter(param);
     }
 
@@ -985,8 +922,8 @@ public abstract class TSignature extends TSignatureSpi {
             }
         }
 
-        private void chooseProvider(int type, Key key, TSecureRandom random)
-                throws InvalidKeyException {
+        private void chooseProvider(int type, TKey key, TSecureRandom random)
+                throws TInvalidKeyException {
             synchronized (lock) {
                 if (sigSpi != null) {
                     init(sigSpi, type, key, random);
@@ -1044,25 +981,25 @@ public abstract class TSignature extends TSignatureSpi {
         private final static int I_PRIV    = 2;
         private final static int I_PRIV_SR = 3;
 
-        private void init(TSignatureSpi spi, int type, Key  key,
-                TSecureRandom random) throws InvalidKeyException {
+        private void init(TSignatureSpi spi, int type, TKey  key,
+                TSecureRandom random) throws TInvalidKeyException {
             switch (type) {
                 case I_PUB:
-                    spi.engineInitVerify((PublicKey)key);
+                    spi.engineInitVerify((TPublicKey)key);
                     break;
                 case I_PRIV:
-                    spi.engineInitSign((PrivateKey)key);
+                    spi.engineInitSign((TPrivateKey)key);
                     break;
                 case I_PRIV_SR:
-                    spi.engineInitSign((PrivateKey)key, random);
+                    spi.engineInitSign((TPrivateKey)key, random);
                     break;
                 default:
                     throw new AssertionError("Internal error: " + type);
             }
         }
 
-        protected void engineInitVerify(PublicKey publicKey)
-                throws InvalidKeyException {
+        protected void engineInitVerify(TPublicKey publicKey)
+                throws TInvalidKeyException {
             if (sigSpi != null) {
                 sigSpi.engineInitVerify(publicKey);
             } else {
@@ -1070,8 +1007,8 @@ public abstract class TSignature extends TSignatureSpi {
             }
         }
 
-        protected void engineInitSign(PrivateKey privateKey)
-                throws InvalidKeyException {
+        protected void engineInitSign(TPrivateKey privateKey)
+                throws TInvalidKeyException {
             if (sigSpi != null) {
                 sigSpi.engineInitSign(privateKey);
             } else {
@@ -1079,8 +1016,8 @@ public abstract class TSignature extends TSignatureSpi {
             }
         }
 
-        protected void engineInitSign(PrivateKey privateKey, TSecureRandom sr)
-                throws InvalidKeyException {
+        protected void engineInitSign(TPrivateKey privateKey, TSecureRandom sr)
+                throws TInvalidKeyException {
             if (sigSpi != null) {
                 sigSpi.engineInitSign(privateKey, sr);
             } else {
@@ -1088,64 +1025,64 @@ public abstract class TSignature extends TSignatureSpi {
             }
         }
 
-        protected void engineUpdate(byte b) throws SignatureException {
+        protected void engineUpdate(byte b) throws TSignatureException {
             chooseFirstProvider();
             sigSpi.engineUpdate(b);
         }
 
         protected void engineUpdate(byte[] b, int off, int len)
-                throws SignatureException {
+                throws TSignatureException {
             chooseFirstProvider();
             sigSpi.engineUpdate(b, off, len);
         }
 
-        protected void engineUpdate(ByteBuffer data) {
+        protected void engineUpdate(TByteBuffer data) {
             chooseFirstProvider();
             sigSpi.engineUpdate(data);
         }
 
-        protected byte[] engineSign() throws SignatureException {
+        protected byte[] engineSign() throws TSignatureException {
             chooseFirstProvider();
             return sigSpi.engineSign();
         }
 
         protected int engineSign(byte[] outbuf, int offset, int len)
-                throws SignatureException {
+                throws TSignatureException {
             chooseFirstProvider();
             return sigSpi.engineSign(outbuf, offset, len);
         }
 
         protected boolean engineVerify(byte[] sigBytes)
-                throws SignatureException {
+                throws TSignatureException {
             chooseFirstProvider();
             return sigSpi.engineVerify(sigBytes);
         }
 
         protected boolean engineVerify(byte[] sigBytes, int offset, int length)
-                throws SignatureException {
+                throws TSignatureException {
             chooseFirstProvider();
             return sigSpi.engineVerify(sigBytes, offset, length);
         }
 
         protected void engineSetParameter(String param, Object value)
-                throws InvalidParameterException {
+                throws TInvalidParameterException {
             chooseFirstProvider();
             sigSpi.engineSetParameter(param, value);
         }
 
-        protected void engineSetParameter(AlgorithmParameterSpec params)
-                throws InvalidAlgorithmParameterException {
+        protected void engineSetParameter(TAlgorithmParameterSpec params)
+                throws TInvalidAlgorithmParameterException {
             chooseFirstProvider();
             sigSpi.engineSetParameter(params);
         }
 
-        protected Object engineGetParameter(String param)
-                throws InvalidParameterException {
+        protected Object engineGetParameter(TString param)
+                throws TInvalidParameterException {
             chooseFirstProvider();
             return sigSpi.engineGetParameter(param);
         }
 
-        protected AlgorithmParameters engineGetParameters() {
+        protected TAlgorithmParameters engineGetParameters() {
             chooseFirstProvider();
             return sigSpi.engineGetParameters();
         }
@@ -1157,85 +1094,85 @@ public abstract class TSignature extends TSignatureSpi {
 
         private final Cipher cipher;
 
-        private ByteArrayOutputStream data;
+        private TByteArrayOutputStream data;
 
         CipherAdapter(Cipher cipher) {
             this.cipher = cipher;
         }
 
-        protected void engineInitVerify(PublicKey publicKey)
-                throws InvalidKeyException {
+        protected void engineInitVerify(TPublicKey publicKey)
+                throws TInvalidKeyException {
             cipher.init(Cipher.DECRYPT_MODE, publicKey);
             if (data == null) {
-                data = new ByteArrayOutputStream(128);
+                data = new TByteArrayOutputStream(128);
             } else {
                 data.reset();
             }
         }
 
         protected void engineInitSign(PrivateKey privateKey)
-                throws InvalidKeyException {
+                throws TInvalidKeyException {
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
             data = null;
         }
 
-        protected void engineInitSign(PrivateKey privateKey,
-                SecureRandom random) throws InvalidKeyException {
+        protected void engineInitSign(TPrivateKey privateKey,
+                TSecureRandom random) throws TInvalidKeyException {
             cipher.init(Cipher.ENCRYPT_MODE, privateKey, random);
             data = null;
         }
 
-        protected void engineUpdate(byte b) throws SignatureException {
+        protected void engineUpdate(byte b) throws TSignatureException {
             engineUpdate(new byte[] {b}, 0, 1);
         }
 
         protected void engineUpdate(byte[] b, int off, int len)
-                throws SignatureException {
+                throws TSignatureException {
             if (data != null) {
                 data.write(b, off, len);
                 return;
             }
             byte[] out = cipher.update(b, off, len);
             if ((out != null) && (out.length != 0)) {
-                throw new SignatureException
-                        ("Cipher unexpectedly returned data");
+                throw new TSignatureException
+                        (TString.wrap("Cipher unexpectedly returned data"));
             }
         }
 
-        protected byte[] engineSign() throws SignatureException {
+        protected byte[] engineSign() throws TSignatureException {
             try {
                 return cipher.doFinal();
-            } catch (IllegalBlockSizeException e) {
-                throw new SignatureException("doFinal() failed", e);
-            } catch (BadPaddingException e) {
-                throw new SignatureException("doFinal() failed", e);
+            } catch (TIllegalBlockSizeException e) {
+                throw new TSignatureException(TString.wrap("doFinal() failed"), e);
+            } catch (TBadPaddingException e) {
+                throw new TSignatureException(TString.wrap("doFinal() failed"), e);
             }
         }
 
         protected boolean engineVerify(byte[] sigBytes)
-                throws SignatureException {
+                throws TSignatureException {
             try {
                 byte[] out = cipher.doFinal(sigBytes);
                 byte[] dataBytes = data.toByteArray();
                 data.reset();
-                return MessageDigest.isEqual(out, dataBytes);
-            } catch (BadPaddingException e) {
+                return TMessageDigest.isEqual(out, dataBytes);
+            } catch (TBadPaddingException e) {
                 // e.g. wrong public key used
                 // return false rather than throwing exception
                 return false;
-            } catch (IllegalBlockSizeException e) {
-                throw new SignatureException("doFinal() failed", e);
+            } catch (TIllegalBlockSizeException e) {
+                throw new TSignatureException("doFinal() failed", e);
             }
         }
 
         protected void engineSetParameter(String param, Object value)
-                throws InvalidParameterException {
-            throw new InvalidParameterException("Parameters not supported");
+                throws TInvalidParameterException {
+            throw new TInvalidParameterException("Parameters not supported");
         }
 
         protected Object engineGetParameter(String param)
-                throws InvalidParameterException {
-            throw new InvalidParameterException("Parameters not supported");
+                throws TInvalidParameterException {
+            throw new TInvalidParameterException("Parameters not supported");
         }
 
     }

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TProperties;
 
 /**
@@ -50,7 +51,7 @@ public abstract class TProvider extends TProperties {
     // list and queries each provider with the same values until it finds
     // a matching service
     private static volatile TProvider.ServiceKey previousKey =
-            new TProvider.ServiceKey("", "", false);
+            new TProvider.ServiceKey(TString.wrap(""), TString.wrap(""), false);
 
     // Map<ServiceKey,Service>
     // used for services added via putService(), initialized on demand
@@ -69,7 +70,7 @@ public abstract class TProvider extends TProperties {
         }
     }
 
-    public synchronized TProvider.Service getService(String type, String algorithm) {
+    public synchronized TProvider.Service getService(TString type, TString algorithm) {
         checkInitialized();
         // avoid allocating a new key object if possible
         TProvider.ServiceKey key = previousKey;
@@ -204,7 +205,7 @@ public abstract class TProvider extends TProperties {
     }
 
 
-    private static String getEngineName(String s) {
+    private static TString getEngineName(TString s) {
         // try original case first, usually correct
         TProvider.EngineDescription e = knownEngines.get(s);
         if (e == null) {
@@ -331,7 +332,7 @@ public abstract class TProvider extends TProperties {
 
     public static class Service {
 
-        private String type, algorithm, className;
+        private TString type, algorithm, className;
         private final TProvider provider;
         private List<String> aliases;
         private Map<TProvider.UString,String> attributes;
@@ -456,7 +457,7 @@ public abstract class TProvider extends TProperties {
          *
          * @return the name of the class implementing this service
          */
-        public final String getClassName() {
+        public final TString getClassName() {
             return className;
         }
 
@@ -517,10 +518,10 @@ public abstract class TProvider extends TProperties {
          * any other reason.
          */
         public Object newInstance(Object constructorParameter)
-                throws NoSuchAlgorithmException {
+                throws TNoSuchAlgorithmException {
             if (registered == false) {
                 if (provider.getService(type, algorithm) != this) {
-                    throw new NoSuchAlgorithmException
+                    throw new TNoSuchAlgorithmException
                             ("Service not registered with Provider "
                                     + provider.getName() + ": " + this);
                 }
@@ -799,10 +800,10 @@ public abstract class TProvider extends TProperties {
     }
 
     private static class ServiceKey {
-        private final String type;
-        private final String algorithm;
-        private final String originalAlgorithm;
-        private ServiceKey(String type, String algorithm, boolean intern) {
+        private final TString type;
+        private final TString algorithm;
+        private final TString originalAlgorithm;
+        private ServiceKey(TString type, TString algorithm, boolean intern) {
             this.type = type;
             this.originalAlgorithm = algorithm;
             algorithm = algorithm.toUpperCase(ENGLISH);
@@ -822,7 +823,7 @@ public abstract class TProvider extends TProperties {
             return this.type.equals(other.type)
                     && this.algorithm.equals(other.algorithm);
         }
-        boolean matches(String type, String algorithm) {
+        boolean matches(TString type, TString algorithm) {
             return (this.type == type) && (this.originalAlgorithm == algorithm);
         }
     }

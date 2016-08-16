@@ -60,7 +60,6 @@ import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.sun.security.TX509CertInfo;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 
-import sun.misc.HexDumpEncoder;
 import sun.security.provider.X509Factory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerOutputStream;

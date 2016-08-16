@@ -18,7 +18,9 @@ package org.teavm.classlib.java.security.cert;
 import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.java.security.TNoSuchProviderException;
+import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.TSignatureException;
 import org.teavm.classlib.java.util.TArrays;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
@@ -129,7 +131,7 @@ public abstract class TCertificate {
     public abstract void verify(TPublicKey key)
             throws TCertificateException, TNoSuchAlgorithmException,
             TInvalidKeyException,TNoSuchProviderException,
-            SignatureException;
+            TSignatureException;
 
     /**
      * Verifies that this certificate was signed using the
@@ -147,10 +149,10 @@ public abstract class TCertificate {
      * @exception SignatureException on signature errors.
      * @exception CertificateException on encoding errors.
      */
-    public abstract void verify(PublicKey key, String sigProvider)
-            throws CertificateException, NoSuchAlgorithmException,
-            InvalidKeyException, NoSuchProviderException,
-            SignatureException;
+    public abstract void verify(TPublicKey key, String sigProvider)
+            throws TCertificateException, TNoSuchAlgorithmException,
+            TInvalidKeyException, TNoSuchProviderException,
+            TSignatureException;
 
     /**
      * Verifies that this certificate was signed using the
@@ -175,9 +177,9 @@ public abstract class TCertificate {
      * @exception UnsupportedOperationException if the method is not supported
      * @since 1.8
      */
-    public void verify(PublicKey key, Provider sigProvider)
-            throws CertificateException, NoSuchAlgorithmException,
-            InvalidKeyException, SignatureException {
+    public void verify(TPublicKey key, TProvider sigProvider)
+            throws TCertificateException, TNoSuchAlgorithmException,
+            TInvalidKeyException, TSignatureException {
         throw new UnsupportedOperationException();
     }
 
@@ -232,17 +234,6 @@ public abstract class TCertificate {
          *      could not be resolved
          */
         protected Object readResolve() throws java.io.ObjectStreamException {
-            try {
-                CertificateFactory cf = CertificateFactory.getInstance(type);
-                return cf.generateCertificate
-                        (new java.io.ByteArrayInputStream(data));
-            } catch (CertificateException e) {
-                throw new java.io.NotSerializableException
-                        ("java.security.cert.Certificate: " +
-                                type +
-                                ": " +
-                                e.getMessage());
-            }
         }
     }
 
@@ -257,8 +248,8 @@ public abstract class TCertificate {
      */
     protected Object writeReplace() throws java.io.ObjectStreamException {
         try {
-            return new Certificate.CertificateRep(type, getEncoded());
-        } catch (CertificateException e) {
+            return new TCertificate.CertificateRep(type, getEncoded());
+        } catch (TCertificateException e) {
             throw new java.io.NotSerializableException
                     ("java.security.cert.Certificate: " +
                             type +

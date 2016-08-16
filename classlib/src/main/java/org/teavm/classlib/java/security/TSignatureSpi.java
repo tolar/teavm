@@ -16,7 +16,6 @@
 package org.teavm.classlib.java.security;
 
 import java.nio.ByteBuffer;
-import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
@@ -24,7 +23,8 @@ import java.security.ProviderException;
 import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
 
-import sun.security.jca.JCAUtil;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.sun.security.jca.TJCAUtil;
 
 public abstract class TSignatureSpi {
 
@@ -75,7 +75,7 @@ public abstract class TSignatureSpi {
      */
     protected void engineInitSign(TPrivateKey privateKey,
             TSecureRandom random)
-            throws InvalidKeyException {
+            throws TInvalidKeyException {
         this.appRandom = random;
         engineInitSign(privateKey);
     }
@@ -103,7 +103,7 @@ public abstract class TSignatureSpi {
      * properly
      */
     protected abstract void engineUpdate(byte[] b, int off, int len)
-            throws SignatureException;
+            throws TSignatureException;
 
     /**
      * Updates the data to be signed or verified using the specified
@@ -129,7 +129,7 @@ public abstract class TSignatureSpi {
                 input.position(lim);
             } else {
                 int len = input.remaining();
-                byte[] b = new byte[JCAUtil.getTempArraySize(len)];
+                byte[] b = new byte[TJCAUtil.getTempArraySize(len)];
                 while (len > 0) {
                     int chunk = Math.min(len, b.length);
                     input.get(b, 0, chunk);
@@ -156,7 +156,7 @@ public abstract class TSignatureSpi {
      * initialized properly or if this signature algorithm is unable to
      * process the input data provided.
      */
-    protected abstract byte[] engineSign() throws SignatureException;
+    protected abstract byte[] engineSign() throws TSignatureException;
 
     /**
      * Finishes this signature operation and stores the resulting signature
@@ -199,16 +199,16 @@ public abstract class TSignatureSpi {
      * @since 1.2
      */
     protected int engineSign(byte[] outbuf, int offset, int len)
-            throws SignatureException {
+            throws TSignatureException {
         byte[] sig = engineSign();
         if (len < sig.length) {
-            throw new SignatureException
-                    ("partial signatures not returned");
+            throw new TSignatureException
+                    (TString.wrap("partial signatures not returned"));
         }
         if (outbuf.length - offset < sig.length) {
-            throw new SignatureException
-                    ("insufficient space in the output buffer to store the "
-                            + "signature");
+            throw new TSignatureException
+                    (TString.wrap("insufficient space in the output buffer to store the "
+                            + "signature"));
         }
         System.arraycopy(sig, 0, outbuf, offset, sig.length);
         return sig.length;
@@ -227,7 +227,7 @@ public abstract class TSignatureSpi {
      * process the input data provided, etc.
      */
     protected abstract boolean engineVerify(byte[] sigBytes)
-            throws SignatureException;
+            throws TSignatureException;
 
     /**
      * Verifies the passed-in signature in the specified array
@@ -249,7 +249,7 @@ public abstract class TSignatureSpi {
      * @since 1.4
      */
     protected boolean engineVerify(byte[] sigBytes, int offset, int length)
-            throws SignatureException {
+            throws TSignatureException {
         byte[] sigBytesCopy = new byte[length];
         System.arraycopy(sigBytes, offset, sigBytesCopy, 0, length);
         return engineVerify(sigBytesCopy);
@@ -319,7 +319,7 @@ public abstract class TSignatureSpi {
      * not overridden by a provider
      * @since 1.4
      */
-    protected AlgorithmParameters engineGetParameters() {
+    protected TAlgorithmParameters engineGetParameters() {
         throw new UnsupportedOperationException();
     }
 

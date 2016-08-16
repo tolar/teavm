@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,43 +13,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.io;
+package org.teavm.classlib.sun.security.jca;
 
+import org.teavm.classlib.java.security.TSecureRandom;
 
-/**
- * Created by vasek on 14. 7. 2016.
- */
-public class TFile {
+public final class TJCAUtil {
+    private static final int ARRAY_SIZE = 4096;
 
-
-    public TFile(String pathname) {
+    private TJCAUtil() {
     }
 
-    public boolean canRead() {
-        return false;
+    public static int getTempArraySize(int var0) {
+        return Math.min(4096, var0);
     }
 
-    public boolean isDirectory() {
-        return false;
+    public static TSecureRandom getSecureRandom() {
+        return TJCAUtil.CachedSecureRandomHolder.instance;
     }
 
-    public static TFile createTempFile(String prefix, String suffix,
-            TFile directory)
-            throws TIOException
-    {
-        return null;
-    }
+    private static class CachedSecureRandomHolder {
+        public static TSecureRandom instance = new TSecureRandom();
 
-    public String getName() {
-        return null;
+        private CachedSecureRandomHolder() {
+        }
     }
-
-    public boolean exists() {
-        return false;
-    }
-
-    final boolean isInvalid() {
-        return true;
-    }
-
 }

@@ -70,7 +70,7 @@ abstract class TFileSystem {
     /**
      * Tell whether or not the given abstract pathname is absolute.
      */
-    public abstract boolean isAbsolute(File f);
+    public abstract boolean isAbsolute(TFile f);
 
     /**
      * Resolve the given abstract pathname into absolute form.  Invoked by the
@@ -106,27 +106,27 @@ abstract class TFileSystem {
      * which access, ACCESS_READ, ACCESS_WRITE or ACCESS_EXECUTE, to check.
      * Return false if access is denied or an I/O error occurs
      */
-    public abstract boolean checkAccess(File f, int access);
+    public abstract boolean checkAccess(TFile f, int access);
     /**
      * Set on or off the access permission (to owner only or to all) to the file
      * or directory denoted by the given abstract pathname, based on the parameters
      * enable, access and oweronly.
      */
-    public abstract boolean setPermission(File f, int access, boolean enable, boolean owneronly);
+    public abstract boolean setPermission(TFile f, int access, boolean enable, boolean owneronly);
 
     /**
      * Return the time at which the file or directory denoted by the given
      * abstract pathname was last modified, or zero if it does not exist or
      * some other I/O error occurs.
      */
-    public abstract long getLastModifiedTime(File f);
+    public abstract long getLastModifiedTime(TFile f);
 
     /**
      * Return the length in bytes of the file denoted by the given abstract
      * pathname, or zero if it does not exist, is a directory, or some other
      * I/O error occurs.
      */
-    public abstract long getLength(File f);
+    public abstract long getLength(TFile f);
 
 
     /* -- File operations -- */
@@ -138,47 +138,47 @@ abstract class TFileSystem {
      * IOException if an I/O error occurs.
      */
     public abstract boolean createFileExclusively(String pathname)
-            throws IOException;
+            throws TIOException;
 
     /**
      * Delete the file or directory denoted by the given abstract pathname,
      * returning <code>true</code> if and only if the operation succeeds.
      */
-    public abstract boolean delete(File f);
+    public abstract boolean delete(TFile f);
 
     /**
      * List the elements of the directory denoted by the given abstract
      * pathname.  Return an array of strings naming the elements of the
      * directory if successful; otherwise, return <code>null</code>.
      */
-    public abstract String[] list(File f);
+    public abstract String[] list(TFile f);
 
     /**
      * Create a new directory denoted by the given abstract pathname,
      * returning <code>true</code> if and only if the operation succeeds.
      */
-    public abstract boolean createDirectory(File f);
+    public abstract boolean createDirectory(TFile f);
 
     /**
      * Rename the file or directory denoted by the first abstract pathname to
      * the second abstract pathname, returning <code>true</code> if and only if
      * the operation succeeds.
      */
-    public abstract boolean rename(File f1, File f2);
+    public abstract boolean rename(TFile f1, TFile f2);
 
     /**
      * Set the last-modified time of the file or directory denoted by the
      * given abstract pathname, returning <code>true</code> if and only if the
      * operation succeeds.
      */
-    public abstract boolean setLastModifiedTime(File f, long time);
+    public abstract boolean setLastModifiedTime(TFile f, long time);
 
     /**
      * Mark the file or directory denoted by the given abstract pathname as
      * read-only, returning <code>true</code> if and only if the operation
      * succeeds.
      */
-    public abstract boolean setReadOnly(File f);
+    public abstract boolean setReadOnly(TFile f);
 
 
     /* -- Filesystem interface -- */
@@ -186,26 +186,26 @@ abstract class TFileSystem {
     /**
      * List the available filesystem roots.
      */
-    public abstract File[] listRoots();
+    public abstract TFile[] listRoots();
 
     /* -- Disk usage -- */
      public static final int SPACE_TOTAL  = 0;
      public static final int SPACE_FREE   = 1;
      public static final int SPACE_USABLE = 2;
 
-    public abstract long getSpace(File f, int t);
+    public abstract long getSpace(TFile f, int t);
 
     /* -- Basic infrastructure -- */
 
     /**
      * Compare two abstract pathnames lexicographically.
      */
-    public abstract int compare(File f1, File f2);
+    public abstract int compare(TFile f1, TFile f2);
 
     /**
      * Compute the hash code of an abstract pathname.
      */
-    public abstract int hashCode(File f);
+    public abstract int hashCode(TFile f);
 
     // Flags for enabling/disabling performance optimizations for file
     // name canonicalization

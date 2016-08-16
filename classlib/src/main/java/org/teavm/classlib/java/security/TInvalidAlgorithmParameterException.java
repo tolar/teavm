@@ -15,10 +15,5 @@
  */
 package org.teavm.classlib.java.security;
 
-import org.teavm.classlib.java.lang.TString;
-
-public class TSignatureException extends TGeneralSecurityException {
-    public TSignatureException(TString message) {
-        super(message);
-    }
+public class TInvalidAlgorithmParameterException extends TGeneralSecurityException {
 }

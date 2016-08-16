@@ -15,5 +15,10 @@
  */
 package org.teavm.classlib.java.security;
 
+import org.teavm.classlib.java.lang.TString;
+
 public class TNoSuchProviderException extends TGeneralSecurityException {
+    public TNoSuchProviderException(TString message) {
+        super(message);
+    }
 }
