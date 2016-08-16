@@ -60,48 +60,6 @@ import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.sun.security.TX509CertInfo;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 
-import sun.security.provider.X509Factory;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.AccessDescription;
-import sun.security.x509.AlgorithmId;
-import sun.security.x509.AttributeNameEnumeration;
-import sun.security.x509.AuthorityInfoAccessExtension;
-import sun.security.x509.AuthorityKeyIdentifierExtension;
-import sun.security.x509.BasicConstraintsExtension;
-import sun.security.x509.CRLDistributionPointsExtension;
-import sun.security.x509.CertificateExtensions;
-import sun.security.x509.CertificatePoliciesExtension;
-import sun.security.x509.CertificateValidity;
-import sun.security.x509.DNSName;
-import sun.security.x509.ExtendedKeyUsageExtension;
-import sun.security.x509.Extension;
-import sun.security.x509.GeneralName;
-import sun.security.x509.GeneralNameInterface;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.IPAddressName;
-import sun.security.x509.IssuerAlternativeNameExtension;
-import sun.security.x509.KeyIdentifier;
-import sun.security.x509.KeyUsageExtension;
-import sun.security.x509.NameConstraintsExtension;
-import sun.security.x509.OIDMap;
-import sun.security.x509.OIDName;
-import sun.security.x509.PKIXExtensions;
-import sun.security.x509.PolicyConstraintsExtension;
-import sun.security.x509.PolicyMappingsExtension;
-import sun.security.x509.PrivateKeyUsageExtension;
-import sun.security.x509.RFC822Name;
-import sun.security.x509.SerialNumber;
-import sun.security.x509.SubjectAlternativeNameExtension;
-import sun.security.x509.SubjectKeyIdentifierExtension;
-import sun.security.x509.URIName;
-import sun.security.x509.UniqueIdentity;
-import sun.security.x509.X500Name;
-import sun.security.x509.X509AttributeName;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509CertInfo;
 
 public class TX509CertImpl extends TX509Certificate {
 
@@ -122,7 +80,7 @@ public class TX509CertImpl extends TX509Certificate {
     private boolean readOnly = false;
     private byte[] signedCert = null;
     protected TX509CertInfo info = null;
-    protected AlgorithmId algId = null;
+    protected TAlgorithmId algId = null;
     protected byte[] signature = null;
     private static final String KEY_USAGE_OID = "2.5.29.15";
     private static final String EXTENDED_KEY_USAGE_OID = "2.5.29.37";

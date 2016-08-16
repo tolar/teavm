@@ -20,5 +20,18 @@ package org.teavm.classlib.java.security.cert;
  */
 public abstract class TX509Certificate extends TCertificate {
 
+    /**
+     * Creates a certificate of the specified type.
+     *
+     * @param type the standard name of the certificate type.
+     *             See the CertificateFactory section in the <a href=
+     *             "{@docRoot}/../technotes/guides/security/StandardNames.html#CertificateFactory">
+     *             Java Cryptography Architecture Standard Algorithm Name Documentation</a>
+     *             for information about standard certificate types.
+     */
+    protected TX509Certificate(String type) {
+        super(type);
+    }
+
     public abstract byte[] getTBSCertificate();
 }

@@ -270,7 +270,7 @@ public abstract class TSignature extends TSignatureSpi {
         try {
             Cipher c = Cipher.getInstance(RSA_CIPHER, p);
             return new TSignature.Delegate(new TSignature.CipherAdapter(c), RSA_SIGNATURE);
-        } catch (GeneralSecurityException e) {
+        } catch (TGeneralSecurityException e) {
             // throw Signature style exception message to avoid confusion,
             // but append Cipher exception as cause
             throw new NoSuchAlgorithmException("no such algorithm: "

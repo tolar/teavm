@@ -56,9 +56,9 @@ public abstract class TProvider extends TProperties {
     // Map<ServiceKey,Service>
     // used for services added via putService(), initialized on demand
     private transient Map<TProvider.ServiceKey,TProvider.Service> serviceMap;
-    private String name;
+    private TString name;
 
-    protected TProvider(String name, double version, String info) {
+    protected TProvider(TString name, double version, TString info) {
         this.name = name;
         initialized = true;
     }
@@ -795,7 +795,7 @@ public abstract class TProvider extends TProperties {
 
     }
 
-    private String getName() {
+    private TString getName() {
         return name;
     }
 
