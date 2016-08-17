@@ -18,7 +18,7 @@ package org.teavm.classlib.sun.util.calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import sun.util.calendar.CalendarDate;
+import org.teavm.classlib.java.util.TTimeZone;
 
 class TImmutableGregorianDate extends TBaseCalendar.Date {
     private final TBaseCalendar.Date date;
@@ -103,7 +103,7 @@ class TImmutableGregorianDate extends TBaseCalendar.Date {
         return this;
     }
 
-    public CalendarDate addHours(int var1) {
+    public TCalendarDate addHours(int var1) {
         this.unsupported();
         return this;
     }
@@ -198,7 +198,7 @@ class TImmutableGregorianDate extends TBaseCalendar.Date {
         this.unsupported();
     }
 
-    public TimeZone getZone() {
+    public TTimeZone getZone() {
         return this.date.getZone();
     }
 

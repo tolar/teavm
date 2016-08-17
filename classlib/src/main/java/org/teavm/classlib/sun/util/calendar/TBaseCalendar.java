@@ -15,7 +15,7 @@
  */
 package org.teavm.classlib.sun.util.calendar;
 
-import java.util.TimeZone;
+import org.teavm.classlib.java.util.TTimeZone;
 
 public abstract class TBaseCalendar extends TAbstractCalendar {
     public static final int JANUARY = 1;
@@ -73,12 +73,12 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         }
     }
 
-    public boolean normalize(CalendarDate var1) {
+    public boolean normalize(TCalendarDate var1) {
         if(var1.isNormalized()) {
             return true;
         } else {
             TBaseCalendar.Date var2 = (TBaseCalendar.Date)var1;
-            TimeZone var3 = var2.getZone();
+            TTimeZone var3 = var2.getZone();
             if(var3 != null) {
                 this.getTime(var1);
                 return true;
@@ -126,7 +126,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         }
     }
 
-    void normalizeMonth(CalendarDate var1) {
+    void normalizeMonth(TCalendarDate var1) {
         TBaseCalendar.Date var2 = (TBaseCalendar.Date)var1;
         int var3 = var2.getNormalizedYear();
         long var4 = (long)var2.getMonth();
@@ -145,15 +145,15 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
 
     }
 
-    public int getYearLength(CalendarDate var1) {
+    public int getYearLength(TCalendarDate var1) {
         return this.isLeapYear(((TBaseCalendar.Date)var1).getNormalizedYear())?366:365;
     }
 
-    public int getYearLengthInMonths(CalendarDate var1) {
+    public int getYearLengthInMonths(TCalendarDate var1) {
         return 12;
     }
 
-    public int getMonthLength(CalendarDate var1) {
+    public int getMonthLength(TCalendarDate var1) {
         TBaseCalendar.Date var2 = (TBaseCalendar.Date)var1;
         int var3 = var2.getMonth();
         if(var3 >= 1 && var3 <= 12) {
@@ -172,7 +172,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         return var3;
     }
 
-    public long getDayOfYear(CalendarDate var1) {
+    public long getDayOfYear(TCalendarDate var1) {
         return this.getDayOfYear(((TBaseCalendar.Date)var1).getNormalizedYear(), var1.getMonth(), var1.getDayOfMonth());
     }
 
@@ -180,7 +180,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         return (long)var3 + (long)(this.isLeapYear(var1)?ACCUMULATED_DAYS_IN_MONTH_LEAP[var2]:ACCUMULATED_DAYS_IN_MONTH[var2]);
     }
 
-    public long getFixedDate(CalendarDate var1) {
+    public long getFixedDate(TCalendarDate var1) {
         if(!var1.isNormalized()) {
             this.normalizeMonth(var1);
         }
@@ -225,7 +225,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         }
     }
 
-    public void getCalendarDateFromFixedDate(CalendarDate var1, long var2) {
+    public void getCalendarDateFromFixedDate(TCalendarDate var1, long var2) {
         TBaseCalendar.Date var4 = (TBaseCalendar.Date)var1;
         int var5;
         long var6;
@@ -276,7 +276,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         var4.setNormalized(true);
     }
 
-    public int getDayOfWeek(CalendarDate var1) {
+    public int getDayOfWeek(TCalendarDate var1) {
         long var2 = this.getFixedDate(var1);
         return getDayOfWeekFromFixedDate(var2);
     }
@@ -329,7 +329,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         return var13;
     }
 
-    protected boolean isLeapYear(CalendarDate var1) {
+    protected boolean isLeapYear(TCalendarDate var1) {
         return this.isLeapYear(((TBaseCalendar.Date)var1).getNormalizedYear());
     }
 
@@ -337,7 +337,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
         return TCalendarUtils.isGregorianLeapYear(var1);
     }
 
-    public abstract static class Date extends CalendarDate {
+    public abstract static class Date extends TCalendarDate {
         int cachedYear = 2004;
         long cachedFixedDateJan1 = 731581L;
         long cachedFixedDateNextJan1;
@@ -346,7 +346,7 @@ public abstract class TBaseCalendar extends TAbstractCalendar {
             this.cachedFixedDateNextJan1 = this.cachedFixedDateJan1 + 366L;
         }
 
-        protected Date(TimeZone var1) {
+        protected Date(TTimeZone var1) {
             super(var1);
             this.cachedFixedDateNextJan1 = this.cachedFixedDateJan1 + 366L;
         }

@@ -17,11 +17,11 @@ package org.teavm.classlib.sun.util.calendar;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Date;
 import java.util.Map;
 import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 
+import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.java.util.TSimpleTimeZone;
 import org.teavm.classlib.java.util.TTimeZone;
 
 public class TZoneInfo extends TTimeZone {
@@ -121,7 +121,7 @@ public class TZoneInfo extends TTimeZone {
 
                     return var13;
                 } else {
-                    SimpleTimeZone var6 = this.getLastRule();
+                    TSimpleTimeZone var6 = this.getLastRule();
                     int var7;
                     if(var6 != null) {
                         var7 = var6.getRawOffset();
@@ -200,7 +200,7 @@ public class TZoneInfo extends TTimeZone {
                 throw new IllegalArgumentException();
             }
 
-            CalendarDate var7 = gcal.newCalendarDate((TimeZone)null);
+            TCalendarDate var7 = gcal.newCalendarDate((TTimeZone)null);
             var7.setDate(var2, var3 + 1, var4);
             if(!gcal.validate(var7)) {
                 throw new IllegalArgumentException();
@@ -275,7 +275,7 @@ public class TZoneInfo extends TTimeZone {
         }
     }
 
-    public boolean inDaylightTime(Date var1) {
+    public boolean inDaylightTime(TDate var1) {
         if(var1 == null) {
             throw new NullPointerException();
         } else if(this.transitions == null) {
@@ -288,7 +288,7 @@ public class TZoneInfo extends TTimeZone {
             } else if(var4 < this.transitions.length) {
                 return (this.transitions[var4] & 240L) != 0L;
             } else {
-                SimpleTimeZone var5 = this.getLastRule();
+                TSimpleTimeZone var5 = this.getLastRule();
                 return var5 != null?var5.inDaylightTime(var1):false;
             }
         }
@@ -303,18 +303,18 @@ public class TZoneInfo extends TTimeZone {
     }
 
     public static String[] getAvailableIDs() {
-        return ZoneInfoFile.getZoneIds();
+        return TZoneInfoFile.getZoneIds();
     }
 
     public static String[] getAvailableIDs(int var0) {
-        return ZoneInfoFile.getZoneIds(var0);
+        return TZoneInfoFile.getZoneIds(var0);
     }
 
-    public static TimeZone getTimeZone(String var0) {
-        return ZoneInfoFile.getZoneInfo(var0);
+    public static TTimeZone getTimeZone(String var0) {
+        return TZoneInfoFile.getZoneInfo(var0);
     }
 
-    private synchronized SimpleTimeZone getLastRule() {
+    private synchronized TSimpleTimeZone getLastRule() {
         if(this.lastRule == null) {
             this.lastRule = this.getLastRuleInstance();
         }
@@ -322,12 +322,12 @@ public class TZoneInfo extends TTimeZone {
         return this.lastRule;
     }
 
-    public SimpleTimeZone getLastRuleInstance() {
+    public TSimpleTimeZone getLastRuleInstance() {
         return this.simpleTimeZoneParams == null?null:(this.simpleTimeZoneParams.length == 10?new SimpleTimeZone(this.getLastRawOffset(), this.getID(), this.simpleTimeZoneParams[0], this.simpleTimeZoneParams[1], this.simpleTimeZoneParams[2], this.simpleTimeZoneParams[3], this.simpleTimeZoneParams[4], this.simpleTimeZoneParams[5], this.simpleTimeZoneParams[6], this.simpleTimeZoneParams[7], this.simpleTimeZoneParams[8], this.simpleTimeZoneParams[9], this.dstSavings):new SimpleTimeZone(this.getLastRawOffset(), this.getID(), this.simpleTimeZoneParams[0], this.simpleTimeZoneParams[1], this.simpleTimeZoneParams[2], this.simpleTimeZoneParams[3], this.simpleTimeZoneParams[4], this.simpleTimeZoneParams[5], this.simpleTimeZoneParams[6], this.simpleTimeZoneParams[7], this.dstSavings));
     }
 
     public Object clone() {
-        sun.util.calendar.ZoneInfo var1 = (sun.util.calendar.ZoneInfo)super.clone();
+        TZoneInfo var1 = (TZoneInfo)super.clone();
         var1.lastRule = null;
         return var1;
     }
@@ -342,17 +342,17 @@ public class TZoneInfo extends TTimeZone {
         } else if(!(var1 instanceof sun.util.calendar.ZoneInfo)) {
             return false;
         } else {
-            sun.util.calendar.ZoneInfo var2 = (sun.util.calendar.ZoneInfo)var1;
+            TZoneInfo var2 = (TZoneInfo)var1;
             return this.getID().equals(var2.getID()) && this.getLastRawOffset() == var2.getLastRawOffset() && this.checksum == var2.checksum;
         }
     }
 
-    public boolean hasSameRules(TimeZone var1) {
-        return this == var1?true:(var1 == null?false:(!(var1 instanceof sun.util.calendar.ZoneInfo)?(this.getRawOffset() != var1.getRawOffset()?false:this.transitions == null && !this.useDaylightTime() && !var1.useDaylightTime()):(this.getLastRawOffset() != ((sun.util.calendar.ZoneInfo)var1).getLastRawOffset()?false:this.checksum == ((sun.util.calendar.ZoneInfo)var1).checksum)));
+    public boolean hasSameRules(TTimeZone var1) {
+        return this == var1?true:(var1 == null?false:(!(var1 instanceof TZoneInfo)?(this.getRawOffset() != var1.getRawOffset()?false:this.transitions == null && !this.useDaylightTime() && !var1.useDaylightTime()):(this.getLastRawOffset() != ((TZoneInfo)var1).getLastRawOffset()?false:this.checksum == ((TZoneInfo)var1).checksum)));
     }
 
     public static Map<String, String> getAliasTable() {
-        return ZoneInfoFile.getAliasMap();
+        return TZoneInfoFile.getAliasMap();
     }
 
     private void readObject(ObjectInputStream var1) throws IOException, ClassNotFoundException {

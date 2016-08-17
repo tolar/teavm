@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
+
+import org.teavm.classlib.java.util.TTimeZone;
 
 public class TLocalGregorianCalendar extends TBaseCalendar {
     private String name;
@@ -103,7 +104,7 @@ public class TLocalGregorianCalendar extends TBaseCalendar {
         return this.getCalendarDate(var1, (TCalendarDate)this.newCalendarDate());
     }
 
-    public TLocalGregorianCalendar.Date getCalendarDate(long var1, TimeZone var3) {
+    public TLocalGregorianCalendar.Date getCalendarDate(long var1, TTimeZone var3) {
         return this.getCalendarDate(var1, (TCalendarDate)this.newCalendarDate(var3));
     }
 
@@ -116,7 +117,7 @@ public class TLocalGregorianCalendar extends TBaseCalendar {
         int var5;
         for(var5 = this.eras.length - 1; var5 >= 0; --var5) {
             TEra var6 = this.eras[var5];
-            long var7 = var6.getSince((TimeZone)null);
+            long var7 = var6.getSince((TTimeZone)null);
             if(var6.isLocalTime()) {
                 var7 -= (long)var4;
             }
@@ -142,7 +143,7 @@ public class TLocalGregorianCalendar extends TBaseCalendar {
         return new TLocalGregorianCalendar.Date();
     }
 
-    public TLocalGregorianCalendar.Date newCalendarDate(TimeZone var1) {
+    public TLocalGregorianCalendar.Date newCalendarDate(TTimeZone var1) {
         return new TLocalGregorianCalendar.Date(var1);
     }
 
@@ -182,7 +183,7 @@ public class TLocalGregorianCalendar extends TBaseCalendar {
         return false;
     }
 
-    public boolean normalize(CalendarDate var1) {
+    public boolean normalize(TCalendarDate var1) {
         if(var1.isNormalized()) {
             return true;
         } else {
@@ -198,7 +199,7 @@ public class TLocalGregorianCalendar extends TBaseCalendar {
             for(var7 = this.eras.length - 1; var7 >= 0; --var7) {
                 var8 = this.eras[var7];
                 if(var8.isLocalTime()) {
-                    CalendarDate var9 = var8.getSinceDate();
+                    TCalendarDate var9 = var8.getSinceDate();
                     int var10 = var9.getYear();
                     if(var6 > var10) {
                         break;
@@ -256,12 +257,12 @@ public class TLocalGregorianCalendar extends TBaseCalendar {
         }
     }
 
-    void normalizeMonth(CalendarDate var1) {
+    void normalizeMonth(TCalendarDate var1) {
         this.normalizeYear(var1);
         super.normalizeMonth(var1);
     }
 
-    void normalizeYear(CalendarDate var1) {
+    void normalizeYear(TCalendarDate var1) {
         TLocalGregorianCalendar.Date var2 = (TLocalGregorianCalendar.Date)var1;
         TEra var3 = var2.getEra();
         if(var3 != null && this.validateEra(var3)) {
@@ -285,19 +286,19 @@ public class TLocalGregorianCalendar extends TBaseCalendar {
         }
     }
 
-    public void getCalendarDateFromFixedDate(CalendarDate var1, long var2) {
+    public void getCalendarDateFromFixedDate(TCalendarDate var1, long var2) {
         TLocalGregorianCalendar.Date var4 = (TLocalGregorianCalendar.Date)var1;
         super.getCalendarDateFromFixedDate(var4, var2);
         this.adjustYear(var4, (var2 - 719163L) * 86400000L, 0);
     }
 
-    public static class Date extends sun.util.calendar.BaseCalendar.Date {
+    public static class Date extends TBaseCalendar.Date {
         private int gregorianYear = -2147483648;
 
         protected Date() {
         }
 
-        protected Date(TimeZone var1) {
+        protected Date(TTimeZone var1) {
             super(var1);
         }
 

@@ -16,7 +16,8 @@
 package org.teavm.classlib.sun.util.calendar;
 
 import java.util.Locale;
-import java.util.TimeZone;
+
+import org.teavm.classlib.java.util.TTimeZone;
 
 public final class TEra {
     private final String name;
@@ -32,7 +33,7 @@ public final class TEra {
         this.since = var3;
         this.localTime = var5;
         TGregorian var6 = TCalendarSystem.getGregorianCalendar();
-        TGregorian.Date var7 = var6.newCalendarDate((TimeZone)null);
+        TGregorian.Date var7 = var6.newCalendarDate((TTimeZone)null);
         var6.getCalendarDate(var3, var7);
         this.sinceDate = new TImmutableGregorianDate(var7);
     }
@@ -53,7 +54,7 @@ public final class TEra {
         return this.abbr;
     }
 
-    public long getSince(TimeZone var1) {
+    public long getSince(TTimeZone var1) {
         if(var1 != null && this.localTime) {
             int var2 = var1.getOffset(this.since);
             return this.since - (long)var2;
@@ -62,7 +63,7 @@ public final class TEra {
         }
     }
 
-    public CalendarDate getSinceDate() {
+    public TCalendarDate getSinceDate() {
         return this.sinceDate;
     }
 
@@ -71,10 +72,10 @@ public final class TEra {
     }
 
     public boolean equals(Object var1) {
-        if(!(var1 instanceof sun.util.calendar.Era)) {
+        if(!(var1 instanceof TEra)) {
             return false;
         } else {
-            sun.util.calendar.Era var2 = (sun.util.calendar.Era)var1;
+            TEra var2 = (TEra)var1;
             return this.name.equals(var2.name) && this.abbr.equals(var2.abbr) && this.since == var2.since && this.localTime == var2.localTime;
         }
     }

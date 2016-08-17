@@ -15,11 +15,8 @@
  */
 package org.teavm.classlib.sun.util.calendar;
 
-import java.util.TimeZone;
-
 import org.teavm.classlib.java.util.TTimeZone;
 
-import sun.util.calendar.CalendarDate;
 
 public class TGregorian extends TBaseCalendar {
     TGregorian() {
@@ -30,18 +27,18 @@ public class TGregorian extends TBaseCalendar {
     }
 
     public TGregorian.Date getCalendarDate() {
-        return this.getCalendarDate(System.currentTimeMillis(), (CalendarDate)this.newCalendarDate());
+        return this.getCalendarDate(System.currentTimeMillis(), (TCalendarDate)this.newCalendarDate());
     }
 
     public TGregorian.Date getCalendarDate(long var1) {
         return this.getCalendarDate(var1, (TCalendarDate)this.newCalendarDate());
     }
 
-    public TGregorian.Date getCalendarDate(long var1, CalendarDate var3) {
+    public TGregorian.Date getCalendarDate(long var1, TCalendarDate var3) {
         return (TGregorian.Date)super.getCalendarDate(var1, var3);
     }
 
-    public TGregorian.Date getCalendarDate(long var1, TimeZone var3) {
+    public TGregorian.Date getCalendarDate(long var1, TTimeZone var3) {
         return this.getCalendarDate(var1, (TCalendarDate)this.newCalendarDate(var3));
     }
 
@@ -57,7 +54,7 @@ public class TGregorian extends TBaseCalendar {
         protected Date() {
         }
 
-        protected Date(TimeZone var1) {
+        protected Date(TTimeZone var1) {
             super(var1);
         }
 

@@ -25,7 +25,7 @@ import org.teavm.classlib.java.util.TTimeZone;
 public abstract class TCalendarSystem {
     private static volatile boolean initialized = false;
     private static ConcurrentMap<String, String> names;
-    private static ConcurrentMap<String, sun.util.calendar.CalendarSystem> calendars;
+    private static ConcurrentMap<String, TCalendarSystem> calendars;
     private static final String PACKAGE_NAME = "sun.util.calendar.";
     private static final String[] namePairs = new String[]{"gregorian", "Gregorian", "japanese", "LocalGregorianCalendar", "julian", "JulianCalendar"};
     private static final TGregorian GREGORIAN_INSTANCE = new TGregorian();
@@ -58,7 +58,7 @@ public abstract class TCalendarSystem {
         return GREGORIAN_INSTANCE;
     }
 
-    public static sun.util.calendar.CalendarSystem forName(String var0) {
+    public static TCalendarSystem forName(String var0) {
         if("gregorian".equals(var0)) {
             return GREGORIAN_INSTANCE;
         } else {
@@ -66,7 +66,7 @@ public abstract class TCalendarSystem {
                 initNames();
             }
 
-            sun.util.calendar.CalendarSystem var1 = (sun.util.calendar.CalendarSystem)calendars.get(var0);
+            TCalendarSystem var1 = (TCalendarSystem)calendars.get(var0);
             if(var1 != null) {
                 return var1;
             } else {
@@ -74,13 +74,13 @@ public abstract class TCalendarSystem {
                 if(var2 == null) {
                     return null;
                 } else {
-                    Object var5;
+                    TCalendarSystem var5;
                     if(var2.endsWith("LocalGregorianCalendar")) {
                         var5 = TLocalGregorianCalendar.getLocalGregorianCalendar(var0);
                     } else {
                         try {
                             Class var3 = Class.forName(var2);
-                            var5 = (sun.util.calendar.CalendarSystem)var3.newInstance();
+                            var5 = (TCalendarSystem)var3.newInstance();
                         } catch (Exception var4) {
                             throw new InternalError(var4);
                         }
@@ -89,9 +89,9 @@ public abstract class TCalendarSystem {
                     if(var5 == null) {
                         return null;
                     } else {
-                        sun.util.calendar.CalendarSystem
-                                var6 = (sun.util.calendar.CalendarSystem)calendars.putIfAbsent(var0, var5);
-                        return (sun.util.calendar.CalendarSystem)(var6 == null?var5:var6);
+                        TCalendarSystem
+                                var6 = (TCalendarSystem)calendars.putIfAbsent(var0, var5);
+                        return (TCalendarSystem)(var6 == null?var5:var6);
                     }
                 }
             }
