@@ -17,11 +17,11 @@ package org.teavm.classlib.java.util;
 
 import java.io.Serializable;
 import java.util.Arrays;
+
 import org.teavm.classlib.impl.tz.DateTimeZone;
 import org.teavm.classlib.impl.tz.DateTimeZoneProvider;
 import org.teavm.classlib.impl.tz.FixedDateTimeZone;
 import org.teavm.classlib.impl.unicode.CLDRHelper;
-import org.teavm.classlib.java.lang.TThreadInterruptHandler;
 
 /**
  * {@code TimeZone} represents a time zone offset, taking into account
@@ -86,6 +86,11 @@ public abstract class TTimeZone implements Serializable, Cloneable {
     static final TTimeZone GMT = new TIANATimeZone(new FixedDateTimeZone("GMT", 0, 0));
 
     private String id;
+
+    /**
+     * The null constant as a TimeZone.
+     */
+    static final TTimeZone NO_TIMEZONE = null;
 
     /**
      * Constructs a new instance of this class.

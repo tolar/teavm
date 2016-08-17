@@ -22,6 +22,7 @@ public class TGregorianCalendar extends TCalendar {
     public static final int AD = 1;
 
     private static final long defaultGregorianCutover = -12219292800000L;
+    static final long DEFAULT_GREGORIAN_CUTOVER = -12219292800000L;
 
     private long gregorianCutover = defaultGregorianCutover;
 

@@ -15,29 +15,21 @@
  */
 package org.teavm.classlib.sun.util.calendar;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.CRC32;
 
-import sun.security.action.GetPropertyAction;
-import sun.util.calendar.ZoneInfo;
 
 public final class TZoneInfoFile {
     private static String versionId;
@@ -151,9 +143,9 @@ public final class TZoneInfoFile {
         return versionId;
     }
 
-    public static ZoneInfo getCustomTimeZone(String var0, int var1) {
+    public static TZoneInfo getCustomTimeZone(String var0, int var1) {
         String var2 = toCustomID(var1);
-        return new ZoneInfo(var2, var1);
+        return new TZoneInfo(var2, var1);
     }
 
     public static String toCustomID(int var0) {
@@ -657,48 +649,6 @@ public final class TZoneInfoFile {
 
         var0[var1] = var4 * 1000L << 12 | (long)(var9 << 4) & 240L | (long)var8 & 15L;
         return var3;
-    }
-
-    static {
-        String var0 = ((String) AccessController
-                .doPrivileged(new GetPropertyAction("sun.timezone.ids.oldmapping", "false"))).toLowerCase(Locale.ROOT);
-        USE_OLDMAPPING = var0.equals("yes") || var0.equals("true");
-        AccessController.doPrivileged(new PrivilegedAction() {
-            public Object run() {
-                try {
-                    String var1 = System.getProperty("java.home") + File.separator + "lib";
-                    DataInputStream var2 = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(var1, "tzdb.dat"))));
-                    Throwable var3 = null;
-
-                    try {
-                        TZoneInfoFile.load(var2);
-                    } catch (Throwable var13) {
-                        var3 = var13;
-                        throw var13;
-                    } finally {
-                        if(var2 != null) {
-                            if(var3 != null) {
-                                try {
-                                    var2.close();
-                                } catch (Throwable var12) {
-                                    var3.addSuppressed(var12);
-                                }
-                            } else {
-                                var2.close();
-                            }
-                        }
-
-                    }
-
-                    return null;
-                } catch (Exception var15) {
-                    throw new Error(var15);
-                }
-            }
-        });
-        CURRT = System.currentTimeMillis() / 1000L;
-        toCalendarDOW = new int[]{-1, 2, 3, 4, 5, 6, 7, 1};
-        toSTZTime = new int[]{2, 0, 1};
     }
 
     private static class Checksum extends CRC32 {

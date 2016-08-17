@@ -19,7 +19,6 @@ import java.util.Locale;
 
 import org.teavm.classlib.java.util.TTimeZone;
 
-import sun.util.calendar.CalendarUtils;
 
 public abstract class TCalendarDate implements Cloneable {
     public static final int FIELD_UNDEFINED = -2147483648;
@@ -346,13 +345,13 @@ public abstract class TCalendarDate implements Cloneable {
 
     public String toString() {
         StringBuilder var1 = new StringBuilder();
-        CalendarUtils.sprintf0d(var1, this.year, 4).append('-');
-        CalendarUtils.sprintf0d(var1, this.month, 2).append('-');
-        CalendarUtils.sprintf0d(var1, this.dayOfMonth, 2).append('T');
-        CalendarUtils.sprintf0d(var1, this.hours, 2).append(':');
-        CalendarUtils.sprintf0d(var1, this.minutes, 2).append(':');
-        CalendarUtils.sprintf0d(var1, this.seconds, 2).append('.');
-        CalendarUtils.sprintf0d(var1, this.millis, 3);
+        TCalendarUtils.sprintf0d(var1, this.year, 4).append('-');
+        TCalendarUtils.sprintf0d(var1, this.month, 2).append('-');
+        TCalendarUtils.sprintf0d(var1, this.dayOfMonth, 2).append('T');
+        TCalendarUtils.sprintf0d(var1, this.hours, 2).append(':');
+        TCalendarUtils.sprintf0d(var1, this.minutes, 2).append(':');
+        TCalendarUtils.sprintf0d(var1, this.seconds, 2).append('.');
+        TCalendarUtils.sprintf0d(var1, this.millis, 3);
         if(this.zoneOffset == 0) {
             var1.append('Z');
         } else if(this.zoneOffset != -2147483648) {
@@ -368,8 +367,8 @@ public abstract class TCalendarDate implements Cloneable {
 
             var2 /= '\uea60';
             var1.append(var3);
-            CalendarUtils.sprintf0d(var1, var2 / 60, 2);
-            CalendarUtils.sprintf0d(var1, var2 % 60, 2);
+            TCalendarUtils.sprintf0d(var1, var2 / 60, 2);
+            TCalendarUtils.sprintf0d(var1, var2 % 60, 2);
         } else {
             var1.append(" local time");
         }

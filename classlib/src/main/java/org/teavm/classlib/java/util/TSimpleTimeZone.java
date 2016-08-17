@@ -19,16 +19,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.teavm.classlib.sun.util.calendar.TBaseCalendar;
-
-import sun.util.calendar.BaseCalendar;
-import sun.util.calendar.CalendarSystem;
-import sun.util.calendar.CalendarUtils;
-import sun.util.calendar.Gregorian;
+import org.teavm.classlib.sun.util.calendar.TCalendarSystem;
+import org.teavm.classlib.sun.util.calendar.TCalendarUtils;
+import org.teavm.classlib.sun.util.calendar.TGregorian;
 
 public class TSimpleTimeZone extends TTimeZone {
     /**
@@ -439,7 +436,7 @@ public class TSimpleTimeZone extends TTimeZone {
                 }
             }
             TBaseCalendar cal = date >= TGregorianCalendar.DEFAULT_GREGORIAN_CUTOVER ?
-                    gcal : (BaseCalendar) CalendarSystem.forName("julian");
+                    gcal : (TBaseCalendar) TCalendarSystem.forName("julian");
             TBaseCalendar.Date cdate = (TBaseCalendar.Date) cal.newCalendarDate(TTimeZone.NO_TIMEZONE);
             // Get the year in local time
             cal.getCalendarDate(date + rawOffset, cdate);
@@ -508,15 +505,15 @@ public class TSimpleTimeZone extends TTimeZone {
             // y %= 28 also produces an equivalent year, but positive
             // year numbers would be convenient to use the UNIX cal
             // command.
-            y = (int) CalendarUtils.mod((long) y, 28);
+            y = (int) TCalendarUtils.mod((long) y, 28);
         }
 
         // convert year to its 1-based month value
         int m = month + 1;
 
         // First, calculate time as a Gregorian date.
-        BaseCalendar cal = gcal;
-        BaseCalendar.Date cdate = (BaseCalendar.Date) cal.newCalendarDate(TimeZone.NO_TIMEZONE);
+        TBaseCalendar cal = gcal;
+        TBaseCalendar.Date cdate = (TBaseCalendar.Date) cal.newCalendarDate(TTimeZone.NO_TIMEZONE);
         cdate.setDate(y, m, day);
         long time = cal.getTime(cdate); // normalize cdate
         time += millis - rawOffset; // UTC time
@@ -527,9 +524,9 @@ public class TSimpleTimeZone extends TTimeZone {
         // normalized year numbering is ..., -2 (BCE 2), -1 (BCE 1),
         // 1, 2 ... which is different from the GregorianCalendar
         // style year numbering (..., -1, 0 (BCE 1), 1, 2, ...).
-        if (time < GregorianCalendar.DEFAULT_GREGORIAN_CUTOVER) {
-            cal = (BaseCalendar) CalendarSystem.forName("julian");
-            cdate = (BaseCalendar.Date) cal.newCalendarDate(TimeZone.NO_TIMEZONE);
+        if (time < TGregorianCalendar.DEFAULT_GREGORIAN_CUTOVER) {
+            cal = (TBaseCalendar) TCalendarSystem.forName("julian");
+            cdate = (TBaseCalendar.Date) cal.newCalendarDate(TTimeZone.NO_TIMEZONE);
             cdate.setNormalizedDate(y, m, day);
             time = cal.getTime(cdate) + millis - rawOffset;
         }
@@ -545,14 +542,14 @@ public class TSimpleTimeZone extends TTimeZone {
             throw new IllegalArgumentException();
         }
 
-        if (!useDaylight || year < startYear || era != GregorianCalendar.CE) {
+        if (!useDaylight || year < startYear /*|| era != TGregorianCalendar.CE*/) {
             return rawOffset;
         }
 
         return getOffset(cal, cdate, y, time);
     }
 
-    private int getOffset(BaseCalendar cal, BaseCalendar.Date cdate, int year, long time) {
+    private int getOffset(TBaseCalendar cal, TBaseCalendar.Date cdate, int year, long time) {
         synchronized (this) {
             if (cacheStart != 0) {
                 if (time >= cacheStart && time < cacheEnd) {
@@ -604,7 +601,7 @@ public class TSimpleTimeZone extends TTimeZone {
         return offset;
     }
 
-    private long getStart(BaseCalendar cal, BaseCalendar.Date cdate, int year) {
+    private long getStart(TBaseCalendar cal, TBaseCalendar.Date cdate, int year) {
         int time = startTime;
         if (startTimeMode != UTC_TIME) {
             time -= rawOffset;
@@ -613,7 +610,7 @@ public class TSimpleTimeZone extends TTimeZone {
                 startDayOfWeek, time);
     }
 
-    private long getEnd(BaseCalendar cal, BaseCalendar.Date cdate, int year) {
+    private long getEnd(TBaseCalendar cal, TBaseCalendar.Date cdate, int year) {
         int time = endTime;
         if (endTimeMode != UTC_TIME) {
             time -= rawOffset;
@@ -625,7 +622,7 @@ public class TSimpleTimeZone extends TTimeZone {
                 endDayOfWeek, time);
     }
 
-    private long getTransition(BaseCalendar cal, BaseCalendar.Date cdate,
+    private long getTransition(TBaseCalendar cal, TBaseCalendar.Date cdate,
             int mode, int year, int month, int dayOfMonth,
             int dayOfWeek, int timeOfDay) {
         cdate.setNormalizedYear(year);
@@ -640,17 +637,17 @@ public class TSimpleTimeZone extends TTimeZone {
                 if (dayOfMonth < 0) {
                     cdate.setDayOfMonth(cal.getMonthLength(cdate));
                 }
-                cdate = (BaseCalendar.Date) cal.getNthDayOfWeek(dayOfMonth, dayOfWeek, cdate);
+                cdate = (TBaseCalendar.Date) cal.getNthDayOfWeek(dayOfMonth, dayOfWeek, cdate);
                 break;
 
             case DOW_GE_DOM_MODE:
                 cdate.setDayOfMonth(dayOfMonth);
-                cdate = (BaseCalendar.Date) cal.getNthDayOfWeek(1, dayOfWeek, cdate);
+                cdate = (TBaseCalendar.Date) cal.getNthDayOfWeek(1, dayOfWeek, cdate);
                 break;
 
             case DOW_LE_DOM_MODE:
                 cdate.setDayOfMonth(dayOfMonth);
-                cdate = (BaseCalendar.Date) cal.getNthDayOfWeek(-1, dayOfWeek, cdate);
+                cdate = (TBaseCalendar.Date) cal.getNthDayOfWeek(-1, dayOfWeek, cdate);
                 break;
         }
         return cal.getTime(cdate) + timeOfDay;
@@ -721,16 +718,6 @@ public class TSimpleTimeZone extends TTimeZone {
         return useDaylight;
     }
 
-    /**
-     * Returns {@code true} if this {@code SimpleTimeZone} observes
-     * Daylight Saving Time. This method is equivalent to {@link
-     * #useDaylightTime()}.
-     *
-     * @return {@code true} if this {@code SimpleTimeZone} observes
-     * Daylight Saving Time; {@code false} otherwise.
-     * @since 1.7
-     */
-    @Override
     public boolean observesDaylightTime() {
         return useDaylightTime();
     }
@@ -740,7 +727,7 @@ public class TSimpleTimeZone extends TTimeZone {
      * @return true if daylight saving time is in effective at the
      * given date; false otherwise.
      */
-    public boolean inDaylightTime(Date date)
+    public boolean inDaylightTime(TDate date)
     {
         return (getOffset(date.getTime()) != rawOffset);
     }
@@ -776,11 +763,11 @@ public class TSimpleTimeZone extends TTimeZone {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof java.util.SimpleTimeZone)) {
+        if (!(obj instanceof TSimpleTimeZone)) {
             return false;
         }
 
-        java.util.SimpleTimeZone that = (java.util.SimpleTimeZone) obj;
+        TSimpleTimeZone that = (TSimpleTimeZone) obj;
 
         return getID().equals(that.getID()) &&
                 hasSameRules(that);
@@ -793,14 +780,14 @@ public class TSimpleTimeZone extends TTimeZone {
      * same rules and offset as this one
      * @since 1.2
      */
-    public boolean hasSameRules(TimeZone other) {
+    public boolean hasSameRules(TTimeZone other) {
         if (this == other) {
             return true;
         }
-        if (!(other instanceof java.util.SimpleTimeZone)) {
+        if (!(other instanceof TSimpleTimeZone)) {
             return false;
         }
-        java.util.SimpleTimeZone that = (java.util.SimpleTimeZone) other;
+        TSimpleTimeZone that = (TSimpleTimeZone) other;
         return rawOffset == that.rawOffset &&
                 useDaylight == that.useDaylight &&
                 (!useDaylight
@@ -1079,7 +1066,7 @@ public class TSimpleTimeZone extends TTimeZone {
      */
     private int dstSavings;
 
-    private static final Gregorian gcal = CalendarSystem.getGregorianCalendar();
+    private static final TGregorian gcal = TCalendarSystem.getGregorianCalendar();
 
     /**
      * Cache values representing a single period of daylight saving
@@ -1301,11 +1288,6 @@ public class TSimpleTimeZone extends TTimeZone {
         }
     }
 
-    /**
-     * Decode the end rule and validate the parameters.  This method is exactly
-     * analogous to decodeStartRule().
-     * @see decodeStartRule
-     */
     private void decodeEndRule() {
         useDaylight = (startDay != 0) && (endDay != 0);
         if (endDay != 0) {

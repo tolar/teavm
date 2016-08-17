@@ -22,9 +22,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Date;
 
-import sun.misc.IOUtils;
-import sun.security.util.BitArray;
-import sun.security.util.DerInputStream;
+import org.teavm.classlib.sun.misc.TIOUtils;
 
 public class TDerValue {
     public static final byte TAG_UNIVERSAL = 0;
@@ -222,7 +220,7 @@ public class TDerValue {
         if(var1 && ((InputStream)var2).available() != this.length) {
             throw new IOException("extra data given to DerValue constructor");
         } else {
-            byte[] var9 = IOUtils.readFully((InputStream)var2, this.length, true);
+            byte[] var9 = TIOUtils.readFully((InputStream)var2, this.length, true);
             this.buffer = new TDerInputBuffer(var9);
             return new TDerInputStream(this.buffer);
         }
@@ -294,7 +292,7 @@ public class TDerValue {
                 throw new IOException("short read on DerValue buffer");
             } else {
                 if(this.isConstructed()) {
-                    DerInputStream var2 = new DerInputStream(var1);
+                    TDerInputStream var2 = new TDerInputStream(var1);
 
                     for(var1 = null; var2.available() != 0; var1 = this.append(var1, var2.getOctetString())) {
                         ;
@@ -346,7 +344,7 @@ public class TDerValue {
         }
     }
 
-    public BitArray getUnalignedBitString() throws IOException {
+    public TBitArray getUnalignedBitString() throws IOException {
         if(this.tag != 3) {
             throw new IOException("DerValue.getBitString, not a bit string " + this.tag);
         } else {
@@ -366,7 +364,7 @@ public class TDerValue {
         }
     }
 
-    public BitArray getUnalignedBitString(boolean var1) throws IOException {
+    public TBitArray getUnalignedBitString(boolean var1) throws IOException {
         if(!var1 && this.tag != 3) {
             throw new IOException("DerValue.getBitString, not a bit string " + this.tag);
         } else {

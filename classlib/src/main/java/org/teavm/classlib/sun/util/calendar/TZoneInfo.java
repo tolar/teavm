@@ -18,7 +18,6 @@ package org.teavm.classlib.sun.util.calendar;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Map;
-import java.util.SimpleTimeZone;
 
 import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TSimpleTimeZone;
@@ -44,7 +43,7 @@ public class TZoneInfo extends TTimeZone {
     private boolean willGMTOffsetChange;
     private transient boolean dirty;
     private static final long serialVersionUID = 2653134537216586139L;
-    private transient SimpleTimeZone lastRule;
+    private transient TSimpleTimeZone lastRule;
 
     public TZoneInfo() {
         this.rawOffsetDiff = 0;
@@ -323,7 +322,7 @@ public class TZoneInfo extends TTimeZone {
     }
 
     public TSimpleTimeZone getLastRuleInstance() {
-        return this.simpleTimeZoneParams == null?null:(this.simpleTimeZoneParams.length == 10?new SimpleTimeZone(this.getLastRawOffset(), this.getID(), this.simpleTimeZoneParams[0], this.simpleTimeZoneParams[1], this.simpleTimeZoneParams[2], this.simpleTimeZoneParams[3], this.simpleTimeZoneParams[4], this.simpleTimeZoneParams[5], this.simpleTimeZoneParams[6], this.simpleTimeZoneParams[7], this.simpleTimeZoneParams[8], this.simpleTimeZoneParams[9], this.dstSavings):new SimpleTimeZone(this.getLastRawOffset(), this.getID(), this.simpleTimeZoneParams[0], this.simpleTimeZoneParams[1], this.simpleTimeZoneParams[2], this.simpleTimeZoneParams[3], this.simpleTimeZoneParams[4], this.simpleTimeZoneParams[5], this.simpleTimeZoneParams[6], this.simpleTimeZoneParams[7], this.dstSavings));
+        return this.simpleTimeZoneParams == null?null:(this.simpleTimeZoneParams.length == 10?new TSimpleTimeZone(this.getLastRawOffset(), this.getID(), this.simpleTimeZoneParams[0], this.simpleTimeZoneParams[1], this.simpleTimeZoneParams[2], this.simpleTimeZoneParams[3], this.simpleTimeZoneParams[4], this.simpleTimeZoneParams[5], this.simpleTimeZoneParams[6], this.simpleTimeZoneParams[7], this.simpleTimeZoneParams[8], this.simpleTimeZoneParams[9], this.dstSavings):new TSimpleTimeZone(this.getLastRawOffset(), this.getID(), this.simpleTimeZoneParams[0], this.simpleTimeZoneParams[1], this.simpleTimeZoneParams[2], this.simpleTimeZoneParams[3], this.simpleTimeZoneParams[4], this.simpleTimeZoneParams[5], this.simpleTimeZoneParams[6], this.simpleTimeZoneParams[7], this.dstSavings));
     }
 
     public Object clone() {

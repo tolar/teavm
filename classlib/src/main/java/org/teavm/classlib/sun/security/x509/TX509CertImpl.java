@@ -59,7 +59,7 @@ import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.sun.security.TX509CertInfo;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
-
+import org.teavm.classlib.sun.security.util.TDerValue;
 
 public class TX509CertImpl extends TX509Certificate {
 
@@ -134,8 +134,8 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    private DerValue readRFC1421Cert(InputStream var1) throws IOException {
-        DerValue var2 = null;
+    private TDerValue readRFC1421Cert(InputStream var1) throws IOException {
+        TDerValue var2 = null;
         String var3 = null;
         BufferedReader var4 = new BufferedReader(new InputStreamReader(var1, "ASCII"));
 
@@ -153,7 +153,7 @@ public class TX509CertImpl extends TX509Certificate {
             try {
                 while((var3 = var4.readLine()) != null) {
                     if(var3.equals("-----END CERTIFICATE-----")) {
-                        var2 = new DerValue(var5.toByteArray());
+                        var2 = new TDerValue(var5.toByteArray());
                         break;
                     }
 
@@ -171,7 +171,7 @@ public class TX509CertImpl extends TX509Certificate {
         this.info = var1;
     }
 
-    public TX509CertImpl(DerValue var1) throws CertificateException {
+    public TX509CertImpl(TDerValue var1) throws CertificateException {
         try {
             this.parse(var1);
         } catch (IOException var3) {

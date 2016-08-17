@@ -19,7 +19,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.TimeZone;
+
+import org.teavm.classlib.java.util.TTimeZone;
+import org.teavm.classlib.sun.util.calendar.TCalendarDate;
+import org.teavm.classlib.sun.util.calendar.TCalendarSystem;
+import org.teavm.classlib.sun.util.calendar.TGregorian;
 
 class TDerInputBuffer extends ByteArrayInputStream implements Cloneable {
     TDerInputBuffer(byte[] var1) {
@@ -152,7 +156,7 @@ class TDerInputBuffer extends ByteArrayInputStream implements Cloneable {
         return this.getBitString(this.available());
     }
 
-    BitArray getUnalignedBitString() throws IOException {
+    TBitArray getUnalignedBitString() throws IOException {
         if(this.pos >= this.count) {
             return null;
         } else {
@@ -164,7 +168,7 @@ class TDerInputBuffer extends ByteArrayInputStream implements Cloneable {
                 byte[] var3 = new byte[var1 - 1];
                 int var4 = var3.length == 0?0:var3.length * 8 - var2;
                 System.arraycopy(this.buf, this.pos + 1, var3, 0, var1 - 1);
-                BitArray var5 = new BitArray(var4, var3);
+                TBitArray var5 = new TBitArray(var4, var3);
                 this.pos = this.count;
                 return var5;
             }
@@ -260,8 +264,8 @@ class TDerInputBuffer extends ByteArrayInputStream implements Cloneable {
         }
 
         if(var4 != 0 && var5 != 0 && var4 <= 12 && var5 <= 31 && var6 < 24 && var7 < 60 && var8 < 60) {
-            Gregorian var17 = CalendarSystem.getGregorianCalendar();
-            CalendarDate var18 = var17.newCalendarDate((TimeZone)null);
+            TGregorian var17 = TCalendarSystem.getGregorianCalendar();
+            TCalendarDate var18 = var17.newCalendarDate((TTimeZone)null);
             var18.setDate(var3, var4, var5);
             var18.setTimeOfDay(var6, var7, var8, var9);
             long var13 = var17.getTime(var18);
