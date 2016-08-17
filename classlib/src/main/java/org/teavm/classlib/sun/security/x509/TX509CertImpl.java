@@ -92,7 +92,7 @@ public class TX509CertImpl extends TX509Certificate {
     private Collection<List<?>> subjectAlternativeNames;
     private Collection<List<?>> issuerAlternativeNames;
     private List<String> extKeyUsage;
-    private Set<AccessDescription> authInfoAccess;
+    private Set<TAccessDescription> authInfoAccess;
     private TPublicKey verifiedPublicKey;
     private String verifiedProvider;
     private boolean verificationResult;
