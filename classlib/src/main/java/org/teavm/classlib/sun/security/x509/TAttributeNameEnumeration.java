@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vtolar.
+ *  Copyright 2016 vasek.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.sun.security;
+package org.teavm.classlib.sun.security.x509;
 
-public class TX509CertInfo {
+import org.teavm.classlib.java.util.TVector;
+
+/**
+ * Created by vasek on 18. 8. 2016.
+ */
+public class TAttributeNameEnumeration extends TVector<String> {
+    private static final long serialVersionUID = -6067440240757099134L;
+
+    public TAttributeNameEnumeration() {
+        super(4, 2);
+    }
 }

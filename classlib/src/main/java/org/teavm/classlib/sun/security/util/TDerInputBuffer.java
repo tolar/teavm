@@ -15,17 +15,17 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Date;
-
+import org.teavm.classlib.java.io.TByteArrayInputStream;
+import org.teavm.classlib.java.lang.TCloneable;
 import org.teavm.classlib.java.util.TTimeZone;
 import org.teavm.classlib.sun.util.calendar.TCalendarDate;
 import org.teavm.classlib.sun.util.calendar.TCalendarSystem;
 import org.teavm.classlib.sun.util.calendar.TGregorian;
 
-class TDerInputBuffer extends ByteArrayInputStream implements Cloneable {
+class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
     TDerInputBuffer(byte[] var1) {
         super(var1);
     }

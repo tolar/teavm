@@ -21,6 +21,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TException;
+import org.teavm.classlib.java.lang.TString;
 
 public final class TObjectIdentifier implements Serializable {
     private byte[] encoding = null;
@@ -54,7 +57,7 @@ public final class TObjectIdentifier implements Serializable {
         var1.defaultWriteObject();
     }
 
-    public TObjectIdentifier(String var1) throws IOException {
+    public TObjectIdentifier(String var1) throws TIOException {
         byte var2 = 46;
         int var3 = 0;
         boolean var4 = false;
@@ -119,10 +122,10 @@ public final class TObjectIdentifier implements Serializable {
             this.encoding = new byte[var5];
             System.arraycopy(var6, 0, this.encoding, 0, var5);
             this.stringForm = var1;
-        } catch (IOException var13) {
+        } catch (TIOException var13) {
             throw var13;
-        } catch (Exception var14) {
-            throw new IOException("ObjectIdentifier() -- Invalid format: " + var14.toString(), var14);
+        } catch (TException var14) {
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- Invalid format: " + var14.toString()), var14);
         }
     }
 
@@ -138,10 +141,10 @@ public final class TObjectIdentifier implements Serializable {
         this.init(var1, var1.length);
     }
 
-    public TObjectIdentifier(TDerInputStream var1) throws IOException {
+    public TObjectIdentifier(TDerInputStream var1) throws TIOException {
         byte var2 = (byte)var1.getByte();
         if(var2 != 6) {
-            throw new IOException("ObjectIdentifier() -- data isn\'t an object ID (tag = " + var2 + ")");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- data isn\'t an object ID (tag = " + var2 + ")"));
         } else {
             this.encoding = new byte[var1.getLength()];
             var1.getBytes(this.encoding);
@@ -405,9 +408,9 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    private static void checkCount(int var0) throws IOException {
+    private static void checkCount(int var0) throws TIOException {
         if(var0 < 2) {
-            throw new IOException("ObjectIdentifier() -- Must be at least two oid components ");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- Must be at least two oid components "));
         }
     }
 
@@ -423,27 +426,27 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    private static void checkSecondComponent(int var0, int var1) throws IOException {
+    private static void checkSecondComponent(int var0, int var1) throws TIOException {
         if(var1 < 0 || var0 != 2 && var1 > 39) {
-            throw new IOException("ObjectIdentifier() -- Second oid component is invalid ");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- Second oid component is invalid "));
         }
     }
 
-    private static void checkSecondComponent(int var0, BigInteger var1) throws IOException {
+    private static void checkSecondComponent(int var0, BigInteger var1) throws TIOException {
         if(var1.signum() == -1 || var0 != 2 && var1.compareTo(BigInteger.valueOf(39L)) == 1) {
-            throw new IOException("ObjectIdentifier() -- Second oid component is invalid ");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- Second oid component is invalid "));
         }
     }
 
-    private static void checkOtherComponent(int var0, int var1) throws IOException {
+    private static void checkOtherComponent(int var0, int var1) throws TIOException {
         if(var1 < 0) {
-            throw new IOException("ObjectIdentifier() -- oid component #" + (var0 + 1) + " must be non-negative ");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- oid component #" + (var0 + 1) + " must be non-negative "));
         }
     }
 
-    private static void checkOtherComponent(int var0, BigInteger var1) throws IOException {
+    private static void checkOtherComponent(int var0, BigInteger var1) throws TIOException {
         if(var1.signum() == -1) {
-            throw new IOException("ObjectIdentifier() -- oid component #" + (var0 + 1) + " must be non-negative ");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- oid component #" + (var0 + 1) + " must be non-negative "));
         }
     }
 

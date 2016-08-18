@@ -50,14 +50,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.TSignature;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
-import org.teavm.classlib.sun.security.TX509CertInfo;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
@@ -103,7 +100,7 @@ public class TX509CertImpl extends TX509Certificate {
 
     public TX509CertImpl(byte[] var1) throws CertificateException {
         try {
-            this.parse(new DerValue(var1));
+            this.parse(new TDerValue(var1));
         } catch (IOException var3) {
             this.signedCert = null;
             throw new CertificateException("Unable to initialize, " + var3, var3);
@@ -111,7 +108,7 @@ public class TX509CertImpl extends TX509Certificate {
     }
 
     public TX509CertImpl(InputStream var1) throws CertificateException {
-        DerValue var2 = null;
+        TDerValue var2 = null;
         BufferedInputStream var3 = new BufferedInputStream(var1);
 
         try {
@@ -120,7 +117,7 @@ public class TX509CertImpl extends TX509Certificate {
         } catch (IOException var8) {
             try {
                 var3.reset();
-                var2 = new DerValue(var3);
+                var2 = new TDerValue(var3);
             } catch (IOException var7) {
                 throw new CertificateException("Input stream must be either DER-encoded bytes or RFC1421 hex-encoded DER-encoded bytes: " + var7.getMessage(), var7);
             }
@@ -291,7 +288,7 @@ public class TX509CertImpl extends TX509Certificate {
                 }
 
                 var4.initSign(var1);
-                this.algId = AlgorithmId.get(var4.getAlgorithm());
+                this.algId = TAlgorithmId.get(var4.getAlgorithm());
                 DerOutputStream var5 = new DerOutputStream();
                 DerOutputStream var6 = new DerOutputStream();
                 this.info.encode(var6);
@@ -377,11 +374,11 @@ public class TX509CertImpl extends TX509Certificate {
                 var4 = var3.getPrefix();
                 if(var4.equalsIgnoreCase("info")) {
                     if(var3.getSuffix() == null) {
-                        if(!(var2 instanceof X509CertInfo)) {
-                            throw new CertificateException("Attribute value should be of type X509CertInfo.");
+                        if(!(var2 instanceof TX509CertInfo)) {
+                            throw new CertificateException("Attribute value should be of type TX509CertInfo.");
                         }
 
-                        this.info = (X509CertInfo)var2;
+                        this.info = (TX509CertInfo)var2;
                         this.signedCert = null;
                     } else {
                         this.info.set(var3.getSuffix(), var2);
@@ -429,7 +426,7 @@ public class TX509CertImpl extends TX509Certificate {
     }
 
     public Enumeration<String> getElements() {
-        AttributeNameEnumeration var1 = new AttributeNameEnumeration();
+        TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("x509.info");
         var1.addElement("x509.algorithm");
         var1.addElement("x509.signature");
@@ -1143,25 +1140,25 @@ public class TX509CertImpl extends TX509Certificate {
         return (AuthorityInfoAccessExtension)this.getExtension(PKIXExtensions.AuthInfoAccess_Id);
     }
 
-    private void parse(DerValue var1) throws CertificateException, IOException {
+    private void parse(TDerValue var1) throws CertificateException, IOException {
         if(this.readOnly) {
             throw new CertificateParsingException("cannot over-write existing certificate");
         } else if(var1.data != null && var1.tag == 48) {
             this.signedCert = var1.toByteArray();
-            DerValue[] var2 = new DerValue[]{var1.data.getDerValue(), var1.data.getDerValue(), var1.data.getDerValue()};
+            TDerValue[] var2 = new TDerValue[]{var1.data.getDerValue(), var1.data.getDerValue(), var1.data.getDerValue()};
             if(var1.data.available() != 0) {
                 throw new CertificateParsingException("signed overrun, bytes = " + var1.data.available());
             } else if(var2[0].tag != 48) {
                 throw new CertificateParsingException("signed fields invalid");
             } else {
-                this.algId = AlgorithmId.parse(var2[1]);
+                this.algId = TAlgorithmId.parse(var2[1]);
                 this.signature = var2[2].getBitString();
                 if(var2[1].data.available() != 0) {
                     throw new CertificateParsingException("algid field overrun");
                 } else if(var2[2].data.available() != 0) {
                     throw new CertificateParsingException("signed fields overrun");
                 } else {
-                    this.info = new X509CertInfo(var2[0]);
+                    this.info = new TX509CertInfo(var2[0]);
                     AlgorithmId var3 = (AlgorithmId)this.info.get("algorithmID.algorithm");
                     if(!this.algId.equals(var3)) {
                         throw new CertificateException("Signature algorithm mismatch");

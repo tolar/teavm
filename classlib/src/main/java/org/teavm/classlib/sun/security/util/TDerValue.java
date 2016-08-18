@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Date;
-
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.sun.misc.TIOUtils;
 
 public class TDerValue {
@@ -107,7 +107,7 @@ public class TDerValue {
         this.data.mark(2147483647);
     }
 
-    TDerValue(TDerInputBuffer var1) throws IOException {
+    TDerValue(TDerInputBuffer var1) throws TIOException {
         this.tag = (byte)var1.read();
         byte var2 = (byte)var1.read();
         this.length = TDerInputStream.getLength(var2 & 255, var1);
@@ -485,7 +485,7 @@ public class TDerValue {
         return var1.toByteArray();
     }
 
-    public TDerInputStream toDerInputStream() throws IOException {
+    public TDerInputStream toDerInputStream() throws TIOException {
         if(this.tag != 48 && this.tag != 49) {
             throw new IOException("toDerInputStream rejects tag type " + this.tag);
         } else {

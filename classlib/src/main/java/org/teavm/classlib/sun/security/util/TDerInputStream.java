@@ -17,10 +17,12 @@ package org.teavm.classlib.sun.security.util;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Vector;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.lang.TString;
 
 public class TDerInputStream {
     TDerInputBuffer buffer;
@@ -151,7 +153,7 @@ public class TDerInputStream {
         }
     }
 
-    public TObjectIdentifier getOID() throws IOException {
+    public TObjectIdentifier getOID() throws TIOException {
         return new TObjectIdentifier(this);
     }
 
@@ -235,7 +237,7 @@ public class TDerInputStream {
         }
     }
 
-    public TDerValue getDerValue() throws IOException {
+    public TDerValue getDerValue() throws TIOException {
         return new TDerValue(this.buffer);
     }
 
@@ -293,7 +295,7 @@ public class TDerInputStream {
         }
     }
 
-    int getByte() throws IOException {
+    int getByte() throws TIOException {
         return 255 & this.buffer.read();
     }
 
@@ -301,15 +303,15 @@ public class TDerInputStream {
         return this.buffer.peek();
     }
 
-    int getLength() throws IOException {
+    int getLength() throws TIOException {
         return getLength(this.buffer);
     }
 
-    static int getLength(InputStream var0) throws IOException {
+    static int getLength(TInputStream var0) throws TIOException {
         return getLength(var0.read(), var0);
     }
 
-    static int getLength(int var0, InputStream var1) throws IOException {
+    static int getLength(int var0, TInputStream var1) throws TIOException {
         int var2;
         if((var0 & 128) == 0) {
             var2 = var0;
@@ -320,7 +322,7 @@ public class TDerInputStream {
             }
 
             if(var3 < 0 || var3 > 4) {
-                throw new IOException("DerInputStream.getLength(): lengthTag=" + var3 + ", " + (var3 < 0?"incorrect DER encoding.":"too big."));
+                throw new TIOException(TString.wrap("DerInputStream.getLength(): lengthTag=" + var3 + ", " + (var3 < 0?"incorrect DER encoding.":"too big.")));
             }
 
             for(var2 = 0; var3 > 0; --var3) {
@@ -329,7 +331,7 @@ public class TDerInputStream {
             }
 
             if(var2 < 0) {
-                throw new IOException("DerInputStream.getLength(): Invalid length bytes");
+                throw new TIOException(TString.wrap("DerInputStream.getLength(): Invalid length bytes"));
             }
         }
 

@@ -19,8 +19,8 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-
-import sun.net.www.ParseUtil;
+import org.teavm.classlib.java.lang.TException;
+import org.teavm.classlib.java.lang.TString;
 
 public class TPropertyExpander {
     public TPropertyExpander() {
@@ -77,10 +77,12 @@ public class TPropertyExpander {
                                     if(var1) {
                                         try {
                                             if(var3.length() > 0 || !(new URI(var8)).isAbsolute()) {
-                                                var8 = ParseUtil.encodePath(var8);
+                                                throw new TException(TString.wrap("Not implemented"));
+                                                //var8 = ParseUtil.encodePath(var8);
                                             }
                                         } catch (URISyntaxException var10) {
-                                            var8 = ParseUtil.encodePath(var8);
+                                            throw new TException(TString.wrap("Not implemented"));
+                                            //var8 = ParseUtil.encodePath(var8);
                                         }
                                     }
 
