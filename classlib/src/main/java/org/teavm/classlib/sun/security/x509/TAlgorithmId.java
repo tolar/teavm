@@ -16,7 +16,7 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.security.AlgorithmParameters;
+import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
@@ -27,45 +27,48 @@ import java.util.Locale;
 import java.util.Map;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.TAlgorithmParameters;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
+import sun.security.util.DerOutputStream;
 import sun.security.util.DerValue;
 import sun.security.util.ObjectIdentifier;
 
 public class TAlgorithmId {
 
     private static final long serialVersionUID = 7205873507486557157L;
-    private ObjectIdentifier algid;
-    private AlgorithmParameters algParams;
+    private TObjectIdentifier algid;
+    private TAlgorithmParameters algParams;
     private boolean constructedFromDer = true;
-    protected DerValue params;
+    protected TDerValue params;
     private static boolean initOidTable = false;
-    private static Map<String, ObjectIdentifier> oidTable;
-    private static final Map<ObjectIdentifier, String> nameTable;
-    public static final ObjectIdentifier MD2_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 2, 2});
-    public static final ObjectIdentifier MD5_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 2, 5});
-    public static final ObjectIdentifier SHA_oid = ObjectIdentifier.newInternal(new int[]{1, 3, 14, 3, 2, 26});
-    public static final ObjectIdentifier SHA224_oid = ObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 4});
-    public static final ObjectIdentifier SHA256_oid = ObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 1});
-    public static final ObjectIdentifier SHA384_oid = ObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 2});
-    public static final ObjectIdentifier SHA512_oid = ObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 3});
+    private static Map<String, TObjectIdentifier> oidTable;
+    private static final Map<TObjectIdentifier, String> nameTable;
+    public static final TObjectIdentifier MD2_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 2, 2});
+    public static final TObjectIdentifier MD5_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 2, 5});
+    public static final TObjectIdentifier SHA_oid = TObjectIdentifier.newInternal(new int[]{1, 3, 14, 3, 2, 26});
+    public static final TObjectIdentifier SHA224_oid = TObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 4});
+    public static final TObjectIdentifier SHA256_oid = TObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 1});
+    public static final TObjectIdentifier SHA384_oid = TObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 2});
+    public static final TObjectIdentifier SHA512_oid = TObjectIdentifier.newInternal(new int[]{2, 16, 840, 1, 101, 3, 4, 2, 3});
     private static final int[] DH_data = new int[]{1, 2, 840, 113549, 1, 3, 1};
     private static final int[] DH_PKIX_data = new int[]{1, 2, 840, 10046, 2, 1};
     private static final int[] DSA_OIW_data = new int[]{1, 3, 14, 3, 2, 12};
     private static final int[] DSA_PKIX_data = new int[]{1, 2, 840, 10040, 4, 1};
     private static final int[] RSA_data = new int[]{2, 5, 8, 1, 1};
     private static final int[] RSAEncryption_data = new int[]{1, 2, 840, 113549, 1, 1, 1};
-    public static final ObjectIdentifier DH_oid;
-    public static final ObjectIdentifier DH_PKIX_oid;
-    public static final ObjectIdentifier DSA_oid;
-    public static final ObjectIdentifier DSA_OIW_oid;
-    public static final ObjectIdentifier EC_oid = oid(new int[]{1, 2, 840, 10045, 2, 1});
-    public static final ObjectIdentifier ECDH_oid = oid(new int[]{1, 3, 132, 1, 12});
-    public static final ObjectIdentifier RSA_oid;
-    public static final ObjectIdentifier RSAEncryption_oid;
-    public static final ObjectIdentifier AES_oid = oid(new int[]{2, 16, 840, 1, 101, 3, 4, 1});
+    public static final TObjectIdentifier DH_oid;
+    public static final TObjectIdentifier DH_PKIX_oid;
+    public static final TObjectIdentifier DSA_oid;
+    public static final TObjectIdentifier DSA_OIW_oid;
+    public static final TObjectIdentifier EC_oid = oid(new int[]{1, 2, 840, 10045, 2, 1});
+    public static final TObjectIdentifier ECDH_oid = oid(new int[]{1, 3, 132, 1, 12});
+    public static final TObjectIdentifier RSA_oid;
+    public static final TObjectIdentifier RSAEncryption_oid;
+    public static final TObjectIdentifier AES_oid = oid(new int[]{2, 16, 840, 1, 101, 3, 4, 1});
     private static final int[] md2WithRSAEncryption_data = new int[]{1, 2, 840, 113549, 1, 1, 2};
     private static final int[] md5WithRSAEncryption_data = new int[]{1, 2, 840, 113549, 1, 1, 4};
     private static final int[] sha1WithRSAEncryption_data = new int[]{1, 2, 840, 113549, 1, 1, 5};
@@ -77,33 +80,95 @@ public class TAlgorithmId {
     private static final int[] shaWithDSA_OIW_data = new int[]{1, 3, 14, 3, 2, 13};
     private static final int[] sha1WithDSA_OIW_data = new int[]{1, 3, 14, 3, 2, 27};
     private static final int[] dsaWithSHA1_PKIX_data = new int[]{1, 2, 840, 10040, 4, 3};
-    public static final ObjectIdentifier md2WithRSAEncryption_oid;
-    public static final ObjectIdentifier md5WithRSAEncryption_oid;
-    public static final ObjectIdentifier sha1WithRSAEncryption_oid;
-    public static final ObjectIdentifier sha1WithRSAEncryption_OIW_oid;
-    public static final ObjectIdentifier sha224WithRSAEncryption_oid;
-    public static final ObjectIdentifier sha256WithRSAEncryption_oid;
-    public static final ObjectIdentifier sha384WithRSAEncryption_oid;
-    public static final ObjectIdentifier sha512WithRSAEncryption_oid;
-    public static final ObjectIdentifier shaWithDSA_OIW_oid;
-    public static final ObjectIdentifier sha1WithDSA_OIW_oid;
-    public static final ObjectIdentifier sha1WithDSA_oid;
-    public static final ObjectIdentifier sha224WithDSA_oid = oid(new int[]{2, 16, 840, 1, 101, 3, 4, 3, 1});
-    public static final ObjectIdentifier sha256WithDSA_oid = oid(new int[]{2, 16, 840, 1, 101, 3, 4, 3, 2});
-    public static final ObjectIdentifier sha1WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 1});
-    public static final ObjectIdentifier sha224WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 1});
-    public static final ObjectIdentifier sha256WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 2});
-    public static final ObjectIdentifier sha384WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 3});
-    public static final ObjectIdentifier sha512WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 4});
-    public static final ObjectIdentifier specifiedWithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3});
-    public static final ObjectIdentifier pbeWithMD5AndDES_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 3});
-    public static final ObjectIdentifier pbeWithMD5AndRC2_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 6});
-    public static final ObjectIdentifier pbeWithSHA1AndDES_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 10});
-    public static final ObjectIdentifier pbeWithSHA1AndRC2_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 11});
-    public static ObjectIdentifier pbeWithSHA1AndDESede_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 12, 1, 3});
-    public static ObjectIdentifier pbeWithSHA1AndRC2_40_oid = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 12, 1, 6});
+    public static final TObjectIdentifier md2WithRSAEncryption_oid;
+    public static final TObjectIdentifier md5WithRSAEncryption_oid;
+    public static final TObjectIdentifier sha1WithRSAEncryption_oid;
+    public static final TObjectIdentifier sha1WithRSAEncryption_OIW_oid;
+    public static final TObjectIdentifier sha224WithRSAEncryption_oid;
+    public static final TObjectIdentifier sha256WithRSAEncryption_oid;
+    public static final TObjectIdentifier sha384WithRSAEncryption_oid;
+    public static final TObjectIdentifier sha512WithRSAEncryption_oid;
+    public static final TObjectIdentifier shaWithDSA_OIW_oid;
+    public static final TObjectIdentifier sha1WithDSA_OIW_oid;
+    public static final TObjectIdentifier sha1WithDSA_oid;
+    public static final TObjectIdentifier sha224WithDSA_oid = oid(new int[]{2, 16, 840, 1, 101, 3, 4, 3, 1});
+    public static final TObjectIdentifier sha256WithDSA_oid = oid(new int[]{2, 16, 840, 1, 101, 3, 4, 3, 2});
+    public static final TObjectIdentifier sha1WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 1});
+    public static final TObjectIdentifier sha224WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 1});
+    public static final TObjectIdentifier sha256WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 2});
+    public static final TObjectIdentifier sha384WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 3});
+    public static final TObjectIdentifier sha512WithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3, 4});
+    public static final TObjectIdentifier specifiedWithECDSA_oid = oid(new int[]{1, 2, 840, 10045, 4, 3});
+    public static final TObjectIdentifier pbeWithMD5AndDES_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 3});
+    public static final TObjectIdentifier pbeWithMD5AndRC2_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 6});
+    public static final TObjectIdentifier pbeWithSHA1AndDES_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 10});
+    public static final TObjectIdentifier pbeWithSHA1AndRC2_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 5, 11});
+    public static TObjectIdentifier pbeWithSHA1AndDESede_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 12, 1, 3});
+    public static TObjectIdentifier pbeWithSHA1AndRC2_40_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 12, 1, 6});
 
-    private TAlgorithmId(ObjectIdentifier var1, DerValue var2) throws TIOException {
+    static {
+        DH_oid = TObjectIdentifier.newInternal(DH_data);
+        DH_PKIX_oid = TObjectIdentifier.newInternal(DH_PKIX_data);
+        DSA_OIW_oid = TObjectIdentifier.newInternal(DSA_OIW_data);
+        DSA_oid = TObjectIdentifier.newInternal(DSA_PKIX_data);
+        RSA_oid = TObjectIdentifier.newInternal(RSA_data);
+        RSAEncryption_oid = TObjectIdentifier.newInternal(RSAEncryption_data);
+        md2WithRSAEncryption_oid = TObjectIdentifier.newInternal(md2WithRSAEncryption_data);
+        md5WithRSAEncryption_oid = TObjectIdentifier.newInternal(md5WithRSAEncryption_data);
+        sha1WithRSAEncryption_oid = TObjectIdentifier.newInternal(sha1WithRSAEncryption_data);
+        sha1WithRSAEncryption_OIW_oid = TObjectIdentifier.newInternal(sha1WithRSAEncryption_OIW_data);
+        sha224WithRSAEncryption_oid = TObjectIdentifier.newInternal(sha224WithRSAEncryption_data);
+        sha256WithRSAEncryption_oid = TObjectIdentifier.newInternal(sha256WithRSAEncryption_data);
+        sha384WithRSAEncryption_oid = TObjectIdentifier.newInternal(sha384WithRSAEncryption_data);
+        sha512WithRSAEncryption_oid = TObjectIdentifier.newInternal(sha512WithRSAEncryption_data);
+        shaWithDSA_OIW_oid = TObjectIdentifier.newInternal(shaWithDSA_OIW_data);
+        sha1WithDSA_OIW_oid = TObjectIdentifier.newInternal(sha1WithDSA_OIW_data);
+        sha1WithDSA_oid = TObjectIdentifier.newInternal(dsaWithSHA1_PKIX_data);
+        nameTable = new HashMap();
+        nameTable.put(MD5_oid, "MD5");
+        nameTable.put(MD2_oid, "MD2");
+        nameTable.put(SHA_oid, "SHA-1");
+        nameTable.put(SHA224_oid, "SHA-224");
+        nameTable.put(SHA256_oid, "SHA-256");
+        nameTable.put(SHA384_oid, "SHA-384");
+        nameTable.put(SHA512_oid, "SHA-512");
+        nameTable.put(RSAEncryption_oid, "RSA");
+        nameTable.put(RSA_oid, "RSA");
+        nameTable.put(DH_oid, "Diffie-Hellman");
+        nameTable.put(DH_PKIX_oid, "Diffie-Hellman");
+        nameTable.put(DSA_oid, "DSA");
+        nameTable.put(DSA_OIW_oid, "DSA");
+        nameTable.put(EC_oid, "EC");
+        nameTable.put(ECDH_oid, "ECDH");
+        nameTable.put(AES_oid, "AES");
+        nameTable.put(sha1WithECDSA_oid, "SHA1withECDSA");
+        nameTable.put(sha224WithECDSA_oid, "SHA224withECDSA");
+        nameTable.put(sha256WithECDSA_oid, "SHA256withECDSA");
+        nameTable.put(sha384WithECDSA_oid, "SHA384withECDSA");
+        nameTable.put(sha512WithECDSA_oid, "SHA512withECDSA");
+        nameTable.put(md5WithRSAEncryption_oid, "MD5withRSA");
+        nameTable.put(md2WithRSAEncryption_oid, "MD2withRSA");
+        nameTable.put(sha1WithDSA_oid, "SHA1withDSA");
+        nameTable.put(sha1WithDSA_OIW_oid, "SHA1withDSA");
+        nameTable.put(shaWithDSA_OIW_oid, "SHA1withDSA");
+        nameTable.put(sha224WithDSA_oid, "SHA224withDSA");
+        nameTable.put(sha256WithDSA_oid, "SHA256withDSA");
+        nameTable.put(sha1WithRSAEncryption_oid, "SHA1withRSA");
+        nameTable.put(sha1WithRSAEncryption_OIW_oid, "SHA1withRSA");
+        nameTable.put(sha224WithRSAEncryption_oid, "SHA224withRSA");
+        nameTable.put(sha256WithRSAEncryption_oid, "SHA256withRSA");
+        nameTable.put(sha384WithRSAEncryption_oid, "SHA384withRSA");
+        nameTable.put(sha512WithRSAEncryption_oid, "SHA512withRSA");
+        nameTable.put(pbeWithMD5AndDES_oid, "PBEWithMD5AndDES");
+        nameTable.put(pbeWithMD5AndRC2_oid, "PBEWithMD5AndRC2");
+        nameTable.put(pbeWithSHA1AndDES_oid, "PBEWithSHA1AndDES");
+        nameTable.put(pbeWithSHA1AndRC2_oid, "PBEWithSHA1AndRC2");
+        nameTable.put(pbeWithSHA1AndDESede_oid, "PBEWithSHA1AndDESede");
+        nameTable.put(pbeWithSHA1AndRC2_40_oid, "PBEWithSHA1AndRC2_40");
+    }
+
+
+    private TAlgorithmId(TObjectIdentifier var1, TDerValue var2) throws TIOException {
         this.algid = var1;
         this.params = var2;
         if(this.params != null) {
@@ -116,7 +181,7 @@ public class TAlgorithmId {
         String var1 = this.algid.toString();
 
         try {
-            this.algParams = AlgorithmParameters.getInstance(var1);
+            this.algParams = TAlgorithmParameters.getInstance(var1);
         } catch (NoSuchAlgorithmException var3) {
             this.algParams = null;
             return;
@@ -286,7 +351,33 @@ public class TAlgorithmId {
         }
     }
 
-    private static ObjectIdentifier oid(int... var0) {
-        return ObjectIdentifier.newInternal(var0);
+    private static TObjectIdentifier oid(int... var0) {
+        return TObjectIdentifier.newInternal(var0);
+    }
+
+    public final void encode(DerOutputStream var1) throws IOException {
+        this.derEncode(var1);
+    }
+
+    public void derEncode(OutputStream var1) throws IOException {
+        TDerOutputStream var2 = new TDerOutputStream();
+        TDerOutputStream var3 = new TDerOutputStream();
+        var2.putOID(this.algid);
+        if(!this.constructedFromDer) {
+            if(this.algParams != null) {
+                this.params = new DerValue(this.algParams.getEncoded());
+            } else {
+                this.params = null;
+            }
+        }
+
+        if(this.params == null) {
+            var2.putNull();
+        } else {
+            var2.putDerValue(this.params);
+        }
+
+        var3.write(48, var2);
+        var1.write(var3.toByteArray());
     }
 }

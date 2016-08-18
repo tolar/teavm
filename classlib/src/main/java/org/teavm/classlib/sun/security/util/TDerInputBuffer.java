@@ -16,10 +16,13 @@
 package org.teavm.classlib.sun.security.util;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Date;
 import org.teavm.classlib.java.io.TByteArrayInputStream;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TCloneNotSupportedException;
 import org.teavm.classlib.java.lang.TCloneable;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.util.TTimeZone;
 import org.teavm.classlib.sun.util.calendar.TCalendarDate;
 import org.teavm.classlib.sun.util.calendar.TCalendarSystem;
@@ -39,7 +42,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
             TDerInputBuffer var1 = (TDerInputBuffer)this.clone();
             var1.mark(2147483647);
             return var1;
-        } catch (CloneNotSupportedException var2) {
+        } catch (TCloneNotSupportedException var2) {
             throw new IllegalArgumentException(var2.toString());
         }
     }
@@ -106,24 +109,24 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    BigInteger getBigInteger(int var1, boolean var2) throws IOException {
+    TBigInteger getBigInteger(int var1, boolean var2) throws TIOException {
         if(var1 > this.available()) {
-            throw new IOException("short read of integer");
+            throw new TIOException(TString.wrap("short read of integer"));
         } else if(var1 == 0) {
-            throw new IOException("Invalid encoding: zero length Int value");
+            throw new TIOException(TString.wrap("Invalid encoding: zero length Int value"));
         } else {
             byte[] var3 = new byte[var1];
             System.arraycopy(this.buf, this.pos, var3, 0, var1);
             this.skip((long)var1);
-            return var2?new BigInteger(1, var3):new BigInteger(var3);
+            return var2?new TBigInteger(1, var3):new TBigInteger(var3);
         }
     }
 
     public int getInteger(int var1) throws IOException {
-        BigInteger var2 = this.getBigInteger(var1, false);
-        if(var2.compareTo(BigInteger.valueOf(-2147483648L)) < 0) {
+        TBigInteger var2 = this.getBigInteger(var1, false);
+        if(var2.compareTo(TBigInteger.valueOf(-2147483648L)) < 0) {
             throw new IOException("Integer below minimum valid value");
-        } else if(var2.compareTo(BigInteger.valueOf(2147483647L)) > 0) {
+        } else if(var2.compareTo(TBigInteger.valueOf(2147483647L)) > 0) {
             throw new IOException("Integer exceeds maximum valid value");
         } else {
             return var2.intValue();

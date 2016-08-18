@@ -31,11 +31,8 @@ import java.security.cert.X509Extension;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
-
 import sun.security.x509.X509CertImpl;
 
 /**
@@ -122,9 +119,9 @@ public abstract class TX509Certificate extends TCertificate
      * serial number identify a unique certificate).
      * The ASN.1 definition for this is:
      * <pre>
-     * serialNumber     CertificateSerialNumber
+     * serialNumber     TCertificateSerialNumber
      *
-     * CertificateSerialNumber  ::=  INTEGER
+     * TCertificateSerialNumber  ::=  INTEGER
      * </pre>
      *
      * @return the serial number.

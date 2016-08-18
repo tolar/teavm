@@ -17,6 +17,8 @@ package org.teavm.classlib.sun.security.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 
 class TDerIndefLenConverter {
     private static final int TAG_MASK = 31;
@@ -50,7 +52,7 @@ class TDerIndefLenConverter {
         return isLongForm(var0) && (var0 & 127) == 0;
     }
 
-    private void parseTag() throws IOException {
+    private void parseTag() throws TIOException {
         if(this.dataPos != this.dataSize) {
             if(this.isEOC(this.data[this.dataPos]) && this.data[this.dataPos + 1] == 0) {
                 int var1 = 0;
@@ -67,7 +69,7 @@ class TDerIndefLenConverter {
                 }
 
                 if(var3 < 0) {
-                    throw new IOException("EOC does not have matching indefinite-length tag");
+                    throw new TIOException(TString.wrap("EOC does not have matching indefinite-length tag"));
                 }
 
                 int var4 = this.dataPos - ((Integer)var2).intValue() + var1;
@@ -94,7 +96,7 @@ class TDerIndefLenConverter {
         }
     }
 
-    private int parseLength() throws IOException {
+    private int parseLength() throws TIOException {
         int var1 = 0;
         if(this.dataPos == this.dataSize) {
             return var1;
@@ -108,11 +110,11 @@ class TDerIndefLenConverter {
                 if(isLongForm(var2)) {
                     var2 &= 127;
                     if(var2 > 4) {
-                        throw new IOException("Too much data");
+                        throw new TIOException(TString.wrap("Too much data"));
                     }
 
                     if(this.dataSize - this.dataPos < var2 + 1) {
-                        throw new IOException("Too little data");
+                        throw new TIOException(TString.wrap("Too little data"));
                     }
 
                     for(int var3 = 0; var3 < var2; ++var3) {
@@ -131,7 +133,7 @@ class TDerIndefLenConverter {
         }
     }
 
-    private void writeLengthAndValue() throws IOException {
+    private void writeLengthAndValue() throws TIOException {
         if(this.dataPos != this.dataSize) {
             int var1 = 0;
             int var2 = this.data[this.dataPos++] & 255;
@@ -148,7 +150,7 @@ class TDerIndefLenConverter {
                     }
 
                     if(var1 < 0) {
-                        throw new IOException("Invalid length bytes");
+                        throw new TIOException(TString.wrap("Invalid length bytes"));
                     }
                 } else {
                     var1 = var2 & 127;
@@ -253,7 +255,7 @@ class TDerIndefLenConverter {
 
     }
 
-    byte[] convert(byte[] var1) throws IOException {
+    byte[] convert(byte[] var1) throws TIOException {
         this.data = var1;
         this.dataPos = 0;
         this.index = 0;
@@ -273,7 +275,7 @@ class TDerIndefLenConverter {
         }
 
         if(this.unresolved != 0) {
-            throw new IOException("not all indef len BER resolved");
+            throw new TIOException(TString.wrap("not all indef len BER resolved"));
         } else {
             this.newData = new byte[this.dataSize + this.numOfTotalLenBytes + var3];
             this.dataPos = 0;

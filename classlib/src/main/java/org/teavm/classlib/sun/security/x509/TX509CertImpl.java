@@ -480,16 +480,16 @@ public class TX509CertImpl extends TX509Certificate {
     }
 
     public BigInteger getSerialNumber() {
-        SerialNumber var1 = this.getSerialNumberObject();
+        TSerialNumber var1 = this.getSerialNumberObject();
         return var1 != null?var1.getNumber():null;
     }
 
-    public SerialNumber getSerialNumberObject() {
+    public TSerialNumber getSerialNumberObject() {
         if(this.info == null) {
             return null;
         } else {
             try {
-                SerialNumber var1 = (SerialNumber)this.info.get("serialNumber.number");
+                TSerialNumber var1 = (TSerialNumber)this.info.get("serialNumber.number");
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -638,11 +638,11 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public KeyIdentifier getAuthKeyId() {
-        AuthorityKeyIdentifierExtension var1 = this.getAuthorityKeyIdentifierExtension();
+    public TKeyIdentifier getAuthKeyId() {
+        TAuthorityKeyIdentifierExtension var1 = this.getAuthorityKeyIdentifierExtension();
         if(var1 != null) {
             try {
-                return (KeyIdentifier)var1.get("key_id");
+                return (TKeyIdentifier)var1.get("key_id");
             } catch (IOException var3) {
                 ;
             }
@@ -651,7 +651,7 @@ public class TX509CertImpl extends TX509Certificate {
         return null;
     }
 
-    public KeyIdentifier getSubjectKeyId() {
+    public TKeyIdentifier getSubjectKeyId() {
         SubjectKeyIdentifierExtension var1 = this.getSubjectKeyIdentifierExtension();
         if(var1 != null) {
             try {
@@ -664,12 +664,12 @@ public class TX509CertImpl extends TX509Certificate {
         return null;
     }
 
-    public AuthorityKeyIdentifierExtension getAuthorityKeyIdentifierExtension() {
-        return (AuthorityKeyIdentifierExtension)this.getExtension(PKIXExtensions.AuthorityKey_Id);
+    public TAuthorityKeyIdentifierExtension getAuthorityKeyIdentifierExtension() {
+        return (TAuthorityKeyIdentifierExtension)this.getExtension(PKIXExtensions.AuthorityKey_Id);
     }
 
-    public BasicConstraintsExtension getBasicConstraintsExtension() {
-        return (BasicConstraintsExtension)this.getExtension(PKIXExtensions.BasicConstraints_Id);
+    public TBasicConstraintsExtension getBasicConstraintsExtension() {
+        return (TBasicConstraintsExtension)this.getExtension(PKIXExtensions.BasicConstraints_Id);
     }
 
     public CertificatePoliciesExtension getCertificatePoliciesExtension() {
@@ -738,7 +738,7 @@ public class TX509CertImpl extends TX509Certificate {
                     Iterator var3 = var1.getAllExtensions().iterator();
 
                     while(var3.hasNext()) {
-                        Extension var4 = (Extension)var3.next();
+                        TExtension var4 = (TExtension)var3.next();
                         if(var4.isCritical()) {
                             var2.add(var4.getExtensionId().toString());
                         }
@@ -765,7 +765,7 @@ public class TX509CertImpl extends TX509Certificate {
                     Iterator var3 = var1.getAllExtensions().iterator();
 
                     while(var3.hasNext()) {
-                        Extension var4 = (Extension)var3.next();
+                        TExtension var4 = (TExtension)var3.next();
                         if(!var4.isCritical()) {
                             var2.add(var4.getExtensionId().toString());
                         }
@@ -780,7 +780,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public Extension getExtension(ObjectIdentifier var1) {
+    public TExtension getExtension(ObjectIdentifier var1) {
         if(this.info == null) {
             return null;
         } else {
@@ -795,19 +795,19 @@ public class TX509CertImpl extends TX509Certificate {
                 if(var2 == null) {
                     return null;
                 } else {
-                    Extension var3 = var2.getExtension(var1.toString());
+                    TExtension var3 = var2.getExtension(var1.toString());
                     if(var3 != null) {
                         return var3;
                     } else {
                         Iterator var4 = var2.getAllExtensions().iterator();
 
-                        Extension var5;
+                        TExtension var5;
                         do {
                             if(!var4.hasNext()) {
                                 return null;
                             }
 
-                            var5 = (Extension)var4.next();
+                            var5 = (TExtension)var4.next();
                         } while(!var5.getExtensionId().equals(var1));
 
                         return var5;
@@ -819,7 +819,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public Extension getUnparseableExtension(ObjectIdentifier var1) {
+    public TExtension getUnparseableExtension(ObjectIdentifier var1) {
         if(this.info == null) {
             return null;
         } else {
@@ -831,7 +831,7 @@ public class TX509CertImpl extends TX509Certificate {
                     return null;
                 }
 
-                return var2 == null?null:(Extension)var2.getUnparseableExtensions().get(var1.toString());
+                return var2 == null?null:(TExtension)var2.getUnparseableExtensions().get(var1.toString());
             } catch (IOException var5) {
                 return null;
             }
@@ -842,7 +842,7 @@ public class TX509CertImpl extends TX509Certificate {
         try {
             ObjectIdentifier var2 = new ObjectIdentifier(var1);
             String var3 = OIDMap.getName(var2);
-            Extension var4 = null;
+            TExtension var4 = null;
             CertificateExtensions var5 = (CertificateExtensions)this.info.get("extensions");
             if(var3 == null) {
                 if(var5 == null) {
@@ -852,7 +852,7 @@ public class TX509CertImpl extends TX509Certificate {
                 Iterator var6 = var5.getAllExtensions().iterator();
 
                 while(var6.hasNext()) {
-                    Extension var7 = (Extension)var6.next();
+                    TExtension var7 = (TExtension)var6.next();
                     ObjectIdentifier var8 = var7.getExtensionId();
                     if(var8.equals(var2)) {
                         var4 = var7;
@@ -861,7 +861,7 @@ public class TX509CertImpl extends TX509Certificate {
                 }
             } else {
                 try {
-                    var4 = (Extension)this.get(var3);
+                    var4 = (TExtension)this.get(var3);
                 } catch (CertificateException var9) {
                     ;
                 }
@@ -869,7 +869,7 @@ public class TX509CertImpl extends TX509Certificate {
 
             if(var4 == null) {
                 if(var5 != null) {
-                    var4 = (Extension)var5.getUnparseableExtensions().get(var1);
+                    var4 = (TExtension)var5.getUnparseableExtensions().get(var1);
                 }
 
                 if(var4 == null) {
@@ -951,7 +951,7 @@ public class TX509CertImpl extends TX509Certificate {
             if(var1 == null) {
                 return -1;
             } else {
-                BasicConstraintsExtension var2 = (BasicConstraintsExtension)this.get(var1);
+                TBasicConstraintsExtension var2 = (TBasicConstraintsExtension)this.get(var1);
                 return var2 == null?-1:(((Boolean)var2.get("is_ca")).booleanValue()?((Integer)var2.get("path_len")).intValue():-1);
             }
         } catch (Exception var3) {
@@ -992,7 +992,7 @@ public class TX509CertImpl extends TX509Certificate {
                         var5.add(var6.toByteArray());
                         break;
                     case 4:
-                        var5.add(((X500Name)var4).getRFC2253Name());
+                        var5.add(((TX500Name)var4).getRFC2253Name());
                         break;
                     case 6:
                         var5.add(((URIName)var4).getName());

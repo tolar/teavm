@@ -46,10 +46,10 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     public static final String SUBJECT_ID = "subjectID";
     public static final String EXTENSIONS = "extensions";
     protected TCertificateVersion version = new TCertificateVersion();
-    protected CertificateSerialNumber serialNum = null;
-    protected CertificateAlgorithmId algId = null;
-    protected X500Name issuer = null;
-    protected X500Name subject = null;
+    protected TCertificateSerialNumber serialNum = null;
+    protected TCertificateAlgorithmId algId = null;
+    protected TX500Name issuer = null;
+    protected TX500Name subject = null;
     protected CertificateValidity interval = null;
     protected CertificateX509Key pubKey = null;
     protected UniqueIdentity issuerUniqueId = null;
@@ -188,12 +188,12 @@ public class TX509CertInfo implements TCertAttrSet<String> {
 
             if(this.extensions != null) {
                 Collection var2 = this.extensions.getAllExtensions();
-                Extension[] var3 = (Extension[])var2.toArray(new Extension[0]);
+                TExtension[] var3 = (TExtension[])var2.toArray(new TExtension[0]);
                 var1.append("\nCertificate Extensions: " + var3.length);
 
                 for(int var4 = 0; var4 < var3.length; ++var4) {
                     var1.append("\n[" + (var4 + 1) + "]: ");
-                    Extension var5 = var3[var4];
+                    TExtension var5 = var3[var4];
 
                     try {
                         if(OIDMap.getClass(var5.getExtensionId()) == null) {
@@ -204,7 +204,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                                 var7.putOctetString(var6);
                                 var6 = var7.toByteArray();
                                 HexDumpEncoder var8 = new HexDumpEncoder();
-                                var1.append("Extension unknown: DER encoded OCTET string =\n" + var8.encodeBuffer(var6) + "\n");
+                                var1.append("TExtension unknown: DER encoded OCTET string =\n" + var8.encodeBuffer(var6) + "\n");
                             }
                         } else {
                             var1.append(var5.toString());
@@ -221,7 +221,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                     Iterator var12 = var10.values().iterator();
 
                     while(var12.hasNext()) {
-                        Extension var13 = (Extension)var12.next();
+                        TExtension var13 = (TExtension)var12.next();
                         var1.append("\n[" + var11++ + "]: ");
                         var1.append(var13);
                     }
@@ -465,14 +465,14 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                 var3 = var2.getDerValue();
             }
 
-            this.serialNum = new CertificateSerialNumber(var3);
-            this.algId = new CertificateAlgorithmId(var2);
-            this.issuer = new X500Name(var2);
+            this.serialNum = new TCertificateSerialNumber(var3);
+            this.algId = new TCertificateAlgorithmId(var2);
+            this.issuer = new TX500Name(var2);
             if(this.issuer.isEmpty()) {
                 throw new CertificateParsingException("Empty issuer DN not allowed in X509Certificates");
             } else {
                 this.interval = new CertificateValidity(var2);
-                this.subject = new X500Name(var2);
+                this.subject = new TX500Name(var2);
                 if(this.version.compare(0) == 0 && this.subject.isEmpty()) {
                     throw new CertificateParsingException("Empty subject DN not allowed in v1 certificate");
                 } else {
@@ -516,7 +516,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private void verifyCert(X500Name var1, CertificateExtensions var2) throws CertificateParsingException, IOException {
+    private void verifyCert(TX500Name var1, CertificateExtensions var2) throws CertificateParsingException, IOException {
         if(var1.isEmpty()) {
             if(var2 == null) {
                 throw new CertificateParsingException("X.509 Certificate is incomplete: subject field is empty, and certificate has no extensions");
@@ -590,26 +590,26 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     }
 
     private void setSerialNumber(Object var1) throws CertificateException {
-        if(!(var1 instanceof CertificateSerialNumber)) {
-            throw new CertificateException("SerialNumber class type invalid.");
+        if(!(var1 instanceof TCertificateSerialNumber)) {
+            throw new CertificateException("TSerialNumber class type invalid.");
         } else {
-            this.serialNum = (CertificateSerialNumber)var1;
+            this.serialNum = (TCertificateSerialNumber)var1;
         }
     }
 
     private void setAlgorithmId(Object var1) throws CertificateException {
-        if(!(var1 instanceof CertificateAlgorithmId)) {
+        if(!(var1 instanceof TCertificateAlgorithmId)) {
             throw new CertificateException("AlgorithmId class type invalid.");
         } else {
-            this.algId = (CertificateAlgorithmId)var1;
+            this.algId = (TCertificateAlgorithmId)var1;
         }
     }
 
     private void setIssuer(Object var1) throws CertificateException {
-        if(!(var1 instanceof X500Name)) {
+        if(!(var1 instanceof TX500Name)) {
             throw new CertificateException("Issuer class type invalid.");
         } else {
-            this.issuer = (X500Name)var1;
+            this.issuer = (TX500Name)var1;
         }
     }
 
@@ -622,10 +622,10 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     }
 
     private void setSubject(Object var1) throws CertificateException {
-        if(!(var1 instanceof X500Name)) {
+        if(!(var1 instanceof TX500Name)) {
             throw new CertificateException("Subject class type invalid.");
         } else {
-            this.subject = (X500Name)var1;
+            this.subject = (TX500Name)var1;
         }
     }
 

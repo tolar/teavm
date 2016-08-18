@@ -19,8 +19,8 @@ package org.teavm.classlib.java.util.regex;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.junit.Test;
 import junit.framework.TestCase;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.teavm.junit.TeaVMTestRunner;
 
@@ -1392,7 +1392,7 @@ public class Pattern2Test extends TestCase {
             new UBInfo(0x3200, 0x32FF, "EnclosedCJKLettersandMonths"), // Character.UnicodeBlock.ENCLOSED_CJK_LETTERS_AND_MONTHS
             /* 3300; 33FF; CJK Compatibility */
             new UBInfo(0x3300, 0x33FF, "CJKCompatibility"), // Character.UnicodeBlock.CJK_COMPATIBILITY
-            /* 3400; 4DB5; CJK Unified Ideographs Extension A */
+            /* 3400; 4DB5; CJK Unified Ideographs TExtension A */
             new UBInfo(0x3400, 0x4DB5, "CJKUnifiedIdeographsExtensionA"), // Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
             /* 4E00; 9FFF; CJK Unified Ideographs */
             new UBInfo(0x4E00, 0x9FFF, "CJKUnifiedIdeographs"), // Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS

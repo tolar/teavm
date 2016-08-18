@@ -15,26 +15,24 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.cert.CertificateException;
-import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.java.util.TComparator;
 
 /**
  * Created by vasek on 18. 8. 2016.
  */
-public interface TCertAttrSet<T> {
-    String toString();
+class TAVAComparator implements TComparator<TAVA> {
+    private static final TComparator<TAVA> INSTANCE = new TAVAComparator();
 
-    void encode(OutputStream var1) throws CertificateException, IOException;
+    private TAVAComparator() {
+    }
 
-    void set(String var1, Object var2) throws CertificateException, IOException;
+    static TComparator<TAVA> getInstance() {
+        return INSTANCE;
+    }
 
-    Object get(String var1) throws CertificateException, IOException;
-
-    void delete(String var1) throws CertificateException, IOException;
-
-    TEnumeration<T> getElements();
-
-    String getName();
+    public int compare(TAVA var1, TAVA var2) {
+        boolean var3 = var1.hasRFC2253Keyword();
+        boolean var4 = var2.hasRFC2253Keyword();
+        return var3 == var4?var1.toRFC2253CanonicalString().compareTo(var2.toRFC2253CanonicalString()):(var3?-1:1);
+    }
 }

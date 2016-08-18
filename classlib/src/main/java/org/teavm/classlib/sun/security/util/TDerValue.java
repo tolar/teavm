@@ -16,12 +16,15 @@
 package org.teavm.classlib.sun.security.util;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.util.Date;
+import org.teavm.classlib.java.io.TByteArrayInputStream;
+import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.sun.misc.TIOUtils;
 
 public class TDerValue {
@@ -118,7 +121,7 @@ public class TDerValue {
             byte[] var6 = new byte[var4 + var5];
             var6[0] = this.tag;
             var6[1] = var2;
-            DataInputStream var7 = new DataInputStream(var3);
+            TDataInputStream var7 = new TDataInputStream(var3);
             var7.readFully(var6, var5, var4);
             var7.close();
             TDerIndefLenConverter var8 = new TDerIndefLenConverter();
@@ -149,7 +152,7 @@ public class TDerValue {
         this.data = this.init(true, new ByteArrayInputStream(var1, var2, var3));
     }
 
-    public TDerValue(InputStream var1) throws IOException {
+    public TDerValue(TInputStream var1) throws IOException {
         this.data = this.init(false, var1);
     }
 
@@ -195,26 +198,26 @@ public class TDerValue {
         return var5;
     }
 
-    private TDerInputStream init(boolean var1, InputStream var2) throws IOException {
-        this.tag = (byte)((InputStream)var2).read();
-        byte var3 = (byte)((InputStream)var2).read();
-        this.length = TDerInputStream.getLength(var3 & 255, (InputStream)var2);
+    private TDerInputStream init(boolean var1, TInputStream var2) throws IOException {
+        this.tag = (byte)((TInputStream)var2).read();
+        byte var3 = (byte)((TInputStream)var2).read();
+        this.length = TDerInputStream.getLength(var3 & 255, (TInputStream)var2);
         if(this.length == -1) {
-            int var4 = ((InputStream)var2).available();
+            int var4 = ((TInputStream)var2).available();
             byte var5 = 2;
             byte[] var6 = new byte[var4 + var5];
             var6[0] = this.tag;
             var6[1] = var3;
-            DataInputStream var7 = new DataInputStream((InputStream)var2);
+            TDataInputStream var7 = new TDataInputStream((TInputStream)var2);
             var7.readFully(var6, var5, var4);
             var7.close();
             TDerIndefLenConverter var8 = new TDerIndefLenConverter();
-            var2 = new ByteArrayInputStream(var8.convert(var6));
-            if(this.tag != ((InputStream)var2).read()) {
-                throw new IOException("Indefinite length encoding not supported");
+            var2 = new TByteArrayInputStream(var8.convert(var6));
+            if(this.tag != ((TInputStream)var2).read()) {
+                throw new TIOException(TString.wrap("Indefinite length encoding not supported"));
             }
 
-            this.length = TDerInputStream.getLength((InputStream)var2);
+            this.length = TDerInputStream.getLength((TInputStream)var2);
         }
 
         if(var1 && ((InputStream)var2).available() != this.length) {
@@ -312,17 +315,17 @@ public class TDerValue {
         }
     }
 
-    public BigInteger getBigInteger() throws IOException {
+    public TBigInteger getBigInteger() throws TIOException {
         if(this.tag != 2) {
-            throw new IOException("DerValue.getBigInteger, not an int " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getBigInteger, not an int " + this.tag));
         } else {
             return this.buffer.getBigInteger(this.data.available(), false);
         }
     }
 
-    public BigInteger getPositiveBigInteger() throws IOException {
+    public TBigInteger getPositiveBigInteger() throws TIOException {
         if(this.tag != 2) {
-            throw new IOException("DerValue.getBigInteger, not an int " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getBigInteger, not an int " + this.tag));
         } else {
             return this.buffer.getBigInteger(this.data.available(), true);
         }
@@ -487,7 +490,7 @@ public class TDerValue {
 
     public TDerInputStream toDerInputStream() throws TIOException {
         if(this.tag != 48 && this.tag != 49) {
-            throw new IOException("toDerInputStream rejects tag type " + this.tag);
+            throw new TIOException(TString.wrap("toDerInputStream rejects tag type " + this.tag));
         } else {
             return new TDerInputStream(this.buffer);
         }

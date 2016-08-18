@@ -16,25 +16,32 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.security.cert.CertificateException;
-import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 
 /**
  * Created by vasek on 18. 8. 2016.
  */
-public interface TCertAttrSet<T> {
-    String toString();
+public interface TGeneralNameInterface {
+    int NAME_ANY = 0;
+    int NAME_RFC822 = 1;
+    int NAME_DNS = 2;
+    int NAME_X400 = 3;
+    int NAME_DIRECTORY = 4;
+    int NAME_EDI = 5;
+    int NAME_URI = 6;
+    int NAME_IP = 7;
+    int NAME_OID = 8;
+    int NAME_DIFF_TYPE = -1;
+    int NAME_MATCH = 0;
+    int NAME_NARROWS = 1;
+    int NAME_WIDENS = 2;
+    int NAME_SAME_TYPE = 3;
 
-    void encode(OutputStream var1) throws CertificateException, IOException;
+    int getType();
 
-    void set(String var1, Object var2) throws CertificateException, IOException;
+    void encode(TDerOutputStream var1) throws IOException;
 
-    Object get(String var1) throws CertificateException, IOException;
+    int constrains(TGeneralNameInterface var1) throws UnsupportedOperationException;
 
-    void delete(String var1) throws CertificateException, IOException;
-
-    TEnumeration<T> getElements();
-
-    String getName();
+    int subtreeDepth() throws UnsupportedOperationException;
 }
