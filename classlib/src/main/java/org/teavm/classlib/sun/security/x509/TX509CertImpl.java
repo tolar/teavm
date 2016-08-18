@@ -688,8 +688,8 @@ public class TX509CertImpl extends TX509Certificate {
         return (NameConstraintsExtension)this.getExtension(PKIXExtensions.NameConstraints_Id);
     }
 
-    public PolicyConstraintsExtension getPolicyConstraintsExtension() {
-        return (PolicyConstraintsExtension)this.getExtension(PKIXExtensions.PolicyConstraints_Id);
+    public TPolicyConstraintsExtension getPolicyConstraintsExtension() {
+        return (TPolicyConstraintsExtension)this.getExtension(PKIXExtensions.PolicyConstraints_Id);
     }
 
     public PolicyMappingsExtension getPolicyMappingsExtension() {
