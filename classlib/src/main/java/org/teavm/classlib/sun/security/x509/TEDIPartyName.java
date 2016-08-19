@@ -15,8 +15,6 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -39,7 +37,7 @@ public class TEDIPartyName implements TGeneralNameInterface {
         this.party = var1;
     }
 
-    public TEDIPartyName(TDerValue var1) throws IOException {
+    public TEDIPartyName(TDerValue var1) throws TIOException {
         TDerInputStream var2 = new TDerInputStream(var1.toByteArray());
         TDerValue[] var3 = var2.getSequence(2);
         int var4 = var3.length;
@@ -48,7 +46,7 @@ public class TEDIPartyName implements TGeneralNameInterface {
                 TDerValue var6 = var3[var5];
                 if(var6.isContextSpecific((byte) 0) && !var6.isConstructed()) {
                     if(this.assigner != null) {
-                        throw new IOException("Duplicate nameAssigner found in EDIPartyName");
+                        throw new TIOException(TString.wrap("Duplicate nameAssigner found in EDIPartyName"));
                     }
 
                     var6 = var6.data.getDerValue();
@@ -57,7 +55,7 @@ public class TEDIPartyName implements TGeneralNameInterface {
 
                 if(var6.isContextSpecific((byte) 1) && !var6.isConstructed()) {
                     if(this.party != null) {
-                        throw new IOException("Duplicate partyName found in EDIPartyName");
+                        throw new TIOException(TString.wrap("Duplicate partyName found in EDIPartyName"));
                     }
 
                     var6 = var6.data.getDerValue();
@@ -66,7 +64,7 @@ public class TEDIPartyName implements TGeneralNameInterface {
             }
 
         } else {
-            throw new IOException("Invalid encoding of EDIPartyName");
+            throw new TIOException(TString.wrap("Invalid encoding of EDIPartyName"));
         }
     }
 

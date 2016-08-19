@@ -70,8 +70,6 @@ import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
-import sun.security.x509.X509AttributeName;
-
 public class TX509CertImpl extends TX509Certificate {
 
     private static final long serialVersionUID = -3457612960190864406L;
@@ -254,12 +252,12 @@ public class TX509CertImpl extends TX509Certificate {
             this.verifiedPublicKey = var1;
             this.verifiedProvider = var2;
             if(!this.verificationResult) {
-                throw new SignatureException("Signature does not match.");
+                throw new TSignatureException(TString.wrap("Signature does not match."));
             }
         }
     }
 
-    public synchronized void verify(PublicKey var1, Provider var2) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public synchronized void verify(TPublicKey var1, Provider var2) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         if(this.signedCert == null) {
             throw new CertificateEncodingException("Uninitialized certificate");
         } else {
@@ -666,7 +664,7 @@ public class TX509CertImpl extends TX509Certificate {
     }
 
     public TKeyIdentifier getSubjectKeyId() {
-        SubjectKeyIdentifierExtension var1 = this.getSubjectKeyIdentifierExtension();
+        TSubjectKeyIdentifierExtension var1 = this.getSubjectKeyIdentifierExtension();
         if(var1 != null) {
             try {
                 return var1.get("key_id");
@@ -690,40 +688,40 @@ public class TX509CertImpl extends TX509Certificate {
         return (TCertificatePoliciesExtension)this.getExtension(TPKIXExtensions.CertificatePolicies_Id);
     }
 
-    public ExtendedKeyUsageExtension getExtendedKeyUsageExtension() {
-        return (ExtendedKeyUsageExtension)this.getExtension(TPKIXExtensions.ExtendedKeyUsage_Id);
+    public TExtendedKeyUsageExtension getExtendedKeyUsageExtension() {
+        return (TExtendedKeyUsageExtension)this.getExtension(TPKIXExtensions.ExtendedKeyUsage_Id);
     }
 
-    public IssuerAlternativeNameExtension getIssuerAlternativeNameExtension() {
-        return (IssuerAlternativeNameExtension)this.getExtension(TPKIXExtensions.IssuerAlternativeName_Id);
+    public TIssuerAlternativeNameExtension getIssuerAlternativeNameExtension() {
+        return (TIssuerAlternativeNameExtension)this.getExtension(TPKIXExtensions.IssuerAlternativeName_Id);
     }
 
-    public NameConstraintsExtension getNameConstraintsExtension() {
-        return (NameConstraintsExtension)this.getExtension(TPKIXExtensions.NameConstraints_Id);
+    public TNameConstraintsExtension getNameConstraintsExtension() {
+        return (TNameConstraintsExtension)this.getExtension(TPKIXExtensions.NameConstraints_Id);
     }
 
     public TPolicyConstraintsExtension getPolicyConstraintsExtension() {
         return (TPolicyConstraintsExtension)this.getExtension(TPKIXExtensions.PolicyConstraints_Id);
     }
 
-    public PolicyMappingsExtension getPolicyMappingsExtension() {
-        return (PolicyMappingsExtension)this.getExtension(TPKIXExtensions.PolicyMappings_Id);
+    public TPolicyMappingsExtension getPolicyMappingsExtension() {
+        return (TPolicyMappingsExtension)this.getExtension(TPKIXExtensions.PolicyMappings_Id);
     }
 
-    public PrivateKeyUsageExtension getPrivateKeyUsageExtension() {
-        return (PrivateKeyUsageExtension)this.getExtension(TPKIXExtensions.PrivateKeyUsage_Id);
+    public TPrivateKeyUsageExtension getPrivateKeyUsageExtension() {
+        return (TPrivateKeyUsageExtension)this.getExtension(TPKIXExtensions.PrivateKeyUsage_Id);
     }
 
-    public SubjectAlternativeNameExtension getSubjectAlternativeNameExtension() {
-        return (SubjectAlternativeNameExtension)this.getExtension(TPKIXExtensions.SubjectAlternativeName_Id);
+    public TSubjectAlternativeNameExtension getSubjectAlternativeNameExtension() {
+        return (TSubjectAlternativeNameExtension)this.getExtension(TPKIXExtensions.SubjectAlternativeName_Id);
     }
 
-    public SubjectKeyIdentifierExtension getSubjectKeyIdentifierExtension() {
-        return (SubjectKeyIdentifierExtension)this.getExtension(TPKIXExtensions.SubjectKey_Id);
+    public TSubjectKeyIdentifierExtension getSubjectKeyIdentifierExtension() {
+        return (TSubjectKeyIdentifierExtension)this.getExtension(TPKIXExtensions.SubjectKey_Id);
     }
 
-    public CRLDistributionPointsExtension getCRLDistributionPointsExtension() {
-        return (CRLDistributionPointsExtension)this.getExtension(TPKIXExtensions.CRLDistributionPoints_Id);
+    public TCRLDistributionPointsExtension getCRLDistributionPointsExtension() {
+        return (TCRLDistributionPointsExtension)this.getExtension(TPKIXExtensions.CRLDistributionPoints_Id);
     }
 
     public boolean hasUnsupportedCriticalExtension() {
@@ -933,7 +931,7 @@ public class TX509CertImpl extends TX509Certificate {
         if(this.readOnly && this.extKeyUsage != null) {
             return this.extKeyUsage;
         } else {
-            ExtendedKeyUsageExtension var1 = this.getExtendedKeyUsageExtension();
+            TExtendedKeyUsageExtension var1 = this.getExtendedKeyUsageExtension();
             if(var1 == null) {
                 return null;
             } else {
@@ -951,7 +949,7 @@ public class TX509CertImpl extends TX509Certificate {
             } else {
                 DerValue var2 = new DerValue(var1);
                 byte[] var3 = var2.getOctetString();
-                ExtendedKeyUsageExtension var4 = new ExtendedKeyUsageExtension(Boolean.FALSE, var3);
+                TExtendedKeyUsageExtension var4 = new TExtendedKeyUsageExtension(Boolean.FALSE, var3);
                 return Collections.unmodifiableList(var4.getExtendedKeyUsage());
             }
         } catch (IOException var5) {
@@ -1009,17 +1007,17 @@ public class TX509CertImpl extends TX509Certificate {
                         var5.add(((TX500Name)var4).getRFC2253Name());
                         break;
                     case 6:
-                        var5.add(((URIName)var4).getName());
+                        var5.add(((TURIName)var4).getName());
                         break;
                     case 7:
                         try {
-                            var5.add(((IPAddressName)var4).getName());
+                            var5.add(((TIPAddressName)var4).getName());
                             break;
                         } catch (IOException var9) {
                             throw new RuntimeException("IPAddress cannot be parsed", var9);
                         }
                     case 8:
-                        var5.add(((OIDName)var4).getOID().toString());
+                        var5.add(((TOIDName)var4).getOID().toString());
                 }
             }
 
@@ -1109,7 +1107,7 @@ public class TX509CertImpl extends TX509Certificate {
         if(this.readOnly && this.issuerAlternativeNames != null) {
             return cloneAltNames(this.issuerAlternativeNames);
         } else {
-            IssuerAlternativeNameExtension var1 = this.getIssuerAlternativeNameExtension();
+            TIssuerAlternativeNameExtension var1 = this.getIssuerAlternativeNameExtension();
             if(var1 == null) {
                 return null;
             } else {
@@ -1134,7 +1132,7 @@ public class TX509CertImpl extends TX509Certificate {
             } else {
                 DerValue var2 = new DerValue(var1);
                 byte[] var3 = var2.getOctetString();
-                IssuerAlternativeNameExtension var4 = new IssuerAlternativeNameExtension(Boolean.FALSE, var3);
+                TIssuerAlternativeNameExtension var4 = new TIssuerAlternativeNameExtension(Boolean.FALSE, var3);
 
                 TGeneralNames var5;
                 try {
@@ -1150,7 +1148,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public AuthorityInfoAccessExtension getAuthorityInfoAccessExtension() {
+    public TAuthorityInfoAccessExtension getAuthorityInfoAccessExtension() {
         return (AuthorityInfoAccessExtension)this.getExtension(TPKIXExtensions.AuthInfoAccess_Id);
     }
 
@@ -1227,8 +1225,8 @@ public class TX509CertImpl extends TX509Certificate {
         return var0 instanceof TX509CertImpl ?((TX509CertImpl)var0).getEncodedInternal():var0.getEncoded();
     }
 
-    public static X509CertImpl toImpl(X509Certificate var0) throws TCertificateException {
-        return var0 instanceof X509CertImpl?(X509CertImpl)var0: X509Factory.intern(var0);
+    public static TX509CertImpl toImpl(X509Certificate var0) throws TCertificateException {
+        return var0 instanceof TX509CertImpl?(TX509CertImpl)var0: X509Factory.intern(var0);
     }
 
     public static boolean isSelfIssued(X509Certificate var0) {
@@ -1275,7 +1273,7 @@ public class TX509CertImpl extends TX509Certificate {
             }
 
             var2 = var6.toString();
-        } catch (CertificateEncodingException | NoSuchAlgorithmException var8) {
+        } catch (TCertificateEncodingException | NoSuchAlgorithmException var8) {
             ;
         }
 

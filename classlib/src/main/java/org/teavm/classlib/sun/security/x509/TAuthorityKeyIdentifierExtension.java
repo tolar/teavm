@@ -62,25 +62,25 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
                     var2.writeImplicit(TDerValue.createTag((byte)-128, true, (byte) 1), var3);
                 }
             } catch (TException var4) {
-                throw new TIOException(var4.toString());
+                throw new TIOException(TString.wrap(var4.toString()));
             }
 
             if(this.serialNum != null) {
                 var3 = new TDerOutputStream();
                 this.serialNum.encode(var3);
-                var2.writeImplicit(TDerValue.createTag(-128, false, 2), var3);
+                var2.writeImplicit(TDerValue.createTag((byte)-128, false, (byte) 2), var3);
             }
 
-            var1.write(48, var2);
+            var1.write((byte) 48, var2);
             this.extensionValue = var1.toByteArray();
         }
     }
 
-    public TAuthorityKeyIdentifierExtension(KeyIdentifier var1, TGeneralNames var2, SerialNumber var3) throws IOException {
+    public TAuthorityKeyIdentifierExtension(TKeyIdentifier var1, TGeneralNames var2, TSerialNumber var3) throws IOException {
         this.id = var1;
         this.names = var2;
         this.serialNum = var3;
-        this.extensionId = PKIXExtensions.AuthorityKey_Id;
+        this.extensionId = TPKIXExtensions.AuthorityKey_Id;
         this.critical = false;
         this.encodeThis();
     }
@@ -96,7 +96,7 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
             while(true) {
                 if(var3.data != null && var3.data.available() != 0) {
                     TDerValue var4 = var3.data.getDerValue();
-                    if(var4.isContextSpecific(0) && !var4.isConstructed()) {
+                    if(var4.isContextSpecific((byte) 0) && !var4.isConstructed()) {
                         if(this.id != null) {
                             throw new IOException("Duplicate KeyIdentifier in AuthorityKeyIdentifier.");
                         }
@@ -106,7 +106,7 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
                         continue;
                     }
 
-                    if(var4.isContextSpecific(1) && var4.isConstructed()) {
+                    if(var4.isContextSpecific((byte) 1) && var4.isConstructed()) {
                         if(this.names != null) {
                             throw new IOException("Duplicate GeneralNames in AuthorityKeyIdentifier.");
                         }
@@ -191,7 +191,7 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
         this.encodeThis();
     }
 
-    public Object get(String var1) throws IOException {
+    public Object get(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("key_id")) {
             return this.id;
         } else if(var1.equalsIgnoreCase("auth_name")) {
@@ -199,7 +199,7 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
         } else if(var1.equalsIgnoreCase("serial_number")) {
             return this.serialNum;
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier."));
         }
     }
 

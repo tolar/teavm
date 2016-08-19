@@ -16,11 +16,12 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -70,7 +71,7 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         this.construct(var2);
     }
 
-    public TCertificateVersion(InputStream var1) throws IOException {
+    public TCertificateVersion(TInputStream var1) throws IOException {
         this.version = 0;
         TDerValue var2 = new TDerValue(var1);
         this.construct(var2);
@@ -97,31 +98,31 @@ public class TCertificateVersion implements TCertAttrSet<String> {
 
     public void set(String var1, Object var2) throws TIOException {
         if(!(var2 instanceof Integer)) {
-            throw new IOException("Attribute must be of type Integer.");
+            throw new TIOException(TString.wrap("Attribute must be of type Integer."));
         } else if(var1.equalsIgnoreCase("number")) {
             this.version = ((Integer)var2).intValue();
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet: TCertificateVersion.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: TCertificateVersion."));
         }
     }
 
-    public Integer get(String var1) throws IOException {
+    public Integer get(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("number")) {
             return new Integer(this.getVersion());
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet: TCertificateVersion.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: TCertificateVersion."));
         }
     }
 
-    public void delete(String var1) throws IOException {
+    public void delete(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("number")) {
             this.version = 0;
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet: TCertificateVersion.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: TCertificateVersion."));
         }
     }
 
-    public Enumeration<String> getElements() {
+    public TEnumeration<String> getElements() {
         TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("number");
         return var1.elements();

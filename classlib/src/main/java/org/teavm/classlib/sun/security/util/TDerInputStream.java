@@ -128,14 +128,14 @@ public class TDerInputStream {
         }
     }
 
-    public byte[] getOctetString() throws IOException {
+    public byte[] getOctetString() throws TIOException {
         if(this.buffer.read() != 4) {
-            throw new IOException("DER input not an octet string");
+            throw new TIOException(TString.wrap("DER input not an octet string"));
         } else {
             int var1 = getLength(this.buffer);
             byte[] var2 = new byte[var1];
             if(var1 != 0 && this.buffer.read(var2) != var1) {
-                throw new IOException("short read of DER octet string");
+                throw new TIOException(TString.wrap("short read of DER octet string"));
             } else {
                 return var2;
             }

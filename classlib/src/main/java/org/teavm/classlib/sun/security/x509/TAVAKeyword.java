@@ -20,23 +20,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
-import sun.security.pkcs.PKCS9Attribute;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.X500Name;
 
 /**
  * Created by vasek on 18. 8. 2016.
  */
 class TAVAKeyword {
-    private static final Map<ObjectIdentifier, TAVAKeyword> oidMap = new HashMap();
+    private static final Map<TObjectIdentifier, TAVAKeyword> oidMap = new HashMap();
     private static final Map<String, TAVAKeyword> keywordMap = new HashMap();
     private String keyword;
-    private ObjectIdentifier oid;
+    private TObjectIdentifier oid;
     private boolean rfc1779Compliant;
     private boolean rfc2253Compliant;
 
-    private TAVAKeyword(String var1, ObjectIdentifier var2, boolean var3, boolean var4) {
+    private TAVAKeyword(String var1, TObjectIdentifier var2, boolean var3, boolean var4) {
         this.keyword = var1;
         this.oid = var2;
         this.rfc1779Compliant = var3;
@@ -58,23 +58,23 @@ class TAVAKeyword {
         }
     }
 
-    static ObjectIdentifier getOID(String var0, int var1, Map<String, String> var2) throws IOException {
+    static TObjectIdentifier getOID(TString var0, int var1, Map<TString, TString> var2) throws IOException {
         var0 = var0.toUpperCase(Locale.ENGLISH);
         if(var1 == 3) {
-            if(var0.startsWith(" ") || var0.endsWith(" ")) {
+            if(var0.startsWith(TString.wrap(" ")) || var0.endsWith(TString.wrap(" "))) {
                 throw new IOException("Invalid leading or trailing space in keyword \"" + var0 + "\"");
             }
         } else {
             var0 = var0.trim();
         }
 
-        String var3 = (String)var2.get(var0);
+        TString var3 = (TString)var2.get(var0);
         if(var3 == null) {
             TAVAKeyword var4 = (TAVAKeyword)keywordMap.get(var0);
             if(var4 != null && var4.isCompliant(var1)) {
                 return var4.oid;
             } else {
-                if(var1 == 1 && var0.startsWith("OID.")) {
+                if(var1 == 1 && var0.startsWith(TString.wrap("OID."))) {
                     var0 = var0.substring(4);
                 }
 
@@ -89,11 +89,11 @@ class TAVAKeyword {
                 if(!var6) {
                     throw new IOException("Invalid keyword \"" + var0 + "\"");
                 } else {
-                    return new ObjectIdentifier(var0);
+                    return new TObjectIdentifier(var0);
                 }
             }
         } else {
-            return new ObjectIdentifier(var3);
+            return new TObjectIdentifier(var3);
         }
     }
 
@@ -127,32 +127,32 @@ class TAVAKeyword {
         }
     }
 
-    static boolean hasKeyword(ObjectIdentifier var0, int var1) {
+    static boolean hasKeyword(TObjectIdentifier var0, int var1) {
         TAVAKeyword var2 = (TAVAKeyword)oidMap.get(var0);
         return var2 == null?false:var2.isCompliant(var1);
     }
 
     static {
-        new TAVAKeyword("CN", X500Name.commonName_oid, true, true);
-        new TAVAKeyword("C", X500Name.countryName_oid, true, true);
-        new TAVAKeyword("L", X500Name.localityName_oid, true, true);
-        new TAVAKeyword("S", X500Name.stateName_oid, false, false);
-        new TAVAKeyword("ST", X500Name.stateName_oid, true, true);
-        new TAVAKeyword("O", X500Name.orgName_oid, true, true);
-        new TAVAKeyword("OU", X500Name.orgUnitName_oid, true, true);
-        new TAVAKeyword("T", X500Name.title_oid, false, false);
-        new TAVAKeyword("IP", X500Name.ipAddress_oid, false, false);
-        new TAVAKeyword("STREET", X500Name.streetAddress_oid, true, true);
-        new TAVAKeyword("DC", X500Name.DOMAIN_COMPONENT_OID, false, true);
-        new TAVAKeyword("DNQUALIFIER", X500Name.DNQUALIFIER_OID, false, false);
-        new TAVAKeyword("DNQ", X500Name.DNQUALIFIER_OID, false, false);
-        new TAVAKeyword("SURNAME", X500Name.SURNAME_OID, false, false);
-        new TAVAKeyword("GIVENNAME", X500Name.GIVENNAME_OID, false, false);
-        new TAVAKeyword("INITIALS", X500Name.INITIALS_OID, false, false);
-        new TAVAKeyword("GENERATION", X500Name.GENERATIONQUALIFIER_OID, false, false);
-        new TAVAKeyword("EMAIL", PKCS9Attribute.EMAIL_ADDRESS_OID, false, false);
-        new TAVAKeyword("EMAILADDRESS", PKCS9Attribute.EMAIL_ADDRESS_OID, false, false);
-        new TAVAKeyword("UID", X500Name.userid_oid, false, true);
-        new TAVAKeyword("SERIALNUMBER", X500Name.SERIALNUMBER_OID, false, false);
+        new TAVAKeyword("CN", TX500Name.commonName_oid, true, true);
+        new TAVAKeyword("C", TX500Name.countryName_oid, true, true);
+        new TAVAKeyword("L", TX500Name.localityName_oid, true, true);
+        new TAVAKeyword("S", TX500Name.stateName_oid, false, false);
+        new TAVAKeyword("ST", TX500Name.stateName_oid, true, true);
+        new TAVAKeyword("O", TX500Name.orgName_oid, true, true);
+        new TAVAKeyword("OU", TX500Name.orgUnitName_oid, true, true);
+        new TAVAKeyword("T", TX500Name.title_oid, false, false);
+        new TAVAKeyword("IP", TX500Name.ipAddress_oid, false, false);
+        new TAVAKeyword("STREET", TX500Name.streetAddress_oid, true, true);
+        new TAVAKeyword("DC", TX500Name.DOMAIN_COMPONENT_OID, false, true);
+        new TAVAKeyword("DNQUALIFIER", TX500Name.DNQUALIFIER_OID, false, false);
+        new TAVAKeyword("DNQ", TX500Name.DNQUALIFIER_OID, false, false);
+        new TAVAKeyword("SURNAME", TX500Name.SURNAME_OID, false, false);
+        new TAVAKeyword("GIVENNAME", TX500Name.GIVENNAME_OID, false, false);
+        new TAVAKeyword("INITIALS", TX500Name.INITIALS_OID, false, false);
+        new TAVAKeyword("GENERATION", TX500Name.GENERATIONQUALIFIER_OID, false, false);
+        new TAVAKeyword("EMAIL", TPKCS9Attribute.EMAIL_ADDRESS_OID, false, false);
+        new TAVAKeyword("EMAILADDRESS", TPKCS9Attribute.EMAIL_ADDRESS_OID, false, false);
+        new TAVAKeyword("UID", TX500Name.userid_oid, false, true);
+        new TAVAKeyword("SERIALNUMBER", TX500Name.SERIALNUMBER_OID, false, false);
     }
 }

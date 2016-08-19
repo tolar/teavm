@@ -17,6 +17,7 @@ package org.teavm.classlib.java.text;
 
 import org.teavm.classlib.java.io.TSerializable;
 import org.teavm.classlib.java.lang.TCloneable;
+import org.teavm.classlib.java.lang.TString;
 
 public abstract class TFormat implements TSerializable, TCloneable {
     public TFormat() {
@@ -59,8 +60,8 @@ public abstract class TFormat implements TSerializable, TCloneable {
         return output.toString();
     }
 
-    public final String format(Object object) {
-        return format(object, new StringBuffer(), new TFieldPosition(0)).toString();
+    public final TString format(Object object) {
+        return TString.wrap(format(object, new StringBuffer(), new TFieldPosition(0)).toString());
     }
 
     public abstract StringBuffer format(Object object, StringBuffer buffer, TFieldPosition field);

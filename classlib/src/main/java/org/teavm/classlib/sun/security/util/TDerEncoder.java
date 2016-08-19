@@ -15,10 +15,10 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
 
 public interface TDerEncoder {
-    void derEncode(OutputStream var1) throws IOException;
+    void derEncode(TOutputStream var1) throws TIOException;
 }
 

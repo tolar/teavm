@@ -44,7 +44,7 @@ public class TRDN {
         this(var1, Collections.emptyMap());
     }
 
-    public TRDN(String var1, Map<String, String> var2) throws IOException {
+    public TRDN(String var1, Map<TString, TString> var2) throws IOException {
         int var3 = 0;
         int var4 = 0;
         int var5 = 0;
@@ -83,7 +83,7 @@ public class TRDN {
         this(var1, var2, Collections.emptyMap());
     }
 
-    TRDN(String var1, String var2, Map<String, String> var3) throws IOException {
+    TRDN(String var1, String var2, Map<TString, TString> var3) throws IOException {
         if(!var2.equalsIgnoreCase("RFC2253")) {
             throw new IOException("Unsupported format " + var2);
         } else {
@@ -203,7 +203,7 @@ public class TRDN {
         return null;
     }
 
-    void encode(TDerOutputStream var1) throws IOException {
+    void encode(TDerOutputStream var1) throws TIOException {
         var1.putOrderedSetOf((byte) 49, this.assertion);
     }
 

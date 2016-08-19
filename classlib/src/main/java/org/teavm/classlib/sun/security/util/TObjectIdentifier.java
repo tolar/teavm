@@ -169,8 +169,8 @@ public final class TObjectIdentifier implements Serializable {
         if(var1[1] < 2147483647 - var1[0] * 40) {
             var6 = var3 + pack7Oid(var1[0] * 40 + var1[1], var4, var3);
         } else {
-            BigInteger var5 = BigInteger.valueOf((long)var1[1]);
-            var5 = var5.add(BigInteger.valueOf((long)(var1[0] * 40)));
+            TBigInteger var5 = TBigInteger.valueOf((long)var1[1]);
+            var5 = var5.add(TBigInteger.valueOf((long)(var1[0] * 40)));
             var6 = var3 + pack7Oid(var5, var4, var3);
         }
 
@@ -274,7 +274,7 @@ public final class TObjectIdentifier implements Serializable {
     }
 
     public String toString() {
-        String var1 = this.stringForm;
+        TString var1 = this.stringForm;
         if(var1 == null) {
             int var2 = this.encoding.length;
             StringBuffer var3 = new StringBuffer(var2 * 4);
@@ -321,11 +321,11 @@ public final class TObjectIdentifier implements Serializable {
                 }
             }
 
-            var1 = var3.toString();
+            var1 = TString.wrap(var3.toString());
             this.stringForm = var1;
         }
 
-        return var1;
+        return var1.toString();
     }
 
     private static byte[] pack(byte[] var0, int var1, int var2, int var3, int var4) {

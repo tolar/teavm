@@ -17,7 +17,6 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -25,6 +24,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -59,7 +63,7 @@ public class TAVA implements TDerEncoder {
         this(var1, 1);
     }
 
-    TAVA(Reader var1, Map<String, String> var2) throws IOException {
+    TAVA(Reader var1, Map<TString, TString> var2) throws IOException {
         this(var1, 1, var2);
     }
 
@@ -67,13 +71,13 @@ public class TAVA implements TDerEncoder {
         this(var1, var2, Collections.emptyMap());
     }
 
-    TAVA(Reader var1, int var2, Map<String, String> var3) throws IOException {
+    TAVA(Reader var1, int var2, Map<TString, TString> var3) throws IOException {
         StringBuilder var4 = new StringBuilder();
 
         while(true) {
             int var5 = readChar(var1, "Incorrect TAVA format");
             if(var5 == 61) {
-                this.oid = TAVAKeyword.getOID(var4.toString(), var2, var3);
+                this.oid = TAVAKeyword.getOID(TString.wrap(var4.toString()), var2, var3);
                 var4.setLength(0);
                 if(var2 == 3) {
                     var5 = var1.read();
@@ -116,15 +120,15 @@ public class TAVA implements TDerEncoder {
         return this.value;
     }
 
-    public String getValueString() {
+    public TString getValueString() {
         try {
-            String var1 = this.value.getAsString();
+            TString var1 = this.value.getAsString();
             if(var1 == null) {
                 throw new RuntimeException("TAVA string is null");
             } else {
                 return var1;
             }
-        } catch (IOException var2) {
+        } catch (TIOException var2) {
             throw new RuntimeException("TAVA error: " + var2, var2);
         }
     }
@@ -212,15 +216,15 @@ public class TAVA implements TDerEncoder {
                 throw new IOException("TAVA had characters other than whitespace after terminating quote");
             }
 
-            if(!this.oid.equals(PKCS9Attribute.EMAIL_ADDRESS_OID) && (!this.oid.equals(TX500Name.DOMAIN_COMPONENT_OID) )) {
+            if(!this.oid.equals(TPKCS9Attribute.EMAIL_ADDRESS_OID) && (!this.oid.equals(TX500Name.DOMAIN_COMPONENT_OID) )) {
                 if(var5) {
                     return new TDerValue(var2.toString().trim());
                 }
 
-                return new TDerValue(12, var2.toString().trim());
+                return new TDerValue((byte) 12, var2.toString().trim());
             }
 
-            return new TDerValue(22, var2.toString().trim());
+            return new TDerValue((byte) 22, var2.toString().trim());
         }
     }
 
@@ -283,7 +287,7 @@ public class TAVA implements TDerEncoder {
                 var5.clear();
             }
 
-            var6 &= DerValue.isPrintableStringChar((char)var2);
+            var6 &= TDerValue.isPrintableStringChar((char)var2);
             if(var2 == 32 && !var7) {
                 ++var9;
             } else {
@@ -308,12 +312,12 @@ public class TAVA implements TDerEncoder {
                 var5.clear();
             }
 
-            if(this.oid.equals(PKCS9Attribute.EMAIL_ADDRESS_OID) || this.oid.equals(TX500Name.DOMAIN_COMPONENT_OID) ) {
-                return new DerValue(22, var4.toString());
+            if(this.oid.equals(TPKCS9Attribute.EMAIL_ADDRESS_OID) || this.oid.equals(TX500Name.DOMAIN_COMPONENT_OID) ) {
+                return new TDerValue((byte) 22, var4.toString());
             } else if(var6) {
-                return new DerValue(var4.toString());
+                return new TDerValue(var4.toString());
             } else {
-                return new DerValue(12, var4.toString());
+                return new TDerValue((byte) 12, var4.toString());
             }
         }
     }
@@ -401,14 +405,14 @@ public class TAVA implements TDerEncoder {
         }
     }
 
-    TAVA(TDerValue var1) throws IOException {
+    TAVA(TDerValue var1) throws TIOException {
         if(var1.tag != 48) {
-            throw new IOException("TAVA not a sequence");
+            throw new TIOException(TString.wrap("TAVA not a sequence"));
         } else {
             this.oid = TX500Name.intern(var1.data.getOID());
             this.value = var1.data.getDerValue();
             if(var1.data.available() != 0) {
-                throw new IOException("TAVA, extra bytes = " + var1.data.available());
+                throw new TIOException(TString.wrap("TAVA, extra bytes = " + var1.data.available()));
             }
         }
     }
@@ -436,7 +440,7 @@ public class TAVA implements TDerEncoder {
         this.derEncode(var1);
     }
 
-    public void derEncode(OutputStream var1) throws IOException {
+    public void derEncode(TOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         TDerOutputStream var3 = new TDerOutputStream();
         var2.putOID(this.oid);
@@ -485,26 +489,9 @@ public class TAVA implements TDerEncoder {
             char var10;
             for(int var6 = 0; var6 < var3.length(); ++var6) {
                 char var7 = var3.charAt(var6);
-                if(!DerValue.isPrintableStringChar(var7) && ",=+<>#;\"\\".indexOf(var7) < 0) {
+                if(!TDerValue.isPrintableStringChar(var7) && ",=+<>#;\"\\".indexOf(var7) < 0) {
                     if(var7 == 0) {
                         var15.append("\\00");
-                    } else if(debug != null && Debug.isOn("ava")) {
-                        Object var8 = null;
-
-                        byte[] var18;
-                        try {
-                            var18 = Character.toString(var7).getBytes("UTF8");
-                        } catch (IOException var11) {
-                            throw new IllegalArgumentException("DER Value conversion");
-                        }
-
-                        for(var9 = 0; var9 < var18.length; ++var9) {
-                            var15.append('\\');
-                            var10 = Character.forDigit(15 & var18[var9] >>> 4, 16);
-                            var15.append(Character.toUpperCase(var10));
-                            var10 = Character.forDigit(15 & var18[var9], 16);
-                            var15.append(Character.toUpperCase(var10));
-                        }
                     } else {
                         var15.append(var7);
                     }
@@ -546,7 +533,7 @@ public class TAVA implements TDerEncoder {
             byte[] var14;
             try {
                 var14 = this.value.toByteArray();
-            } catch (IOException var13) {
+            } catch (TIOException var13) {
                 throw new IllegalArgumentException("DER Value conversion");
             }
 
@@ -581,7 +568,7 @@ public class TAVA implements TDerEncoder {
 
             for(int var6 = 0; var6 < var2.length(); ++var6) {
                 char var7 = var2.charAt(var6);
-                if(DerValue.isPrintableStringChar(var7) || ",+<>;\"\\".indexOf(var7) >= 0 || var6 == 0 && var7 == 35) {
+                if(TDerValue.isPrintableStringChar(var7) || ",+<>;\"\\".indexOf(var7) >= 0 || var6 == 0 && var7 == 35) {
                     if(var6 == 0 && var7 == 35 || ",+<>;\"\\".indexOf(var7) >= 0) {
                         var14.append('\\');
                     }
@@ -593,27 +580,7 @@ public class TAVA implements TDerEncoder {
                         var5 = true;
                         var14.append(var7);
                     }
-                } else if(debug != null && Debug.isOn("ava")) {
-                    var5 = false;
-                    Object var8 = null;
-
-                    byte[] var15;
-                    try {
-                        var15 = Character.toString(var7).getBytes("UTF8");
-                    } catch (IOException var10) {
-                        throw new IllegalArgumentException("DER Value conversion");
-                    }
-
-                    for(int var9 = 0; var9 < var15.length; ++var9) {
-                        var14.append('\\');
-                        var14.append(Character.forDigit(15 & var15[var9] >>> 4, 16));
-                        var14.append(Character.forDigit(15 & var15[var9], 16));
-                    }
-                } else {
-                    var5 = false;
-                    var14.append(var7);
-                }
-            }
+                }             }
 
             var1.append(var14.toString().trim());
         } else {
@@ -622,7 +589,7 @@ public class TAVA implements TDerEncoder {
             byte[] var13;
             try {
                 var13 = this.value.toByteArray();
-            } catch (IOException var12) {
+            } catch (TIOException var12) {
                 throw new IllegalArgumentException("DER Value conversion");
             }
 
@@ -687,7 +654,7 @@ public class TAVA implements TDerEncoder {
         var2.append("=");
 
         try {
-            String var3 = this.value.getAsString();
+            TString var3 = this.value.getAsString();
             if(var3 == null) {
                 byte[] var4 = this.value.toByteArray();
                 var2.append('#');
@@ -761,7 +728,7 @@ public class TAVA implements TDerEncoder {
                     var2.append(var17.toString());
                 }
             }
-        } catch (IOException var15) {
+        } catch (TIOException var15) {
             throw new IllegalArgumentException("DER Value conversion");
         }
 

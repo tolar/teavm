@@ -236,7 +236,7 @@ public class TAlgorithmId {
 
     private static TObjectIdentifier algOID(String var0) throws TIOException {
         if(var0.indexOf(46) != -1) {
-            return var0.startsWith("OID.")?new TObjectIdentifier(var0.substring("OID.".length())):new TObjectIdentifier(var0);
+            return var0.startsWith("OID.")?new TObjectIdentifier(TString.wrap(var0.substring("OID.".length()))):new TObjectIdentifier(TString.wrap(var0));
         } else if(var0.equalsIgnoreCase("MD5")) {
             return MD5_oid;
         } else if(var0.equalsIgnoreCase("MD2")) {
@@ -302,7 +302,7 @@ public class TAlgorithmId {
                                                                         }
 
                                                                         if(var8 != null && oidTable.get(var8) == null) {
-                                                                            oidTable.put(var8, new TObjectIdentifier(var1));
+                                                                            oidTable.put(var8, new TObjectIdentifier(TString.wrap(var1)));
                                                                         }
                                                                     }
                                                                 }
@@ -380,5 +380,37 @@ public class TAlgorithmId {
 
         var3.write((byte) 48, var2);
         var1.write(var3.toByteArray());
+    }
+
+    public String getName() {
+        String var1 = (String)nameTable.get(this.algid);
+        if(var1 != null) {
+            return var1;
+        } else {
+            if(this.params != null && this.algid.equals(specifiedWithECDSA_oid)) {
+                try {
+                    TAlgorithmId var2 = parse(new TDerValue(this.getEncodedParams()));
+                    String var3 = var2.getName();
+                    var1 = makeSigAlg(var3, "EC");
+                } catch (TIOException var4) {
+                    ;
+                }
+            }
+
+            return var1 == null?this.algid.toString():var1;
+        }
+    }
+
+    public byte[] getEncodedParams() throws TIOException {
+        return this.params == null?null:this.params.toByteArray();
+    }
+
+    public static String makeSigAlg(String var0, String var1) {
+        var0 = var0.replace("-", "");
+        if(var1.equalsIgnoreCase("EC")) {
+            var1 = "ECDSA";
+        }
+
+        return var0 + "with" + var1;
     }
 }

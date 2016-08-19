@@ -16,19 +16,19 @@
 package org.teavm.classlib.sun.security.util;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TInteger;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.text.TSimpleDateFormat;
+import org.teavm.classlib.java.util.TLocale;
+import org.teavm.classlib.java.util.TTimeZone;
 
 public class TDerOutputStream extends TByteArrayOutputStream implements TDerEncoder {
     private static TByteArrayLexOrder lexOrder = new TByteArrayLexOrder();
@@ -78,7 +78,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.putIntegerContents(var1);
     }
 
-    public void putInteger(TBigInteger var1) throws IOException {
+    public void putInteger(TBigInteger var1) throws TIOException {
         this.write(2);
         byte[] var2 = var1.toByteArray();
         this.putLength(var2.length);
@@ -127,7 +127,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write(var1);
     }
 
-    public void putUnalignedBitString(TBitArray var1) throws IOException {
+    public void putUnalignedBitString(TBitArray var1) throws TIOException {
         byte[] var2 = var1.toByteArray();
         this.write(3);
         this.putLength(var2.length + 1);
@@ -135,7 +135,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write(var2);
     }
 
-    public void putTruncatedUnalignedBitString(TBitArray var1) throws IOException {
+    public void putTruncatedUnalignedBitString(TBitArray var1) throws TIOException {
         this.putUnalignedBitString(var1.truncate());
     }
 
@@ -172,19 +172,19 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write((byte) 49, (TDerOutputStream)var2);
     }
 
-    public void putOrderedSetOf(byte var1, TDerEncoder[] var2) throws IOException {
+    public void putOrderedSetOf(byte var1, TDerEncoder[] var2) throws TIOException {
         this.putOrderedSet(var1, var2, lexOrder);
     }
 
-    public void putOrderedSet(byte var1, TDerEncoder[] var2) throws IOException {
+    public void putOrderedSet(byte var1, TDerEncoder[] var2) throws TIOException {
         this.putOrderedSet(var1, var2, tagOrder);
     }
 
-    private void putOrderedSet(byte var1, TDerEncoder[] var2, Comparator<byte[]> var3) throws IOException {
-        sun.security.util.DerOutputStream[] var4 = new sun.security.util.DerOutputStream[var2.length];
+    private void putOrderedSet(byte var1, TDerEncoder[] var2, Comparator<byte[]> var3) throws TIOException {
+        TDerOutputStream[] var4 = new TDerOutputStream[var2.length];
 
         for(int var5 = 0; var5 < var2.length; ++var5) {
-            var4[var5] = new sun.security.util.DerOutputStream();
+            var4[var5] = new TDerOutputStream();
             var2[var5].derEncode(var4[var5]);
         }
 
@@ -235,16 +235,16 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write(var4);
     }
 
-    public void putUTCTime(Date var1) throws IOException {
+    public void putUTCTime(Date var1) throws TIOException {
         this.putTime(var1, (byte) 23);
     }
 
-    public void putGeneralizedTime(Date var1) throws IOException {
+    public void putGeneralizedTime(Date var1) throws TIOException {
         this.putTime(var1, (byte) 24);
     }
 
-    private void putTime(Date var1, byte var2) throws IOException {
-        TimeZone var3 = TimeZone.getTimeZone("GMT");
+    private void putTime(Date var1, byte var2) throws TIOException {
+        TTimeZone var3 = TTimeZone.getTimeZone("GMT");
         String var4 = null;
         if(var2 == 23) {
             var4 = "yyMMddHHmmss\'Z\'";
@@ -253,9 +253,9 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
             var4 = "yyyyMMddHHmmss\'Z\'";
         }
 
-        SimpleDateFormat var5 = new SimpleDateFormat(var4, Locale.US);
+        TSimpleDateFormat var5 = new TSimpleDateFormat(var4, TLocale.US);
         var5.setTimeZone(var3);
-        byte[] var6 = var5.format(var1).getBytes("ISO-8859-1");
+        byte[] var6 = var5.format(var1).getBytes(TString.wrap("ISO-8859-1"));
         this.write(var2);
         this.putLength(var6.length);
         this.write(var6);
@@ -295,7 +295,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write(var4);
     }
 
-    public void derEncode(OutputStream var1) throws IOException {
+    public void derEncode(TOutputStream var1) throws TIOException {
         var1.write(this.toByteArray());
     }
 }

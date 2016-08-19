@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -90,11 +91,11 @@ public class TExtension implements org.teavm.classlib.java.security.cert.TExtens
         }
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         if(this.extensionId == null) {
-            throw new IOException("Null OID to encode for the extension!");
+            throw new TIOException(TString.wrap("Null OID to encode for the extension!"));
         } else if(this.extensionValue == null) {
-            throw new IOException("No value to encode for the extension!");
+            throw new TIOException(TString.wrap("No value to encode for the extension!"));
         } else {
             TDerOutputStream var2 = new TDerOutputStream();
             var2.putOID(this.extensionId);
@@ -103,7 +104,7 @@ public class TExtension implements org.teavm.classlib.java.security.cert.TExtens
             }
 
             var2.putOctetString(this.extensionValue);
-            var1.write(48, var2);
+            var1.write((byte) 48, var2);
         }
     }
 
@@ -159,7 +160,7 @@ public class TExtension implements org.teavm.classlib.java.security.cert.TExtens
         } else if(!(var1 instanceof sun.security.x509.Extension)) {
             return false;
         } else {
-            sun.security.x509.Extension var2 = (sun.security.x509.Extension)var1;
+            TExtension var2 = (TExtension)var1;
             return this.critical != var2.critical?false:(!this.extensionId.equals(var2.extensionId)?false: Arrays
                     .equals(this.extensionValue, var2.extensionValue));
         }

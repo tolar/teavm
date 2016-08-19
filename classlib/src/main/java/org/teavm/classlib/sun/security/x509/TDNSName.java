@@ -15,13 +15,15 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
+import java.util.Locale;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
 public class TDNSName implements TGeneralNameInterface {
-    private String name;
+    private TString name;
     private static final String alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final String digitsAndHyphen = "0123456789-";
     private static final String alphaDigitsAndHyphen = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
@@ -30,7 +32,7 @@ public class TDNSName implements TGeneralNameInterface {
         this.name = var1.getIA5String();
     }
 
-    public TDNSName(String var1) throws TIOException {
+    public TDNSName(TString var1) throws TIOException {
         if(var1 != null && var1.length() != 0) {
             if(var1.indexOf(32) != -1) {
                 throw new TIOException(TString.wrap("DNS names or NameConstraints with blank components are not permitted"));
@@ -71,7 +73,7 @@ public class TDNSName implements TGeneralNameInterface {
         return 2;
     }
 
-    public String getName() {
+    public TString getName() {
         return this.name;
     }
 
@@ -89,7 +91,7 @@ public class TDNSName implements TGeneralNameInterface {
         } else if(!(var1 instanceof sun.security.x509.DNSName)) {
             return false;
         } else {
-            sun.security.x509.DNSName var2 = (sun.security.x509.DNSName)var1;
+            TDNSName var2 = (TDNSName)var1;
             return this.name.equalsIgnoreCase(var2.name);
         }
     }
@@ -98,15 +100,15 @@ public class TDNSName implements TGeneralNameInterface {
         return this.name.toUpperCase(Locale.ENGLISH).hashCode();
     }
 
-    public int constrains(GeneralNameInterface var1) throws UnsupportedOperationException {
+    public int constrains(TGeneralNameInterface var1) throws UnsupportedOperationException {
         byte var2;
         if(var1 == null) {
             var2 = -1;
         } else if(var1.getType() != 2) {
             var2 = -1;
         } else {
-            String var3 = ((sun.security.x509.DNSName)var1).getName().toLowerCase(Locale.ENGLISH);
-            String var4 = this.name.toLowerCase(Locale.ENGLISH);
+            TString var3 = ((TDNSName)var1).getName().toLowerCase(Locale.ENGLISH);
+            TString var4 = this.name.toLowerCase(Locale.ENGLISH);
             if(var3.equals(var4)) {
                 var2 = 0;
             } else {

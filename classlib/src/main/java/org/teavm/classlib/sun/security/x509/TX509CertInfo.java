@@ -595,9 +595,9 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private void setSerialNumber(Object var1) throws CertificateException {
+    private void setSerialNumber(Object var1) throws TCertificateException {
         if(!(var1 instanceof TCertificateSerialNumber)) {
-            throw new CertificateException("TSerialNumber class type invalid.");
+            throw new TCertificateException(TString.wrap("TSerialNumber class type invalid."));
         } else {
             this.serialNum = (TCertificateSerialNumber)var1;
         }
@@ -605,69 +605,69 @@ public class TX509CertInfo implements TCertAttrSet<String> {
 
     private void setAlgorithmId(Object var1) throws TCertificateException {
         if(!(var1 instanceof TCertificateAlgorithmId)) {
-            throw new TCertificateException("AlgorithmId class type invalid.");
+            throw new TCertificateException(TString.wrap("AlgorithmId class type invalid."));
         } else {
             this.algId = (TCertificateAlgorithmId)var1;
         }
     }
 
-    private void setIssuer(Object var1) throws CertificateException {
+    private void setIssuer(Object var1) throws TCertificateException {
         if(!(var1 instanceof TX500Name)) {
-            throw new CertificateException("Issuer class type invalid.");
+            throw new TCertificateException(TString.wrap("Issuer class type invalid."));
         } else {
             this.issuer = (TX500Name)var1;
         }
     }
 
-    private void setValidity(Object var1) throws CertificateException {
+    private void setValidity(Object var1) throws TCertificateException {
         if(!(var1 instanceof TCertificateValidity)) {
-            throw new CertificateException("CertificateValidity class type invalid.");
+            throw new TCertificateException(TString.wrap("CertificateValidity class type invalid."));
         } else {
             this.interval = (TCertificateValidity)var1;
         }
     }
 
-    private void setSubject(Object var1) throws CertificateException {
+    private void setSubject(Object var1) throws TCertificateException {
         if(!(var1 instanceof TX500Name)) {
-            throw new CertificateException("Subject class type invalid.");
+            throw new TCertificateException(TString.wrap("Subject class type invalid."));
         } else {
             this.subject = (TX500Name)var1;
         }
     }
 
-    private void setKey(Object var1) throws CertificateException {
+    private void setKey(Object var1) throws TCertificateException {
         if(!(var1 instanceof TCertificateX509Key)) {
-            throw new CertificateException("Key class type invalid.");
+            throw new TCertificateException(TString.wrap("Key class type invalid."));
         } else {
             this.pubKey = (TCertificateX509Key)var1;
         }
     }
 
-    private void setIssuerUniqueId(Object var1) throws CertificateException {
+    private void setIssuerUniqueId(Object var1) throws TCertificateException {
         if(this.version.compare(1) < 0) {
-            throw new CertificateException("Invalid version");
+            throw new TCertificateException(TString.wrap("Invalid version"));
         } else if(!(var1 instanceof TUniqueIdentity)) {
-            throw new CertificateException("IssuerUniqueId class type invalid.");
+            throw new TCertificateException(TString.wrap("IssuerUniqueId class type invalid."));
         } else {
             this.issuerUniqueId = (TUniqueIdentity)var1;
         }
     }
 
-    private void setSubjectUniqueId(Object var1) throws CertificateException {
+    private void setSubjectUniqueId(Object var1) throws TCertificateException {
         if(this.version.compare(1) < 0) {
-            throw new CertificateException("Invalid version");
+            throw new TCertificateException(TString.wrap("Invalid version"));
         } else if(!(var1 instanceof TUniqueIdentity)) {
-            throw new CertificateException("SubjectUniqueId class type invalid.");
+            throw new TCertificateException(TString.wrap("SubjectUniqueId class type invalid."));
         } else {
             this.subjectUniqueId = (TUniqueIdentity)var1;
         }
     }
 
-    private void setExtensions(Object var1) throws CertificateException {
+    private void setExtensions(Object var1) throws TCertificateException {
         if(this.version.compare(2) < 0) {
-            throw new CertificateException("Invalid version");
+            throw new TCertificateException(TString.wrap("Invalid version"));
         } else if(!(var1 instanceof TCertificateExtensions)) {
-            throw new CertificateException("Extensions class type invalid.");
+            throw new TCertificateException(TString.wrap("Extensions class type invalid."));
         } else {
             this.extensions = (TCertificateExtensions)var1;
         }

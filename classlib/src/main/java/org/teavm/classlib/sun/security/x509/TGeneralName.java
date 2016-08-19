@@ -18,6 +18,7 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.IOException;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
@@ -37,13 +38,13 @@ public class TGeneralName {
         this(var1, false);
     }
 
-    public TGeneralName(TDerValue var1, boolean var2) throws IOException {
+    public TGeneralName(TDerValue var1, boolean var2) throws TIOException {
         this.name = null;
         short var3 = (short)((byte)(var1.tag & 31));
         switch(var3) {
             case 0:
                 if(!var1.isContextSpecific() || !var1.isConstructed()) {
-                    throw new IOException("Invalid encoding of Other-Name");
+                    throw new TIOException(TString.wrap("Invalid encoding of Other-Name"));
                 }
 
                 var1.resetTag((byte) 48);
@@ -56,7 +57,7 @@ public class TGeneralName {
                     break;
                 }
 
-                throw new IOException("Invalid encoding of RFC822 name");
+                throw new TIOException(TString.wrap("Invalid encoding of RFC822 name"));
             case 2:
                 if(var1.isContextSpecific() && !var1.isConstructed()) {
                     var1.resetTag((byte) 22);
@@ -64,48 +65,48 @@ public class TGeneralName {
                     break;
                 }
 
-                throw new IOException("Invalid encoding of DNS name");
+                throw new TIOException(TString.wrap("Invalid encoding of DNS name"));
             case 3:
             default:
-                throw new IOException("Unrecognized GeneralName tag, (" + var3 + ")");
+                throw new TIOException(TString.wrap("Unrecognized GeneralName tag, (" + var3 + ")"));
             case 4:
                 if(!var1.isContextSpecific() || !var1.isConstructed()) {
-                    throw new IOException("Invalid encoding of Directory name");
+                    throw new TIOException(TString.wrap("Invalid encoding of Directory name"));
                 }
 
                 this.name = new TX500Name(var1.getData());
                 break;
             case 5:
                 if(!var1.isContextSpecific() || !var1.isConstructed()) {
-                    throw new IOException("Invalid encoding of EDI name");
+                    throw new TIOException(TString.wrap("Invalid encoding of EDI name"));
                 }
 
-                var1.resetTag(48);
+                var1.resetTag((byte) 48);
                 this.name = new TEDIPartyName(var1);
                 break;
             case 6:
                 if(!var1.isContextSpecific() || var1.isConstructed()) {
-                    throw new IOException("Invalid encoding of URI");
+                    throw new TIOException(TString.wrap("Invalid encoding of URI"));
                 }
 
-                var1.resetTag(22);
-                this.name = var2? URIName.nameConstraint(var1):new URIName(var1);
+                var1.resetTag((byte) 22);
+                this.name = var2? TURIName.nameConstraint(var1):new TURIName(var1);
                 break;
             case 7:
                 if(var1.isContextSpecific() && !var1.isConstructed()) {
-                    var1.resetTag(4);
-                    this.name = new IPAddressName(var1);
+                    var1.resetTag((byte) 4);
+                    this.name = new TIPAddressName(var1);
                     break;
                 }
 
-                throw new IOException("Invalid encoding of IP address");
+                throw new TIOException(TString.wrap("Invalid encoding of IP address"));
             case 8:
                 if(!var1.isContextSpecific() || var1.isConstructed()) {
-                    throw new IOException("Invalid encoding of OID name");
+                    throw new TIOException(TString.wrap("Invalid encoding of OID name"));
                 }
 
-                var1.resetTag(6);
-                this.name = new OIDName(var1);
+                var1.resetTag((byte) 6);
+                this.name = new TOIDName(var1);
         }
 
     }

@@ -283,15 +283,15 @@ public class TDerValue {
         }
     }
 
-    public byte[] getOctetString() throws IOException {
+    public byte[] getOctetString() throws TIOException {
         if(this.tag != 4 && !this.isConstructed((byte) 4)) {
-            throw new IOException("DerValue.getOctetString, not an Octet String: " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getOctetString, not an Octet String: " + this.tag));
         } else {
             byte[] var1 = new byte[this.length];
             if(this.length == 0) {
                 return var1;
             } else if(this.buffer.read(var1) != this.length) {
-                throw new IOException("short read on DerValue buffer");
+                throw new TIOException(TString.wrap("short read on DerValue buffer"));
             } else {
                 if(this.isConstructed()) {
                     TDerInputStream var2 = new TDerInputStream(var1);
@@ -449,7 +449,7 @@ public class TDerValue {
     }
 
     public boolean equals(Object var1) {
-        return var1 instanceof sun.security.util.DerValue ?this.equals((sun.security.util.DerValue)var1):false;
+        return var1 instanceof TDerValue ?this.equals((TDerValue)var1):false;
     }
 
     public boolean equals(TDerValue var1) {

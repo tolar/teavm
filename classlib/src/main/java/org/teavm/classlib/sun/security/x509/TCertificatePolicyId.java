@@ -17,6 +17,7 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
@@ -41,7 +42,7 @@ public class TCertificatePolicyId {
         return var1;
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         var1.putOID(this.id);
     }
 

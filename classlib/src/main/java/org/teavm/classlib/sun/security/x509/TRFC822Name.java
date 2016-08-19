@@ -67,7 +67,7 @@ public class TRFC822Name implements TGeneralNameInterface {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.RFC822Name)) {
+        } else if(!(var1 instanceof TRFC822Name)) {
             return false;
         } else {
             TRFC822Name var2 = (TRFC822Name)var1;

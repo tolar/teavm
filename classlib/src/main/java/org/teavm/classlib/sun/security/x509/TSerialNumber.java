@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
@@ -65,11 +64,11 @@ public class TSerialNumber {
         return "TSerialNumber: [" + (this.serialNum) + "]";
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         var1.putInteger(this.serialNum);
     }
 
-    public BigInteger getNumber() {
+    public TBigInteger getNumber() {
         return this.serialNum;
     }
 }

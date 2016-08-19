@@ -16,20 +16,17 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.reflect.TConstructor;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
-
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.GeneralNameInterface;
 
 public class TOtherName implements TGeneralNameInterface {
     private String name;
@@ -55,7 +52,7 @@ public class TOtherName implements TGeneralNameInterface {
         }
     }
 
-    public TOtherName(TDerValue var1) throws IOException {
+    public TOtherName(TDerValue var1) throws TIOException {
         TDerInputStream var2 = var1.toDerInputStream();
         this.oid = var2.getOID();
         TDerValue var3 = var2.getDerValue();
@@ -83,8 +80,8 @@ public class TOtherName implements TGeneralNameInterface {
             if(var3 == null) {
                 return null;
             } else {
-                Class[] var4 = new Class[]{Object.class};
-                Constructor var5 = var3.getConstructor(var4);
+                TClass[] var4 = new TClass[]{Object.class};
+                TConstructor var5 = var3.getConstructor(var4);
                 Object[] var6 = new Object[]{var2};
                 TGeneralNameInterface var7 = (TGeneralNameInterface)var5.newInstance(var6);
                 return var7;
@@ -98,14 +95,14 @@ public class TOtherName implements TGeneralNameInterface {
         return 0;
     }
 
-    public void encode(DerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         if(this.gni != null) {
             this.gni.encode(var1);
         } else {
-            DerOutputStream var2 = new DerOutputStream();
+            TDerOutputStream var2 = new TDerOutputStream();
             var2.putOID(this.oid);
-            var2.write(DerValue.createTag(-128, true, 0), this.nameValue);
-            var1.write(48, var2);
+            var2.write(TDerValue.createTag((byte)-128, true, (byte) 0), this.nameValue);
+            var1.write((byte) 48, var2);
         }
     }
 
@@ -115,15 +112,15 @@ public class TOtherName implements TGeneralNameInterface {
         } else if(!(var1 instanceof sun.security.x509.OtherName)) {
             return false;
         } else {
-            sun.security.x509.OtherName var2 = (sun.security.x509.OtherName)var1;
+            TOtherName var2 = (TOtherName)var1;
             if(!var2.oid.equals(this.oid)) {
                 return false;
             } else {
-                GeneralNameInterface var3 = null;
+                TGeneralNameInterface var3 = null;
 
                 try {
                     var3 = this.getGNI(var2.oid, var2.nameValue);
-                } catch (IOException var7) {
+                } catch (TIOException var7) {
                     return false;
                 }
 
@@ -159,7 +156,7 @@ public class TOtherName implements TGeneralNameInterface {
         return "Other-Name: " + this.name;
     }
 
-    public int constrains(GeneralNameInterface var1) {
+    public int constrains(TGeneralNameInterface var1) {
         byte var2;
         if(var1 == null) {
             var2 = -1;
