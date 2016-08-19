@@ -67,7 +67,7 @@ public class TGetInstance {
         } else {
             TProvider.Service var3 = var2.getService(var0, var1);
             if(var3 == null) {
-                throw new TNoSuchAlgorithmException("no such algorithm: " + var1 + " for provider " + var2.getName());
+                throw new TNoSuchAlgorithmException("no such algorithm: " + var1 + " for provider " + var2.getName(), e);
             } else {
                 return var3;
             }

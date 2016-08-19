@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -69,10 +70,10 @@ public class TPolicyInformation {
     }
 
     public boolean equals(Object var1) {
-        if(!(var1 instanceof sun.security.x509.PolicyInformation)) {
+        if(!(var1 instanceof TPolicyInformation)) {
             return false;
         } else {
-            sun.security.x509.PolicyInformation var2 = (sun.security.x509.PolicyInformation)var1;
+            TPolicyInformation var2 = (TPolicyInformation)var1;
             return !this.policyIdentifier.equals(var2.getPolicyIdentifier())?false:this.policyQualifiers.equals(var2.getPolicyQualifiers());
         }
     }
@@ -162,7 +163,7 @@ public class TPolicyInformation {
         return var1.toString();
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         this.policyIdentifier.encode(var2);
         if(!this.policyQualifiers.isEmpty()) {

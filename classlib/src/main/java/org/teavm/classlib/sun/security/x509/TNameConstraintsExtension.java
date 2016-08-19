@@ -78,7 +78,7 @@ public class TNameConstraintsExtension extends TExtension implements TCertAttrSe
         this.minMaxValid = true;
     }
 
-    private void encodeThis() throws IOException {
+    private void encodeThis() throws TIOException {
         this.minMaxValid = false;
         if(this.permitted == null && this.excluded == null) {
             this.extensionValue = null;
@@ -380,13 +380,13 @@ public class TNameConstraintsExtension extends TExtension implements TCertAttrSe
                     var4 = var3.getObjectIdentifier();
                 } while(!var4.equals(TPKCS9Attribute.EMAIL_ADDRESS_OID));
 
-                var5 = var3.getValueString();
+                var5 = var3.getValueString().toString();
             } while(var5 == null);
 
             TRFC822Name var6;
             try {
-                var6 = new TRFC822Name(var5);
-            } catch (IOException var8) {
+                var6 = new TRFC822Name(TString.wrap(var5));
+            } catch (TIOException var8) {
                 continue;
             }
 

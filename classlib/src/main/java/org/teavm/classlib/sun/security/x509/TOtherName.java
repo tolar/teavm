@@ -22,7 +22,6 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
-import org.teavm.classlib.java.lang.reflect.TConstructor;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -77,15 +76,19 @@ public class TOtherName implements TGeneralNameInterface {
     private TGeneralNameInterface getGNI(TObjectIdentifier var1, byte[] var2) throws TIOException {
         try {
             TClass var3 = TOIDMap.getClass(var1);
-            if(var3 == null) {
+            if (var3 == null) {
                 return null;
             } else {
-                TClass[] var4 = new TClass[]{Object.class};
-                TConstructor var5 = var3.getConstructor(var4);
-                Object[] var6 = new Object[]{var2};
-                TGeneralNameInterface var7 = (TGeneralNameInterface)var5.newInstance(var6);
-                return var7;
+                return null;
             }
+
+//            } else {
+//                TClass[] var4 = new TClass[]{TObject.wrap(Object.class)};
+//                TConstructor var5 = var3.getConstructor(var4);
+//                Object[] var6 = new Object[]{var2};
+//                TGeneralNameInterface var7 = (TGeneralNameInterface)var5.newInstance(var6);
+//                return var7;
+//            }
         } catch (TException var8) {
             throw new TIOException(TString.wrap("Instantiation error: " + var8), var8);
         }
@@ -109,7 +112,7 @@ public class TOtherName implements TGeneralNameInterface {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.OtherName)) {
+        } else if(!(var1 instanceof TOtherName)) {
             return false;
         } else {
             TOtherName var2 = (TOtherName)var1;

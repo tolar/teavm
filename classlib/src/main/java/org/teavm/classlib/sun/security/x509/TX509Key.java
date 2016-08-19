@@ -15,11 +15,7 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -29,11 +25,13 @@ import java.security.Security;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
+import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.util.TBitArray;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -184,7 +182,7 @@ public class TX509Key implements TPublicKey {
                 this.encode(var2);
                 var1 = var2.toByteArray();
             } catch (IOException var3) {
-                throw new TInvalidKeyException("IOException : " + var3.getMessage());
+                throw new TInvalidKeyException(TString.wrap("IOException : " + var3.getMessage()));
             }
 
             this.encodedKey = var1;
@@ -202,7 +200,7 @@ public class TX509Key implements TPublicKey {
     }
 
     public String toString() {
-        HexDumpEncoder var1 = new HexDumpEncoder();
+        THexDumpEncoder var1 = new THexDumpEncoder();
         return "algorithm = " + this.algid.toString() + ", unparsed keybits = \n" + var1.encodeBuffer(this.key);
     }
 
@@ -225,21 +223,21 @@ public class TX509Key implements TPublicKey {
     }
 
     public void decode(byte[] var1) throws InvalidKeyException {
-        this.decode((InputStream)(new ByteArrayInputStream(var1)));
+        this.decode((TInputStream)(new TByteArrayInputStream(var1)));
     }
 
-    private void writeObject(ObjectOutputStream var1) throws IOException {
-        var1.write(this.getEncoded());
-    }
-
-    private void readObject(ObjectInputStream var1) throws IOException {
-        try {
-            this.decode((TInputStream)var1);
-        } catch (InvalidKeyException var3) {
-            var3.printStackTrace();
-            throw new IOException("deserialized key is invalid: " + var3.getMessage());
-        }
-    }
+//    private void writeObject(ObjectOutputStream var1) throws IOException {
+//        var1.write(this.getEncoded());
+//    }
+//
+//    private void readObject(ObjectInputStream var1) throws IOException {
+//        try {
+//            this.decode((TInputStream)var1);
+//        } catch (InvalidKeyException var3) {
+//            var3.printStackTrace();
+//            throw new IOException("deserialized key is invalid: " + var3.getMessage());
+//        }
+//    }
 
     public boolean equals(Object var1) {
         if(this == var1) {
@@ -273,7 +271,7 @@ public class TX509Key implements TPublicKey {
             }
 
             return var2;
-        } catch (InvalidKeyException var4) {
+        } catch (TInvalidKeyException var4) {
             return 0;
         }
     }

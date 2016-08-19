@@ -157,7 +157,7 @@ public class TExtension implements org.teavm.classlib.java.security.cert.TExtens
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.Extension)) {
+        } else if(!(var1 instanceof TExtension)) {
             return false;
         } else {
             TExtension var2 = (TExtension)var1;

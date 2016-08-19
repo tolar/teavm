@@ -36,10 +36,10 @@ public class TIPAddressName implements TGeneralNameInterface {
         this(var1.getOctetString());
     }
 
-    public TIPAddressName(byte[] var1) throws IOException {
+    public TIPAddressName(byte[] var1) throws TIOException {
         if(var1.length != 4 && var1.length != 8) {
             if(var1.length != 16 && var1.length != 32) {
-                throw new IOException("Invalid IPAddressName");
+                throw new TIOException(TString.wrap("Invalid IPAddressName"));
             }
 
             this.isIPv4 = false;
@@ -73,14 +73,14 @@ public class TIPAddressName implements TGeneralNameInterface {
         }
     }
 
-    private void parseIPv4(String var1) throws IOException {
+    private void parseIPv4(TString var1) throws IOException {
         int var2 = var1.indexOf(47);
         if(var2 == -1) {
-            this.address = InetAddress.getByName(var1).getAddress();
+            this.address = InetAddress.getByName(var1.toString()).getAddress();
         } else {
             this.address = new byte[8];
-            byte[] var3 = InetAddress.getByName(var1.substring(var2 + 1)).getAddress();
-            byte[] var4 = InetAddress.getByName(var1.substring(0, var2)).getAddress();
+            byte[] var3 = InetAddress.getByName(var1.substring(var2 + 1).toString()).getAddress();
+            byte[] var4 = InetAddress.getByName(var1.substring(0, var2).toString()).getAddress();
             System.arraycopy(var4, 0, this.address, 0, 4);
             System.arraycopy(var3, 0, this.address, 4, 4);
         }
@@ -90,12 +90,12 @@ public class TIPAddressName implements TGeneralNameInterface {
     private void parseIPv6(TString var1) throws IOException {
         int var2 = var1.indexOf(47);
         if(var2 == -1) {
-            this.address = InetAddress.getByName(var1).getAddress();
+            this.address = InetAddress.getByName(var1.toString()).getAddress();
         } else {
             this.address = new byte[32];
-            byte[] var3 = InetAddress.getByName(var1.substring(0, var2)).getAddress();
+            byte[] var3 = InetAddress.getByName(var1.substring(0, var2).toString()).getAddress();
             System.arraycopy(var3, 0, this.address, 0, 16);
-            int var4 = Integer.parseInt(var1.substring(var2 + 1));
+            int var4 = Integer.parseInt(var1.substring(var2 + 1).toString());
             if(var4 < 0 || var4 > 128) {
                 throw new IOException("IPv6Address prefix length (" + var4 + ") in out of valid range [0,128]");
             }
@@ -232,7 +232,7 @@ public class TIPAddressName implements TGeneralNameInterface {
             var2 = -1;
         } else if(var1.getType() != 7) {
             var2 = -1;
-        } else if(((sun.security.x509.IPAddressName)var1).equals(this)) {
+        } else if(((TIPAddressName)var1).equals(this)) {
             var2 = 0;
         } else {
             TIPAddressName var3 = (TIPAddressName)var1;

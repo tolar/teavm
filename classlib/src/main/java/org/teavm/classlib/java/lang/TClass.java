@@ -16,6 +16,7 @@
 package org.teavm.classlib.java.lang;
 
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -307,6 +308,11 @@ public class TClass<T> extends TObject implements TAnnotatedElement,TType, TGene
 
     public TField[] getDeclaredFields() throws SecurityException {
         return new TField[0];
+    }
+
+    public Field getDeclaredField(String name)
+            throws NoSuchFieldException, SecurityException {
+        return null;
     }
 
     public TPackage getPackage() {

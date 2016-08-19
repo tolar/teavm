@@ -15,6 +15,9 @@
  */
 package org.teavm.classlib.java.security;
 
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.TThrowable;
+
 public class TInvalidKeyException extends TKeyException {
 
     private static final long serialVersionUID = 5698479920593359816L;
@@ -35,7 +38,7 @@ public class TInvalidKeyException extends TKeyException {
      *
      * @param msg the detail message.
      */
-    public TInvalidKeyException(String msg) {
+    public TInvalidKeyException(TString msg) {
         super(msg);
     }
 
@@ -50,7 +53,7 @@ public class TInvalidKeyException extends TKeyException {
      *        and indicates that the cause is nonexistent or unknown.)
      * @since 1.5
      */
-    public TInvalidKeyException(String message, Throwable cause) {
+    public TInvalidKeyException(TString message, TThrowable cause) {
         super(message, cause);
     }
 
@@ -65,7 +68,7 @@ public class TInvalidKeyException extends TKeyException {
      *        and indicates that the cause is nonexistent or unknown.)
      * @since 1.5
      */
-    public TInvalidKeyException(Throwable cause) {
+    public TInvalidKeyException(TThrowable cause) {
         super(cause);
     }
 }

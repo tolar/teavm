@@ -19,6 +19,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
+
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
 
@@ -26,11 +27,11 @@ public class TPropertyExpander {
     public TPropertyExpander() {
     }
 
-    public static String expand(String var0) throws sun.security.util.PropertyExpander.ExpandException {
+    public static String expand(String var0) throws TPropertyExpander.ExpandException {
         return expand(var0, false);
     }
 
-    public static String expand(String var0, boolean var1) throws sun.security.util.PropertyExpander.ExpandException {
+    public static String expand(String var0, boolean var1) throws TPropertyExpander.ExpandException {
         if(var0 == null) {
             return null;
         } else {
@@ -71,7 +72,7 @@ public class TPropertyExpander {
                                 } else {
                                     String var8 = System.getProperty(var7);
                                     if(var8 == null) {
-                                        throw new sun.security.util.PropertyExpander.ExpandException("unable to expand property " + var7);
+                                        throw new TPropertyExpander.ExpandException("unable to expand property " + var7);
                                     }
 
                                     if(var1) {

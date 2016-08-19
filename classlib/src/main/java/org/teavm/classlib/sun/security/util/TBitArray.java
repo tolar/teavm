@@ -110,7 +110,7 @@ public class TBitArray {
     public boolean equals(Object var1) {
         if(var1 == this) {
             return true;
-        } else if(var1 != null && var1 instanceof sun.security.util.BitArray) {
+        } else if(var1 != null && var1 instanceof TBitArray) {
             TBitArray var2 = (TBitArray)var1;
             if(var2.length != this.length) {
                 return false;

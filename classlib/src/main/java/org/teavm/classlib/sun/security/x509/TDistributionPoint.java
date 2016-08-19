@@ -180,7 +180,7 @@ public class TDistributionPoint {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.DistributionPoint)) {
+        } else if(!(var1 instanceof TDistributionPoint)) {
             return false;
         } else {
             TDistributionPoint var2 = (TDistributionPoint)var1;

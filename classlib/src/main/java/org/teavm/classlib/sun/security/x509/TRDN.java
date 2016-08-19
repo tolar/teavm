@@ -175,7 +175,7 @@ public class TRDN {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.RDN)) {
+        } else if(!(var1 instanceof TRDN)) {
             return false;
         } else {
             TRDN var2 = (TRDN)var1;

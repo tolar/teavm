@@ -46,16 +46,16 @@ public class TPolicyConstraintsExtension extends TExtension implements TCertAttr
             if(this.require != -1) {
                 var3 = new TDerOutputStream();
                 var3.putInteger(this.require);
-                var1.writeImplicit(TDerValue.createTag(-128, false, 0), var3);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, false, (byte) 0), var3);
             }
 
             if(this.inhibit != -1) {
                 var3 = new TDerOutputStream();
                 var3.putInteger(this.inhibit);
-                var1.writeImplicit(TDerValue.createTag(-128, false, 1), var3);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, false, (byte) 1), var3);
             }
 
-            var2.write(48, var1);
+            var2.write((byte)48, var1);
             this.extensionValue = var2.toByteArray();
         }
     }
@@ -82,29 +82,29 @@ public class TPolicyConstraintsExtension extends TExtension implements TCertAttr
         this.extensionValue = (byte[])((byte[])var2);
         TDerValue var3 = new TDerValue(this.extensionValue);
         if(var3.tag != 48) {
-            throw new TIOException("Sequence tag missing for PolicyConstraint.");
+            throw new TIOException(TString.wrap("Sequence tag missing for PolicyConstraint."));
         } else {
             TDerInputStream var4 = var3.data;
 
             while(true) {
                 if(var4 != null && var4.available() != 0) {
                     TDerValue var5 = var4.getDerValue();
-                    if(var5.isContextSpecific(0) && !var5.isConstructed()) {
+                    if(var5.isContextSpecific((byte) 0) && !var5.isConstructed()) {
                         if(this.require != -1) {
                             throw new TIOException(TString.wrap("Duplicate requireExplicitPolicyfound in the TPolicyConstraintsExtension"));
                         }
 
-                        var5.resetTag(2);
+                        var5.resetTag((byte) 2);
                         this.require = var5.getInteger();
                         continue;
                     }
 
-                    if(var5.isContextSpecific(1) && !var5.isConstructed()) {
+                    if(var5.isContextSpecific((byte) 1) && !var5.isConstructed()) {
                         if(this.inhibit != -1) {
                             throw new TIOException(TString.wrap("Duplicate inhibitPolicyMappingfound in the TPolicyConstraintsExtension"));
                         }
 
-                        var5.resetTag(2);
+                        var5.resetTag((byte) 2);
                         this.inhibit = var5.getInteger();
                         continue;
                     }

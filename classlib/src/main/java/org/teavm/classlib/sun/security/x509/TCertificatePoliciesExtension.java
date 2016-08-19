@@ -18,13 +18,14 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
 
 public class TCertificatePoliciesExtension extends TExtension implements TCertAttrSet<String> {
     public static final String IDENT = "x509.info.extensions.CertificatePolicies";
@@ -43,7 +44,7 @@ public class TCertificatePoliciesExtension extends TExtension implements TCertAt
                 var4.encode(var2);
             }
 
-            var1.write(48, var2);
+            var1.write((byte) 48, var2);
             this.extensionValue = var1.toByteArray();
         } else {
             this.extensionValue = null;
@@ -57,23 +58,23 @@ public class TCertificatePoliciesExtension extends TExtension implements TCertAt
 
     public TCertificatePoliciesExtension(Boolean var1, List<TPolicyInformation> var2) throws IOException {
         this.certPolicies = var2;
-        this.extensionId = PKIXExtensions.CertificatePolicies_Id;
+        this.extensionId = TPKIXExtensions.CertificatePolicies_Id;
         this.critical = var1.booleanValue();
         this.encodeThis();
     }
 
     public TCertificatePoliciesExtension(Boolean var1, Object var2) throws IOException {
-        this.extensionId = PKIXExtensions.CertificatePolicies_Id;
+        this.extensionId = TPKIXExtensions.CertificatePolicies_Id;
         this.critical = var1.booleanValue();
         this.extensionValue = (byte[])((byte[])var2);
-        DerValue var3 = new DerValue(this.extensionValue);
+        TDerValue var3 = new TDerValue(this.extensionValue);
         if(var3.tag != 48) {
             throw new IOException("Invalid encoding for CertificatePoliciesExtension.");
         } else {
             this.certPolicies = new ArrayList();
 
             while(var3.data.available() != 0) {
-                DerValue var4 = var3.data.getDerValue();
+                TDerValue var4 = var3.data.getDerValue();
                 TPolicyInformation var5 = new TPolicyInformation(var4);
                 this.certPolicies.add(var5);
             }
@@ -124,25 +125,25 @@ public class TCertificatePoliciesExtension extends TExtension implements TCertAt
         }
     }
 
-    public List<TPolicyInformation> get(String var1) throws IOException {
+    public List<TPolicyInformation> get(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("policies")) {
             return this.certPolicies;
         } else {
-            throw new IOException("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:CertificatePoliciesExtension.");
+            throw new TIOException(TString.wrap("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:CertificatePoliciesExtension."));
         }
     }
 
-    public void delete(String var1) throws IOException {
+    public void delete(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("policies")) {
             this.certPolicies = null;
             this.encodeThis();
         } else {
-            throw new IOException("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:CertificatePoliciesExtension.");
+            throw new TIOException(TString.wrap("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:CertificatePoliciesExtension."));
         }
     }
 
-    public Enumeration<String> getElements() {
-        AttributeNameEnumeration var1 = new AttributeNameEnumeration();
+    public TEnumeration<String> getElements() {
+        TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("policies");
         return var1.elements();
     }

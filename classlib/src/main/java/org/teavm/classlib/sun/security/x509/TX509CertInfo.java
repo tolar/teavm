@@ -241,8 +241,8 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public void set(TString var1, Object var2) throws TCertificateException, TIOException {
-        TX509AttributeName var3 = new TX509AttributeName(var1);
+    public void set(String var1, Object var2) throws TCertificateException, TIOException {
+        TX509AttributeName var3 = new TX509AttributeName(TString.wrap(var1));
         int var4 = this.attributeMap(var3.getPrefix());
         if(var4 == 0) {
             throw new TCertificateException(TString.wrap("Attribute name not recognized: " + var1));
@@ -312,14 +312,14 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public void delete(String var1) throws CertificateException, IOException {
+    public void delete(String var1) throws TCertificateException, TIOException {
         TX509AttributeName var2 = new TX509AttributeName(var1);
         int var3 = this.attributeMap(var2.getPrefix());
         if(var3 == 0) {
-            throw new CertificateException("Attribute name not recognized: " + var1);
+            throw new TCertificateException(TString.wrap("Attribute name not recognized: " + var1));
         } else {
             this.rawCertInfo = null;
-            String var4 = var2.getSuffix();
+            TString var4 = var2.getSuffix();
             switch(var3) {
                 case 1:
                     if(var4 == null) {
@@ -477,18 +477,18 @@ public class TX509CertInfo implements TCertAttrSet<String> {
             if(this.issuer.isEmpty()) {
                 throw new CertificateParsingException("Empty issuer DN not allowed in X509Certificates");
             } else {
-                this.interval = new CertificateValidity(var2);
+                this.interval = new TCertificateValidity(var2);
                 this.subject = new TX500Name(var2);
                 if(this.version.compare(0) == 0 && this.subject.isEmpty()) {
                     throw new CertificateParsingException("Empty subject DN not allowed in v1 certificate");
                 } else {
-                    this.pubKey = new CertificateX509Key(var2);
+                    this.pubKey = new TCertificateX509Key(var2);
                     if(var2.available() != 0) {
                         if(this.version.compare(0) == 0) {
                             throw new CertificateParsingException("no more data allowed for version 1 certificate");
                         } else {
                             var3 = var2.getDerValue();
-                            if(var3.isContextSpecific(1)) {
+                            if(var3.isContextSpecific((byte) 1)) {
                                 this.issuerUniqueId = new UniqueIdentity(var3);
                                 if(var2.available() == 0) {
                                     return;

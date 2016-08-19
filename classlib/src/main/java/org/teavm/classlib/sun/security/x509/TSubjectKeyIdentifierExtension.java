@@ -71,8 +71,8 @@ public class TSubjectKeyIdentifierExtension extends TExtension implements TCertA
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("key_id")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("key_id"))) {
             if(!(var2 instanceof TKeyIdentifier)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type KeyIdentifier."));
             } else {
@@ -84,16 +84,16 @@ public class TSubjectKeyIdentifierExtension extends TExtension implements TCertA
         }
     }
 
-    public TKeyIdentifier get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("key_id")) {
+    public TKeyIdentifier get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("key_id"))) {
             return this.id;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:SubjectKeyIdentifierExtension."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("key_id")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("key_id"))) {
             this.id = null;
             this.encodeThis();
         } else {

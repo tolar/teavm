@@ -18,10 +18,6 @@ package org.teavm.classlib.java.security;
 import static java.util.Locale.ENGLISH;
 
 import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.security.InvalidParameterException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -126,17 +122,17 @@ public abstract class TProvider extends TProperties {
             if (typeAndAlg == null) {
                 return;
             }
-            String type = getEngineName(typeAndAlg[0]);
+            TString type = getEngineName(TString.wrap(typeAndAlg[0]));
             String aliasAlg = typeAndAlg[1].intern();
-            TProvider.ServiceKey key = new TProvider.ServiceKey(type, stdAlg, true);
+            TProvider.ServiceKey key = new TProvider.ServiceKey(type, TString.wrap(stdAlg), true);
             TProvider.Service s = legacyMap.get(key);
             if (s == null) {
                 s = new TProvider.Service(this);
                 s.type = type;
-                s.algorithm = stdAlg;
+                s.algorithm = TString.wrap(stdAlg);
                 legacyMap.put(key, s);
             }
-            legacyMap.put(new TProvider.ServiceKey(type, aliasAlg, true), s);
+            legacyMap.put(new TProvider.ServiceKey(type, TString.wrap(stdAlg), true), s);
             s.addAlias(aliasAlg);
         } else {
             String[] typeAndAlg = getTypeAndAlgorithm(name);
@@ -146,22 +142,22 @@ public abstract class TProvider extends TProperties {
             int i = typeAndAlg[1].indexOf(' ');
             if (i == -1) {
                 // e.g. put("MessageDigest.SHA-1", "sun.security.provider.SHA");
-                String type = getEngineName(typeAndAlg[0]);
+                String type = getEngineName(TString.wrap(typeAndAlg[0])).toString();
                 String stdAlg = typeAndAlg[1].intern();
                 String className = value;
-                TProvider.ServiceKey key = new TProvider.ServiceKey(type, stdAlg, true);
+                TProvider.ServiceKey key = new TProvider.ServiceKey(TString.wrap(type), TString.wrap(stdAlg), true);
                 TProvider.Service s = legacyMap.get(key);
                 if (s == null) {
                     s = new TProvider.Service(this);
-                    s.type = type;
-                    s.algorithm = stdAlg;
+                    s.type = TString.wrap(type);
+                    s.algorithm = TString.wrap(stdAlg);
                     legacyMap.put(key, s);
                 }
-                s.className = className;
+                s.className = TString.wrap(className);
             } else { // attribute
                 // e.g. put("MessageDigest.SHA-1 ImplementedIn", "Software");
                 String attributeValue = value;
-                String type = getEngineName(typeAndAlg[0]);
+                String type = getEngineName(TString.wrap(typeAndAlg[0])).toString();
                 String attributeString = typeAndAlg[1];
                 String stdAlg = attributeString.substring(0, i).intern();
                 String attributeName = attributeString.substring(i + 1);
@@ -170,12 +166,12 @@ public abstract class TProvider extends TProperties {
                     attributeName = attributeName.substring(1);
                 }
                 attributeName = attributeName.intern();
-                TProvider.ServiceKey key = new TProvider.ServiceKey(type, stdAlg, true);
+                TProvider.ServiceKey key = new TProvider.ServiceKey(TString.wrap(type), TString.wrap(stdAlg), true);
                 TProvider.Service s = legacyMap.get(key);
                 if (s == null) {
                     s = new TProvider.Service(this);
-                    s.type = type;
-                    s.algorithm = stdAlg;
+                    s.type = TString.wrap(type);
+                    s.algorithm = TString.wrap(stdAlg);
                     legacyMap.put(key, s);
                 }
                 s.addAttribute(attributeName, attributeValue);
@@ -211,7 +207,7 @@ public abstract class TProvider extends TProperties {
         if (e == null) {
             e = knownEngines.get(s.toLowerCase(ENGLISH));
         }
-        return (e == null) ? s : e.name;
+        return (e == null) ? s : TString.wrap(e.name);
     }
 
     private static final Map<String,TProvider.EngineDescription> knownEngines;
@@ -406,9 +402,9 @@ public abstract class TProvider extends TProperties {
                 throw new NullPointerException();
             }
             this.provider = provider;
-            this.type = getEngineName(type);
-            this.algorithm = algorithm;
-            this.className = className;
+            this.type = getEngineName(TString.wrap(type));
+            this.algorithm = TString.wrap(algorithm);
+            this.className = TString.wrap(className);
             if (aliases == null) {
                 this.aliases = Collections.<String>emptyList();
             } else {
@@ -430,7 +426,7 @@ public abstract class TProvider extends TProperties {
          * @return the type of this service
          */
         public final String getType() {
-            return type;
+            return type.toString();
         }
 
         /**
@@ -440,7 +436,7 @@ public abstract class TProvider extends TProperties {
          * @return the algorithm of this service
          */
         public final String getAlgorithm() {
-            return algorithm;
+            return algorithm.toString();
         }
 
         /**
@@ -517,127 +513,122 @@ public abstract class TProvider extends TProperties {
          * @throws NoSuchAlgorithmException if instantiation failed for
          * any other reason.
          */
-        public Object newInstance(Object constructorParameter)
-                throws TNoSuchAlgorithmException {
-            if (registered == false) {
-                if (provider.getService(type, algorithm) != this) {
-                    throw new TNoSuchAlgorithmException
-                            ("Service not registered with Provider "
-                                    + provider.getName() + ": " + this);
-                }
-                registered = true;
-            }
-            try {
-                TProvider.EngineDescription cap = knownEngines.get(type);
-                if (cap == null) {
-                    // unknown engine type, use generic code
-                    // this is the code path future for non-core
-                    // optional packages
-                    return newInstanceGeneric(constructorParameter);
-                }
-                if (cap.constructorParameterClassName == null) {
-                    if (constructorParameter != null) {
-                        throw new InvalidParameterException
-                                ("constructorParameter not used with " + type
-                                        + " engines");
-                    }
-                    Class<?> clazz = getImplClass();
-                    Class<?>[] empty = {};
-                    Constructor<?> con = clazz.getConstructor(empty);
-                    return con.newInstance();
-                } else {
-                    Class<?> paramClass = cap.getConstructorParameterClass();
-                    if (constructorParameter != null) {
-                        Class<?> argClass = constructorParameter.getClass();
-                        if (paramClass.isAssignableFrom(argClass) == false) {
-                            throw new InvalidParameterException
-                                    ("constructorParameter must be instanceof "
-                                            + cap.constructorParameterClassName.replace('$', '.')
-                                            + " for engine type " + type);
-                        }
-                    }
-                    Class<?> clazz = getImplClass();
-                    Constructor<?> cons = clazz.getConstructor(paramClass);
-                    return cons.newInstance(constructorParameter);
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw e;
-            } catch (InvocationTargetException e) {
-                throw new NoSuchAlgorithmException
-                        ("Error constructing implementation (algorithm: "
-                                + algorithm + ", provider: " + provider.getName()
-                                + ", class: " + className + ")", e.getCause());
-            } catch (Exception e) {
-                throw new NoSuchAlgorithmException
-                        ("Error constructing implementation (algorithm: "
-                                + algorithm + ", provider: " + provider.getName()
-                                + ", class: " + className + ")", e);
-            }
-        }
-
-        // return the implementation Class object for this service
-        private Class<?> getImplClass() throws NoSuchAlgorithmException {
-            try {
-                Reference<Class<?>> ref = classRef;
-                Class<?> clazz = (ref == null) ? null : ref.get();
-                if (clazz == null) {
-                    ClassLoader cl = provider.getClass().getClassLoader();
-                    if (cl == null) {
-                        clazz = Class.forName(className);
-                    } else {
-                        clazz = cl.loadClass(className);
-                    }
-                    if (!Modifier.isPublic(clazz.getModifiers())) {
-                        throw new NoSuchAlgorithmException
-                                ("class configured for " + type + " (provider: " +
-                                        provider.getName() + ") is not public.");
-                    }
-                    classRef = new WeakReference<Class<?>>(clazz);
-                }
-                return clazz;
-            } catch (ClassNotFoundException e) {
-                throw new NoSuchAlgorithmException
-                        ("class configured for " + type + " (provider: " +
-                                provider.getName() + ") cannot be found.", e);
-            }
-        }
+//        public Object newInstance(Object constructorParameter)
+//                throws TNoSuchAlgorithmException {
+//            if (registered == false) {
+//                if (provider.getService(type, algorithm) != this) {
+//                    throw new TNoSuchAlgorithmException
+//                            (TString.wrap("Service not registered with Provider "
+//                                    + provider.getName() + ": "));
+//                }
+//                registered = true;
+//            }
+//            try {
+//                TProvider.EngineDescription cap = knownEngines.get(type);
+//                if (cap == null) {
+//                    // unknown engine type, use generic code
+//                    // this is the code path future for non-core
+//                    // optional packages
+//                    return newInstanceGeneric(constructorParameter);
+//                }
+//                if (cap.constructorParameterClassName == null) {
+//                    if (constructorParameter != null) {
+//                        throw new InvalidParameterException
+//                                ("constructorParameter not used with " + type
+//                                        + " engines");
+//                    }
+//                    Class<?> clazz = getImplClass();
+//                    Class<?>[] empty = {};
+//                    Constructor<?> con = clazz.getConstructor(empty);
+//                    return con.newInstance();
+//                } else {
+//                    Class<?> paramClass = cap.getConstructorParameterClass();
+//                    if (constructorParameter != null) {
+//                        Class<?> argClass = constructorParameter.getClass();
+//                        if (paramClass.isAssignableFrom(argClass) == false) {
+//                            throw new InvalidParameterException
+//                                    ("constructorParameter must be instanceof "
+//                                            + cap.constructorParameterClassName.replace('$', '.')
+//                                            + " for engine type " + type);
+//                        }
+//                    }
+//                    Class<?> clazz = getImplClass();
+//                    Constructor<?> cons = clazz.getConstructor(paramClass);
+//                    return cons.newInstance(constructorParameter);
+//                }
+//            } catch (TNoSuchAlgorithmException e) {
+//                throw e;
+//            } catch (TException e) {
+//                throw new TNoSuchAlgorithmException
+//                        (TString.wrap("Error constructing implementation (algorithm: "
+//                                + algorithm + ", provider: " + provider.getName()
+//                                + ", class: " + className + ")"), e);
+//            }
+//        }
+//
+//        // return the implementation Class object for this service
+//        private Class<?> getImplClass() throws NoSuchAlgorithmException {
+//            try {
+//                Reference<Class<?>> ref = classRef;
+//                Class<?> clazz = (ref == null) ? null : ref.get();
+//                if (clazz == null) {
+//                    ClassLoader cl = provider.getClass().getClassLoader();
+//                    if (cl == null) {
+//                        clazz = Class.forName(className);
+//                    } else {
+//                        clazz = cl.loadClass(className);
+//                    }
+//                    if (!Modifier.isPublic(clazz.getModifiers())) {
+//                        throw new NoSuchAlgorithmException
+//                                ("class configured for " + type + " (provider: " +
+//                                        provider.getName() + ") is not public.");
+//                    }
+//                    classRef = new WeakReference<Class<?>>(clazz);
+//                }
+//                return clazz;
+//            } catch (ClassNotFoundException e) {
+//                throw new NoSuchAlgorithmException
+//                        ("class configured for " + type + " (provider: " +
+//                                provider.getName() + ") cannot be found.", e);
+//            }
+//        }
 
         /**
          * Generic code path for unknown engine types. Call the
          * no-args constructor if constructorParameter is null, otherwise
          * use the first matching constructor.
          */
-        private Object newInstanceGeneric(Object constructorParameter)
-                throws Exception {
-            Class<?> clazz = getImplClass();
-            if (constructorParameter == null) {
-                // create instance with public no-arg constructor if it exists
-                try {
-                    Class<?>[] empty = {};
-                    Constructor<?> con = clazz.getConstructor(empty);
-                    return con.newInstance();
-                } catch (NoSuchMethodException e) {
-                    throw new NoSuchAlgorithmException("No public no-arg "
-                            + "constructor found in class " + className);
-                }
-            }
-            Class<?> argClass = constructorParameter.getClass();
-            Constructor[] cons = clazz.getConstructors();
-            // find first public constructor that can take the
-            // argument as parameter
-            for (Constructor<?> con : cons) {
-                Class<?>[] paramTypes = con.getParameterTypes();
-                if (paramTypes.length != 1) {
-                    continue;
-                }
-                if (paramTypes[0].isAssignableFrom(argClass) == false) {
-                    continue;
-                }
-                return con.newInstance(constructorParameter);
-            }
-            throw new NoSuchAlgorithmException("No public constructor matching "
-                    + argClass.getName() + " found in class " + className);
-        }
+//        private Object newInstanceGeneric(Object constructorParameter)
+//                throws Exception {
+//            Class<?> clazz = getImplClass();
+//            if (constructorParameter == null) {
+//                // create instance with public no-arg constructor if it exists
+//                try {
+//                    Class<?>[] empty = {};
+//                    Constructor<?> con = clazz.getConstructor(empty);
+//                    return con.newInstance();
+//                } catch (NoSuchMethodException e) {
+//                    throw new NoSuchAlgorithmException("No public no-arg "
+//                            + "constructor found in class " + className);
+//                }
+//            }
+//            Class<?> argClass = constructorParameter.getClass();
+//            Constructor[] cons = clazz.getConstructors();
+//            // find first public constructor that can take the
+//            // argument as parameter
+//            for (Constructor<?> con : cons) {
+//                Class<?>[] paramTypes = con.getParameterTypes();
+//                if (paramTypes.length != 1) {
+//                    continue;
+//                }
+//                if (paramTypes[0].isAssignableFrom(argClass) == false) {
+//                    continue;
+//                }
+//                return con.newInstance(constructorParameter);
+//            }
+//            throw new NoSuchAlgorithmException("No public constructor matching "
+//                    + argClass.getName() + " found in class " + className);
+//        }
 
         /**
          * Test whether this Service can use the specified parameter.

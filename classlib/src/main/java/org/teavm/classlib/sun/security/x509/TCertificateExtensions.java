@@ -16,16 +16,14 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.util.TCollection;
 import org.teavm.classlib.java.util.TCollections;
 import org.teavm.classlib.java.util.TEnumeration;
@@ -40,10 +38,10 @@ import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 public class TCertificateExtensions implements TCertAttrSet<TExtension> {
     public static final String IDENT = "x509.info.extensions";
     public static final String NAME = "extensions";
-    private TMap<String, TExtension> map = TCollections.synchronizedMap(new TreeMap());
+    private TMap<TString, TExtension> map = TCollections.synchronizedMap(new TTreeMap());
     private boolean unsupportedCritExt = false;
-    private TMap<String, TExtension> unparseableExtensions;
-    private static Class[] PARAMS = new Class[]{Boolean.class, Object.class};
+    private TMap<TString, TExtension> unparseableExtensions;
+    //private static TClass[] PARAMS = new TClass[]{TBoolean.class, TObject.class};
 
     public TCertificateExtensions() {
     }
@@ -64,37 +62,37 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
 
     private void parseExtension(TExtension var1) throws IOException {
         try {
-            Class var2 = TOIDMap.getClass(var1.getExtensionId());
+            TClass var2 = TOIDMap.getClass(var1.getExtensionId());
             if(var2 == null) {
                 if(var1.isCritical()) {
                     this.unsupportedCritExt = true;
                 }
 
-                if(this.map.put(var1.getExtensionId().toString(), var1) != null) {
+                if(this.map.put(TString.wrap(var1.getExtensionId().toString()), var1) != null) {
                     throw new IOException("Duplicate extensions not allowed");
                 }
             } else {
-                Constructor var9 = var2.getConstructor(PARAMS);
-                Object[] var10 = new Object[]{Boolean.valueOf(var1.isCritical()), var1.getExtensionValue()};
-                TCertAttrSet var5 = (TCertAttrSet)var9.newInstance(var10);
-                if(this.map.put(var5.getName(), (TExtension)var5) != null) {
-                    throw new IOException("Duplicate extensions not allowed");
-                }
+//                Constructor var9 = var2.getConstructor(PARAMS);
+//                Object[] var10 = new Object[]{Boolean.valueOf(var1.isCritical()), var1.getExtensionValue()};
+//                TCertAttrSet var5 = (TCertAttrSet)var9.newInstance(var10);
+//                if(this.map.put(var5.getName(), (TExtension)var5) != null) {
+//                    throw new IOException("Duplicate extensions not allowed");
+//                }
             }
-        } catch (InvocationTargetException var6) {
-            Throwable var3 = var6.getTargetException();
-            if(!var1.isCritical()) {
-                if(this.unparseableExtensions == null) {
-                    this.unparseableExtensions = new TTreeMap();
-                }
-
-                this.unparseableExtensions.put(var1.getExtensionId().toString(), new UnparseableExtension(var1, var3));
-
-            } else if(var3 instanceof IOException) {
-                throw (IOException)var3;
-            } else {
-                throw new IOException(var3);
-            }
+//        } catch (InvocationTargetException var6) {
+//            Throwable var3 = var6.getTargetException();
+//            if(!var1.isCritical()) {
+//                if(this.unparseableExtensions == null) {
+//                    this.unparseableExtensions = new TTreeMap();
+//                }
+//
+//                this.unparseableExtensions.put(var1.getExtensionId().toString(), new TUnparseableExtension(var1, var3));
+//
+//            } else if(var3 instanceof IOException) {
+//                throw (IOException)var3;
+//            } else {
+//                throw new IOException(var3);
+//            }
         } catch (IOException var7) {
             throw var7;
         } catch (Exception var8) {
@@ -102,11 +100,11 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         }
     }
 
-    public void encode(OutputStream var1) throws CertificateException, IOException {
+    public void encode(TOutputStream var1) throws TCertificateException, TIOException {
         this.encode(var1, false);
     }
 
-    public void encode(OutputStream var1, boolean var2) throws CertificateException, IOException {
+    public void encode(TOutputStream var1, boolean var2) throws TCertificateException, TIOException {
         TDerOutputStream var3 = new TDerOutputStream();
         TCollection var4 = this.map.values();
         Object[] var5 = var4.toArray();
@@ -116,7 +114,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
                 ((TCertAttrSet)var5[var6]).encode(var3);
             } else {
                 if(!(var5[var6] instanceof TExtension)) {
-                    throw new CertificateException("Illegal extension object");
+                    throw new TCertificateException(TString.wrap("Illegal extension object"));
                 }
 
                 ((TExtension)var5[var6]).encode(var3);
@@ -136,7 +134,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         var1.write(var7.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
+    public void set(TString var1, Object var2) throws TIOException {
         if(var2 instanceof TExtension) {
             this.map.put(var1, (TExtension)var2);
         } else {
@@ -144,7 +142,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         }
     }
 
-    public TExtension get(String var1) throws TIOException {
+    public TExtension get(TString var1) throws TIOException {
         TExtension var2 = (TExtension)this.map.get(var1);
         if(var2 == null) {
             throw new TIOException(TString.wrap("No extension found with name " + var1));
@@ -157,7 +155,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         return (TExtension)this.map.get(var1);
     }
 
-    public void delete(String var1) throws TIOException {
+    public void delete(TString var1) throws TIOException {
         Object var2 = this.map.get(var1);
         if(var2 == null) {
             throw new TIOException(TString.wrap("No extension found with name " + var1));
@@ -190,7 +188,8 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
     }
 
     public Map<String, TExtension> getUnparseableExtensions() {
-        return this.unparseableExtensions == null?TCollections.emptyMap():this.unparseableExtensions;
+        //return this.unparseableExtensions == null?TCollections.emptyMap():this.unparseableExtensions;
+        return null;
     }
 
     public String getName() {

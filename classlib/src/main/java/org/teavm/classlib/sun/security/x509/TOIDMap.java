@@ -54,7 +54,7 @@ public class TOIDMap {
     private static final String OCSPNOCHECK = "x509.info.extensions.OCSPNoCheck";
     private static final int[] NetscapeCertType_data = new int[]{2, 16, 840, 1, 113730, 1, 1};
     private static final Map<TObjectIdentifier, TOIDMap.OIDInfo> oidMap = new HashMap();
-    private static final Map<String, TOIDMap.OIDInfo> nameMap = new HashMap();
+    private static final Map<TString, TOIDMap.OIDInfo> nameMap = new HashMap();
 
     private TOIDMap() {
     }
@@ -69,7 +69,7 @@ public class TOIDMap {
         nameMap.put(var0, var3);
     }
 
-    public static void addAttribute(TString var0, TString var1, Class<?> var2) throws TCertificateException {
+    public static void addAttribute(TString var0, TString var1, TClass<?> var2) throws TCertificateException {
         TObjectIdentifier var3;
         try {
             var3 = new TObjectIdentifier(var1);

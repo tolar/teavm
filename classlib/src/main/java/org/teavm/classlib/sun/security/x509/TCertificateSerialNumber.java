@@ -17,8 +17,10 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -58,35 +60,35 @@ public class TCertificateSerialNumber implements TCertAttrSet<String> {
         return this.serial == null?"":this.serial.toString();
     }
 
-    public void encode(TOutputStream var1) throws IOException {
+    public void encode(TOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         this.serial.encode(var2);
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws IOException {
+    public void set(TString var1, Object var2) throws TIOException {
         if(!(var2 instanceof TSerialNumber)) {
-            throw new IOException("Attribute must be of type TSerialNumber.");
-        } else if(var1.equalsIgnoreCase("number")) {
+            throw new TIOException(TString.wrap("Attribute must be of type TSerialNumber."));
+        } else if(var1.equalsIgnoreCase(TString.wrap("number"))) {
             this.serial = (TSerialNumber)var2;
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet:TCertificateSerialNumber.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:TCertificateSerialNumber."));
         }
     }
 
-    public TSerialNumber get(String var1) throws IOException {
-        if(var1.equalsIgnoreCase("number")) {
+    public TSerialNumber get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("number"))) {
             return this.serial;
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet:TCertificateSerialNumber.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:TCertificateSerialNumber."));
         }
     }
 
-    public void delete(String var1) throws IOException {
-        if(var1.equalsIgnoreCase("number")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("number"))) {
             this.serial = null;
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet:TCertificateSerialNumber.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:TCertificateSerialNumber."));
         }
     }
 

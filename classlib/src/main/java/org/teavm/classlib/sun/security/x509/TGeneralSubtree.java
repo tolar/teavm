@@ -15,8 +15,6 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -124,7 +122,7 @@ public class TGeneralSubtree {
         return this.myhash;
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         this.name.encode(var2);
         TDerOutputStream var3;

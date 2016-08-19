@@ -101,7 +101,7 @@ public class TGeneralSubtrees implements Cloneable {
         return var1;
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         int var3 = 0;
 

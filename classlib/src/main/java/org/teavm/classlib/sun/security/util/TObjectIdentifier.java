@@ -196,14 +196,14 @@ public final class TObjectIdentifier implements Serializable {
 
     /** @deprecated */
     @Deprecated
-    public boolean equals(sun.security.util.ObjectIdentifier var1) {
+    public boolean equals(TObjectIdentifier var1) {
         return this.equals((Object)var1);
     }
 
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.util.ObjectIdentifier)) {
+        } else if(!(var1 instanceof TObjectIdentifier)) {
             return false;
         } else {
             TObjectIdentifier var2 = (TObjectIdentifier)var1;

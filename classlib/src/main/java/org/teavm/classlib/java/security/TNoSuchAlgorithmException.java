@@ -15,8 +15,16 @@
  */
 package org.teavm.classlib.java.security;
 
+import org.teavm.classlib.java.lang.TException;
+import org.teavm.classlib.java.lang.TString;
+
 public class TNoSuchAlgorithmException extends TGeneralSecurityException {
-    public TNoSuchAlgorithmException(String msg) {
+
+    public TNoSuchAlgorithmException(TString msg) {
         super(msg);
+    }
+
+    public TNoSuchAlgorithmException(TString msg, TException e) {
+        super(msg, e);
     }
 }

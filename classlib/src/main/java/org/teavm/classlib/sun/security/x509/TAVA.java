@@ -424,10 +424,10 @@ public class TAVA implements TDerEncoder {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.AVA)) {
+        } else if(!(var1 instanceof TAVA)) {
             return false;
         } else {
-            sun.security.x509.AVA var2 = (sun.security.x509.AVA)var1;
+            TAVA var2 = (TAVA)var1;
             return this.toRFC2253CanonicalString().equals(var2.toRFC2253CanonicalString());
         }
     }
