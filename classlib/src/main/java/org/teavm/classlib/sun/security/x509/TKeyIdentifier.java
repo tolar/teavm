@@ -22,10 +22,9 @@ import java.security.PublicKey;
 import java.util.Arrays;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
-
-import sun.misc.HexDumpEncoder;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -67,7 +66,7 @@ public class TKeyIdentifier {
 
     public String toString() {
         String var1 = "TKeyIdentifier [\n";
-        HexDumpEncoder var2 = new HexDumpEncoder();
+        THexDumpEncoder var2 = new THexDumpEncoder();
         var1 = var1 + var2.encodeBuffer(this.octetString);
         var1 = var1 + "]\n";
         return var1;

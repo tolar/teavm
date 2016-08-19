@@ -24,12 +24,13 @@ import java.util.Arrays;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TException;
+import org.teavm.classlib.java.lang.TInteger;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 
 public final class TObjectIdentifier implements Serializable {
     private byte[] encoding = null;
-    private transient volatile String stringForm;
+    private transient volatile TString stringForm;
     private static final long serialVersionUID = 8697030238860181294L;
     private Object components = null;
     private int componentLen = -1;
@@ -100,7 +101,7 @@ public final class TObjectIdentifier implements Serializable {
                         var5 += pack7Oid(var12, var6, var5);
                     }
                 } else {
-                    int var17 = Integer.parseInt(var10);
+                    int var17 = TInteger.parseInt(var10);
                     if(var9 == 0) {
                         checkFirstComponent(var17);
                         var7 = var17;
@@ -391,7 +392,7 @@ public final class TObjectIdentifier implements Serializable {
         return pack7Oid(var3, 0, 4, var1, var2);
     }
 
-    private static int pack7Oid(BigInteger var0, byte[] var1, int var2) {
+    private static int pack7Oid(TBigInteger var0, byte[] var1, int var2) {
         byte[] var3 = var0.toByteArray();
         return pack7Oid(var3, 0, var3.length, var1, var2);
     }
@@ -434,8 +435,8 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    private static void checkSecondComponent(int var0, BigInteger var1) throws TIOException {
-        if(var1.signum() == -1 || var0 != 2 && var1.compareTo(BigInteger.valueOf(39L)) == 1) {
+    private static void checkSecondComponent(int var0, TBigInteger var1) throws TIOException {
+        if(var1.signum() == -1 || var0 != 2 && var1.compareTo(TBigInteger.valueOf(39L)) == 1) {
             throw new TIOException(TString.wrap("ObjectIdentifier() -- Second oid component is invalid "));
         }
     }
@@ -446,7 +447,7 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    private static void checkOtherComponent(int var0, BigInteger var1) throws TIOException {
+    private static void checkOtherComponent(int var0, TBigInteger var1) throws TIOException {
         if(var1.signum() == -1) {
             throw new TIOException(TString.wrap("ObjectIdentifier() -- oid component #" + (var0 + 1) + " must be non-negative "));
         }

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -84,7 +85,7 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         return "Version: V" + (this.version + 1);
     }
 
-    public void encode(TOutputStream var1) throws IOException {
+    public void encode(TOutputStream var1) throws TIOException {
         if(this.version != 0) {
             TDerOutputStream var2 = new TDerOutputStream();
             var2.putInteger(this.version);
@@ -94,7 +95,7 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         }
     }
 
-    public void set(String var1, Object var2) throws IOException {
+    public void set(String var1, Object var2) throws TIOException {
         if(!(var2 instanceof Integer)) {
             throw new IOException("Attribute must be of type Integer.");
         } else if(var1.equalsIgnoreCase("number")) {

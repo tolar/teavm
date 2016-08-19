@@ -27,6 +27,7 @@ import java.util.TimeZone;
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TInteger;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 
 public class TDerOutputStream extends TByteArrayOutputStream implements TDerEncoder {
@@ -61,7 +62,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         var1.encode(this);
     }
 
-    public void putBoolean(boolean var1) throws IOException {
+    public void putBoolean(boolean var1) throws TIOException {
         this.write(1);
         this.putLength(1);
         if(var1) {
@@ -72,7 +73,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
 
     }
 
-    public void putEnumerated(int var1) throws IOException {
+    public void putEnumerated(int var1) throws TIOException {
         this.write(10);
         this.putIntegerContents(var1);
     }
@@ -84,16 +85,16 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write(var2, 0, var2.length);
     }
 
-    public void putInteger(TInteger var1) throws IOException {
+    public void putInteger(TInteger var1) throws TIOException {
         this.putInteger(var1.intValue());
     }
 
-    public void putInteger(int var1) throws IOException {
+    public void putInteger(int var1) throws TIOException {
         this.write(2);
         this.putIntegerContents(var1);
     }
 
-    private void putIntegerContents(int var1) throws IOException {
+    private void putIntegerContents(int var1) throws TIOException {
         byte[] var2 = new byte[4];
         int var3 = 0;
         var2[3] = (byte)(var1 & 255);
@@ -203,31 +204,31 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write(var1, var9);
     }
 
-    public void putUTF8String(String var1) throws IOException {
-        this.writeString(var1, (byte) 12, "UTF8");
+    public void putUTF8String(TString var1) throws TIOException {
+        this.writeString(var1, (byte) 12, TString.wrap("UTF8"));
     }
 
-    public void putPrintableString(String var1) throws IOException {
-        this.writeString(var1, (byte) 19, "ASCII");
+    public void putPrintableString(TString var1) throws TIOException {
+        this.writeString(var1, (byte) 19, TString.wrap("ASCII"));
     }
 
-    public void putT61String(String var1) throws IOException {
-        this.writeString(var1, (byte) 20, "ISO-8859-1");
+    public void putT61String(TString var1) throws TIOException {
+        this.writeString(var1, (byte) 20, TString.wrap("ISO-8859-1"));
     }
 
-    public void putIA5String(String var1) throws IOException {
-        this.writeString(var1, (byte) 22, "ASCII");
+    public void putIA5String(TString var1) throws TIOException {
+        this.writeString(var1, (byte) 22, TString.wrap("ASCII"));
     }
 
-    public void putBMPString(String var1) throws IOException {
-        this.writeString(var1, (byte) 30, "UnicodeBigUnmarked");
+    public void putBMPString(TString var1) throws IOException {
+        this.writeString(var1, (byte) 30, TString.wrap("UnicodeBigUnmarked"));
     }
 
-    public void putGeneralString(String var1) throws IOException {
-        this.writeString(var1, (byte) 27, "ASCII");
+    public void putGeneralString(TString var1) throws IOException {
+        this.writeString(var1, (byte) 27, TString.wrap("ASCII"));
     }
 
-    private void writeString(String var1, byte var2, String var3) throws IOException {
+    private void writeString(TString var1, byte var2, TString var3) throws TIOException {
         byte[] var4 = var1.getBytes(var3);
         this.write(var2);
         this.putLength(var4.length);

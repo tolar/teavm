@@ -17,17 +17,9 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
-
-import sun.security.util.DerValue;
-import sun.security.x509.DNSName;
-import sun.security.x509.EDIPartyName;
-import sun.security.x509.GeneralNameInterface;
-import sun.security.x509.IPAddressName;
-import sun.security.x509.OIDName;
-import sun.security.x509.RFC822Name;
-import sun.security.x509.URIName;
-import sun.security.x509.X500Name;
+import org.teavm.classlib.sun.security.util.TDerValue;
 
 public class TGeneralName {
     private TGeneralNameInterface name;
@@ -41,11 +33,11 @@ public class TGeneralName {
         }
     }
 
-    public TGeneralName(DerValue var1) throws IOException {
+    public TGeneralName(TDerValue var1) throws IOException {
         this(var1, false);
     }
 
-    public TGeneralName(DerValue var1, boolean var2) throws IOException {
+    public TGeneralName(TDerValue var1, boolean var2) throws IOException {
         this.name = null;
         short var3 = (short)((byte)(var1.tag & 31));
         switch(var3) {
@@ -59,16 +51,16 @@ public class TGeneralName {
                 break;
             case 1:
                 if(var1.isContextSpecific() && !var1.isConstructed()) {
-                    var1.resetTag(22);
-                    this.name = new RFC822Name(var1);
+                    var1.resetTag((byte) 22);
+                    this.name = new TRFC822Name(var1);
                     break;
                 }
 
                 throw new IOException("Invalid encoding of RFC822 name");
             case 2:
                 if(var1.isContextSpecific() && !var1.isConstructed()) {
-                    var1.resetTag(22);
-                    this.name = new DNSName(var1);
+                    var1.resetTag((byte) 22);
+                    this.name = new TDNSName(var1);
                     break;
                 }
 
@@ -81,7 +73,7 @@ public class TGeneralName {
                     throw new IOException("Invalid encoding of Directory name");
                 }
 
-                this.name = new X500Name(var1.getData());
+                this.name = new TX500Name(var1.getData());
                 break;
             case 5:
                 if(!var1.isContextSpecific() || !var1.isConstructed()) {
@@ -89,7 +81,7 @@ public class TGeneralName {
                 }
 
                 var1.resetTag(48);
-                this.name = new EDIPartyName(var1);
+                this.name = new TEDIPartyName(var1);
                 break;
             case 6:
                 if(!var1.isContextSpecific() || var1.isConstructed()) {
@@ -133,10 +125,10 @@ public class TGeneralName {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.GeneralName)) {
+        } else if(!(var1 instanceof TGeneralName)) {
             return false;
         } else {
-            GeneralNameInterface var2 = ((sun.security.x509.GeneralName)var1).name;
+            TGeneralNameInterface var2 = ((TGeneralName)var1).name;
 
             try {
                 return this.name.constrains(var2) == 0;
@@ -150,18 +142,18 @@ public class TGeneralName {
         return this.name.hashCode();
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         this.name.encode(var2);
         int var3 = this.name.getType();
         if(var3 != 0 && var3 != 3 && var3 != 5) {
             if(var3 == 4) {
-                var1.write(DerValue.createTag((byte) -128, true, (byte)var3), var2);
+                var1.write(TDerValue.createTag((byte) -128, true, (byte)var3), var2);
             } else {
-                var1.writeImplicit(DerValue.createTag((byte) -128, false, (byte)var3), var2);
+                var1.writeImplicit(TDerValue.createTag((byte) -128, false, (byte)var3), var2);
             }
         } else {
-            var1.writeImplicit(DerValue.createTag((byte) -128, true, (byte)var3), var2);
+            var1.writeImplicit(TDerValue.createTag((byte) -128, true, (byte)var3), var2);
         }
 
     }

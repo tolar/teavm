@@ -19,13 +19,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
-import sun.security.x509.PKIXExtensions;
-import sun.security.x509.SerialNumber;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -60,10 +59,10 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
                 if(this.names != null) {
                     var3 = new TDerOutputStream();
                     this.names.encode(var3);
-                    var2.writeImplicit(TDerValue.createTag(-128, true, 1), var3);
+                    var2.writeImplicit(TDerValue.createTag((byte)-128, true, (byte) 1), var3);
                 }
-            } catch (Exception var4) {
-                throw new IOException(var4.toString());
+            } catch (TException var4) {
+                throw new TIOException(var4.toString());
             }
 
             if(this.serialNum != null) {

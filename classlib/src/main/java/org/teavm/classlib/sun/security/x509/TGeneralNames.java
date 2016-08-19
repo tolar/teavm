@@ -20,13 +20,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
-import sun.security.x509.GeneralName;
 
 public class TGeneralNames {
-    private final List<GeneralName> names;
+    private final List<TGeneralName> names;
 
     public TGeneralNames(TDerValue var1) throws IOException {
         this();
@@ -37,7 +37,7 @@ public class TGeneralNames {
         } else {
             while(var1.data.available() != 0) {
                 TDerValue var2 = var1.data.getDerValue();
-                GeneralName var3 = new GeneralName(var2);
+                TGeneralName var3 = new TGeneralName(var2);
                 this.add(var3);
             }
 
@@ -48,7 +48,7 @@ public class TGeneralNames {
         this.names = new ArrayList();
     }
 
-    public TGeneralNames add(GeneralName var1) {
+    public TGeneralNames add(TGeneralName var1) {
         if(var1 == null) {
             throw new NullPointerException();
         } else {
@@ -57,8 +57,8 @@ public class TGeneralNames {
         }
     }
 
-    public GeneralName get(int var1) {
-        return (GeneralName)this.names.get(var1);
+    public TGeneralName get(int var1) {
+        return (TGeneralName)this.names.get(var1);
     }
 
     public boolean isEmpty() {
@@ -69,15 +69,15 @@ public class TGeneralNames {
         return this.names.size();
     }
 
-    public Iterator<GeneralName> iterator() {
+    public Iterator<TGeneralName> iterator() {
         return this.names.iterator();
     }
 
-    public List<GeneralName> names() {
+    public List<TGeneralName> names() {
         return this.names;
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         if(!this.isEmpty()) {
             TDerOutputStream var2 = new TDerOutputStream();
             Iterator var3 = this.names.iterator();
@@ -87,14 +87,14 @@ public class TGeneralNames {
                 var4.encode(var2);
             }
 
-            var1.write(48, var2);
+            var1.write((byte) 48, var2);
         }
     }
 
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.GeneralNames)) {
+        } else if(!(var1 instanceof TGeneralNames)) {
             return false;
         } else {
             TGeneralNames var2 = (TGeneralNames)var1;

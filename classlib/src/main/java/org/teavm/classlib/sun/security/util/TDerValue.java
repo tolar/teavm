@@ -354,7 +354,7 @@ public class TDerValue {
         }
     }
 
-    public String getAsString() throws IOException {
+    public TString getAsString() throws TIOException {
         return this.tag == 12?this.getUTF8String():(this.tag == 19?this.getPrintableString():(this.tag == 20?this.getT61String():(this.tag == 22?this.getIA5String():(this.tag == 30?this.getBMPString():(this.tag == 27?this.getGeneralString():null)))));
     }
 
@@ -374,7 +374,7 @@ public class TDerValue {
         }
     }
 
-    public byte[] getDataBytes() throws IOException {
+    public byte[] getDataBytes() throws TIOException {
         byte[] var1 = new byte[this.length];
         TDerInputStream var2 = this.data;
         synchronized(this.data) {
@@ -384,65 +384,65 @@ public class TDerValue {
         }
     }
 
-    public String getPrintableString() throws IOException {
+    public TString getPrintableString() throws TIOException {
         if(this.tag != 19) {
-            throw new IOException("DerValue.getPrintableString, not a string " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getPrintableString, not a string " + this.tag));
         } else {
-            return new String(this.getDataBytes(), "ASCII");
+            return new TString(this.getDataBytes(), TString.wrap("ASCII"));
         }
     }
 
-    public String getT61String() throws IOException {
+    public TString getT61String() throws TIOException {
         if(this.tag != 20) {
-            throw new IOException("DerValue.getT61String, not T61 " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getT61String, not T61 " + this.tag));
         } else {
-            return new String(this.getDataBytes(), "ISO-8859-1");
+            return new TString(this.getDataBytes(), TString.wrap("ISO-8859-1"));
         }
     }
 
-    public String getIA5String() throws IOException {
+    public TString getIA5String() throws TIOException {
         if(this.tag != 22) {
-            throw new IOException("DerValue.getIA5String, not IA5 " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getIA5String, not IA5 " + this.tag));
         } else {
-            return new String(this.getDataBytes(), "ASCII");
+            return new TString(this.getDataBytes(), TString.wrap("ASCII"));
         }
     }
 
-    public String getBMPString() throws IOException {
+    public TString getBMPString() throws TIOException {
         if(this.tag != 30) {
-            throw new IOException("DerValue.getBMPString, not BMP " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getBMPString, not BMP " + this.tag));
         } else {
-            return new String(this.getDataBytes(), "UnicodeBigUnmarked");
+            return new TString(this.getDataBytes(), TString.wrap("UnicodeBigUnmarked"));
         }
     }
 
-    public String getUTF8String() throws IOException {
+    public TString getUTF8String() throws TIOException {
         if(this.tag != 12) {
-            throw new IOException("DerValue.getUTF8String, not UTF-8 " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getUTF8String, not UTF-8 " + this.tag));
         } else {
-            return new String(this.getDataBytes(), "UTF8");
+            return new TString(this.getDataBytes(), TString.wrap("UTF8"));
         }
     }
 
-    public String getGeneralString() throws IOException {
+    public TString getGeneralString() throws TIOException {
         if(this.tag != 27) {
-            throw new IOException("DerValue.getGeneralString, not GeneralString " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getGeneralString, not GeneralString " + this.tag));
         } else {
-            return new String(this.getDataBytes(), "ASCII");
+            return new TString(this.getDataBytes(), TString.wrap("ASCII"));
         }
     }
 
-    public Date getUTCTime() throws IOException {
+    public Date getUTCTime() throws TIOException {
         if(this.tag != 23) {
-            throw new IOException("DerValue.getUTCTime, not a UtcTime: " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getUTCTime, not a UtcTime: " + this.tag));
         } else {
             return this.buffer.getUTCTime(this.data.available());
         }
     }
 
-    public Date getGeneralizedTime() throws IOException {
+    public Date getGeneralizedTime() throws TIOException {
         if(this.tag != 24) {
-            throw new IOException("DerValue.getGeneralizedTime, not a GeneralizedTime: " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getGeneralizedTime, not a GeneralizedTime: " + this.tag));
         } else {
             return this.buffer.getGeneralizedTime(this.data.available());
         }
@@ -473,9 +473,9 @@ public class TDerValue {
 
     public String toString() {
         try {
-            String var1 = this.getAsString();
+            TString var1 = this.getAsString();
             return var1 != null?"\"" + var1 + "\"":(this.tag == 5?"[DerValue, null]":(this.tag == 6?"OID." + this.getOID():"[DerValue, tag = " + this.tag + ", length = " + this.length + "]"));
-        } catch (IOException var2) {
+        } catch (TIOException var2) {
             throw new IllegalArgumentException("misformatted DER value");
         }
     }

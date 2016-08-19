@@ -17,15 +17,19 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.util.TCollection;
+import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.sun.misc.THexDumpEncoder;
+import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -100,7 +104,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         var1.write((byte[])this.rawCertInfo.clone());
     }
 
-    public Enumeration<String> getElements() {
+    public TEnumeration<String> getElements() {
         TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("version");
         var1.addElement("serialNumber");
@@ -119,27 +123,27 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         return "info";
     }
 
-    public byte[] getEncodedInfo() throws CertificateEncodingException {
+    public byte[] getEncodedInfo() throws TCertificateEncodingException {
         try {
             if(this.rawCertInfo == null) {
-                DerOutputStream var1 = new DerOutputStream();
+                TDerOutputStream var1 = new TDerOutputStream();
                 this.emit(var1);
                 this.rawCertInfo = var1.toByteArray();
             }
 
             return (byte[])this.rawCertInfo.clone();
-        } catch (IOException var2) {
-            throw new CertificateEncodingException(var2.toString());
-        } catch (CertificateException var3) {
-            throw new CertificateEncodingException(var3.toString());
+        } catch (TIOException var2) {
+            throw new TCertificateEncodingException(var2.toString());
+        } catch (TCertificateException var3) {
+            throw new TCertificateEncodingException(var3.toString());
         }
     }
 
     public boolean equals(Object var1) {
-        return var1 instanceof sun.security.x509.X509CertInfo ?this.equals((sun.security.x509.X509CertInfo)var1):false;
+        return var1 instanceof TX509CertInfo ?this.equals((TX509CertInfo)var1):false;
     }
 
-    public boolean equals(sun.security.x509.X509CertInfo var1) {
+    public boolean equals(TX509CertInfo var1) {
         if(this == var1) {
             return true;
         } else if(this.rawCertInfo != null && var1.rawCertInfo != null) {
@@ -189,7 +193,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
             }
 
             if(this.extensions != null) {
-                Collection var2 = this.extensions.getAllExtensions();
+                TCollection var2 = this.extensions.getAllExtensions();
                 TExtension[] var3 = (TExtension[])var2.toArray(new TExtension[0]);
                 var1.append("\nCertificate Extensions: " + var3.length);
 
@@ -202,10 +206,10 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                             var1.append(var5.toString());
                             byte[] var6 = var5.getExtensionValue();
                             if(var6 != null) {
-                                DerOutputStream var7 = new DerOutputStream();
+                                TDerOutputStream var7 = new TDerOutputStream();
                                 var7.putOctetString(var6);
                                 var6 = var7.toByteArray();
-                                HexDumpEncoder var8 = new HexDumpEncoder();
+                                THexDumpEncoder var8 = new THexDumpEncoder();
                                 var1.append("TExtension unknown: DER encoded OCTET string =\n" + var8.encodeBuffer(var6) + "\n");
                             }
                         } else {
@@ -237,14 +241,14 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public void set(String var1, Object var2) throws CertificateException, IOException {
-        X509AttributeName var3 = new X509AttributeName(var1);
+    public void set(TString var1, Object var2) throws TCertificateException, TIOException {
+        TX509AttributeName var3 = new TX509AttributeName(var1);
         int var4 = this.attributeMap(var3.getPrefix());
         if(var4 == 0) {
-            throw new CertificateException("Attribute name not recognized: " + var1);
+            throw new TCertificateException(TString.wrap("Attribute name not recognized: " + var1));
         } else {
             this.rawCertInfo = null;
-            String var5 = var3.getSuffix();
+            TString var5 = var3.getSuffix();
             switch(var4) {
                 case 1:
                     if(var5 == null) {
@@ -309,7 +313,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     }
 
     public void delete(String var1) throws CertificateException, IOException {
-        X509AttributeName var2 = new X509AttributeName(var1);
+        TX509AttributeName var2 = new TX509AttributeName(var1);
         int var3 = this.attributeMap(var2.getPrefix());
         if(var3 == 0) {
             throw new CertificateException("Attribute name not recognized: " + var1);
@@ -375,8 +379,8 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public Object get(String var1) throws CertificateException, IOException {
-        X509AttributeName var2 = new X509AttributeName(var1);
+    public Object get(TString var1) throws CertificateException, IOException {
+        TX509AttributeName var2 = new TX509AttributeName(var1);
         int var3 = this.attributeMap(var2.getPrefix());
         if(var3 == 0) {
             throw new CertificateParsingException("Attribute name not recognized: " + var1);
@@ -546,7 +550,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
 
     }
 
-    private void emit(TDerOutputStream var1) throws CertificateException, IOException {
+    private void emit(TDerOutputStream var1) throws TCertificateException, TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         this.version.encode(var2);
         this.serialNum.encode(var2);
@@ -578,14 +582,14 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private int attributeMap(String var1) {
+    private int attributeMap(TString var1) {
         Integer var2 = (Integer)map.get(var1);
         return var2 == null?0:var2.intValue();
     }
 
-    private void setVersion(Object var1) throws CertificateException {
+    private void setVersion(Object var1) throws TCertificateException {
         if(!(var1 instanceof TCertificateVersion)) {
-            throw new CertificateException("Version class type invalid.");
+            throw new TCertificateException(TString.wrap("Version class type invalid."));
         } else {
             this.version = (TCertificateVersion)var1;
         }
@@ -599,9 +603,9 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private void setAlgorithmId(Object var1) throws CertificateException {
+    private void setAlgorithmId(Object var1) throws TCertificateException {
         if(!(var1 instanceof TCertificateAlgorithmId)) {
-            throw new CertificateException("AlgorithmId class type invalid.");
+            throw new TCertificateException("AlgorithmId class type invalid.");
         } else {
             this.algId = (TCertificateAlgorithmId)var1;
         }
@@ -616,10 +620,10 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     }
 
     private void setValidity(Object var1) throws CertificateException {
-        if(!(var1 instanceof CertificateValidity)) {
+        if(!(var1 instanceof TCertificateValidity)) {
             throw new CertificateException("CertificateValidity class type invalid.");
         } else {
-            this.interval = (CertificateValidity)var1;
+            this.interval = (TCertificateValidity)var1;
         }
     }
 
@@ -632,30 +636,30 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     }
 
     private void setKey(Object var1) throws CertificateException {
-        if(!(var1 instanceof CertificateX509Key)) {
+        if(!(var1 instanceof TCertificateX509Key)) {
             throw new CertificateException("Key class type invalid.");
         } else {
-            this.pubKey = (CertificateX509Key)var1;
+            this.pubKey = (TCertificateX509Key)var1;
         }
     }
 
     private void setIssuerUniqueId(Object var1) throws CertificateException {
         if(this.version.compare(1) < 0) {
             throw new CertificateException("Invalid version");
-        } else if(!(var1 instanceof UniqueIdentity)) {
+        } else if(!(var1 instanceof TUniqueIdentity)) {
             throw new CertificateException("IssuerUniqueId class type invalid.");
         } else {
-            this.issuerUniqueId = (UniqueIdentity)var1;
+            this.issuerUniqueId = (TUniqueIdentity)var1;
         }
     }
 
     private void setSubjectUniqueId(Object var1) throws CertificateException {
         if(this.version.compare(1) < 0) {
             throw new CertificateException("Invalid version");
-        } else if(!(var1 instanceof UniqueIdentity)) {
+        } else if(!(var1 instanceof TUniqueIdentity)) {
             throw new CertificateException("SubjectUniqueId class type invalid.");
         } else {
-            this.subjectUniqueId = (UniqueIdentity)var1;
+            this.subjectUniqueId = (TUniqueIdentity)var1;
         }
     }
 

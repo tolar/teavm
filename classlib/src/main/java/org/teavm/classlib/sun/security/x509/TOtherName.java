@@ -23,9 +23,10 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
-import sun.security.util.DerInputStream;
 import sun.security.util.DerOutputStream;
 import sun.security.util.DerValue;
 import sun.security.x509.GeneralNameInterface;
@@ -54,10 +55,10 @@ public class TOtherName implements TGeneralNameInterface {
         }
     }
 
-    public TOtherName(DerValue var1) throws IOException {
-        DerInputStream var2 = var1.toDerInputStream();
+    public TOtherName(TDerValue var1) throws IOException {
+        TDerInputStream var2 = var1.toDerInputStream();
         this.oid = var2.getOID();
-        DerValue var3 = var2.getDerValue();
+        TDerValue var3 = var2.getDerValue();
         this.nameValue = var3.toByteArray();
         this.gni = this.getGNI(this.oid, this.nameValue);
         if(this.gni != null) {

@@ -59,6 +59,10 @@ public class TOIDMap {
     private TOIDMap() {
     }
 
+    private static void addInternal(String var0, TObjectIdentifier var1, String var2) {
+        addInternal(TString.wrap(var0), var1, TString.wrap(var2));
+    }
+
     private static void addInternal(TString var0, TObjectIdentifier var1, TString var2) {
         TOIDMap.OIDInfo var3 = new TOIDMap.OIDInfo(var0, var1, var2);
         oidMap.put(var1, var3);
@@ -81,7 +85,7 @@ public class TOIDMap {
         }
     }
 
-    public static String getName(ObjectIdentifier var0) {
+    public static TString getName(TObjectIdentifier var0) {
         TOIDMap.OIDInfo var1 = (TOIDMap.OIDInfo)oidMap.get(var0);
         return var1 == null?null:var1.name;
     }
@@ -91,12 +95,12 @@ public class TOIDMap {
         return var1 == null?null:var1.oid;
     }
 
-    public static Class<?> getClass(String var0) throws TCertificateException {
+    public static TClass<?> getClass(String var0) throws TCertificateException {
         TOIDMap.OIDInfo var1 = (TOIDMap.OIDInfo)nameMap.get(var0);
         return var1 == null?null:var1.getClazz();
     }
 
-    public static Class<?> getClass(TObjectIdentifier var0) throws TCertificateException {
+    public static TClass<?> getClass(TObjectIdentifier var0) throws TCertificateException {
         TOIDMap.OIDInfo var1 = (TOIDMap.OIDInfo)oidMap.get(var0);
         return var1 == null?null:var1.getClazz();
     }

@@ -15,7 +15,7 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 
 /**
@@ -39,7 +39,7 @@ public interface TGeneralNameInterface {
 
     int getType();
 
-    void encode(TDerOutputStream var1) throws IOException;
+    void encode(TDerOutputStream var1) throws TIOException;
 
     int constrains(TGeneralNameInterface var1) throws UnsupportedOperationException;
 

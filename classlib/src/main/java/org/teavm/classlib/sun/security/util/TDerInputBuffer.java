@@ -179,27 +179,27 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    public Date getUTCTime(int var1) throws IOException {
+    public Date getUTCTime(int var1) throws TIOException {
         if(var1 > this.available()) {
-            throw new IOException("short read of DER UTC Time");
+            throw new TIOException(TString.wrap("short read of DER UTC Time"));
         } else if(var1 >= 11 && var1 <= 17) {
             return this.getTime(var1, false);
         } else {
-            throw new IOException("DER UTC Time length error");
+            throw new TIOException(TString.wrap("DER UTC Time length error"));
         }
     }
 
-    public Date getGeneralizedTime(int var1) throws IOException {
+    public Date getGeneralizedTime(int var1) throws TIOException {
         if(var1 > this.available()) {
-            throw new IOException("short read of DER Generalized Time");
+            throw new TIOException(TString.wrap("short read of DER Generalized Time"));
         } else if(var1 >= 13 && var1 <= 23) {
             return this.getTime(var1, true);
         } else {
-            throw new IOException("DER Generalized Time length error");
+            throw new TIOException(TString.wrap("DER Generalized Time length error"));
         }
     }
 
-    private Date getTime(int var1, boolean var2) throws IOException {
+    private Date getTime(int var1, boolean var2) throws TIOException {
         String var10 = null;
         int var3;
         if(var2) {
@@ -258,7 +258,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
                         var9 += Character.digit((char)this.buf[this.pos++], 10);
                         break;
                     default:
-                        throw new IOException("Parse " + var10 + " time, unsupported precision for seconds value");
+                        throw new TIOException(TString.wrap("Parse " + var10 + " time, unsupported precision for seconds value"));
                 }
 
                 var1 -= var11;
@@ -274,7 +274,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
             var18.setTimeOfDay(var6, var7, var8, var9);
             long var13 = var17.getTime(var18);
             if(var1 != 1 && var1 != 5) {
-                throw new IOException("Parse " + var10 + " time, invalid offset");
+                throw new TIOException(TString.wrap("Parse " + var10 + " time, invalid offset"));
             } else {
                 int var15;
                 int var16;
@@ -285,7 +285,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
                         var16 = 10 * Character.digit((char)this.buf[this.pos++], 10);
                         var16 += Character.digit((char)this.buf[this.pos++], 10);
                         if(var15 >= 24 || var16 >= 60) {
-                            throw new IOException("Parse " + var10 + " time, +hhmm");
+                            throw new TIOException(TString.wrap("Parse " + var10 + " time, +hhmm"));
                         }
 
                         var13 -= (long)((var15 * 60 + var16) * 60 * 1000);
@@ -296,20 +296,20 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
                         var16 = 10 * Character.digit((char)this.buf[this.pos++], 10);
                         var16 += Character.digit((char)this.buf[this.pos++], 10);
                         if(var15 >= 24 || var16 >= 60) {
-                            throw new IOException("Parse " + var10 + " time, -hhmm");
+                            throw new TIOException(TString.wrap("Parse " + var10 + " time, -hhmm"));
                         }
 
                         var13 += (long)((var15 * 60 + var16) * 60 * 1000);
                     case 90:
                         break;
                     default:
-                        throw new IOException("Parse " + var10 + " time, garbage offset");
+                        throw new TIOException(TString.wrap("Parse " + var10 + " time, garbage offset"));
                 }
 
                 return new Date(var13);
             }
         } else {
-            throw new IOException("Parse " + var10 + " time, invalid format");
+            throw new TIOException(TString.wrap("Parse " + var10 + " time, invalid format"));
         }
     }
 }
