@@ -20,10 +20,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.Arrays;
+
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
+
 import sun.misc.HexDumpEncoder;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.AlgorithmId;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -35,16 +37,16 @@ public class TKeyIdentifier {
         this.octetString = (byte[])var1.clone();
     }
 
-    public TKeyIdentifier(DerValue var1) throws IOException {
+    public TKeyIdentifier(TDerValue var1) throws IOException {
         this.octetString = var1.getOctetString();
     }
 
     public TKeyIdentifier(PublicKey var1) throws IOException {
-        DerValue var2 = new DerValue(var1.getEncoded());
+        TDerValue var2 = new TDerValue(var1.getEncoded());
         if(var2.tag != 48) {
             throw new IOException("PublicKey value is not a valid X.509 public key");
         } else {
-            AlgorithmId var3 = AlgorithmId.parse(var2.data.getDerValue());
+            TAlgorithmId var3 = TAlgorithmId.parse(var2.data.getDerValue());
             byte[] var4 = var2.data.getUnalignedBitString().toByteArray();
             MessageDigest var5 = null;
 
@@ -71,7 +73,7 @@ public class TKeyIdentifier {
         return var1;
     }
 
-    void encode(DerOutputStream var1) throws IOException {
+    void encode(TDerOutputStream var1) throws TIOException {
         var1.putOctetString(this.octetString);
     }
 
@@ -88,10 +90,10 @@ public class TKeyIdentifier {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.KeyIdentifier)) {
+        } else if(!(var1 instanceof TKeyIdentifier)) {
             return false;
         } else {
-            byte[] var2 = ((sun.security.x509.KeyIdentifier)var1).octetString;
+            byte[] var2 = ((TKeyIdentifier)var1).octetString;
             return Arrays.equals(this.octetString, var2);
         }
     }

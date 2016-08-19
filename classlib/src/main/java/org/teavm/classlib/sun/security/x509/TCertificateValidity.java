@@ -21,7 +21,12 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.Date;
 
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
 
 public class TCertificateValidity implements TCertAttrSet<String> {
     public static final String IDENT = "x509.info.validity";
@@ -40,14 +45,14 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         return new Date(this.notAfter.getTime());
     }
 
-    private void construct(DerValue var1) throws IOException {
+    private void construct(TDerValue var1) throws IOException {
         if(var1.tag != 48) {
             throw new IOException("Invalid encoded CertificateValidity, starting sequence tag missing.");
         } else if(var1.data.available() == 0) {
             throw new IOException("No data encoded for CertificateValidity");
         } else {
-            DerInputStream var2 = new DerInputStream(var1.toByteArray());
-            DerValue[] var3 = var2.getSequence(2);
+            TDerInputStream var2 = new TDerInputStream(var1.toByteArray());
+            TDerValue[] var3 = var2.getSequence(2);
             if(var3.length != 2) {
                 throw new IOException("Invalid encoding for CertificateValidity");
             } else {
@@ -83,8 +88,8 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         this.notAfter = var2;
     }
 
-    public TCertificateValidity(DerInputStream var1) throws IOException {
-        DerValue var2 = var1.getDerValue();
+    public TCertificateValidity(TDerInputStream var1) throws IOException {
+        TDerValue var2 = var1.getDerValue();
         this.construct(var2);
     }
 
@@ -94,7 +99,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
 
     public void encode(OutputStream var1) throws IOException {
         if(this.notBefore != null && this.notAfter != null) {
-            DerOutputStream var2 = new DerOutputStream();
+            TDerOutputStream var2 = new TDerOutputStream();
             if(this.notBefore.getTime() < 2524636800000L) {
                 var2.putUTCTime(this.notBefore);
             } else {
@@ -107,7 +112,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
                 var2.putGeneralizedTime(this.notAfter);
             }
 
-            DerOutputStream var3 = new DerOutputStream();
+            TDerOutputStream var3 = new TDerOutputStream();
             var3.write((byte) 48, var2);
             var1.write(var3.toByteArray());
         } else {
@@ -115,15 +120,15 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         }
     }
 
-    public void set(String var1, Object var2) throws IOException {
+    public void set(String var1, Object var2) throws TIOException {
         if(!(var2 instanceof Date)) {
-            throw new IOException("Attribute must be of type Date.");
+            throw new TIOException(TString.wrap("Attribute must be of type Date."));
         } else {
             if(var1.equalsIgnoreCase("notBefore")) {
                 this.notBefore = (Date)var2;
             } else {
                 if(!var1.equalsIgnoreCase("notAfter")) {
-                    throw new IOException("Attribute name not recognized by CertAttrSet: CertificateValidity.");
+                    throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateValidity."));
                 }
 
                 this.notAfter = (Date)var2;
@@ -132,22 +137,22 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         }
     }
 
-    public Date get(String var1) throws IOException {
+    public Date get(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("notBefore")) {
             return this.getNotBefore();
         } else if(var1.equalsIgnoreCase("notAfter")) {
             return this.getNotAfter();
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet: CertificateValidity.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateValidity."));
         }
     }
 
-    public void delete(String var1) throws IOException {
+    public void delete(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("notBefore")) {
             this.notBefore = null;
         } else {
             if(!var1.equalsIgnoreCase("notAfter")) {
-                throw new IOException("Attribute name not recognized by CertAttrSet: CertificateValidity.");
+                throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateValidity."));
             }
 
             this.notAfter = null;

@@ -264,9 +264,9 @@ public class TDerValue {
         }
     }
 
-    public TObjectIdentifier getOID() throws IOException {
+    public TObjectIdentifier getOID() throws TIOException {
         if(this.tag != 6) {
-            throw new IOException("DerValue.getOID, not an OID " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getOID, not an OID " + this.tag));
         } else {
             return new TObjectIdentifier(this.buffer);
         }

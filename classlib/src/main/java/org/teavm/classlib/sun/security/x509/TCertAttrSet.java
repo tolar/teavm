@@ -15,9 +15,9 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.cert.CertificateException;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.util.TEnumeration;
 
 /**
@@ -26,13 +26,13 @@ import org.teavm.classlib.java.util.TEnumeration;
 public interface TCertAttrSet<T> {
     String toString();
 
-    void encode(OutputStream var1) throws CertificateException, IOException;
+    void encode(TOutputStream var1) throws TCertificateException, TIOException;
 
-    void set(String var1, Object var2) throws CertificateException, IOException;
+    void set(String var1, Object var2) throws TCertificateException, TIOException;
 
-    Object get(String var1) throws CertificateException, IOException;
+    Object get(String var1) throws TCertificateException, TIOException;
 
-    void delete(String var1) throws CertificateException, IOException;
+    void delete(String var1) throws TCertificateException, TIOException;
 
     TEnumeration<T> getElements();
 

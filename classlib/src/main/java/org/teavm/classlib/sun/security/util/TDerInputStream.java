@@ -59,7 +59,7 @@ public class TDerInputStream {
         this.buffer.mark(2147483647);
     }
 
-    public TDerInputStream subStream(int var1, boolean var2) throws IOException {
+    public TDerInputStream subStream(int var1, boolean var2) throws TIOException {
         TDerInputBuffer var3 = this.buffer.dup();
         var3.truncate(var1);
         if(var2) {
@@ -158,34 +158,34 @@ public class TDerInputStream {
         return new TObjectIdentifier(this);
     }
 
-    public TDerValue[] getSequence(int var1) throws IOException {
+    public TDerValue[] getSequence(int var1) throws TIOException {
         this.tag = (byte)this.buffer.read();
         if(this.tag != 48) {
-            throw new IOException("Sequence tag error");
+            throw new TIOException(TString.wrap("Sequence tag error"));
         } else {
             return this.readVector(var1);
         }
     }
 
-    public TDerValue[] getSet(int var1) throws IOException {
+    public TDerValue[] getSet(int var1) throws TIOException {
         this.tag = (byte)this.buffer.read();
         if(this.tag != 49) {
-            throw new IOException("Set tag error");
+            throw new TIOException(TString.wrap("Set tag error"));
         } else {
             return this.readVector(var1);
         }
     }
 
-    public TDerValue[] getSet(int var1, boolean var2) throws IOException {
+    public TDerValue[] getSet(int var1, boolean var2) throws TIOException {
         this.tag = (byte)this.buffer.read();
         if(!var2 && this.tag != 49) {
-            throw new IOException("Set tag error");
+            throw new TIOException(TString.wrap("Set tag error"));
         } else {
             return this.readVector(var1);
         }
     }
 
-    protected TDerValue[] readVector(int var1) throws IOException {
+    protected TDerValue[] readVector(int var1) throws TIOException {
         byte var3 = (byte)this.buffer.read();
         int var4 = getLength(var3 & 255, this.buffer);
         if(var4 == -1) {
@@ -200,7 +200,7 @@ public class TDerInputStream {
             TDerIndefLenConverter var9 = new TDerIndefLenConverter();
             this.buffer = new TDerInputBuffer(var9.convert(var7));
             if(this.tag != this.buffer.read()) {
-                throw new IOException("Indefinite length encoding not supported");
+                throw new TIOException(TString.wrap("Indefinite length encoding not supported"));
             }
 
             var4 = getLength(this.buffer);
@@ -224,7 +224,7 @@ public class TDerInputStream {
             } while(var2.available() > 0);
 
             if(var2.available() != 0) {
-                throw new IOException("extra data at end of vector");
+                throw new TIOException(TString.wrap("extra data at end of vector"));
             } else {
                 int var13 = var10.size();
                 TDerValue[] var14 = new TDerValue[var13];

@@ -16,12 +16,13 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Enumeration;
 
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
 /**
@@ -45,7 +46,7 @@ public class TCertificateSerialNumber implements TCertAttrSet<String> {
         this.serial = new TSerialNumber(var1);
     }
 
-    public TCertificateSerialNumber(InputStream var1) throws IOException {
+    public TCertificateSerialNumber(TInputStream var1) throws IOException {
         this.serial = new TSerialNumber(var1);
     }
 
@@ -57,8 +58,8 @@ public class TCertificateSerialNumber implements TCertAttrSet<String> {
         return this.serial == null?"":this.serial.toString();
     }
 
-    public void encode(OutputStream var1) throws IOException {
-        DerOutputStream var2 = new DerOutputStream();
+    public void encode(TOutputStream var1) throws IOException {
+        TDerOutputStream var2 = new TDerOutputStream();
         this.serial.encode(var2);
         var1.write(var2.toByteArray());
     }
@@ -89,8 +90,8 @@ public class TCertificateSerialNumber implements TCertAttrSet<String> {
         }
     }
 
-    public Enumeration<String> getElements() {
-        AttributeNameEnumeration var1 = new AttributeNameEnumeration();
+    public TEnumeration<String> getElements() {
+        TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("number");
         return var1.elements();
     }

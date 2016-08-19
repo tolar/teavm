@@ -961,7 +961,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    private static Collection<List<?>> makeAltNames(GeneralNames var0) {
+    private static Collection<List<?>> makeAltNames(TGeneralNames var0) {
         if(var0.isEmpty()) {
             return Collections.emptySet();
         } else {
@@ -969,7 +969,7 @@ public class TX509CertImpl extends TX509Certificate {
 
             ArrayList var5;
             for(Iterator var2 = var0.names().iterator(); var2.hasNext(); var1.add(Collections.unmodifiableList(var5))) {
-                GeneralName var3 = (GeneralName)var2.next();
+                TGeneralName var3 = (TGeneralName)var2.next();
                 GeneralNameInterface var4 = var3.getName();
                 var5 = new ArrayList(2);
                 var5.add(Integer.valueOf(var4.getType()));
@@ -1056,7 +1056,7 @@ public class TX509CertImpl extends TX509Certificate {
             if(var1 == null) {
                 return null;
             } else {
-                GeneralNames var2;
+                TGeneralNames var2;
                 try {
                     var2 = var1.get("subject_name");
                 } catch (IOException var4) {
@@ -1079,7 +1079,7 @@ public class TX509CertImpl extends TX509Certificate {
                 byte[] var3 = var2.getOctetString();
                 SubjectAlternativeNameExtension var4 = new SubjectAlternativeNameExtension(Boolean.FALSE, var3);
 
-                GeneralNames var5;
+                TGeneralNames var5;
                 try {
                     var5 = var4.get("subject_name");
                 } catch (IOException var7) {
@@ -1101,7 +1101,7 @@ public class TX509CertImpl extends TX509Certificate {
             if(var1 == null) {
                 return null;
             } else {
-                GeneralNames var2;
+                TGeneralNames var2;
                 try {
                     var2 = var1.get("issuer_name");
                 } catch (IOException var4) {
@@ -1124,7 +1124,7 @@ public class TX509CertImpl extends TX509Certificate {
                 byte[] var3 = var2.getOctetString();
                 IssuerAlternativeNameExtension var4 = new IssuerAlternativeNameExtension(Boolean.FALSE, var3);
 
-                GeneralNames var5;
+                TGeneralNames var5;
                 try {
                     var5 = var4.get("issuer_name");
                 } catch (IOException var7) {

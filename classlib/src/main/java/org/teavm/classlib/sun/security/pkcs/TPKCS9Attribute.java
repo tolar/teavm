@@ -21,39 +21,35 @@ import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
+
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
-import sun.misc.HexDumpEncoder;
-import sun.security.pkcs.SignerInfo;
-import sun.security.pkcs.SigningCertificateInfo;
-import sun.security.util.Debug;
-import sun.security.util.DerEncoder;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.CertificateExtensions;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
+import org.teavm.classlib.sun.security.util.TObjectIdentifier;
+import org.teavm.classlib.sun.security.x509.TCertificateExtensions;
 
 /**
  * Created by vasek on 18. 8. 2016.
  */
 public class TPKCS9Attribute implements TDerEncoder {
-    private static final Debug debug = Debug.getInstance("jar");
-    static final ObjectIdentifier[] PKCS9_OIDS = new ObjectIdentifier[18];
+    static final TObjectIdentifier[] PKCS9_OIDS = new TObjectIdentifier[18];
     private static final Class<?> BYTE_ARRAY_CLASS;
-    public static final ObjectIdentifier EMAIL_ADDRESS_OID;
-    public static final ObjectIdentifier UNSTRUCTURED_NAME_OID;
-    public static final ObjectIdentifier CONTENT_TYPE_OID;
-    public static final ObjectIdentifier MESSAGE_DIGEST_OID;
-    public static final ObjectIdentifier SIGNING_TIME_OID;
-    public static final ObjectIdentifier COUNTERSIGNATURE_OID;
-    public static final ObjectIdentifier CHALLENGE_PASSWORD_OID;
-    public static final ObjectIdentifier UNSTRUCTURED_ADDRESS_OID;
-    public static final ObjectIdentifier EXTENDED_CERTIFICATE_ATTRIBUTES_OID;
-    public static final ObjectIdentifier ISSUER_SERIALNUMBER_OID;
-    public static final ObjectIdentifier EXTENSION_REQUEST_OID;
-    public static final ObjectIdentifier SMIME_CAPABILITY_OID;
-    public static final ObjectIdentifier SIGNING_CERTIFICATE_OID;
-    public static final ObjectIdentifier SIGNATURE_TIMESTAMP_TOKEN_OID;
+    public static final TObjectIdentifier EMAIL_ADDRESS_OID;
+    public static final TObjectIdentifier UNSTRUCTURED_NAME_OID;
+    public static final TObjectIdentifier CONTENT_TYPE_OID;
+    public static final TObjectIdentifier MESSAGE_DIGEST_OID;
+    public static final TObjectIdentifier SIGNING_TIME_OID;
+    public static final TObjectIdentifier COUNTERSIGNATURE_OID;
+    public static final TObjectIdentifier CHALLENGE_PASSWORD_OID;
+    public static final TObjectIdentifier UNSTRUCTURED_ADDRESS_OID;
+    public static final TObjectIdentifier EXTENDED_CERTIFICATE_ATTRIBUTES_OID;
+    public static final TObjectIdentifier ISSUER_SERIALNUMBER_OID;
+    public static final TObjectIdentifier EXTENSION_REQUEST_OID;
+    public static final TObjectIdentifier SMIME_CAPABILITY_OID;
+    public static final TObjectIdentifier SIGNING_CERTIFICATE_OID;
+    public static final TObjectIdentifier SIGNATURE_TIMESTAMP_TOKEN_OID;
     public static final String EMAIL_ADDRESS_STR = "EmailAddress";
     public static final String UNSTRUCTURED_NAME_STR = "UnstructuredName";
     public static final String CONTENT_TYPE_STR = "ContentType";
@@ -70,21 +66,21 @@ public class TPKCS9Attribute implements TDerEncoder {
     public static final String SMIME_CAPABILITY_STR = "SMIMECapability";
     public static final String SIGNING_CERTIFICATE_STR = "SigningCertificate";
     public static final String SIGNATURE_TIMESTAMP_TOKEN_STR = "SignatureTimestampToken";
-    private static final Hashtable<String, ObjectIdentifier> NAME_OID_TABLE;
-    private static final Hashtable<ObjectIdentifier, String> OID_NAME_TABLE;
+    private static final Hashtable<String, TObjectIdentifier> NAME_OID_TABLE;
+    private static final Hashtable<TObjectIdentifier, String> OID_NAME_TABLE;
     private static final Byte[][] PKCS9_VALUE_TAGS;
     private static final Class<?>[] VALUE_CLASSES;
     private static final boolean[] SINGLE_VALUED;
-    private ObjectIdentifier oid;
+    private TObjectIdentifier oid;
     private int index;
     private Object value;
 
-    public TPKCS9Attribute(ObjectIdentifier var1, Object var2) throws IllegalArgumentException {
+    public TPKCS9Attribute(TObjectIdentifier var1, Object var2) throws IllegalArgumentException {
         this.init(var1, var2);
     }
 
     public TPKCS9Attribute(String var1, Object var2) throws IllegalArgumentException {
-        ObjectIdentifier var3 = getOID(var1);
+        TObjectIdentifier var3 = getOID(var1);
         if(var3 == null) {
             throw new IllegalArgumentException("Unrecognized attribute name " + var1 + " constructing TPKCS9Attribute.");
         } else {
@@ -92,7 +88,7 @@ public class TPKCS9Attribute implements TDerEncoder {
         }
     }
 
-    private void init(ObjectIdentifier var1, Object var2) throws IllegalArgumentException {
+    private void init(TObjectIdentifier var1, Object var2) throws IllegalArgumentException {
         this.oid = var1;
         this.index = indexOf(var1, PKCS9_OIDS, 1);
         Class var3 = this.index == -1?BYTE_ARRAY_CLASS:VALUE_CLASSES[this.index];
@@ -103,22 +99,19 @@ public class TPKCS9Attribute implements TDerEncoder {
         }
     }
 
-    public TPKCS9Attribute(DerValue var1) throws IOException {
-        DerInputStream var2 = new DerInputStream(var1.toByteArray());
-        DerValue[] var3 = var2.getSequence(2);
+    public TPKCS9Attribute(TDerValue var1) throws TIOException {
+        TDerInputStream var2 = new TDerInputStream(var1.toByteArray());
+        TDerValue[] var3 = var2.getSequence(2);
         if(var2.available() != 0) {
-            throw new IOException("Excess data parsing TPKCS9Attribute");
+            throw new TIOException(TString.wrap("Excess data parsing TPKCS9Attribute"));
         } else if(var3.length != 2) {
-            throw new IOException("TPKCS9Attribute doesn\'t have two components");
+            throw new TIOException(TString.wrap("TPKCS9Attribute doesn\'t have two components"));
         } else {
             this.oid = var3[0].getOID();
             byte[] var4 = var3[1].toByteArray();
-            DerValue[] var5 = (new DerInputStream(var4)).getSet(1);
+            TDerValue[] var5 = (new TDerInputStream(var4)).getSet(1);
             this.index = indexOf(this.oid, PKCS9_OIDS, 1);
             if(this.index == -1) {
-                if(debug != null) {
-                    debug.println("Unsupported signer attribute: " + this.oid);
-                }
 
                 this.value = var4;
             } else {
@@ -153,7 +146,7 @@ public class TPKCS9Attribute implements TDerEncoder {
                         this.value = var5[0].getOctetString();
                         break;
                     case 5:
-                        this.value = (new DerInputStream(var5[0].toByteArray())).getUTCTime();
+                        this.value = (new TDerInputStream(var5[0].toByteArray())).getUTCTime();
                         break;
                     case 6:
                         SignerInfo[] var9 = new SignerInfo[var5.length];
@@ -177,7 +170,7 @@ public class TPKCS9Attribute implements TDerEncoder {
                     case 13:
                         throw new IOException("PKCS9 attribute #13 not supported.");
                     case 14:
-                        this.value = new CertificateExtensions(new DerInputStream(var5[0].toByteArray()));
+                        this.value = new TCertificateExtensions(new TDerInputStream(var5[0].toByteArray()));
                         break;
                     case 15:
                         throw new IOException("PKCS9 SMIMECapability attribute not supported.");
@@ -219,7 +212,7 @@ public class TPKCS9Attribute implements TDerEncoder {
                 break;
             case 3:
                 var3 = new DerOutputStream();
-                var3.putOID((ObjectIdentifier)this.value);
+                var3.putOID((TObjectIdentifier)this.value);
                 var2.write(49, var3.toByteArray());
                 break;
             case 4:
@@ -297,7 +290,7 @@ public class TPKCS9Attribute implements TDerEncoder {
         return this.index == -1 || SINGLE_VALUED[this.index];
     }
 
-    public ObjectIdentifier getOID() {
+    public TObjectIdentifier getOID() {
         return this.oid;
     }
 
@@ -305,11 +298,11 @@ public class TPKCS9Attribute implements TDerEncoder {
         return this.index == -1?this.oid.toString():(String)OID_NAME_TABLE.get(PKCS9_OIDS[this.index]);
     }
 
-    public static ObjectIdentifier getOID(String var0) {
-        return (ObjectIdentifier)NAME_OID_TABLE.get(var0.toLowerCase(Locale.ENGLISH));
+    public static TObjectIdentifier getOID(String var0) {
+        return (TObjectIdentifier)NAME_OID_TABLE.get(var0.toLowerCase(Locale.ENGLISH));
     }
 
-    public static String getName(ObjectIdentifier var0) {
+    public static String getName(TObjectIdentifier var0) {
         return (String)OID_NAME_TABLE.get(var0);
     }
 
@@ -388,11 +381,11 @@ public class TPKCS9Attribute implements TDerEncoder {
 
     static {
         for(int var0 = 1; var0 < PKCS9_OIDS.length - 2; ++var0) {
-            PKCS9_OIDS[var0] = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 9, var0});
+            PKCS9_OIDS[var0] = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 9, var0});
         }
 
-        PKCS9_OIDS[PKCS9_OIDS.length - 2] = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 9, 16, 2, 12});
-        PKCS9_OIDS[PKCS9_OIDS.length - 1] = ObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 9, 16, 2, 14});
+        PKCS9_OIDS[PKCS9_OIDS.length - 2] = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 9, 16, 2, 12});
+        PKCS9_OIDS[PKCS9_OIDS.length - 1] = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 1, 9, 16, 2, 14});
 
         try {
             BYTE_ARRAY_CLASS = Class.forName("[B");

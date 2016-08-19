@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.math.TBigInteger;
 
 public final class TObjectIdentifier implements Serializable {
     private byte[] encoding = null;
@@ -58,7 +59,7 @@ public final class TObjectIdentifier implements Serializable {
         var1.defaultWriteObject();
     }
 
-    public TObjectIdentifier(String var1) throws TIOException {
+    public TObjectIdentifier(TString var1) throws TIOException {
         byte var2 = 46;
         int var3 = 0;
         boolean var4 = false;
@@ -68,7 +69,7 @@ public final class TObjectIdentifier implements Serializable {
         int var9 = 0;
 
         try {
-            String var10 = null;
+            TString var10 = null;
 
             int var15;
             do {
@@ -84,14 +85,14 @@ public final class TObjectIdentifier implements Serializable {
                 }
 
                 if(var16 > 9) {
-                    BigInteger var12 = new BigInteger(var10);
+                    TBigInteger var12 = new TBigInteger(var10);
                     if(var9 == 0) {
                         checkFirstComponent(var12);
                         var7 = var12.intValue();
                     } else {
                         if(var9 == 1) {
                             checkSecondComponent(var7, var12);
-                            var12 = var12.add(BigInteger.valueOf((long)(40 * var7)));
+                            var12 = var12.add(TBigInteger.valueOf((long)(40 * var7)));
                         } else {
                             checkOtherComponent(var9, var12);
                         }
@@ -153,7 +154,7 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    TObjectIdentifier(TDerInputBuffer var1) throws IOException {
+    TObjectIdentifier(TDerInputBuffer var1) throws TIOException {
         TDerInputStream var2 = new TDerInputStream(var1);
         this.encoding = new byte[var2.available()];
         var2.getBytes(this.encoding);
@@ -421,8 +422,8 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    private static void checkFirstComponent(BigInteger var0) throws TIOException {
-        if(var0.signum() == -1 || var0.compareTo(BigInteger.valueOf(2L)) == 1) {
+    private static void checkFirstComponent(TBigInteger var0) throws TIOException {
+        if(var0.signum() == -1 || var0.compareTo(TBigInteger.valueOf(2L)) == 1) {
             throw new TIOException(TString.wrap("ObjectIdentifier() -- First oid component is invalid "));
         }
     }

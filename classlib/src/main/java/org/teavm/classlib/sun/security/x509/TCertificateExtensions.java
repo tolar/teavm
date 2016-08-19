@@ -21,14 +21,17 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.cert.CertificateException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TCollection;
 import org.teavm.classlib.java.util.TCollections;
 import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.java.util.TTreeMap;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -82,7 +85,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
             Throwable var3 = var6.getTargetException();
             if(!var1.isCritical()) {
                 if(this.unparseableExtensions == null) {
-                    this.unparseableExtensions = new TreeMap();
+                    this.unparseableExtensions = new TTreeMap();
                 }
 
                 this.unparseableExtensions.put(var1.getExtensionId().toString(), new UnparseableExtension(var1, var3));
@@ -105,7 +108,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
 
     public void encode(OutputStream var1, boolean var2) throws CertificateException, IOException {
         TDerOutputStream var3 = new TDerOutputStream();
-        Collection var4 = this.map.values();
+        TCollection var4 = this.map.values();
         Object[] var5 = var4.toArray();
 
         for(int var6 = 0; var6 < var5.length; ++var6) {
@@ -121,11 +124,11 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         }
 
         TDerOutputStream var8 = new TDerOutputStream();
-        var8.write(48, var3);
+        var8.write((byte) 48, var3);
         TDerOutputStream var7;
         if(!var2) {
             var7 = new TDerOutputStream();
-            var7.write(TDerValue.createTag(-128, true, 3), var8);
+            var7.write(TDerValue.createTag((byte)-128, true, (byte) 3), var8);
         } else {
             var7 = var8;
         }
@@ -133,18 +136,18 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         var1.write(var7.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws IOException {
+    public void set(String var1, Object var2) throws TIOException {
         if(var2 instanceof TExtension) {
             this.map.put(var1, (TExtension)var2);
         } else {
-            throw new IOException("Unknown extension type.");
+            throw new TIOException(TString.wrap("Unknown extension type."));
         }
     }
 
-    public TExtension get(String var1) throws IOException {
+    public TExtension get(String var1) throws TIOException {
         TExtension var2 = (TExtension)this.map.get(var1);
         if(var2 == null) {
-            throw new IOException("No extension found with name " + var1);
+            throw new TIOException(TString.wrap("No extension found with name " + var1));
         } else {
             return var2;
         }
@@ -154,17 +157,17 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         return (TExtension)this.map.get(var1);
     }
 
-    public void delete(String var1) throws IOException {
+    public void delete(String var1) throws TIOException {
         Object var2 = this.map.get(var1);
         if(var2 == null) {
-            throw new IOException("No extension found with name " + var1);
+            throw new TIOException(TString.wrap("No extension found with name " + var1));
         } else {
             this.map.remove(var1);
         }
     }
 
     public String getNameByOid(TObjectIdentifier var1) throws IOException {
-        Iterator var2 = this.map.keySet().iterator();
+        TIterator var2 = this.map.keySet().iterator();
 
         String var3;
         do {
@@ -182,12 +185,12 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
         return TCollections.enumeration(this.map.values());
     }
 
-    public Collection<TExtension> getAllExtensions() {
+    public TCollection<TExtension> getAllExtensions() {
         return this.map.values();
     }
 
     public Map<String, TExtension> getUnparseableExtensions() {
-        return this.unparseableExtensions == null?Collections.emptyMap():this.unparseableExtensions;
+        return this.unparseableExtensions == null?TCollections.emptyMap():this.unparseableExtensions;
     }
 
     public String getName() {
@@ -213,16 +216,16 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
                 String var7 = null;
 
                 for(int var8 = 0; var8 < var4; ++var8) {
-                    if(var3[var8] instanceof CertAttrSet) {
-                        var7 = ((CertAttrSet)var3[var8]).getName();
+                    if(var3[var8] instanceof TCertAttrSet) {
+                        var7 = ((TCertAttrSet)var3[var8]).getName();
                     }
 
-                    Extension var5 = (Extension)var3[var8];
+                    TExtension var5 = (TExtension)var3[var8];
                     if(var7 == null) {
                         var7 = var5.getExtensionId().toString();
                     }
 
-                    Extension var6 = (Extension)this.map.get(var7);
+                    TExtension var6 = (TExtension)this.map.get(var7);
                     if(var6 == null) {
                         return false;
                     }

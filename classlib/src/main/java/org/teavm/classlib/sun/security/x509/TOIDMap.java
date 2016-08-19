@@ -15,16 +15,16 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TClassNotFoundException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
-import sun.security.util.ObjectIdentifier;
 
 public class TOIDMap {
     private static final String ROOT = "x509.info.extensions";
@@ -59,13 +59,13 @@ public class TOIDMap {
     private TOIDMap() {
     }
 
-    private static void addInternal(String var0, TObjectIdentifier var1, String var2) {
+    private static void addInternal(TString var0, TObjectIdentifier var1, TString var2) {
         TOIDMap.OIDInfo var3 = new TOIDMap.OIDInfo(var0, var1, var2);
         oidMap.put(var1, var3);
         nameMap.put(var0, var3);
     }
 
-    public static void addAttribute(String var0, String var1, Class<?> var2) throws TCertificateException {
+    public static void addAttribute(TString var0, TString var1, Class<?> var2) throws TCertificateException {
         TObjectIdentifier var3;
         try {
             var3 = new TObjectIdentifier(var1);
@@ -91,12 +91,12 @@ public class TOIDMap {
         return var1 == null?null:var1.oid;
     }
 
-    public static Class<?> getClass(String var0) throws CertificateException {
+    public static Class<?> getClass(String var0) throws TCertificateException {
         TOIDMap.OIDInfo var1 = (TOIDMap.OIDInfo)nameMap.get(var0);
         return var1 == null?null:var1.getClazz();
     }
 
-    public static Class<?> getClass(TObjectIdentifier var0) throws CertificateException {
+    public static Class<?> getClass(TObjectIdentifier var0) throws TCertificateException {
         TOIDMap.OIDInfo var1 = (TOIDMap.OIDInfo)oidMap.get(var0);
         return var1 == null?null:var1.getClazz();
     }
@@ -130,34 +130,34 @@ public class TOIDMap {
 
     private static class OIDInfo {
         final TObjectIdentifier oid;
-        final String name;
-        final String className;
-        private volatile Class<?> clazz;
+        final TString name;
+        final TString className;
+        private volatile TClass<?> clazz;
 
-        OIDInfo(String var1, TObjectIdentifier var2, String var3) {
+        OIDInfo(TString var1, TObjectIdentifier var2, TString var3) {
             this.name = var1;
             this.oid = var2;
             this.className = var3;
         }
 
-        OIDInfo(String var1, TObjectIdentifier var2, Class<?> var3) {
+        OIDInfo(TString var1, TObjectIdentifier var2, TClass<?> var3) {
             this.name = var1;
             this.oid = var2;
             this.className = var3.getName();
             this.clazz = var3;
         }
 
-        Class<?> getClazz() throws CertificateException {
+        TClass<?> getClazz() throws TCertificateException {
             try {
-                Class var1 = this.clazz;
+                TClass var1 = this.clazz;
                 if(var1 == null) {
-                    var1 = Class.forName(this.className);
+                    var1 = TClass.forName(this.className);
                     this.clazz = var1;
                 }
 
                 return var1;
-            } catch (ClassNotFoundException var2) {
-                throw new CertificateException("Could not load class: " + var2, var2);
+            } catch (TClassNotFoundException var2) {
+                throw new TCertificateException(TString.wrap("Could not load class: " + var2), var2);
             }
         }
     }

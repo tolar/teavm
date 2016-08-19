@@ -18,6 +18,9 @@ package org.teavm.classlib.java.math;
 import java.io.Serializable;
 import java.util.Random;
 
+import org.teavm.classlib.java.lang.TInteger;
+import org.teavm.classlib.java.lang.TString;
+
 /**
  * This class represents immutable integer numbers of arbitrary length. Large
  * numbers are typically used in security applications and therefore BigIntegers
@@ -172,7 +175,7 @@ public class TBigInteger extends Number implements Comparable<TBigInteger>, Seri
      *             if {@code val} is not a valid representation of a
      *             {@code BigInteger}.
      */
-    public TBigInteger(String val) {
+    public TBigInteger(TString val) {
         this(val, 10);
     }
 
@@ -194,7 +197,7 @@ public class TBigInteger extends Number implements Comparable<TBigInteger>, Seri
      *             {@code BigInteger} or if {@code radix < Character.MIN_RADIX}
      *             or {@code radix > Character.MAX_RADIX}.
      */
-    public TBigInteger(String val, int radix) {
+    public TBigInteger(TString val, int radix) {
         if (val == null) {
             throw new NullPointerException();
         }
@@ -439,8 +442,7 @@ public class TBigInteger extends Number implements Comparable<TBigInteger>, Seri
         return bytes;
     }
 
-    /** @see TBigInteger#TBigInteger(String, int) */
-    private static void setFromString(TBigInteger bi, String val, int radix) {
+    private static void setFromString(TBigInteger bi, TString val, int radix) {
         int sign;
         int[] digits;
         int numberLength;
@@ -481,7 +483,7 @@ public class TBigInteger extends Number implements Comparable<TBigInteger>, Seri
 
         for (int substrStart = startChar; substrStart < endChar; substrStart = substrEnd, substrEnd = substrStart
                 + charsPerInt) {
-            int bigRadixDigit = Integer.parseInt(val.substring(substrStart, substrEnd), radix);
+            int bigRadixDigit = TInteger.parseInt(val.substring(substrStart, substrEnd), radix);
             newDigit = TMultiplication.multiplyByInt(digits, digitIndex, bigRadix);
             newDigit += TElementary.inplaceAdd(digits, digitIndex, bigRadixDigit);
             digits[digitIndex++] = newDigit;

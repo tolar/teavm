@@ -17,8 +17,9 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Enumeration;
+
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -83,7 +84,7 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         return "Version: V" + (this.version + 1);
     }
 
-    public void encode(OutputStream var1) throws IOException {
+    public void encode(TOutputStream var1) throws IOException {
         if(this.version != 0) {
             TDerOutputStream var2 = new TDerOutputStream();
             var2.putInteger(this.version);

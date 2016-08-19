@@ -17,20 +17,20 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.AttributeNameEnumeration;
-import sun.security.x509.Extension;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.KeyIdentifier;
+
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
+
 import sun.security.x509.PKIXExtensions;
 import sun.security.x509.SerialNumber;
 
 /**
  * Created by vasek on 18. 8. 2016.
  */
-public class TAuthorityKeyIdentifierExtension extends Extension implements TCertAttrSet<String> {
+public class TAuthorityKeyIdentifierExtension extends TExtension implements TCertAttrSet<String> {
     public static final String IDENT = "x509.info.extensions.AuthorityKeyIdentifier";
     public static final String NAME = "AuthorityKeyIdentifier";
     public static final String KEY_ID = "key_id";
@@ -39,37 +39,37 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
     private static final byte TAG_ID = 0;
     private static final byte TAG_NAMES = 1;
     private static final byte TAG_SERIAL_NUM = 2;
-    private KeyIdentifier id = null;
-    private GeneralNames names = null;
-    private SerialNumber serialNum = null;
+    private TKeyIdentifier id = null;
+    private TGeneralNames names = null;
+    private TSerialNumber serialNum = null;
 
-    private void encodeThis() throws IOException {
+    private void encodeThis() throws TIOException {
         if(this.id == null && this.names == null && this.serialNum == null) {
             this.extensionValue = null;
         } else {
-            DerOutputStream var1 = new DerOutputStream();
-            DerOutputStream var2 = new DerOutputStream();
-            DerOutputStream var3;
+            TDerOutputStream var1 = new TDerOutputStream();
+            TDerOutputStream var2 = new TDerOutputStream();
+            TDerOutputStream var3;
             if(this.id != null) {
-                var3 = new DerOutputStream();
+                var3 = new TDerOutputStream();
                 this.id.encode(var3);
-                var2.writeImplicit(DerValue.createTag(-128, false, 0), var3);
+                var2.writeImplicit(TDerValue.createTag((byte)-128, false, (byte)0), var3);
             }
 
             try {
                 if(this.names != null) {
-                    var3 = new DerOutputStream();
+                    var3 = new TDerOutputStream();
                     this.names.encode(var3);
-                    var2.writeImplicit(DerValue.createTag(-128, true, 1), var3);
+                    var2.writeImplicit(TDerValue.createTag(-128, true, 1), var3);
                 }
             } catch (Exception var4) {
                 throw new IOException(var4.toString());
             }
 
             if(this.serialNum != null) {
-                var3 = new DerOutputStream();
+                var3 = new TDerOutputStream();
                 this.serialNum.encode(var3);
-                var2.writeImplicit(DerValue.createTag(-128, false, 2), var3);
+                var2.writeImplicit(TDerValue.createTag(-128, false, 2), var3);
             }
 
             var1.write(48, var2);
@@ -77,7 +77,7 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
         }
     }
 
-    public TAuthorityKeyIdentifierExtension(KeyIdentifier var1, GeneralNames var2, SerialNumber var3) throws IOException {
+    public TAuthorityKeyIdentifierExtension(KeyIdentifier var1, TGeneralNames var2, SerialNumber var3) throws IOException {
         this.id = var1;
         this.names = var2;
         this.serialNum = var3;
@@ -87,23 +87,23 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
     }
 
     public TAuthorityKeyIdentifierExtension(Boolean var1, Object var2) throws IOException {
-        this.extensionId = PKIXExtensions.AuthorityKey_Id;
+        this.extensionId = TPKIXExtensions.AuthorityKey_Id;
         this.critical = var1.booleanValue();
         this.extensionValue = (byte[])((byte[])var2);
-        DerValue var3 = new DerValue(this.extensionValue);
+        TDerValue var3 = new TDerValue(this.extensionValue);
         if(var3.tag != 48) {
             throw new IOException("Invalid encoding for TAuthorityKeyIdentifierExtension.");
         } else {
             while(true) {
                 if(var3.data != null && var3.data.available() != 0) {
-                    DerValue var4 = var3.data.getDerValue();
+                    TDerValue var4 = var3.data.getDerValue();
                     if(var4.isContextSpecific(0) && !var4.isConstructed()) {
                         if(this.id != null) {
                             throw new IOException("Duplicate KeyIdentifier in AuthorityKeyIdentifier.");
                         }
 
-                        var4.resetTag(4);
-                        this.id = new KeyIdentifier(var4);
+                        var4.resetTag((byte)4);
+                        this.id = new TKeyIdentifier(var4);
                         continue;
                     }
 
@@ -112,18 +112,18 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
                             throw new IOException("Duplicate GeneralNames in AuthorityKeyIdentifier.");
                         }
 
-                        var4.resetTag(48);
-                        this.names = new GeneralNames(var4);
+                        var4.resetTag((byte)48);
+                        this.names = new TGeneralNames(var4);
                         continue;
                     }
 
-                    if(var4.isContextSpecific(2) && !var4.isConstructed()) {
+                    if(var4.isContextSpecific((byte)2) && !var4.isConstructed()) {
                         if(this.serialNum != null) {
                             throw new IOException("Duplicate SerialNumber in AuthorityKeyIdentifier.");
                         }
 
-                        var4.resetTag(2);
-                        this.serialNum = new SerialNumber(var4);
+                        var4.resetTag((byte)2);
+                        this.serialNum = new TSerialNumber(var4);
                         continue;
                     }
 
@@ -153,9 +153,9 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
     }
 
     public void encode(OutputStream var1) throws IOException {
-        DerOutputStream var2 = new DerOutputStream();
+        TDerOutputStream var2 = new TDerOutputStream();
         if(this.extensionValue == null) {
-            this.extensionId = PKIXExtensions.AuthorityKey_Id;
+            this.extensionId = TPKIXExtensions.AuthorityKey_Id;
             this.critical = false;
             this.encodeThis();
         }
@@ -164,29 +164,29 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws IOException {
+    public void set(String var1, Object var2) throws TIOException {
         if(var1.equalsIgnoreCase("key_id")) {
-            if(!(var2 instanceof KeyIdentifier)) {
-                throw new IOException("Attribute value should be of type KeyIdentifier.");
+            if(!(var2 instanceof TKeyIdentifier)) {
+                throw new TIOException(TString.wrap("Attribute value should be of type KeyIdentifier."));
             }
 
-            this.id = (KeyIdentifier)var2;
+            this.id = (TKeyIdentifier)var2;
         } else if(var1.equalsIgnoreCase("auth_name")) {
-            if(!(var2 instanceof GeneralNames)) {
-                throw new IOException("Attribute value should be of type GeneralNames.");
+            if(!(var2 instanceof TGeneralNames)) {
+                throw new TIOException(TString.wrap("Attribute value should be of type GeneralNames."));
             }
 
-            this.names = (GeneralNames)var2;
+            this.names = (TGeneralNames)var2;
         } else {
             if(!var1.equalsIgnoreCase("serial_number")) {
-                throw new IOException("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier.");
+                throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier."));
             }
 
-            if(!(var2 instanceof SerialNumber)) {
-                throw new IOException("Attribute value should be of type SerialNumber.");
+            if(!(var2 instanceof TSerialNumber)) {
+                throw new TIOException(TString.wrap("Attribute value should be of type SerialNumber."));
             }
 
-            this.serialNum = (SerialNumber)var2;
+            this.serialNum = (TSerialNumber)var2;
         }
 
         this.encodeThis();
@@ -204,14 +204,14 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
         }
     }
 
-    public void delete(String var1) throws IOException {
+    public void delete(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("key_id")) {
             this.id = null;
         } else if(var1.equalsIgnoreCase("auth_name")) {
             this.names = null;
         } else {
             if(!var1.equalsIgnoreCase("serial_number")) {
-                throw new IOException("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier.");
+                throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier."));
             }
 
             this.serialNum = null;
@@ -220,8 +220,8 @@ public class TAuthorityKeyIdentifierExtension extends Extension implements TCert
         this.encodeThis();
     }
 
-    public Enumeration<String> getElements() {
-        AttributeNameEnumeration var1 = new AttributeNameEnumeration();
+    public TEnumeration<String> getElements() {
+        TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("key_id");
         var1.addElement("auth_name");
         var1.addElement("serial_number");

@@ -526,7 +526,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
 
             SubjectAlternativeNameExtension var3 = null;
             Object var4 = null;
-            GeneralNames var5 = null;
+            TGeneralNames var5 = null;
 
             try {
                 var3 = (SubjectAlternativeNameExtension)var2.get("SubjectAlternativeName");
@@ -546,8 +546,8 @@ public class TX509CertInfo implements TCertAttrSet<String> {
 
     }
 
-    private void emit(DerOutputStream var1) throws CertificateException, IOException {
-        DerOutputStream var2 = new DerOutputStream();
+    private void emit(TDerOutputStream var1) throws CertificateException, IOException {
+        TDerOutputStream var2 = new TDerOutputStream();
         this.version.encode(var2);
         this.serialNum.encode(var2);
         this.algId.encode(var2);

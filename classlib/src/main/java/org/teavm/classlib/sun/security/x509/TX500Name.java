@@ -182,7 +182,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return this.names.length;
     }
 
-    public List<AVA> allAvas() {
+    public List<TAVA> allAvas() {
         List var1 = this.allAvaList;
         if(var1 == null) {
             ArrayList var3 = new ArrayList();
@@ -224,7 +224,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         } else if(!(var1 instanceof sun.security.x509.X500Name)) {
             return false;
         } else {
-            sun.security.x509.X500Name var2 = (sun.security.x509.X500Name)var1;
+            TX500Name var2 = (TX500Name)var1;
             if(this.canonicalDn != null && var2.canonicalDn != null) {
                 return this.canonicalDn.equals(var2.canonicalDn);
             } else {
@@ -416,7 +416,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return this.toString();
     }
 
-    private TDerValue findAttribute(ObjectIdentifier var1) {
+    private TDerValue findAttribute(TObjectIdentifier var1) {
         if(this.names != null) {
             for(int var2 = 0; var2 < this.names.length; ++var2) {
                 TDerValue var3 = this.names[var2].findAttribute(var1);
@@ -429,7 +429,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return null;
     }
 
-    public TDerValue findMostSpecificAttribute(ObjectIdentifier var1) {
+    public TDerValue findMostSpecificAttribute(TObjectIdentifier var1) {
         if(this.names != null) {
             for(int var2 = this.names.length - 1; var2 >= 0; --var2) {
                 TDerValue var3 = this.names[var2].findAttribute(var1);

@@ -23,6 +23,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TArrays;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -117,9 +120,9 @@ public class TRDN {
         }
     }
 
-    TRDN(TDerValue var1) throws IOException {
+    TRDN(TDerValue var1) throws TIOException {
         if(var1.tag != 49) {
-            throw new IOException("X500 TRDN");
+            throw new TIOException(TString.wrap("X500 TRDN"));
         } else {
             TDerInputStream var2 = new TDerInputStream(var1.toByteArray());
             TDerValue[] var3 = var2.getSet(5);
