@@ -26,15 +26,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.security.auth.x500.X500Principal;
+
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.security.TPrincipal;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
-import sun.security.util.DerInputStream;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.AVA;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -48,8 +48,8 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     private X500Principal x500Principal;
     private byte[] encoded;
     private volatile List<TRDN> rdnList;
-    private volatile List<AVA> allAvaList;
-    private static final Map<ObjectIdentifier, ObjectIdentifier> internedOIDs = new HashMap();
+    private volatile List<TAVA> allAvaList;
+    private static final Map<TObjectIdentifier, TObjectIdentifier> internedOIDs = new HashMap();
     private static final int[] commonName_data = new int[]{2, 5, 4, 3};
     private static final int[] SURNAME_DATA = new int[]{2, 5, 4, 4};
     private static final int[] SERIALNUMBER_DATA = new int[]{2, 5, 4, 5};
@@ -127,17 +127,17 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     public TX500Name(String var1, String var2, String var3, String var4, String var5, String var6) throws IOException {
         this.names = new TRDN[6];
         this.names[5] = new TRDN(1);
-        this.names[5].assertion[0] = new AVA(commonName_oid, new DerValue(var1));
+        this.names[5].assertion[0] = new TAVA(commonName_oid, new TDerValue(var1));
         this.names[4] = new TRDN(1);
-        this.names[4].assertion[0] = new AVA(orgUnitName_oid, new DerValue(var2));
+        this.names[4].assertion[0] = new TAVA(orgUnitName_oid, new TDerValue(var2));
         this.names[3] = new TRDN(1);
-        this.names[3].assertion[0] = new AVA(orgName_oid, new DerValue(var3));
+        this.names[3].assertion[0] = new TAVA(orgName_oid, new TDerValue(var3));
         this.names[2] = new TRDN(1);
-        this.names[2].assertion[0] = new AVA(localityName_oid, new DerValue(var4));
+        this.names[2].assertion[0] = new TAVA(localityName_oid, new TDerValue(var4));
         this.names[1] = new TRDN(1);
-        this.names[1].assertion[0] = new AVA(stateName_oid, new DerValue(var5));
+        this.names[1].assertion[0] = new TAVA(stateName_oid, new TDerValue(var5));
         this.names[0] = new TRDN(1);
-        this.names[0].assertion[0] = new AVA(countryName_oid, new DerValue(var6));
+        this.names[0].assertion[0] = new TAVA(countryName_oid, new TDerValue(var6));
     }
 
     public TX500Name(TRDN[] var1) throws IOException {
@@ -155,16 +155,16 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
 
     }
 
-    public TX500Name(TDerValue var1) throws IOException {
+    public TX500Name(TDerValue var1) throws TIOException {
         this(var1.toDerInputStream());
     }
 
-    public TX500Name(DerInputStream var1) throws IOException {
+    public TX500Name(TDerInputStream var1) throws TIOException {
         this.parseDER(var1);
     }
 
     public TX500Name(byte[] var1) throws IOException {
-        DerInputStream var2 = new DerInputStream(var1);
+        TDerInputStream var2 = new TDerInputStream(var1);
         this.parseDER(var2);
     }
 
@@ -442,7 +442,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return null;
     }
 
-    private void parseDER(TDerInputStream var1) throws IOException {
+    private void parseDER(TDerInputStream var1) throws TIOException {
         TDerValue[] var2 = null;
         byte[] var3 = var1.toByteArray();
 
@@ -454,7 +454,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
             } else {
                 TDerValue var5 = new TDerValue((byte)48, var3);
                 var3 = var5.toByteArray();
-                var2 = (new DerInputStream(var3)).getSequence(5);
+                var2 = (new TDerInputStream(var3)).getSequence(5);
             }
         }
 
@@ -483,7 +483,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
             this.names[var3].encode(var2);
         }
 
-        var1.write(48, var2);
+        var1.write((byte) 48, var2);
     }
 
     public byte[] getEncodedInternal() throws IOException {
@@ -650,8 +650,8 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         }
     }
 
-    static ObjectIdentifier intern(ObjectIdentifier var0) {
-        ObjectIdentifier var1 = (ObjectIdentifier)internedOIDs.putIfAbsent(var0, var0);
+    static TObjectIdentifier intern(TObjectIdentifier var0) {
+        TObjectIdentifier var1 = (TObjectIdentifier)internedOIDs.putIfAbsent(var0, var0);
         return var1 == null?var0:var1;
     }
 
@@ -770,23 +770,23 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     }
 
     static {
-        commonName_oid = intern(ObjectIdentifier.newInternal(commonName_data));
-        SERIALNUMBER_OID = intern(ObjectIdentifier.newInternal(SERIALNUMBER_DATA));
-        countryName_oid = intern(ObjectIdentifier.newInternal(countryName_data));
-        localityName_oid = intern(ObjectIdentifier.newInternal(localityName_data));
-        orgName_oid = intern(ObjectIdentifier.newInternal(orgName_data));
-        orgUnitName_oid = intern(ObjectIdentifier.newInternal(orgUnitName_data));
-        stateName_oid = intern(ObjectIdentifier.newInternal(stateName_data));
-        streetAddress_oid = intern(ObjectIdentifier.newInternal(streetAddress_data));
-        title_oid = intern(ObjectIdentifier.newInternal(title_data));
-        DNQUALIFIER_OID = intern(ObjectIdentifier.newInternal(DNQUALIFIER_DATA));
-        SURNAME_OID = intern(ObjectIdentifier.newInternal(SURNAME_DATA));
-        GIVENNAME_OID = intern(ObjectIdentifier.newInternal(GIVENNAME_DATA));
-        INITIALS_OID = intern(ObjectIdentifier.newInternal(INITIALS_DATA));
-        GENERATIONQUALIFIER_OID = intern(ObjectIdentifier.newInternal(GENERATIONQUALIFIER_DATA));
-        ipAddress_oid = intern(ObjectIdentifier.newInternal(ipAddress_data));
-        DOMAIN_COMPONENT_OID = intern(ObjectIdentifier.newInternal(DOMAIN_COMPONENT_DATA));
-        userid_oid = intern(ObjectIdentifier.newInternal(userid_data));
+        commonName_oid = intern(TObjectIdentifier.newInternal(commonName_data));
+        SERIALNUMBER_OID = intern(TObjectIdentifier.newInternal(SERIALNUMBER_DATA));
+        countryName_oid = intern(TObjectIdentifier.newInternal(countryName_data));
+        localityName_oid = intern(TObjectIdentifier.newInternal(localityName_data));
+        orgName_oid = intern(TObjectIdentifier.newInternal(orgName_data));
+        orgUnitName_oid = intern(TObjectIdentifier.newInternal(orgUnitName_data));
+        stateName_oid = intern(TObjectIdentifier.newInternal(stateName_data));
+        streetAddress_oid = intern(TObjectIdentifier.newInternal(streetAddress_data));
+        title_oid = intern(TObjectIdentifier.newInternal(title_data));
+        DNQUALIFIER_OID = intern(TObjectIdentifier.newInternal(DNQUALIFIER_DATA));
+        SURNAME_OID = intern(TObjectIdentifier.newInternal(SURNAME_DATA));
+        GIVENNAME_OID = intern(TObjectIdentifier.newInternal(GIVENNAME_DATA));
+        INITIALS_OID = intern(TObjectIdentifier.newInternal(INITIALS_DATA));
+        GENERATIONQUALIFIER_OID = intern(TObjectIdentifier.newInternal(GENERATIONQUALIFIER_DATA));
+        ipAddress_oid = intern(TObjectIdentifier.newInternal(ipAddress_data));
+        DOMAIN_COMPONENT_OID = intern(TObjectIdentifier.newInternal(DOMAIN_COMPONENT_DATA));
+        userid_oid = intern(TObjectIdentifier.newInternal(userid_data));
         PrivilegedExceptionAction var0 = new PrivilegedExceptionAction() {
             public Object[] run() throws Exception {
                 Class var1 = X500Principal.class;

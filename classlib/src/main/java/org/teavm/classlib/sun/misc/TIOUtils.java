@@ -15,16 +15,18 @@
  */
 package org.teavm.classlib.sun.misc;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
+
+import org.teavm.classlib.java.io.TEOFException;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.lang.TString;
 
 public class TIOUtils {
     public TIOUtils() {
     }
 
-    public static byte[] readFully(InputStream var0, int var1, boolean var2) throws IOException {
+    public static byte[] readFully(TInputStream var0, int var1, boolean var2) throws TIOException {
         byte[] var3 = new byte[0];
         if(var1 == -1) {
             var1 = 2147483647;
@@ -45,7 +47,7 @@ public class TIOUtils {
             var6 = var0.read(var3, var4, var5);
             if(var6 < 0) {
                 if(var2 && var1 != 2147483647) {
-                    throw new EOFException("Detect premature EOF");
+                    throw new TEOFException(TString.wrap("Detect premature EOF"));
                 }
 
                 if(var3.length != var4) {

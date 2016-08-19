@@ -15,8 +15,6 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
@@ -25,7 +23,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TAlgorithmParameters;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
@@ -33,9 +33,6 @@ import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
 
 public class TAlgorithmId {
 
@@ -177,6 +174,10 @@ public class TAlgorithmId {
 
     }
 
+    public TAlgorithmId(TObjectIdentifier var1) {
+        this.algid = var1;
+    }
+
     protected void decodeParams() throws TIOException {
         String var1 = this.algid.toString();
 
@@ -219,10 +220,10 @@ public class TAlgorithmId {
     }
 
     public static TAlgorithmId get(String var0) throws TNoSuchAlgorithmException {
-        ObjectIdentifier var1;
+        TObjectIdentifier var1;
         try {
             var1 = algOID(var0);
-        } catch (IOException var3) {
+        } catch (TIOException var3) {
             throw new TNoSuchAlgorithmException("Invalid ObjectIdentifier " + var0);
         }
 
@@ -233,7 +234,7 @@ public class TAlgorithmId {
         }
     }
 
-    private static ObjectIdentifier algOID(String var0) throws TIOException {
+    private static TObjectIdentifier algOID(String var0) throws TIOException {
         if(var0.indexOf(46) != -1) {
             return var0.startsWith("OID.")?new TObjectIdentifier(var0.substring("OID.".length())):new TObjectIdentifier(var0);
         } else if(var0.equalsIgnoreCase("MD5")) {
@@ -301,7 +302,7 @@ public class TAlgorithmId {
                                                                         }
 
                                                                         if(var8 != null && oidTable.get(var8) == null) {
-                                                                            oidTable.put(var8, new ObjectIdentifier(var1));
+                                                                            oidTable.put(var8, new TObjectIdentifier(var1));
                                                                         }
                                                                     }
                                                                 }
@@ -314,7 +315,7 @@ public class TAlgorithmId {
                                                             initOidTable = true;
                                                         }
 
-                                                        return (ObjectIdentifier)oidTable.get(var0.toUpperCase(Locale.ENGLISH));
+                                                        return (TObjectIdentifier)oidTable.get(var0.toUpperCase(Locale.ENGLISH));
                                                     }
                                                 } else {
                                                     return sha1WithECDSA_oid;
@@ -355,17 +356,17 @@ public class TAlgorithmId {
         return TObjectIdentifier.newInternal(var0);
     }
 
-    public final void encode(DerOutputStream var1) throws IOException {
+    public final void encode(TDerOutputStream var1) throws TIOException {
         this.derEncode(var1);
     }
 
-    public void derEncode(OutputStream var1) throws IOException {
+    public void derEncode(TOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         TDerOutputStream var3 = new TDerOutputStream();
         var2.putOID(this.algid);
         if(!this.constructedFromDer) {
             if(this.algParams != null) {
-                this.params = new DerValue(this.algParams.getEncoded());
+                this.params = new TDerValue(this.algParams.getEncoded());
             } else {
                 this.params = null;
             }
@@ -377,7 +378,7 @@ public class TAlgorithmId {
             var2.putDerValue(this.params);
         }
 
-        var3.write(48, var2);
+        var3.write((byte) 48, var2);
         var1.write(var3.toByteArray());
     }
 }

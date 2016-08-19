@@ -21,6 +21,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
@@ -187,7 +188,7 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    void encode(TDerOutputStream var1) throws IOException {
+    void encode(TDerOutputStream var1) throws TIOException {
         var1.write((byte) 6, this.encoding);
     }
 
@@ -394,17 +395,17 @@ public final class TObjectIdentifier implements Serializable {
         return pack7Oid(var3, 0, var3.length, var1, var2);
     }
 
-    private static void check(byte[] var0) throws IOException {
+    private static void check(byte[] var0) throws TIOException {
         int var1 = var0.length;
         if(var1 >= 1 && (var0[var1 - 1] & 128) == 0) {
             for(int var2 = 0; var2 < var1; ++var2) {
                 if(var0[var2] == -128 && (var2 == 0 || (var0[var2 - 1] & 128) == 0)) {
-                    throw new IOException("ObjectIdentifier() -- Invalid DER encoding, useless extra octet detected");
+                    throw new TIOException(TString.wrap("ObjectIdentifier() -- Invalid DER encoding, useless extra octet detected"));
                 }
             }
 
         } else {
-            throw new IOException("ObjectIdentifier() -- Invalid DER encoding, not ended");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- Invalid DER encoding, not ended"));
         }
     }
 
@@ -414,15 +415,15 @@ public final class TObjectIdentifier implements Serializable {
         }
     }
 
-    private static void checkFirstComponent(int var0) throws IOException {
+    private static void checkFirstComponent(int var0) throws TIOException {
         if(var0 < 0 || var0 > 2) {
-            throw new IOException("ObjectIdentifier() -- First oid component is invalid ");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- First oid component is invalid "));
         }
     }
 
-    private static void checkFirstComponent(BigInteger var0) throws IOException {
+    private static void checkFirstComponent(BigInteger var0) throws TIOException {
         if(var0.signum() == -1 || var0.compareTo(BigInteger.valueOf(2L)) == 1) {
-            throw new IOException("ObjectIdentifier() -- First oid component is invalid ");
+            throw new TIOException(TString.wrap("ObjectIdentifier() -- First oid component is invalid "));
         }
     }
 

@@ -16,16 +16,15 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
+
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
-import sun.security.util.Debug;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -48,25 +47,25 @@ public class TSerialNumber {
         this.serialNum = TBigInteger.valueOf((long)var1);
     }
 
-    public TSerialNumber(DerInputStream var1) throws IOException {
-        DerValue var2 = var1.getDerValue();
+    public TSerialNumber(TDerInputStream var1) throws IOException {
+        TDerValue var2 = var1.getDerValue();
         this.construct(var2);
     }
 
-    public TSerialNumber(DerValue var1) throws IOException {
+    public TSerialNumber(TDerValue var1) throws IOException {
         this.construct(var1);
     }
 
-    public TSerialNumber(InputStream var1) throws IOException {
-        DerValue var2 = new DerValue(var1);
+    public TSerialNumber(TInputStream var1) throws IOException {
+        TDerValue var2 = new TDerValue(var1);
         this.construct(var2);
     }
 
     public String toString() {
-        return "TSerialNumber: [" + Debug.toHexString(this.serialNum) + "]";
+        return "TSerialNumber: [" + (this.serialNum) + "]";
     }
 
-    public void encode(DerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws IOException {
         var1.putInteger(this.serialNum);
     }
 

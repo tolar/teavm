@@ -17,6 +17,7 @@ package org.teavm.classlib.sun.security.util;
 
 import java.io.IOException;
 import java.util.Date;
+
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TCloneNotSupportedException;
@@ -101,9 +102,9 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         return var1;
     }
 
-    void truncate(int var1) throws IOException {
+    void truncate(int var1) throws TIOException {
         if(var1 > this.available()) {
-            throw new IOException("insufficient data");
+            throw new TIOException(TString.wrap("insufficient data"));
         } else {
             this.count = this.pos + var1;
         }
@@ -122,22 +123,22 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    public int getInteger(int var1) throws IOException {
+    public int getInteger(int var1) throws TIOException {
         TBigInteger var2 = this.getBigInteger(var1, false);
         if(var2.compareTo(TBigInteger.valueOf(-2147483648L)) < 0) {
-            throw new IOException("Integer below minimum valid value");
+            throw new TIOException(TString.wrap("Integer below minimum valid value"));
         } else if(var2.compareTo(TBigInteger.valueOf(2147483647L)) > 0) {
-            throw new IOException("Integer exceeds maximum valid value");
+            throw new TIOException(TString.wrap("Integer exceeds maximum valid value"));
         } else {
             return var2.intValue();
         }
     }
 
-    public byte[] getBitString(int var1) throws IOException {
+    public byte[] getBitString(int var1) throws TIOException {
         if(var1 > this.available()) {
-            throw new IOException("short read of bit string");
+            throw new TIOException(TString.wrap("short read of bit string"));
         } else if(var1 == 0) {
-            throw new IOException("Invalid encoding: zero length bit string");
+            throw new TIOException(TString.wrap("Invalid encoding: zero length bit string"));
         } else {
             byte var2 = this.buf[this.pos];
             if(var2 >= 0 && var2 <= 7) {
@@ -150,7 +151,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
                 this.skip((long)var1);
                 return var3;
             } else {
-                throw new IOException("Invalid number of padding bits");
+                throw new TIOException(TString.wrap("Invalid number of padding bits"));
             }
         }
     }
@@ -159,14 +160,14 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         return this.getBitString(this.available());
     }
 
-    TBitArray getUnalignedBitString() throws IOException {
+    TBitArray getUnalignedBitString() throws TIOException {
         if(this.pos >= this.count) {
             return null;
         } else {
             int var1 = this.available();
             int var2 = this.buf[this.pos] & 255;
             if(var2 > 7) {
-                throw new IOException("Invalid value for unused bits: " + var2);
+                throw new TIOException(TString.wrap("Invalid value for unused bits: " + var2));
             } else {
                 byte[] var3 = new byte[var1 - 1];
                 int var4 = var3.length == 0?0:var3.length * 8 - var2;

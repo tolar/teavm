@@ -300,7 +300,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @param publicKey the public key of the identity whose signature is
      * going to be verified.
      *
-     * @exception InvalidKeyException if the key is invalid.
+     * @exception TInvalidKeyException if the key is invalid.
      */
     public final void initVerify(TPublicKey publicKey)
             throws TInvalidKeyException {
@@ -323,7 +323,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @param certificate the certificate of the identity whose signature is
      * going to be verified.
      *
-     * @exception InvalidKeyException  if the public key in the certificate
+     * @exception TInvalidKeyException  if the public key in the certificate
      * is not encoded properly or does not include required  parameter
      * information or cannot be used for digital signature purposes.
      * @since 1.3
@@ -367,7 +367,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @param privateKey the private key of the identity whose signature
      * is going to be generated.
      *
-     * @exception InvalidKeyException if the key is invalid.
+     * @exception TInvalidKeyException if the key is invalid.
      */
     public final void initSign(TPrivateKey privateKey)
             throws TInvalidKeyException {
@@ -386,7 +386,7 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @param random the source of randomness for this signature.
      *
-     * @exception InvalidKeyException if the key is invalid.
+     * @exception TInvalidKeyException if the key is invalid.
      */
     public final void initSign(TPrivateKey privateKey, TSecureRandom random)
             throws TInvalidKeyException {
@@ -964,14 +964,14 @@ public abstract class TSignature extends TSignatureSpi {
                     }
                 }
                 // no working provider found, fail
-                if (lastException instanceof InvalidKeyException) {
-                    throw (InvalidKeyException)lastException;
+                if (lastException instanceof TInvalidKeyException) {
+                    throw (TInvalidKeyException)lastException;
                 }
                 if (lastException instanceof RuntimeException) {
                     throw (RuntimeException)lastException;
                 }
                 String k = (key != null) ? key.getClass().getName() : "(null)";
-                throw new InvalidKeyException
+                throw new TInvalidKeyException
                         ("No installed provider supports this key: "
                                 + k, lastException);
             }

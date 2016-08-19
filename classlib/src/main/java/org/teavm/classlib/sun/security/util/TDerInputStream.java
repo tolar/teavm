@@ -15,28 +15,29 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.Vector;
+
+import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.math.TBigInteger;
 
 public class TDerInputStream {
     TDerInputBuffer buffer;
     public byte tag;
 
-    public TDerInputStream(byte[] var1) throws IOException {
+    public TDerInputStream(byte[] var1) throws TIOException {
         this.init(var1, 0, var1.length);
     }
 
-    public TDerInputStream(byte[] var1, int var2, int var3) throws IOException {
+    public TDerInputStream(byte[] var1, int var2, int var3) throws TIOException {
         this.init(var1, var2, var3);
     }
 
-    private void init(byte[] var1, int var2, int var3) throws IOException {
+    private void init(byte[] var1, int var2, int var3) throws TIOException {
         if(var2 + 2 <= var1.length && var2 + var3 <= var1.length) {
             if(TDerIndefLenConverter.isIndefinite(var1[var2 + 1])) {
                 byte[] var4 = new byte[var3];
@@ -49,7 +50,7 @@ public class TDerInputStream {
 
             this.buffer.mark(2147483647);
         } else {
-            throw new IOException("Encoding bytes too short");
+            throw new TIOException(TString.wrap("Encoding bytes too short"));
         }
     }
 
@@ -80,7 +81,7 @@ public class TDerInputStream {
         }
     }
 
-    public BigInteger getBigInteger() throws IOException {
+    public TBigInteger getBigInteger() throws IOException {
         if(this.buffer.read() != 2) {
             throw new IOException("DER input, Integer tag error");
         } else {
@@ -88,7 +89,7 @@ public class TDerInputStream {
         }
     }
 
-    public BigInteger getPositiveBigInteger() throws IOException {
+    public TBigInteger getPositiveBigInteger() throws IOException {
         if(this.buffer.read() != 2) {
             throw new IOException("DER input, Integer tag error");
         } else {
@@ -141,15 +142,15 @@ public class TDerInputStream {
         }
     }
 
-    public void getBytes(byte[] var1) throws IOException {
+    public void getBytes(byte[] var1) throws TIOException {
         if(var1.length != 0 && this.buffer.read(var1) != var1.length) {
-            throw new IOException("short read of DER octet string");
+            throw new TIOException(TString.wrap("short read of DER octet string"));
         }
     }
 
-    public void getNull() throws IOException {
+    public void getNull() throws TIOException {
         if(this.buffer.read() != 5 || this.buffer.read() != 0) {
-            throw new IOException("getNull, bad data");
+            throw new TIOException(TString.wrap("getNull, bad data"));
         }
     }
 
@@ -193,7 +194,7 @@ public class TDerInputStream {
             byte[] var7 = new byte[var5 + var6];
             var7[0] = this.tag;
             var7[1] = var3;
-            DataInputStream var8 = new DataInputStream(this.buffer);
+            TDataInputStream var8 = new TDataInputStream(this.buffer);
             var8.readFully(var7, var6, var5);
             var8.close();
             TDerIndefLenConverter var9 = new TDerIndefLenConverter();

@@ -15,21 +15,18 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Enumeration;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.AttributeNameEnumeration;
-import sun.security.x509.CertAttrSet;
-import sun.security.x509.Extension;
-import sun.security.x509.PKIXExtensions;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
 
 /**
  * Created by vasek on 18. 8. 2016.
  */
-public class TPolicyConstraintsExtension extends Extension implements CertAttrSet<String> {
+public class TPolicyConstraintsExtension extends TExtension implements TCertAttrSet<String> {
     public static final String IDENT = "x509.info.extensions.PolicyConstraints";
     public static final String NAME = "PolicyConstraints";
     public static final String REQUIRE = "require";
@@ -39,23 +36,23 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
     private int require;
     private int inhibit;
 
-    private void encodeThis() throws IOException {
+    private void encodeThis() throws TIOException {
         if(this.require == -1 && this.inhibit == -1) {
             this.extensionValue = null;
         } else {
-            DerOutputStream var1 = new DerOutputStream();
-            DerOutputStream var2 = new DerOutputStream();
-            DerOutputStream var3;
+            TDerOutputStream var1 = new TDerOutputStream();
+            TDerOutputStream var2 = new TDerOutputStream();
+            TDerOutputStream var3;
             if(this.require != -1) {
-                var3 = new DerOutputStream();
+                var3 = new TDerOutputStream();
                 var3.putInteger(this.require);
-                var1.writeImplicit(DerValue.createTag(-128, false, 0), var3);
+                var1.writeImplicit(TDerValue.createTag(-128, false, 0), var3);
             }
 
             if(this.inhibit != -1) {
-                var3 = new DerOutputStream();
+                var3 = new TDerOutputStream();
                 var3.putInteger(this.inhibit);
-                var1.writeImplicit(DerValue.createTag(-128, false, 1), var3);
+                var1.writeImplicit(TDerValue.createTag(-128, false, 1), var3);
             }
 
             var2.write(48, var1);
@@ -63,38 +60,38 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
         }
     }
 
-    public TPolicyConstraintsExtension(int var1, int var2) throws IOException {
+    public TPolicyConstraintsExtension(int var1, int var2) throws TIOException {
         this(Boolean.FALSE, var1, var2);
     }
 
-    public TPolicyConstraintsExtension(Boolean var1, int var2, int var3) throws IOException {
+    public TPolicyConstraintsExtension(Boolean var1, int var2, int var3) throws TIOException {
         this.require = -1;
         this.inhibit = -1;
         this.require = var2;
         this.inhibit = var3;
-        this.extensionId = PKIXExtensions.PolicyConstraints_Id;
+        this.extensionId = TPKIXExtensions.PolicyConstraints_Id;
         this.critical = var1.booleanValue();
         this.encodeThis();
     }
 
-    public TPolicyConstraintsExtension(Boolean var1, Object var2) throws IOException {
+    public TPolicyConstraintsExtension(Boolean var1, Object var2) throws TIOException {
         this.require = -1;
         this.inhibit = -1;
-        this.extensionId = PKIXExtensions.PolicyConstraints_Id;
+        this.extensionId = TPKIXExtensions.PolicyConstraints_Id;
         this.critical = var1.booleanValue();
         this.extensionValue = (byte[])((byte[])var2);
-        DerValue var3 = new DerValue(this.extensionValue);
+        TDerValue var3 = new TDerValue(this.extensionValue);
         if(var3.tag != 48) {
-            throw new IOException("Sequence tag missing for PolicyConstraint.");
+            throw new TIOException("Sequence tag missing for PolicyConstraint.");
         } else {
-            DerInputStream var4 = var3.data;
+            TDerInputStream var4 = var3.data;
 
             while(true) {
                 if(var4 != null && var4.available() != 0) {
-                    DerValue var5 = var4.getDerValue();
+                    TDerValue var5 = var4.getDerValue();
                     if(var5.isContextSpecific(0) && !var5.isConstructed()) {
                         if(this.require != -1) {
-                            throw new IOException("Duplicate requireExplicitPolicyfound in the TPolicyConstraintsExtension");
+                            throw new TIOException(TString.wrap("Duplicate requireExplicitPolicyfound in the TPolicyConstraintsExtension"));
                         }
 
                         var5.resetTag(2);
@@ -104,7 +101,7 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
 
                     if(var5.isContextSpecific(1) && !var5.isConstructed()) {
                         if(this.inhibit != -1) {
-                            throw new IOException("Duplicate inhibitPolicyMappingfound in the TPolicyConstraintsExtension");
+                            throw new TIOException(TString.wrap("Duplicate inhibitPolicyMappingfound in the TPolicyConstraintsExtension"));
                         }
 
                         var5.resetTag(2);
@@ -112,7 +109,7 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
                         continue;
                     }
 
-                    throw new IOException("Invalid encoding of PolicyConstraint");
+                    throw new TIOException(TString.wrap("Invalid encoding of PolicyConstraint"));
                 }
 
                 return;
@@ -139,10 +136,10 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
         return var1;
     }
 
-    public void encode(OutputStream var1) throws IOException {
-        DerOutputStream var2 = new DerOutputStream();
+    public void encode(TOutputStream var1) throws TIOException {
+        TDerOutputStream var2 = new TDerOutputStream();
         if(this.extensionValue == null) {
-            this.extensionId = PKIXExtensions.PolicyConstraints_Id;
+            this.extensionId = TPKIXExtensions.PolicyConstraints_Id;
             this.critical = false;
             this.encodeThis();
         }
@@ -151,15 +148,15 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws IOException {
+    public void set(String var1, Object var2) throws TIOException {
         if(!(var2 instanceof Integer)) {
-            throw new IOException("Attribute value should be of type Integer.");
+            throw new TIOException(TString.wrap("Attribute value should be of type Integer."));
         } else {
             if(var1.equalsIgnoreCase("require")) {
                 this.require = ((Integer)var2).intValue();
             } else {
                 if(!var1.equalsIgnoreCase("inhibit")) {
-                    throw new IOException("Attribute name [" + var1 + "]" + " not recognized by " + "CertAttrSet:PolicyConstraints.");
+                    throw new TIOException(TString.wrap("Attribute name [" + var1 + "]" + " not recognized by " + "CertAttrSet:PolicyConstraints."));
                 }
 
                 this.inhibit = ((Integer)var2).intValue();
@@ -169,22 +166,22 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
         }
     }
 
-    public Integer get(String var1) throws IOException {
+    public Integer get(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("require")) {
             return new Integer(this.require);
         } else if(var1.equalsIgnoreCase("inhibit")) {
             return new Integer(this.inhibit);
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet:PolicyConstraints.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:PolicyConstraints."));
         }
     }
 
-    public void delete(String var1) throws IOException {
+    public void delete(String var1) throws TIOException {
         if(var1.equalsIgnoreCase("require")) {
             this.require = -1;
         } else {
             if(!var1.equalsIgnoreCase("inhibit")) {
-                throw new IOException("Attribute name not recognized by CertAttrSet:PolicyConstraints.");
+                throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:PolicyConstraints."));
             }
 
             this.inhibit = -1;
@@ -193,8 +190,8 @@ public class TPolicyConstraintsExtension extends Extension implements CertAttrSe
         this.encodeThis();
     }
 
-    public Enumeration<String> getElements() {
-        AttributeNameEnumeration var1 = new AttributeNameEnumeration();
+    public TEnumeration<String> getElements() {
+        TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("require");
         var1.addElement("inhibit");
         return var1.elements();

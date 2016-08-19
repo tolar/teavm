@@ -50,7 +50,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.security.auth.x500.X500Principal;
+
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.TSignature;
 import org.teavm.classlib.java.security.cert.TCertificate;
@@ -717,7 +719,7 @@ public class TX509CertImpl extends TX509Certificate {
             return false;
         } else {
             try {
-                CertificateExtensions var1 = (CertificateExtensions)this.info.get("extensions");
+                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get("extensions");
                 return var1 == null?false:var1.hasUnsupportedCriticalExtension();
             } catch (Exception var2) {
                 return false;
@@ -730,7 +732,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                CertificateExtensions var1 = (CertificateExtensions)this.info.get("extensions");
+                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get("extensions");
                 if(var1 == null) {
                     return null;
                 } else {
@@ -757,7 +759,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                CertificateExtensions var1 = (CertificateExtensions)this.info.get("extensions");
+                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get("extensions");
                 if(var1 == null) {
                     return null;
                 } else {
@@ -785,9 +787,9 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                CertificateExtensions var2;
+                TCertificateExtensions var2;
                 try {
-                    var2 = (CertificateExtensions)this.info.get("extensions");
+                    var2 = (TCertificateExtensions)this.info.get("extensions");
                 } catch (CertificateException var6) {
                     return null;
                 }
@@ -824,9 +826,9 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                CertificateExtensions var2;
+                TCertificateExtensions var2;
                 try {
-                    var2 = (CertificateExtensions)this.info.get("extensions");
+                    var2 = (TCertificateExtensions)this.info.get("extensions");
                 } catch (CertificateException var4) {
                     return null;
                 }
@@ -841,9 +843,9 @@ public class TX509CertImpl extends TX509Certificate {
     public byte[] getExtensionValue(String var1) {
         try {
             ObjectIdentifier var2 = new ObjectIdentifier(var1);
-            String var3 = OIDMap.getName(var2);
+            String var3 = TOIDMap.getName(var2);
             TExtension var4 = null;
-            CertificateExtensions var5 = (CertificateExtensions)this.info.get("extensions");
+            TCertificateExtensions var5 = (TCertificateExtensions)this.info.get("extensions");
             if(var3 == null) {
                 if(var5 == null) {
                     return null;
@@ -892,7 +894,7 @@ public class TX509CertImpl extends TX509Certificate {
 
     public boolean[] getKeyUsage() {
         try {
-            String var1 = OIDMap.getName(PKIXExtensions.KeyUsage_Id);
+            String var1 = TOIDMap.getName(PKIXExtensions.KeyUsage_Id);
             if(var1 == null) {
                 return null;
             } else {
@@ -947,7 +949,7 @@ public class TX509CertImpl extends TX509Certificate {
 
     public int getBasicConstraints() {
         try {
-            String var1 = OIDMap.getName(PKIXExtensions.BasicConstraints_Id);
+            String var1 = TOIDMap.getName(PKIXExtensions.BasicConstraints_Id);
             if(var1 == null) {
                 return -1;
             } else {

@@ -18,11 +18,11 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.util.Enumeration;
+
+import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
-import sun.security.util.DerOutputStream;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -33,7 +33,7 @@ public class TCertificateSerialNumber implements TCertAttrSet<String> {
     public static final String NUMBER = "number";
     private TSerialNumber serial;
 
-    public TCertificateSerialNumber(BigInteger var1) {
+    public TCertificateSerialNumber(TBigInteger var1) {
         this.serial = new TSerialNumber(var1);
     }
 

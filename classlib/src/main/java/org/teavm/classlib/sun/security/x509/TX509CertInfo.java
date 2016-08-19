@@ -25,6 +25,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
@@ -50,11 +52,11 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     protected TCertificateAlgorithmId algId = null;
     protected TX500Name issuer = null;
     protected TX500Name subject = null;
-    protected CertificateValidity interval = null;
-    protected CertificateX509Key pubKey = null;
-    protected UniqueIdentity issuerUniqueId = null;
-    protected UniqueIdentity subjectUniqueId = null;
-    protected CertificateExtensions extensions = null;
+    protected TCertificateValidity interval = null;
+    protected TCertificateX509Key pubKey = null;
+    protected TUniqueIdentity issuerUniqueId = null;
+    protected TUniqueIdentity subjectUniqueId = null;
+    protected TCertificateExtensions extensions = null;
     private static final int ATTR_VERSION = 1;
     private static final int ATTR_SERIAL = 2;
     private static final int ATTR_ALGORITHM = 3;
@@ -196,7 +198,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                     TExtension var5 = var3[var4];
 
                     try {
-                        if(OIDMap.getClass(var5.getExtensionId()) == null) {
+                        if(TOIDMap.getClass(var5.getExtensionId()) == null) {
                             var1.append(var5.toString());
                             byte[] var6 = var5.getExtensionValue();
                             if(var6 != null) {
@@ -296,7 +298,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                         this.setExtensions(var2);
                     } else {
                         if(this.extensions == null) {
-                            this.extensions = new CertificateExtensions();
+                            this.extensions = new TCertificateExtensions();
                         }
 
                         this.extensions.set(var5, var2);
@@ -453,14 +455,14 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private void parse(DerValue var1) throws CertificateParsingException, IOException {
+    private void parse(TDerValue var1) throws CertificateParsingException, IOException {
         if(var1.tag != 48) {
             throw new CertificateParsingException("signed fields invalid");
         } else {
             this.rawCertInfo = var1.toByteArray();
-            DerInputStream var2 = var1.data;
-            DerValue var3 = var2.getDerValue();
-            if(var3.isContextSpecific(0)) {
+            TDerInputStream var2 = var1.data;
+            TDerValue var3 = var2.getDerValue();
+            if(var3.isContextSpecific((byte) 0)) {
                 this.version = new TCertificateVersion(var3);
                 var3 = var2.getDerValue();
             }
@@ -504,7 +506,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                                 throw new CertificateParsingException("Extensions not allowed in v2 certificate");
                             } else {
                                 if(var3.isConstructed() && var3.isContextSpecific(3)) {
-                                    this.extensions = new CertificateExtensions(var3.data);
+                                    this.extensions = new TCertificateExtensions(var3.data);
                                 }
 
                                 this.verifyCert(this.subject, this.extensions);
@@ -516,7 +518,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private void verifyCert(TX500Name var1, CertificateExtensions var2) throws CertificateParsingException, IOException {
+    private void verifyCert(TX500Name var1, TCertificateExtensions var2) throws CertificateParsingException, IOException {
         if(var1.isEmpty()) {
             if(var2 == null) {
                 throw new CertificateParsingException("X.509 Certificate is incomplete: subject field is empty, and certificate has no extensions");
@@ -660,10 +662,10 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     private void setExtensions(Object var1) throws CertificateException {
         if(this.version.compare(2) < 0) {
             throw new CertificateException("Invalid version");
-        } else if(!(var1 instanceof CertificateExtensions)) {
+        } else if(!(var1 instanceof TCertificateExtensions)) {
             throw new CertificateException("Extensions class type invalid.");
         } else {
-            this.extensions = (CertificateExtensions)var1;
+            this.extensions = (TCertificateExtensions)var1;
         }
     }
 

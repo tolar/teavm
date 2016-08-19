@@ -15,10 +15,9 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
+
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
@@ -127,7 +126,7 @@ public class TDerValue {
             TDerIndefLenConverter var8 = new TDerIndefLenConverter();
             var3 = new TDerInputBuffer(var8.convert(var6));
             if(this.tag != var3.read()) {
-                throw new IOException("Indefinite length encoding not supported");
+                throw new TIOException(TString.wrap("Indefinite length encoding not supported"));
             }
 
             this.length = TDerInputStream.getLength(var3);
@@ -144,12 +143,12 @@ public class TDerValue {
 
     }
 
-    public TDerValue(byte[] var1) throws IOException {
-        this.data = this.init(true, new ByteArrayInputStream(var1));
+    public TDerValue(byte[] var1) throws TIOException {
+        this.data = this.init(true, new TByteArrayInputStream(var1));
     }
 
-    public TDerValue(byte[] var1, int var2, int var3) throws IOException {
-        this.data = this.init(true, new ByteArrayInputStream(var1, var2, var3));
+    public TDerValue(byte[] var1, int var2, int var3) throws TIOException {
+        this.data = this.init(true, new TByteArrayInputStream(var1, var2, var3));
     }
 
     public TDerValue(TInputStream var1) throws IOException {
@@ -198,7 +197,7 @@ public class TDerValue {
         return var5;
     }
 
-    private TDerInputStream init(boolean var1, TInputStream var2) throws IOException {
+    private TDerInputStream init(boolean var1, TInputStream var2) throws TIOException {
         this.tag = (byte)((TInputStream)var2).read();
         byte var3 = (byte)((TInputStream)var2).read();
         this.length = TDerInputStream.getLength(var3 & 255, (TInputStream)var2);
@@ -220,16 +219,16 @@ public class TDerValue {
             this.length = TDerInputStream.getLength((TInputStream)var2);
         }
 
-        if(var1 && ((InputStream)var2).available() != this.length) {
-            throw new IOException("extra data given to DerValue constructor");
+        if(var1 && ((TInputStream)var2).available() != this.length) {
+            throw new TIOException(TString.wrap("extra data given to DerValue constructor"));
         } else {
-            byte[] var9 = TIOUtils.readFully((InputStream)var2, this.length, true);
+            byte[] var9 = TIOUtils.readFully((TInputStream)var2, this.length, true);
             this.buffer = new TDerInputBuffer(var9);
             return new TDerInputStream(this.buffer);
         }
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         var1.write(this.tag);
         var1.putLength(this.length);
         if(this.length > 0) {
@@ -238,7 +237,7 @@ public class TDerValue {
             synchronized(this.data) {
                 this.buffer.reset();
                 if(this.buffer.read(var2) != this.length) {
-                    throw new IOException("short DER value read (encode)");
+                    throw new TIOException(TString.wrap("short DER value read (encode)"));
                 }
 
                 var1.write(var2);
@@ -307,9 +306,9 @@ public class TDerValue {
         }
     }
 
-    public int getInteger() throws IOException {
+    public int getInteger() throws TIOException {
         if(this.tag != 2) {
-            throw new IOException("DerValue.getInteger, not an int " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getInteger, not an int " + this.tag));
         } else {
             return this.buffer.getInteger(this.data.available());
         }
@@ -367,9 +366,9 @@ public class TDerValue {
         }
     }
 
-    public TBitArray getUnalignedBitString(boolean var1) throws IOException {
+    public TBitArray getUnalignedBitString(boolean var1) throws TIOException {
         if(!var1 && this.tag != 3) {
-            throw new IOException("DerValue.getBitString, not a bit string " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getBitString, not a bit string " + this.tag));
         } else {
             return this.buffer.getUnalignedBitString();
         }
@@ -481,7 +480,7 @@ public class TDerValue {
         }
     }
 
-    public byte[] toByteArray() throws IOException {
+    public byte[] toByteArray() throws TIOException {
         TDerOutputStream var1 = new TDerOutputStream();
         this.encode(var1);
         this.data.reset();

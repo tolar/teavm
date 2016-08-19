@@ -16,18 +16,20 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
+
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
+import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
 /**
  * Created by vasek on 18. 8. 2016.
  */
-public class TExtension implements java.security.cert.Extension {
-    protected ObjectIdentifier extensionId = null;
+public class TExtension implements org.teavm.classlib.java.security.cert.TExtension {
+    protected TObjectIdentifier extensionId = null;
     protected boolean critical = false;
     protected byte[] extensionValue = null;
     private static final int hashMagic = 31;
@@ -35,10 +37,10 @@ public class TExtension implements java.security.cert.Extension {
     public TExtension() {
     }
 
-    public TExtension(DerValue var1) throws IOException {
-        DerInputStream var2 = var1.toDerInputStream();
+    public TExtension(TDerValue var1) throws IOException {
+        TDerInputStream var2 = var1.toDerInputStream();
         this.extensionId = var2.getOID();
-        DerValue var3 = var2.getDerValue();
+        TDerValue var3 = var2.getDerValue();
         if(var3.tag == 1) {
             this.critical = var3.getBoolean();
             var3 = var2.getDerValue();
@@ -50,51 +52,51 @@ public class TExtension implements java.security.cert.Extension {
 
     }
 
-    public TExtension(ObjectIdentifier var1, boolean var2, byte[] var3) throws IOException {
+    public TExtension(TObjectIdentifier var1, boolean var2, byte[] var3) throws IOException {
         this.extensionId = var1;
         this.critical = var2;
-        DerValue var4 = new DerValue(var3);
+        TDerValue var4 = new TDerValue(var3);
         this.extensionValue = var4.getOctetString();
     }
 
-    public TExtension(sun.security.x509.Extension var1) {
+    public TExtension(TExtension var1) {
         this.extensionId = var1.extensionId;
         this.critical = var1.critical;
         this.extensionValue = var1.extensionValue;
     }
 
-    public static sun.security.x509.Extension newExtension(ObjectIdentifier var0, boolean var1, byte[] var2) throws IOException {
-        sun.security.x509.Extension var3 = new sun.security.x509.Extension();
+    public static TExtension newExtension(TObjectIdentifier var0, boolean var1, byte[] var2) throws IOException {
+        TExtension var3 = new TExtension();
         var3.extensionId = var0;
         var3.critical = var1;
         var3.extensionValue = var2;
         return var3;
     }
 
-    public void encode(OutputStream var1) throws IOException {
+    public void encode(TOutputStream var1) throws TIOException {
         if(var1 == null) {
             throw new NullPointerException();
         } else {
-            DerOutputStream var2 = new DerOutputStream();
-            DerOutputStream var3 = new DerOutputStream();
+            TDerOutputStream var2 = new TDerOutputStream();
+            TDerOutputStream var3 = new TDerOutputStream();
             var2.putOID(this.extensionId);
             if(this.critical) {
                 var2.putBoolean(this.critical);
             }
 
             var2.putOctetString(this.extensionValue);
-            var3.write(48, var2);
+            var3.write((byte) 48, var2);
             var1.write(var3.toByteArray());
         }
     }
 
-    public void encode(DerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws IOException {
         if(this.extensionId == null) {
             throw new IOException("Null OID to encode for the extension!");
         } else if(this.extensionValue == null) {
             throw new IOException("No value to encode for the extension!");
         } else {
-            DerOutputStream var2 = new DerOutputStream();
+            TDerOutputStream var2 = new TDerOutputStream();
             var2.putOID(this.extensionId);
             if(this.critical) {
                 var2.putBoolean(this.critical);
@@ -109,7 +111,7 @@ public class TExtension implements java.security.cert.Extension {
         return this.critical;
     }
 
-    public ObjectIdentifier getExtensionId() {
+    public TObjectIdentifier getExtensionId() {
         return this.extensionId;
     }
 

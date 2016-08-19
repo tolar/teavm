@@ -15,10 +15,8 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,7 +24,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class TDerOutputStream extends ByteArrayOutputStream implements TDerEncoder {
+import org.teavm.classlib.java.io.TByteArrayOutputStream;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TInteger;
+import org.teavm.classlib.java.math.TBigInteger;
+
+public class TDerOutputStream extends TByteArrayOutputStream implements TDerEncoder {
     private static TByteArrayLexOrder lexOrder = new TByteArrayLexOrder();
     private static TByteArrayTagOrder tagOrder = new TByteArrayTagOrder();
 
@@ -37,24 +40,24 @@ public class TDerOutputStream extends ByteArrayOutputStream implements TDerEncod
     public TDerOutputStream() {
     }
 
-    public void write(byte var1, byte[] var2) throws IOException {
+    public void write(byte var1, byte[] var2) throws TIOException {
         this.write(var1);
         this.putLength(var2.length);
         this.write(var2, 0, var2.length);
     }
 
-    public void write(byte var1, TDerOutputStream var2) throws IOException {
+    public void write(byte var1, TDerOutputStream var2) throws TIOException {
         this.write(var1);
         this.putLength(var2.count);
         this.write(var2.buf, 0, var2.count);
     }
 
-    public void writeImplicit(byte var1, TDerOutputStream var2) throws IOException {
+    public void writeImplicit(byte var1, TDerOutputStream var2) throws TIOException {
         this.write(var1);
         this.write(var2.buf, 1, var2.count - 1);
     }
 
-    public void putDerValue(TDerValue var1) throws IOException {
+    public void putDerValue(TDerValue var1) throws TIOException {
         var1.encode(this);
     }
 
@@ -74,14 +77,14 @@ public class TDerOutputStream extends ByteArrayOutputStream implements TDerEncod
         this.putIntegerContents(var1);
     }
 
-    public void putInteger(BigInteger var1) throws IOException {
+    public void putInteger(TBigInteger var1) throws IOException {
         this.write(2);
         byte[] var2 = var1.toByteArray();
         this.putLength(var2.length);
         this.write(var2, 0, var2.length);
     }
 
-    public void putInteger(Integer var1) throws IOException {
+    public void putInteger(TInteger var1) throws IOException {
         this.putInteger(var1.intValue());
     }
 
@@ -135,20 +138,20 @@ public class TDerOutputStream extends ByteArrayOutputStream implements TDerEncod
         this.putUnalignedBitString(var1.truncate());
     }
 
-    public void putOctetString(byte[] var1) throws IOException {
+    public void putOctetString(byte[] var1) throws TIOException {
         this.write((byte) 4, (byte[])var1);
     }
 
-    public void putNull() throws IOException {
+    public void putNull() throws TIOException {
         this.write(5);
         this.putLength(0);
     }
 
-    public void putOID(TObjectIdentifier var1) throws IOException {
+    public void putOID(TObjectIdentifier var1) throws TIOException {
         var1.encode(this);
     }
 
-    public void putSequence(TDerValue[] var1) throws IOException {
+    public void putSequence(TDerValue[] var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
 
         for(int var3 = 0; var3 < var1.length; ++var3) {
@@ -257,7 +260,7 @@ public class TDerOutputStream extends ByteArrayOutputStream implements TDerEncod
         this.write(var6);
     }
 
-    public void putLength(int var1) throws IOException {
+    public void putLength(int var1) throws TIOException {
         if(var1 < 128) {
             this.write((byte)var1);
         } else if(var1 < 256) {
