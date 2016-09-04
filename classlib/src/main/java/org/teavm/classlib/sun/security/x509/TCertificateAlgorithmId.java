@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -59,26 +58,26 @@ public class TCertificateAlgorithmId implements TCertAttrSet<String> {
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
+    public void set(TString var1, Object var2) throws TIOException {
         if(!(var2 instanceof TAlgorithmId)) {
             throw new TIOException(TString.wrap("Attribute must be of type AlgorithmId."));
-        } else if(var1.equalsIgnoreCase("algorithm")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("algorithm"))) {
             this.algId = (TAlgorithmId)var2;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:TCertificateAlgorithmId."));
         }
     }
 
-    public TAlgorithmId get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("algorithm")) {
+    public TAlgorithmId get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("algorithm"))) {
             return this.algId;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:TCertificateAlgorithmId."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("algorithm")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("algorithm"))) {
             this.algId = null;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:TCertificateAlgorithmId."));

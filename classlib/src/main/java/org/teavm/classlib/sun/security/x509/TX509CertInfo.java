@@ -16,13 +16,12 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TCertificateParsingException;
@@ -33,7 +32,6 @@ import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
-import sun.security.util.DerValue;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -95,7 +93,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public void encode(OutputStream var1) throws CertificateException, IOException {
+    public void encode(TOutputStream var1) throws TCertificateException, TIOException {
         if(this.rawCertInfo == null) {
             TDerOutputStream var2 = new TDerOutputStream();
             this.emit(var2);
@@ -510,7 +508,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                             if(this.version.compare(2) != 0) {
                                 throw new CertificateParsingException("Extensions not allowed in v2 certificate");
                             } else {
-                                if(var3.isConstructed() && var3.isContextSpecific(3)) {
+                                if(var3.isConstructed() && var3.isContextSpecific((byte) 3)) {
                                     this.extensions = new TCertificateExtensions(var3.data);
                                 }
 
@@ -567,18 +565,18 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                 this.subject.encode(var2);
                 this.pubKey.encode(var2);
                 if(this.issuerUniqueId != null) {
-                    this.issuerUniqueId.encode(var2, TDerValue.createTag(-128, false, 1));
+                    this.issuerUniqueId.encode(var2, TDerValue.createTag((byte)-128, false, (byte) 1));
                 }
 
                 if(this.subjectUniqueId != null) {
-                    this.subjectUniqueId.encode(var2, DerValue.createTag(-128, false, 2));
+                    this.subjectUniqueId.encode(var2, TDerValue.createTag((byte)-128, false, (byte) 2));
                 }
 
                 if(this.extensions != null) {
                     this.extensions.encode(var2);
                 }
 
-                var1.write(48, var2);
+                var1.write((byte) 48, var2);
             }
         }
     }

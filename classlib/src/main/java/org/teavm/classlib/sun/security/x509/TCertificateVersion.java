@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -96,10 +95,10 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         }
     }
 
-    public void set(String var1, Object var2) throws TIOException {
+    public void set(TString var1, Object var2) throws TIOException {
         if(!(var2 instanceof Integer)) {
             throw new TIOException(TString.wrap("Attribute must be of type Integer."));
-        } else if(var1.equalsIgnoreCase("number")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("number"))) {
             this.version = ((Integer)var2).intValue();
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: TCertificateVersion."));
@@ -114,8 +113,8 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("number")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("number"))) {
             this.version = 0;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: TCertificateVersion."));

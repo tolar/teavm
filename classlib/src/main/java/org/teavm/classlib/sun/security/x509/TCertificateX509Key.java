@@ -16,11 +16,12 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
 import java.util.Enumeration;
-
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
@@ -39,8 +40,8 @@ public class TCertificateX509Key implements TCertAttrSet<String> {
         this.key = TX509Key.parse(var2);
     }
 
-    public TCertificateX509Key(InputStream var1) throws IOException {
-        DerValue var2 = new DerValue(var1);
+    public TCertificateX509Key(TInputStream var1) throws IOException {
+        TDerValue var2 = new TDerValue(var1);
         this.key = TX509Key.parse(var2);
     }
 
@@ -70,11 +71,11 @@ public class TCertificateX509Key implements TCertAttrSet<String> {
         }
     }
 
-    public void delete(String var1) throws IOException {
-        if(var1.equalsIgnoreCase("value")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("value"))) {
             this.key = null;
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet: CertificateX509Key.");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateX509Key."));
         }
     }
 

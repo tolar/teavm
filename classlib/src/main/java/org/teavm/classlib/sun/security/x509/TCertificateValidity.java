@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.Date;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
@@ -120,14 +119,14 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         }
     }
 
-    public void set(String var1, Object var2) throws TIOException {
+    public void set(TString var1, Object var2) throws TIOException {
         if(!(var2 instanceof Date)) {
             throw new TIOException(TString.wrap("Attribute must be of type Date."));
         } else {
-            if(var1.equalsIgnoreCase("notBefore")) {
+            if(var1.equalsIgnoreCase(TString.wrap("notBefore"))) {
                 this.notBefore = (Date)var2;
             } else {
-                if(!var1.equalsIgnoreCase("notAfter")) {
+                if(!var1.equalsIgnoreCase(TString.wrap("notAfter"))) {
                     throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateValidity."));
                 }
 
@@ -137,21 +136,21 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         }
     }
 
-    public Date get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("notBefore")) {
+    public Date get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("notBefore"))) {
             return this.getNotBefore();
-        } else if(var1.equalsIgnoreCase("notAfter")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("notAfter"))) {
             return this.getNotAfter();
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateValidity."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("notBefore")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("notBefore"))) {
             this.notBefore = null;
         } else {
-            if(!var1.equalsIgnoreCase("notAfter")) {
+            if(!var1.equalsIgnoreCase(TString.wrap("notAfter"))) {
                 throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateValidity."));
             }
 

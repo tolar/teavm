@@ -26,10 +26,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPrincipal;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -472,11 +471,11 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
 
     /** @deprecated */
     @Deprecated
-    public void emit(TDerOutputStream var1) throws IOException {
+    public void emit(TDerOutputStream var1) throws TIOException {
         this.encode(var1);
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
 
         for(int var3 = 0; var3 < this.names.length; ++var3) {
@@ -506,12 +505,12 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return (byte[])this.getEncodedInternal().clone();
     }
 
-    private void parseDN(String var1, Map<String, String> var2) throws IOException {
+    private void parseDN(TString var1, Map<TString, TString> var2) throws IOException {
         if(var1 != null && var1.length() != 0) {
             ArrayList var3 = new ArrayList();
             int var4 = 0;
             int var7 = 0;
-            String var8 = var1;
+            TString var8 = var1;
             int var9 = 0;
             int var10 = var1.indexOf(44);
 
