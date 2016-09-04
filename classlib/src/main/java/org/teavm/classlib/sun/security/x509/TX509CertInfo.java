@@ -22,10 +22,10 @@ import java.security.cert.CertificateParsingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TCertificateParsingException;
 import org.teavm.classlib.java.util.TCollection;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
@@ -33,6 +33,7 @@ import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
+import sun.security.util.DerValue;
 
 /**
  * Created by vasek on 18. 8. 2016.
@@ -241,8 +242,8 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public void set(String var1, Object var2) throws TCertificateException, TIOException {
-        TX509AttributeName var3 = new TX509AttributeName(TString.wrap(var1));
+    public void set(TString var1, Object var2) throws TCertificateException, TIOException {
+        TX509AttributeName var3 = new TX509AttributeName(var1);
         int var4 = this.attributeMap(var3.getPrefix());
         if(var4 == 0) {
             throw new TCertificateException(TString.wrap("Attribute name not recognized: " + var1));
@@ -312,7 +313,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public void delete(String var1) throws TCertificateException, TIOException {
+    public void delete(TString var1) throws TCertificateException, TIOException {
         TX509AttributeName var2 = new TX509AttributeName(var1);
         int var3 = this.attributeMap(var2.getPrefix());
         if(var3 == 0) {
@@ -379,13 +380,13 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public Object get(TString var1) throws CertificateException, IOException {
+    public Object get(TString var1) throws TCertificateException, TIOException {
         TX509AttributeName var2 = new TX509AttributeName(var1);
         int var3 = this.attributeMap(var2.getPrefix());
         if(var3 == 0) {
-            throw new CertificateParsingException("Attribute name not recognized: " + var1);
+            throw new TCertificateParsingException(TString.wrap("Attribute name not recognized: " + var1));
         } else {
-            String var4 = var2.getSuffix();
+            TString var4 = var2.getSuffix();
             switch(var3) {
                 case 1:
                     if(var4 == null) {
@@ -449,13 +450,13 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private Object getX500Name(String var1, boolean var2) throws IOException {
-        if(var1.equalsIgnoreCase("dname")) {
+    private Object getX500Name(TString var1, boolean var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("dname"))) {
             return var2?this.issuer:this.subject;
-        } else if(var1.equalsIgnoreCase("x500principal")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("x500principal"))) {
             return var2?this.issuer.asX500Principal():this.subject.asX500Principal();
         } else {
-            throw new IOException("Attribute name not recognized.");
+            throw new TIOException(TString.wrap("Attribute name not recognized."));
         }
     }
 
@@ -489,7 +490,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                         } else {
                             var3 = var2.getDerValue();
                             if(var3.isContextSpecific((byte) 1)) {
-                                this.issuerUniqueId = new UniqueIdentity(var3);
+                                this.issuerUniqueId = new TUniqueIdentity(var3);
                                 if(var2.available() == 0) {
                                     return;
                                 }
@@ -497,8 +498,8 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                                 var3 = var2.getDerValue();
                             }
 
-                            if(var3.isContextSpecific(2)) {
-                                this.subjectUniqueId = new UniqueIdentity(var3);
+                            if(var3.isContextSpecific((byte) 2)) {
+                                this.subjectUniqueId = new TUniqueIdentity(var3);
                                 if(var2.available() == 0) {
                                     return;
                                 }
@@ -528,14 +529,14 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                 throw new CertificateParsingException("X.509 Certificate is incomplete: subject field is empty, and certificate has no extensions");
             }
 
-            SubjectAlternativeNameExtension var3 = null;
+            TSubjectAlternativeNameExtension var3 = null;
             Object var4 = null;
             TGeneralNames var5 = null;
 
             try {
-                var3 = (SubjectAlternativeNameExtension)var2.get("SubjectAlternativeName");
+                var3 = (TSubjectAlternativeNameExtension)var2.get(TString.wrap("SubjectAlternativeName"));
                 var5 = var3.get("subject_name");
-            } catch (IOException var7) {
+            } catch (TIOException var7) {
                 throw new CertificateParsingException("X.509 Certificate is incomplete: subject field is empty, and SubjectAlternativeName extension is absent");
             }
 
@@ -556,17 +557,17 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         this.serialNum.encode(var2);
         this.algId.encode(var2);
         if(this.version.compare(0) == 0 && this.issuer.toString() == null) {
-            throw new CertificateParsingException("Null issuer DN not allowed in v1 certificate");
+            throw new TCertificateParsingException(TString.wrap("Null issuer DN not allowed in v1 certificate"));
         } else {
             this.issuer.encode(var2);
             this.interval.encode(var2);
             if(this.version.compare(0) == 0 && this.subject.toString() == null) {
-                throw new CertificateParsingException("Null subject DN not allowed in v1 certificate");
+                throw new TCertificateParsingException(TString.wrap("Null subject DN not allowed in v1 certificate"));
             } else {
                 this.subject.encode(var2);
                 this.pubKey.encode(var2);
                 if(this.issuerUniqueId != null) {
-                    this.issuerUniqueId.encode(var2, DerValue.createTag(-128, false, 1));
+                    this.issuerUniqueId.encode(var2, TDerValue.createTag(-128, false, 1));
                 }
 
                 if(this.subjectUniqueId != null) {
