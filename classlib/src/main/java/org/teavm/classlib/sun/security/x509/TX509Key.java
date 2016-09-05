@@ -24,7 +24,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
@@ -248,14 +247,14 @@ public class TX509Key implements TPublicKey {
             try {
                 byte[] var2 = this.getEncodedInternal();
                 byte[] var3;
-                if(var1 instanceof sun.security.x509.X509Key) {
-                    var3 = ((sun.security.x509.X509Key)var1).getEncodedInternal();
+                if(var1 instanceof TX509Key) {
+                    var3 = ((TX509Key)var1).getEncodedInternal();
                 } else {
                     var3 = ((Key)var1).getEncoded();
                 }
 
                 return Arrays.equals(var2, var3);
-            } catch (InvalidKeyException var4) {
+            } catch (TInvalidKeyException var4) {
                 return false;
             }
         }
