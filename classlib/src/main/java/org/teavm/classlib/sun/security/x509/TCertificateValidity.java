@@ -16,11 +16,11 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.Date;
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -96,7 +96,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         return this.notBefore != null && this.notAfter != null?"Validity: [From: " + this.notBefore.toString() + ",\n               To: " + this.notAfter.toString() + "]":"";
     }
 
-    public void encode(OutputStream var1) throws IOException {
+    public void encode(TOutputStream var1) throws TIOException {
         if(this.notBefore != null && this.notAfter != null) {
             TDerOutputStream var2 = new TDerOutputStream();
             if(this.notBefore.getTime() < 2524636800000L) {
@@ -115,7 +115,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
             var3.write((byte) 48, var2);
             var1.write(var3.toByteArray());
         } else {
-            throw new IOException("CertAttrSet:CertificateValidity: null values to encode.\n");
+            throw new TIOException(TString.wrap("CertAttrSet:CertificateValidity: null values to encode.\n"));
         }
     }
 

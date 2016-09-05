@@ -90,7 +90,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         this(var1, Collections.emptyMap());
     }
 
-    public TX500Name(String var1, Map<String, String> var2) throws IOException {
+    public TX500Name(TString var1, Map<TString, TString> var2) throws IOException {
         this.parseDN(var1, var2);
     }
 

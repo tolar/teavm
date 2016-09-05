@@ -105,8 +105,8 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         }
     }
 
-    public Integer get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("number")) {
+    public Integer get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("number"))) {
             return new Integer(this.getVersion());
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: TCertificateVersion."));

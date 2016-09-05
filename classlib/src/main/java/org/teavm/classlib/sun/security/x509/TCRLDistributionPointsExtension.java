@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
@@ -100,8 +99,8 @@ public class TCRLDistributionPointsExtension extends TExtension implements TCert
         var1.write(var4.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("points")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("points"))) {
             if(!(var2 instanceof List)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type List."));
             } else {
@@ -113,16 +112,16 @@ public class TCRLDistributionPointsExtension extends TExtension implements TCert
         }
     }
 
-    public List<TDistributionPoint> get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("points")) {
+    public List<TDistributionPoint> get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("points"))) {
             return this.distributionPoints;
         } else {
             throw new TIOException(TString.wrap("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:" + this.extensionName + "."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("points")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("points"))) {
             this.distributionPoints = Collections.emptyList();
             this.encodeThis();
         } else {
