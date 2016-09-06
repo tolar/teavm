@@ -145,13 +145,13 @@ public class TX509Key implements TPublicKey {
             } catch (InstantiationException var13) {
                 ;
             } catch (IllegalAccessException var14) {
-                throw new TIOException(var4 + " [internal error]");
+                throw new TIOException(TString.wrap(var4 + " [internal error]"));
             }
 
             TX509Key var5 = new TX509Key(var0, var1);
             return var5;
         } catch (TInvalidKeySpecException var16) {
-            throw new TInvalidKeyException(var16.getMessage(), var16);
+            throw new TInvalidKeyException(TString.wrap(var16.getMessage()), var16);
         }
     }
 

@@ -15,12 +15,12 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
@@ -58,11 +58,11 @@ class TAVAKeyword {
         }
     }
 
-    static TObjectIdentifier getOID(TString var0, int var1, Map<TString, TString> var2) throws IOException {
+    static TObjectIdentifier getOID(TString var0, int var1, Map<TString, TString> var2) throws TIOException {
         var0 = var0.toUpperCase(Locale.ENGLISH);
         if(var1 == 3) {
             if(var0.startsWith(TString.wrap(" ")) || var0.endsWith(TString.wrap(" "))) {
-                throw new IOException("Invalid leading or trailing space in keyword \"" + var0 + "\"");
+                throw new TIOException(TString.wrap("Invalid leading or trailing space in keyword \"" + var0 + "\""));
             }
         } else {
             var0 = var0.trim();
@@ -87,7 +87,7 @@ class TAVAKeyword {
                 }
 
                 if(!var6) {
-                    throw new IOException("Invalid keyword \"" + var0 + "\"");
+                    throw new TIOException(TString.wrap("Invalid keyword \"" + var0 + "\""));
                 } else {
                     return new TObjectIdentifier(var0);
                 }

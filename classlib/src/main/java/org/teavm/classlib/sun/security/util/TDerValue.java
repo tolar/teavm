@@ -84,7 +84,7 @@ public class TDerValue {
         return !this.isConstructed()?false:(this.tag & 31) == var1;
     }
 
-    public TDerValue(String var1) throws IOException {
+    public TDerValue(TString var1) throws TIOException {
         boolean var2 = true;
 
         for(int var3 = 0; var3 < var1.length(); ++var3) {
@@ -97,7 +97,7 @@ public class TDerValue {
         this.data = this.init((byte)(var2?19:12), var1);
     }
 
-    public TDerValue(byte var1, String var2) throws IOException {
+    public TDerValue(byte var1, TString var2) throws IOException {
         this.data = this.init(var1, var2);
     }
 
@@ -155,12 +155,12 @@ public class TDerValue {
         this.data = this.init(false, var1);
     }
 
-    private TDerInputStream init(byte var1, String var2) throws IOException {
-        String var3 = null;
+    private TDerInputStream init(byte var1, TString var2) throws TIOException {
+        TString var3 = null;
         this.tag = var1;
         switch(var1) {
             case 12:
-                var3 = "UTF8";
+                var3 = TString.wrap("UTF8");
                 break;
             case 13:
             case 14:
@@ -180,13 +180,13 @@ public class TDerValue {
             case 19:
             case 22:
             case 27:
-                var3 = "ASCII";
+                var3 = TString.wrap("ASCII");
                 break;
             case 20:
-                var3 = "ISO-8859-1";
+                var3 = TString.wrap("ISO-8859-1");
                 break;
             case 30:
-                var3 = "UnicodeBigUnmarked";
+                var3 = TString.wrap("UnicodeBigUnmarked");
         }
 
         byte[] var4 = var2.getBytes(var3);

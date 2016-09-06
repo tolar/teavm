@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
 import org.teavm.classlib.java.io.TIOException;
@@ -203,10 +202,10 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.CertificateExtensions)) {
+        } else if(!(var1 instanceof TCertificateExtensions)) {
             return false;
         } else {
-            Collection var2 = ((sun.security.x509.CertificateExtensions)var1).getAllExtensions();
+            TCollection var2 = ((TCertificateExtensions)var1).getAllExtensions();
             Object[] var3 = var2.toArray();
             int var4 = var3.length;
             if(var4 != this.map.size()) {
@@ -234,7 +233,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
                     }
                 }
 
-                return this.getUnparseableExtensions().equals(((sun.security.x509.CertificateExtensions)var1).getUnparseableExtensions());
+                return this.getUnparseableExtensions().equals(((TCertificateExtensions)var1).getUnparseableExtensions());
             }
         }
     }

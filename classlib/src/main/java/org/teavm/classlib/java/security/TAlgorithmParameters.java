@@ -18,6 +18,7 @@ package org.teavm.classlib.java.security;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+
 import org.teavm.classlib.java.io.TIOException;
 
 public class TAlgorithmParameters {
@@ -41,6 +42,11 @@ public class TAlgorithmParameters {
     }
 
     public final byte[] getEncoded(String format) throws IOException
+    {
+        return null;
+    }
+
+    public final byte[] getEncoded() throws IOException
     {
         return null;
     }

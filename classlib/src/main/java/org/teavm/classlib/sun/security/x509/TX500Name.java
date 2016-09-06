@@ -88,23 +88,23 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     private static final Constructor<X500Principal> principalConstructor;
     private static final Field principalField;
 
-    public TX500Name(String var1) throws IOException {
+    public TX500Name(TString var1) throws TIOException {
         this(var1, Collections.emptyMap());
     }
 
-    public TX500Name(TString var1, Map<TString, TString> var2) throws IOException {
+    public TX500Name(TString var1, Map<TString, TString> var2) throws TIOException {
         this.parseDN(var1, var2);
     }
 
-    public TX500Name(String var1, String var2) throws IOException {
+    public TX500Name(TString var1, TString var2) throws TIOException {
         if(var1 == null) {
             throw new NullPointerException("Name must not be null");
         } else {
-            if(var2.equalsIgnoreCase("RFC2253")) {
+            if(var2.equalsIgnoreCase(TString.wrap("RFC2253"))) {
                 this.parseRFC2253DN(var1);
             } else {
-                if(!var2.equalsIgnoreCase("DEFAULT")) {
-                    throw new IOException("Unsupported format " + var2);
+                if(!var2.equalsIgnoreCase(TString.wrap("DEFAULT"))) {
+                    throw new TIOException(TString.wrap("Unsupported format " + var2));
                 }
 
                 this.parseDN(var1, Collections.emptyMap());
@@ -113,7 +113,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         }
     }
 
-    public TX500Name(String var1, String var2, String var3, String var4) throws IOException {
+    public TX500Name(TString var1, TString var2, TString var3, TString var4) throws IOException {
         this.names = new TRDN[4];
         this.names[3] = new TRDN(1);
         this.names[3].assertion[0] = new TAVA(commonName_oid, new TDerValue(var1));
@@ -125,7 +125,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         this.names[0].assertion[0] = new TAVA(countryName_oid, new TDerValue(var4));
     }
 
-    public TX500Name(String var1, String var2, String var3, String var4, String var5, String var6) throws IOException {
+    public TX500Name(TString var1, TString var2, TString var3, TString var4, TString var5, TString var6) throws IOException {
         this.names = new TRDN[6];
         this.names[5] = new TRDN(1);
         this.names[5].assertion[0] = new TAVA(commonName_oid, new TDerValue(var1));
@@ -222,7 +222,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.X500Name)) {
+        } else if(!(var1 instanceof TX500Name)) {
             return false;
         } else {
             TX500Name var2 = (TX500Name)var1;
@@ -249,11 +249,11 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         }
     }
 
-    private String getString(TDerValue var1) throws IOException {
+    private TString getString(TDerValue var1) throws IOException {
         if(var1 == null) {
             return null;
         } else {
-            String var2 = var1.getAsString();
+            TString var2 = var1.getAsString();
             if(var2 == null) {
                 throw new IOException("not a DER string encoding, " + var1.tag);
             } else {
@@ -266,67 +266,67 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return 4;
     }
 
-    public String getCountry() throws IOException {
+    public TString getCountry() throws IOException {
         TDerValue var1 = this.findAttribute(countryName_oid);
         return this.getString(var1);
     }
 
-    public String getOrganization() throws IOException {
+    public TString getOrganization() throws IOException {
         TDerValue var1 = this.findAttribute(orgName_oid);
         return this.getString(var1);
     }
 
-    public String getOrganizationalUnit() throws IOException {
+    public TString getOrganizationalUnit() throws IOException {
         TDerValue var1 = this.findAttribute(orgUnitName_oid);
         return this.getString(var1);
     }
 
-    public String getCommonName() throws IOException {
+    public TString getCommonName() throws IOException {
         TDerValue var1 = this.findAttribute(commonName_oid);
         return this.getString(var1);
     }
 
-    public String getLocality() throws IOException {
+    public TString getLocality() throws IOException {
         TDerValue var1 = this.findAttribute(localityName_oid);
         return this.getString(var1);
     }
 
-    public String getState() throws IOException {
+    public TString getState() throws IOException {
         TDerValue var1 = this.findAttribute(stateName_oid);
         return this.getString(var1);
     }
 
-    public String getDomain() throws IOException {
+    public TString getDomain() throws IOException {
         TDerValue var1 = this.findAttribute(DOMAIN_COMPONENT_OID);
         return this.getString(var1);
     }
 
-    public String getDNQualifier() throws IOException {
+    public TString getDNQualifier() throws IOException {
         TDerValue var1 = this.findAttribute(DNQUALIFIER_OID);
         return this.getString(var1);
     }
 
-    public String getSurname() throws IOException {
+    public TString getSurname() throws IOException {
         TDerValue var1 = this.findAttribute(SURNAME_OID);
         return this.getString(var1);
     }
 
-    public String getGivenName() throws IOException {
+    public TString getGivenName() throws IOException {
         TDerValue var1 = this.findAttribute(GIVENNAME_OID);
         return this.getString(var1);
     }
 
-    public String getInitials() throws IOException {
+    public TString getInitials() throws IOException {
         TDerValue var1 = this.findAttribute(INITIALS_OID);
         return this.getString(var1);
     }
 
-    public String getGeneration() throws IOException {
+    public TString getGeneration() throws IOException {
         TDerValue var1 = this.findAttribute(GENERATIONQUALIFIER_OID);
         return this.getString(var1);
     }
 
-    public String getIP() throws IOException {
+    public TString getIP() throws IOException {
         TDerValue var1 = this.findAttribute(ipAddress_oid);
         return this.getString(var1);
     }
@@ -507,7 +507,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return (byte[])this.getEncodedInternal().clone();
     }
 
-    private void parseDN(TString var1, Map<TString, TString> var2) throws IOException {
+    private void parseDN(TString var1, Map<TString, TString> var2) throws TIOException {
         if(var1 != null && var1.length() != 0) {
             ArrayList var3 = new ArrayList();
             int var4 = 0;
@@ -551,7 +551,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         }
     }
 
-    private void parseRFC2253DN(String var1) throws IOException {
+    private void parseRFC2253DN(TString var1) throws TIOException {
         if(var1.length() == 0) {
             this.names = new TRDN[0];
         } else {
@@ -559,12 +559,12 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
             int var3 = 0;
             int var5 = 0;
 
-            String var4;
+            TString var4;
             TRDN var7;
             for(int var6 = var1.indexOf(44); var6 >= 0; var6 = var1.indexOf(44, var5)) {
                 if(var6 > 0 && !escaped(var6, var5, var1)) {
                     var4 = var1.substring(var3, var6);
-                    var7 = new TRDN(var4, "RFC2253");
+                    var7 = new TRDN(var4, TString.wrap("RFC2253"));
                     var2.add(var7);
                     var3 = var6 + 1;
                 }
@@ -592,7 +592,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return var3;
     }
 
-    private static boolean escaped(int var0, int var1, String var2) {
+    private static boolean escaped(int var0, int var1, TString var2) {
         if(var0 == 1 && var2.charAt(var0 - 1) == 92) {
             return true;
         } else if(var0 > 1 && var2.charAt(var0 - 1) == 92 && var2.charAt(var0 - 2) != 92) {
@@ -791,7 +791,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         PrivilegedExceptionAction var0 = new PrivilegedExceptionAction() {
             public Object[] run() throws Exception {
                 Class var1 = X500Principal.class;
-                Class[] var2 = new Class[]{sun.security.x509.X500Name.class};
+                Class[] var2 = new Class[]{TX500Name.class};
                 Constructor var3 = var1.getDeclaredConstructor(var2);
                 var3.setAccessible(true);
                 Field var4 = var1.getDeclaredField("thisX500Name");

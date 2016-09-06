@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,7 +44,7 @@ public class TRDN {
         this(var1, Collections.emptyMap());
     }
 
-    public TRDN(TString var1, Map<TString, TString> var2) throws IOException {
+    public TRDN(TString var1, Map<TString, TString> var2) throws TIOException {
         int var3 = 0;
         int var4 = 0;
         int var5 = 0;
@@ -58,7 +57,7 @@ public class TRDN {
             if(var7 > 0 && var1.charAt(var7 - 1) != 92 && var3 != 1) {
                 var8 = var1.substring(var5, var7);
                 if(var8.length() == 0) {
-                    throw new IOException("empty TAVA in TRDN \"" + var1 + "\"");
+                    throw new TIOException(TString.wrap("empty TAVA in TRDN \"" + var1 + "\""));
                 }
 
                 var9 = new TAVA(new TStringReader(var8), var2);
@@ -72,7 +71,7 @@ public class TRDN {
 
         var8 = var1.substring(var5);
         if(var8.length() == 0) {
-            throw new IOException("empty TAVA in TRDN \"" + var1 + "\"");
+            throw new TIOException(TString.wrap("empty TAVA in TRDN \"" + var1 + "\""));
         } else {
             var9 = new TAVA(new TStringReader(var8), var2);
             var6.add(var9);
@@ -80,29 +79,29 @@ public class TRDN {
         }
     }
 
-    TRDN(String var1, String var2) throws IOException {
+    TRDN(TString var1, TString var2) throws TIOException {
         this(var1, var2, Collections.emptyMap());
     }
 
-    TRDN(String var1, String var2, Map<TString, TString> var3) throws IOException {
-        if(!var2.equalsIgnoreCase("RFC2253")) {
-            throw new IOException("Unsupported format " + var2);
+    TRDN(TString var1, TString var2, Map<TString, TString> var3) throws TIOException {
+        if(!var2.equalsIgnoreCase(TString.wrap("RFC2253"))) {
+            throw new TIOException(TString.wrap("Unsupported format " + var2));
         } else {
             boolean var4 = false;
             int var5 = 0;
             ArrayList var6 = new ArrayList(3);
 
-            String var8;
+            TString var8;
             TAVA var9;
             int var10;
             for(int var7 = var1.indexOf(43); var7 >= 0; var7 = var1.indexOf(43, var10)) {
                 if(var7 > 0 && var1.charAt(var7 - 1) != 92) {
                     var8 = var1.substring(var5, var7);
                     if(var8.length() == 0) {
-                        throw new IOException("empty TAVA in TRDN \"" + var1 + "\"");
+                        throw new TIOException(TString.wrap("empty TAVA in TRDN \"" + var1 + "\""));
                     }
 
-                    var9 = new TAVA(new StringReader(var8), 3, var3);
+                    var9 = new TAVA(new TStringReader(var8), 3, var3);
                     var6.add(var9);
                     var5 = var7 + 1;
                 }
@@ -112,9 +111,9 @@ public class TRDN {
 
             var8 = var1.substring(var5);
             if(var8.length() == 0) {
-                throw new IOException("empty TAVA in TRDN \"" + var1 + "\"");
+                throw new TIOException(TString.wrap("empty TAVA in TRDN \"" + var1 + "\""));
             } else {
-                var9 = new TAVA(new StringReader(var8), 3, var3);
+                var9 = new TAVA(new TStringReader(var8), 3, var3);
                 var6.add(var9);
                 this.assertion = (TAVA[])var6.toArray(new TAVA[var6.size()]);
             }
