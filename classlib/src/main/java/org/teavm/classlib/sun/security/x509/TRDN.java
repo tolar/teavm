@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TStringReader;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TArrays;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -40,17 +41,17 @@ public class TRDN {
     private volatile List<TAVA> avaList;
     private volatile String canonicalString;
 
-    public TRDN(String var1) throws IOException {
+    public TRDN(TString var1) throws IOException {
         this(var1, Collections.emptyMap());
     }
 
-    public TRDN(String var1, Map<TString, TString> var2) throws IOException {
+    public TRDN(TString var1, Map<TString, TString> var2) throws IOException {
         int var3 = 0;
         int var4 = 0;
         int var5 = 0;
         ArrayList var6 = new ArrayList(3);
 
-        String var8;
+        TString var8;
         TAVA var9;
         for(int var7 = var1.indexOf(43); var7 >= 0; var7 = var1.indexOf(43, var4)) {
             var3 += TX500Name.countQuotes(var1, var4, var7);
@@ -60,7 +61,7 @@ public class TRDN {
                     throw new IOException("empty TAVA in TRDN \"" + var1 + "\"");
                 }
 
-                var9 = new TAVA(new StringReader(var8), var2);
+                var9 = new TAVA(new TStringReader(var8), var2);
                 var6.add(var9);
                 var5 = var7 + 1;
                 var3 = 0;
@@ -73,7 +74,7 @@ public class TRDN {
         if(var8.length() == 0) {
             throw new IOException("empty TAVA in TRDN \"" + var1 + "\"");
         } else {
-            var9 = new TAVA(new StringReader(var8), var2);
+            var9 = new TAVA(new TStringReader(var8), var2);
             var6.add(var9);
             this.assertion = (TAVA[])var6.toArray(new TAVA[var6.size()]);
         }

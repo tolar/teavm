@@ -24,12 +24,14 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.spec.TInvalidKeySpecException;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.util.TBitArray;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -143,7 +145,7 @@ public class TX509Key implements TPublicKey {
             } catch (InstantiationException var13) {
                 ;
             } catch (IllegalAccessException var14) {
-                throw new IOException(var4 + " [internal error]");
+                throw new TIOException(var4 + " [internal error]");
             }
 
             TX509Key var5 = new TX509Key(var0, var1);

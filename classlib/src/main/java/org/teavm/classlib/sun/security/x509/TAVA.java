@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.io.TReader;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
@@ -59,19 +60,19 @@ public class TAVA implements TDerEncoder {
         }
     }
 
-    TAVA(Reader var1) throws IOException {
+    TAVA(TReader var1) throws IOException {
         this(var1, 1);
     }
 
-    TAVA(Reader var1, Map<TString, TString> var2) throws IOException {
+    TAVA(TReader var1, Map<TString, TString> var2) throws IOException {
         this(var1, 1, var2);
     }
 
-    TAVA(Reader var1, int var2) throws IOException {
+    TAVA(TReader var1, int var2) throws IOException {
         this(var1, var2, Collections.emptyMap());
     }
 
-    TAVA(Reader var1, int var2, Map<TString, TString> var3) throws IOException {
+    TAVA(TReader var1, int var2, Map<TString, TString> var3) throws IOException {
         StringBuilder var4 = new StringBuilder();
 
         while(true) {
@@ -361,7 +362,7 @@ public class TAVA implements TDerEncoder {
         }
     }
 
-    private static int readChar(Reader var0, String var1) throws IOException {
+    private static int readChar(TReader var0, String var1) throws IOException {
         int var2 = var0.read();
         if(var2 == -1) {
             throw new IOException(var1);

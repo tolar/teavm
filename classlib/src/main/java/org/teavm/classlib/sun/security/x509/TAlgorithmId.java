@@ -224,11 +224,11 @@ public class TAlgorithmId {
         try {
             var1 = algOID(var0);
         } catch (TIOException var3) {
-            throw new TNoSuchAlgorithmException("Invalid ObjectIdentifier " + var0, e);
+            throw new TNoSuchAlgorithmException(TString.wrap("Invalid ObjectIdentifier " + var0));
         }
 
         if(var1 == null) {
-            throw new TNoSuchAlgorithmException("unrecognized algorithm name: " + var0, e);
+            throw new TNoSuchAlgorithmException(TString.wrap("unrecognized algorithm name: " + var0));
         } else {
             return new TAlgorithmId(var1);
         }

@@ -26,7 +26,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.security.auth.x500.X500Principal;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPrincipal;
@@ -290,42 +292,42 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     }
 
     public String getState() throws IOException {
-        DerValue var1 = this.findAttribute(stateName_oid);
+        TDerValue var1 = this.findAttribute(stateName_oid);
         return this.getString(var1);
     }
 
     public String getDomain() throws IOException {
-        DerValue var1 = this.findAttribute(DOMAIN_COMPONENT_OID);
+        TDerValue var1 = this.findAttribute(DOMAIN_COMPONENT_OID);
         return this.getString(var1);
     }
 
     public String getDNQualifier() throws IOException {
-        DerValue var1 = this.findAttribute(DNQUALIFIER_OID);
+        TDerValue var1 = this.findAttribute(DNQUALIFIER_OID);
         return this.getString(var1);
     }
 
     public String getSurname() throws IOException {
-        DerValue var1 = this.findAttribute(SURNAME_OID);
+        TDerValue var1 = this.findAttribute(SURNAME_OID);
         return this.getString(var1);
     }
 
     public String getGivenName() throws IOException {
-        DerValue var1 = this.findAttribute(GIVENNAME_OID);
+        TDerValue var1 = this.findAttribute(GIVENNAME_OID);
         return this.getString(var1);
     }
 
     public String getInitials() throws IOException {
-        DerValue var1 = this.findAttribute(INITIALS_OID);
+        TDerValue var1 = this.findAttribute(INITIALS_OID);
         return this.getString(var1);
     }
 
     public String getGeneration() throws IOException {
-        DerValue var1 = this.findAttribute(GENERATIONQUALIFIER_OID);
+        TDerValue var1 = this.findAttribute(GENERATIONQUALIFIER_OID);
         return this.getString(var1);
     }
 
     public String getIP() throws IOException {
-        DerValue var1 = this.findAttribute(ipAddress_oid);
+        TDerValue var1 = this.findAttribute(ipAddress_oid);
         return this.getString(var1);
     }
 
@@ -447,7 +449,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
 
         try {
             var2 = var1.getSequence(5);
-        } catch (IOException var6) {
+        } catch (TIOException var6) {
             if(var3 == null) {
                 var2 = null;
             } else {
@@ -514,7 +516,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
             int var9 = 0;
             int var10 = var1.indexOf(44);
 
-            String var6;
+            TString var6;
             TRDN var12;
             for(int var11 = var1.indexOf(59); var10 >= 0 || var11 >= 0; var11 = var8.indexOf(59, var9)) {
                 int var5;
@@ -578,7 +580,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         }
     }
 
-    static int countQuotes(String var0, int var1, int var2) {
+    static int countQuotes(TString var0, int var1, int var2) {
         int var3 = 0;
 
         for(int var4 = var1; var4 < var2; ++var4) {
