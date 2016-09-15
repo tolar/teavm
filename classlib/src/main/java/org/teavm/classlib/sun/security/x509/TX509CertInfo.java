@@ -20,6 +20,7 @@ import java.security.cert.CertificateParsingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
@@ -132,9 +133,9 @@ public class TX509CertInfo implements TCertAttrSet<String> {
 
             return (byte[])this.rawCertInfo.clone();
         } catch (TIOException var2) {
-            throw new TCertificateEncodingException(var2.toString());
+            throw new TCertificateEncodingException(TString.wrap(var2.toString()));
         } catch (TCertificateException var3) {
-            throw new TCertificateEncodingException(var3.toString());
+            throw new TCertificateEncodingException(TString.wrap(var3.toString()));
         }
     }
 

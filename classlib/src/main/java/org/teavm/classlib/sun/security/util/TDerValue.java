@@ -97,7 +97,7 @@ public class TDerValue {
         this.data = this.init((byte)(var2?19:12), var1);
     }
 
-    public TDerValue(byte var1, TString var2) throws IOException {
+    public TDerValue(byte var1, TString var2) throws TIOException {
         this.data = this.init(var1, var2);
     }
 

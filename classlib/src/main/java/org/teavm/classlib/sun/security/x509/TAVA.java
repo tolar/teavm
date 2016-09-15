@@ -27,7 +27,9 @@ import java.util.Map;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.io.TReader;
+import org.teavm.classlib.java.lang.TByte;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.TStringBuilder;
 import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -72,7 +74,7 @@ public class TAVA implements TDerEncoder {
     }
 
     TAVA(TReader var1, int var2, Map<TString, TString> var3) throws TIOException {
-        StringBuilder var4 = new StringBuilder();
+        TStringBuilder var4 = new TStringBuilder();
 
         while(true) {
             int var5 = readChar(var1, TString.wrap("Incorrect TAVA format"));
@@ -93,7 +95,7 @@ public class TAVA implements TDerEncoder {
                 }
 
                 if(var5 == -1) {
-                    this.value = new TDerValue("");
+                    this.value = new TDerValue(TString.wrap(""));
                     return;
                 } else {
                     if(var5 == 35) {
@@ -133,7 +135,7 @@ public class TAVA implements TDerEncoder {
         }
     }
 
-    private static TDerValue parseHexString(TReader var0, int var1) throws IOException {
+    private static TDerValue parseHexString(TReader var0, int var1) throws TIOException {
         ByteArrayOutputStream var3 = new ByteArrayOutputStream();
         byte var4 = 0;
         int var5 = 0;
@@ -142,9 +144,9 @@ public class TAVA implements TDerEncoder {
             int var2 = var0.read();
             if(isTerminator(var2, var1)) {
                 if(var5 == 0) {
-                    throw new IOException("TAVA parse, zero hex digits");
+                    throw new TIOException(TString.wrap("TAVA parse, zero hex digits"));
                 } else if(var5 % 2 == 1) {
-                    throw new IOException("TAVA parse, odd number of hex digits");
+                    throw new TIOException(TString.wrap("TAVA parse, odd number of hex digits"));
                 } else {
                     return new TDerValue(var3.toByteArray());
                 }
@@ -152,7 +154,7 @@ public class TAVA implements TDerEncoder {
 
             int var6 = "0123456789ABCDEF".indexOf(Character.toUpperCase((char)var2));
             if(var6 == -1) {
-                throw new IOException("TAVA parse, invalid hex digit: " + (char)var2);
+                throw new TIOException(TString.wrap("TAVA parse, invalid hex digit: " + (char)var2));
             }
 
             if(var5 % 2 == 1) {
@@ -166,17 +168,17 @@ public class TAVA implements TDerEncoder {
         }
     }
 
-    private TDerValue parseQuotedString(TReader var1, StringBuilder var2) throws IOException {
-        int var3 = readChar(var1, "Quoted string did not end in quote");
+    private TDerValue parseQuotedString(TReader var1, TStringBuilder var2) throws TIOException {
+        int var3 = readChar(var1, TString.wrap("Quoted string did not end in quote"));
         ArrayList var4 = new ArrayList();
         boolean var5 = true;
 
         while(true) {
-            String var7;
+            TString var7;
             while(var3 != 34) {
                 if(var3 == 92) {
-                    var3 = readChar(var1, "Quoted string did not end in quote");
-                    Byte var6 = null;
+                    var3 = readChar(var1, TString.wrap("Quoted string did not end in quote"));
+                    TByte var6 = null;
                     if((var6 = getEmbeddedHexPair(var3, var1)) != null) {
                         var5 = false;
                         var4.add(var6);
@@ -185,7 +187,7 @@ public class TAVA implements TDerEncoder {
                     }
 
                     if(",=\n+<>#;\\\"".indexOf((char)var3) < 0) {
-                        throw new IOException("Invalid escaped character in TAVA: " + (char)var3);
+                        throw new TIOException(TString.wrap("Invalid escaped character in TAVA: " + (char)var3));
                     }
                 }
 
@@ -197,7 +199,7 @@ public class TAVA implements TDerEncoder {
 
                 var5 &= TDerValue.isPrintableStringChar((char)var3);
                 var2.append((char)var3);
-                var3 = readChar(var1, "Quoted string did not end in quote");
+                var3 = readChar(var1, TString.wrap("Quoted string did not end in quote"));
             }
 
             if(var4.size() > 0) {
@@ -213,35 +215,35 @@ public class TAVA implements TDerEncoder {
             } while(var3 == 32);
 
             if(var3 != -1) {
-                throw new IOException("TAVA had characters other than whitespace after terminating quote");
+                throw new TIOException(TString.wrap("TAVA had characters other than whitespace after terminating quote"));
             }
 
             if(!this.oid.equals(TPKCS9Attribute.EMAIL_ADDRESS_OID) && (!this.oid.equals(TX500Name.DOMAIN_COMPONENT_OID) )) {
                 if(var5) {
-                    return new TDerValue(var2.toString().trim());
+                    return new TDerValue(TString.wrap(var2.toString().trim()));
                 }
 
-                return new TDerValue((byte) 12, var2.toString().trim());
+                return new TDerValue((byte) 12, TString.wrap(var2.toString().trim()));
             }
 
-            return new TDerValue((byte) 22, var2.toString().trim());
+            return new TDerValue((byte) 22, TString.wrap(var2.toString().trim()));
         }
     }
 
-    private TDerValue parseString(TReader var1, int var2, int var3, StringBuilder var4) throws IOException {
+    private TDerValue parseString(TReader var1, int var2, int var3, TStringBuilder var4) throws TIOException {
         ArrayList var5 = new ArrayList();
         boolean var6 = true;
         boolean var7 = false;
         boolean var8 = true;
         int var9 = 0;
 
-        String var12;
+        TString var12;
         do {
             var7 = false;
             if(var2 == 92) {
                 var7 = true;
-                var2 = readChar(var1, "Invalid trailing backslash");
-                Byte var10 = null;
+                var2 = readChar(var1, TString.wrap("Invalid trailing backslash"));
+                TByte var10 = null;
                 if((var10 = getEmbeddedHexPair(var2, var1)) != null) {
                     var6 = false;
                     var5.add(var10);
@@ -251,34 +253,34 @@ public class TAVA implements TDerEncoder {
                 }
 
                 if(var3 == 1 && ",=\n+<>#;\\\" ".indexOf((char)var2) == -1) {
-                    throw new IOException("Invalid escaped character in TAVA: \'" + (char)var2 + "\'");
+                    throw new TIOException(TString.wrap("Invalid escaped character in TAVA: \'" + (char)var2 + "\'"));
                 }
 
                 if(var3 == 3) {
                     if(var2 == 32) {
                         if(!var8 && !trailingSpace(var1)) {
-                            throw new IOException("Invalid escaped space character in TAVA.  Only a leading or trailing space character can be escaped.");
+                            throw new TIOException(TString.wrap("Invalid escaped space character in TAVA.  Only a leading or trailing space character can be escaped."));
                         }
                     } else if(var2 == 35) {
                         if(!var8) {
-                            throw new IOException("Invalid escaped \'#\' character in TAVA.  Only a leading \'#\' can be escaped.");
+                            throw new TIOException(TString.wrap("Invalid escaped \'#\' character in TAVA.  Only a leading \'#\' can be escaped."));
                         }
                     } else if(",=+<>#;\\\"".indexOf((char)var2) == -1) {
-                        throw new IOException("Invalid escaped character in TAVA: \'" + (char)var2 + "\'");
+                        throw new TIOException(TString.wrap("Invalid escaped character in TAVA: \'" + (char)var2 + "\'"));
                     }
                 }
             } else if(var3 == 3) {
                 if(",=+<>#;\\\"".indexOf((char)var2) != -1) {
-                    throw new IOException("Character \'" + (char)var2 + "\' in TAVA appears without escape");
+                    throw new TIOException(TString.wrap("Character \'" + (char)var2 + "\' in TAVA appears without escape"));
                 }
             } else if(",+<>;\"".indexOf((char)var2) != -1) {
-                throw new IOException("Character \'" + (char)var2 + "\' in TAVA appears without escape");
+                throw new TIOException(TString.wrap("Character \'" + (char)var2 + "\' in TAVA appears without escape"));
             }
 
             int var11;
             if(var5.size() > 0) {
                 for(var11 = 0; var11 < var9; ++var11) {
-                    var4.append(" ");
+                    var4.append(TString.wrap(" "));
                 }
 
                 var9 = 0;
@@ -292,7 +294,7 @@ public class TAVA implements TDerEncoder {
                 ++var9;
             } else {
                 for(var11 = 0; var11 < var9; ++var11) {
-                    var4.append(" ");
+                    var4.append(TString.wrap(" "));
                 }
 
                 var9 = 0;
@@ -304,7 +306,7 @@ public class TAVA implements TDerEncoder {
         } while(!isTerminator(var2, var3));
 
         if(var3 == 3 && var9 > 0) {
-            throw new IOException("Incorrect TAVA RFC2253 format - trailing space must be escaped");
+            throw new TIOException(TString.wrap("Incorrect TAVA RFC2253 format - trailing space must be escaped"));
         } else {
             if(var5.size() > 0) {
                 var12 = getEmbeddedHexString(var5);
@@ -313,31 +315,31 @@ public class TAVA implements TDerEncoder {
             }
 
             if(this.oid.equals(TPKCS9Attribute.EMAIL_ADDRESS_OID) || this.oid.equals(TX500Name.DOMAIN_COMPONENT_OID) ) {
-                return new TDerValue((byte) 22, var4.toString());
+                return new TDerValue((byte) 22, TString.wrap(var4.toString()));
             } else if(var6) {
-                return new TDerValue(var4.toString());
+                return new TDerValue(TString.wrap(var4.toString()));
             } else {
-                return new TDerValue((byte) 12, var4.toString());
+                return new TDerValue((byte) 12, TString.wrap(var4.toString()));
             }
         }
     }
 
-    private static Byte getEmbeddedHexPair(int var0, TReader var1) throws IOException {
+    private static TByte getEmbeddedHexPair(int var0, TReader var1) throws TIOException {
         if("0123456789ABCDEF".indexOf(Character.toUpperCase((char)var0)) >= 0) {
-            int var2 = readChar(var1, "unexpected EOF - escaped hex value must include two valid digits");
+            int var2 = readChar(var1, TString.wrap("unexpected EOF - escaped hex value must include two valid digits"));
             if("0123456789ABCDEF".indexOf(Character.toUpperCase((char)var2)) >= 0) {
                 int var3 = Character.digit((char)var0, 16);
                 int var4 = Character.digit((char)var2, 16);
-                return new Byte((byte)((var3 << 4) + var4));
+                return new TByte((byte)((var3 << 4) + var4));
             } else {
-                throw new IOException("escaped hex value must include two valid digits");
+                throw new TIOException(TString.wrap("escaped hex value must include two valid digits"));
             }
         } else {
             return null;
         }
     }
 
-    private static String getEmbeddedHexString(List<Byte> var0) throws IOException {
+    private static TString getEmbeddedHexString(List<Byte> var0) throws TIOException {
         int var1 = var0.size();
         byte[] var2 = new byte[var1];
 
@@ -345,7 +347,7 @@ public class TAVA implements TDerEncoder {
             var2[var3] = ((Byte)var0.get(var3)).byteValue();
         }
 
-        return new String(var2, "UTF8");
+        return new TString(var2, TString.wrap("UTF8"));
     }
 
     private static boolean isTerminator(int var0, int var1) {
@@ -370,7 +372,7 @@ public class TAVA implements TDerEncoder {
         }
     }
 
-    private static boolean trailingSpace(TReader var0) throws IOException {
+    private static boolean trailingSpace(TReader var0) throws TIOException {
         boolean var1 = false;
         if(!var0.markSupported()) {
             return true;

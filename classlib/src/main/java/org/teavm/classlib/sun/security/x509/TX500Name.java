@@ -573,7 +573,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
             }
 
             var4 = var1.substring(var3);
-            var7 = new TRDN(var4, "RFC2253");
+            var7 = new TRDN(var4, TString.wrap("RFC2253"));
             var2.add(var7);
             Collections.reverse(var2);
             this.names = (TRDN[])var2.toArray(new TRDN[var2.size()]);

@@ -30,6 +30,8 @@ import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 import org.teavm.classlib.sun.security.x509.TCertificateExtensions;
 
+import sun.security.pkcs.SignerInfo;
+
 /**
  * Created by vasek on 18. 8. 2016.
  */
@@ -149,7 +151,7 @@ public class TPKCS9Attribute implements TDerEncoder {
                         this.value = (new TDerInputStream(var5[0].toByteArray())).getUTCTime();
                         break;
                     case 6:
-                        SignerInfo[] var9 = new SignerInfo[var5.length];
+                        TSignerInfo[] var9 = new TSignerInfo[var5.length];
 
                         for(var8 = 0; var8 < var5.length; ++var8) {
                             var9[var8] = new SignerInfo(var5[var8].toDerInputStream());

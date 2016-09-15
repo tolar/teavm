@@ -15,6 +15,8 @@
  */
 package org.teavm.classlib.sun.security.cert;
 
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.TThrowable;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 
 public class TCertificateEncodingException extends TCertificateException {
@@ -35,7 +37,7 @@ public class TCertificateEncodingException extends TCertificateException {
      *
      * @param message the detail message.
      */
-    public TCertificateEncodingException(String message) {
+    public TCertificateEncodingException(TString message) {
         super(message);
     }
 
@@ -50,7 +52,7 @@ public class TCertificateEncodingException extends TCertificateException {
      *        and indicates that the cause is nonexistent or unknown.)
      * @since 1.5
      */
-    public TCertificateEncodingException(String message, Throwable cause) {
+    public TCertificateEncodingException(TString message, TThrowable cause) {
         super(message, cause);
     }
 
@@ -66,7 +68,7 @@ public class TCertificateEncodingException extends TCertificateException {
      *        and indicates that the cause is nonexistent or unknown.)
      * @since 1.5
      */
-    public TCertificateEncodingException(Throwable cause) {
+    public TCertificateEncodingException(TThrowable cause) {
         super(cause);
     }
 

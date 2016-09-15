@@ -15,12 +15,22 @@
  */
 package org.teavm.classlib.java.text;
 
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.TStringBuilder;
 import org.teavm.classlib.java.text.TAttributedCharacterIterator.Attribute;
-import org.teavm.classlib.java.util.*;
+import org.teavm.classlib.java.util.TArrayList;
+import org.teavm.classlib.java.util.TArrays;
+import org.teavm.classlib.java.util.THashMap;
+import org.teavm.classlib.java.util.THashSet;
+import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TList;
+import org.teavm.classlib.java.util.TListIterator;
+import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.java.util.TSet;
 
 public class TAttributedString {
 
-    String text;
+    TString text;
 
     TMap<TAttributedCharacterIterator.Attribute, TList<Range>> attributeMap;
 
@@ -339,12 +349,12 @@ public class TAttributedString {
         if (iterator.getBeginIndex() > iterator.getEndIndex()) {
             throw new IllegalArgumentException("Invalid substring range");
         }
-        StringBuilder buffer = new StringBuilder();
+        TStringBuilder buffer = new TStringBuilder();
         for (int i = iterator.getBeginIndex(); i < iterator.getEndIndex(); i++) {
             buffer.append(iterator.current());
             iterator.next();
         }
-        text = buffer.toString();
+        text = TString.wrap(buffer.toString());
         TSet<TAttributedCharacterIterator.Attribute> attributes = iterator.getAllAttributeKeys();
         if (attributes == null) {
             return;
@@ -382,7 +392,7 @@ public class TAttributedString {
             buffer.append(iterator.current());
             iterator.next();
         }
-        text = buffer.toString();
+        text = TString.wrap(buffer.toString());
         attributeMap = new THashMap<>((attributes.size() * 4 / 3) + 1);
 
         TIterator<Attribute> it = attributes.iterator();
@@ -412,7 +422,7 @@ public class TAttributedString {
         this(iterator, start, end, new THashSet<>(TArrays.asList(attributes)));
     }
 
-    public TAttributedString(String value) {
+    public TAttributedString(TString value) {
         if (value == null) {
             throw new NullPointerException();
         }
@@ -420,7 +430,7 @@ public class TAttributedString {
         attributeMap = new THashMap<>(11);
     }
 
-    public TAttributedString(String value, TMap<? extends TAttributedCharacterIterator.Attribute, ?> attributes) {
+    public TAttributedString(TString value, TMap<? extends TAttributedCharacterIterator.Attribute, ?> attributes) {
         if (value == null) {
             throw new NullPointerException();
         }
