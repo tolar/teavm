@@ -32,29 +32,18 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.x509.TAlgorithmId;
 import org.teavm.classlib.sun.security.x509.TX500Name;
 
-import sun.misc.HexDumpEncoder;
-import sun.security.pkcs.ContentInfo;
-import sun.security.pkcs.PKCS7;
-import sun.security.pkcs.PKCS9Attribute;
-import sun.security.pkcs.PKCS9Attributes;
-import sun.security.pkcs.ParsingException;
-import sun.security.timestamp.TimestampToken;
-import sun.security.util.Debug;
-import sun.security.util.DerEncoder;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.AlgorithmId;
-import sun.security.x509.KeyUsageExtension;
-import sun.security.x509.X500Name;
 
-public class TSignerInfo implements DerEncoder {
+public class TSignerInfo implements TDerEncoder {
     TBigInteger version;
     TX500Name issuerName;
     TBigInteger certificateSerialNumber;
@@ -63,7 +52,6 @@ public class TSignerInfo implements DerEncoder {
     byte[] encryptedDigest;
     Timestamp timestamp;
     private boolean hasTimestamp;
-    private static final Debug debug = Debug.getInstance("jar");
     TPKCS9Attributes authenticatedAttributes;
     TPKCS9Attributes unauthenticatedAttributes;
 
@@ -89,7 +77,7 @@ public class TSignerInfo implements DerEncoder {
         this.unauthenticatedAttributes = var7;
     }
 
-    public TSignerInfo(TDerInputStream var1) throws IOException, ParsingException {
+    public TSignerInfo(TDerInputStream var1) throws TIOException, ParsingException {
         this(var1, false);
     }
 
@@ -126,7 +114,7 @@ public class TSignerInfo implements DerEncoder {
         this.derEncode(var1);
     }
 
-    public void derEncode(TOutputStream var1) throws IOException {
+    public void derEncode(TOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         var2.putInteger(this.version);
         TDerOutputStream var3 = new TDerOutputStream();
@@ -149,11 +137,11 @@ public class TSignerInfo implements DerEncoder {
         var1.write(var4.toByteArray());
     }
 
-    public X509Certificate getCertificate(PKCS7 var1) throws IOException {
+    public X509Certificate getCertificate(TPKCS7 var1) throws IOException {
         return var1.getCertificate(this.certificateSerialNumber, this.issuerName);
     }
 
-    public ArrayList<X509Certificate> getCertificateChain(PKCS7 var1) throws IOException {
+    public ArrayList<X509Certificate> getCertificateChain(TPKCS7 var1) throws IOException {
         X509Certificate var2 = var1.getCertificate(this.certificateSerialNumber, this.issuerName);
         if(var2 == null) {
             return null;
@@ -195,9 +183,9 @@ public class TSignerInfo implements DerEncoder {
         }
     }
 
-    sun.security.pkcs.SignerInfo verify(PKCS7 var1, byte[] var2) throws NoSuchAlgorithmException, SignatureException {
+    sun.security.pkcs.SignerInfo verify(TPKCS7 var1, byte[] var2) throws NoSuchAlgorithmException, SignatureException {
         try {
-            ContentInfo var3 = var1.getContentInfo();
+            TContentInfo var3 = var1.getContentInfo();
             if(var2 == null) {
                 var2 = var3.getContentBytes();
             }
@@ -278,7 +266,7 @@ public class TSignerInfo implements DerEncoder {
         }
     }
 
-    sun.security.pkcs.SignerInfo verify(PKCS7 var1) throws NoSuchAlgorithmException, SignatureException {
+    sun.security.pkcs.SignerInfo verify(TPKCS7 var1) throws NoSuchAlgorithmException, SignatureException {
         return this.verify(var1, (byte[])null);
     }
 
@@ -326,7 +314,7 @@ public class TSignerInfo implements DerEncoder {
                     this.hasTimestamp = false;
                     return null;
                 } else {
-                    PKCS7 var2 = new PKCS7((byte[])((byte[])var1.getValue()));
+                    TPKCS7 var2 = new TPKCS7((byte[])((byte[])var1.getValue()));
                     byte[] var3 = var2.getContentInfo().getData();
                     sun.security.pkcs.SignerInfo[] var4 = var2.verify(var3);
                     ArrayList var5 = var4[0].getCertificateChain(var2);
