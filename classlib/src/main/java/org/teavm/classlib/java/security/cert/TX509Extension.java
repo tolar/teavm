@@ -74,7 +74,7 @@ public interface TX509Extension {
      * byte[] certData = <DER-encoded certificate data>
      * ByteArrayInputStream bais = new ByteArrayInputStream(certData);
      * X509Certificate cert = (X509Certificate)cf.generateCertificate(bais);
-     * X509CRLEntry badCert =
+     * TX509CRLEntry badCert =
      *              crl.getRevokedCertificate(cert.getSerialNumber());
      *
      * if (badCert != null) {

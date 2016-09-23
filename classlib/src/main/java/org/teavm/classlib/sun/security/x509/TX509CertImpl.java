@@ -46,9 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.io.TBufferedInputStream;
 import org.teavm.classlib.java.io.TBufferedReader;
 import org.teavm.classlib.java.io.TIOException;
@@ -65,6 +63,7 @@ import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -236,7 +235,7 @@ public class TX509CertImpl extends TX509Certificate {
                 throw new TSignatureException(TString.wrap("Signature does not match."));
             }
         } else if(this.signedCert == null) {
-            throw new TCertificateEncodingException("Uninitialized certificate");
+            throw new TCertificateEncodingException(TString.wrap("Uninitialized certificate"));
         } else {
             TSignature var3 = null;
             if(var2.length() == 0) {
@@ -1213,7 +1212,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public static X500Principal getIssuerX500Principal(X509Certificate var0) {
+    public static TX500Principal getIssuerX500Principal(TX509Certificate var0) {
         try {
             return getX500Principal(var0, true);
         } catch (Exception var2) {

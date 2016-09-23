@@ -15,15 +15,14 @@
  */
 package org.teavm.classlib.java.security.cert;
 
-import javax.security.auth.x500.X500Principal;
 
+import org.teavm.classlib.java.util.TArrays;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CRLImpl;
-
-import sun.security.x509.X509CRLImpl;
 
 public abstract class TX509CRL extends TCRL implements TX509Extension {
 
-    private transient X500Principal issuerPrincipal;
+    private transient TX500Principal issuerPrincipal;
 
     /**
      * Constructor for X.509 CRLs.
@@ -55,8 +54,8 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
             byte[] thisCRL = TX509CRLImpl.getEncodedInternal(this);
             byte[] otherCRL = TX509CRLImpl.getEncodedInternal((java.security.cert.X509CRL)other);
 
-            return Arrays.equals(thisCRL, otherCRL);
-        } catch (CRLException e) {
+            return TArrays.equals(thisCRL, otherCRL);
+        } catch (TCRLException e) {
             return false;
         }
     }
@@ -75,7 +74,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
                 retval += crlData[i] * i;
             }
             return retval;
-        } catch (CRLException e) {
+        } catch (TCRLException e) {
             return retval;
         }
     }
@@ -84,10 +83,10 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * Returns the ASN.1 DER-encoded form of this CRL.
      *
      * @return the encoded form of this certificate
-     * @exception CRLException if an encoding error occurs.
+     * @exception TCRLException if an encoding error occurs.
      */
     public abstract byte[] getEncoded()
-            throws CRLException;
+            throws TCRLException;
 
     /**
      * Verifies that this CRL was signed using the
@@ -100,10 +99,10 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * @exception InvalidKeyException on incorrect key.
      * @exception NoSuchProviderException if there's no default provider.
      * @exception SignatureException on signature errors.
-     * @exception CRLException on encoding errors.
+     * @exception TCRLException on encoding errors.
      */
     public abstract void verify(PublicKey key)
-            throws CRLException,  NoSuchAlgorithmException,
+            throws TCRLException,  NoSuchAlgorithmException,
             InvalidKeyException, NoSuchProviderException,
             SignatureException;
 
@@ -121,10 +120,10 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * @exception InvalidKeyException on incorrect key.
      * @exception NoSuchProviderException on incorrect provider.
      * @exception SignatureException on signature errors.
-     * @exception CRLException on encoding errors.
+     * @exception TCRLException on encoding errors.
      */
     public abstract void verify(PublicKey key, String sigProvider)
-            throws CRLException, NoSuchAlgorithmException,
+            throws TCRLException, NoSuchAlgorithmException,
             InvalidKeyException, NoSuchProviderException,
             SignatureException;
 
@@ -147,11 +146,11 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * algorithms.
      * @exception InvalidKeyException on incorrect key.
      * @exception SignatureException on signature errors.
-     * @exception CRLException on encoding errors.
+     * @exception TCRLException on encoding errors.
      * @since 1.8
      */
     public void verify(PublicKey key, Provider sigProvider)
-            throws CRLException, NoSuchAlgorithmException,
+            throws TCRLException, NoSuchAlgorithmException,
             InvalidKeyException, SignatureException {
         X509CRLImpl.verify(this, key, sigProvider);
     }
@@ -259,9 +258,9 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * is to be looked up
      * @return the entry with the given serial number, or null if no such entry
      * exists in this CRL.
-     * @see X509CRLEntry
+     * @see TX509CRLEntry
      */
-    public abstract X509CRLEntry
+    public abstract TX509CRLEntry
     getRevokedCertificate(BigInteger serialNumber);
 
     /**
@@ -281,7 +280,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      *
      * @since 1.5
      */
-    public X509CRLEntry getRevokedCertificate(X509Certificate certificate) {
+    public TX509CRLEntry getRevokedCertificate(X509Certificate certificate) {
         X500Principal certIssuer = certificate.getIssuerX500Principal();
         X500Principal crlIssuer = getIssuerX500Principal();
         if (certIssuer.equals(crlIssuer) == false) {
@@ -292,12 +291,12 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
 
     /**
      * Gets all the entries from this CRL.
-     * This returns a Set of X509CRLEntry objects.
+     * This returns a Set of TX509CRLEntry objects.
      *
      * @return all the entries or null if there are none present.
-     * @see X509CRLEntry
+     * @see TX509CRLEntry
      */
-    public abstract Set<? extends X509CRLEntry> getRevokedCertificates();
+    public abstract Set<? extends TX509CRLEntry> getRevokedCertificates();
 
     /**
      * Gets the DER-encoded CRL information, the
@@ -305,9 +304,9 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * This can be used to verify the signature independently.
      *
      * @return the DER-encoded CRL information.
-     * @exception CRLException if an encoding error occurs.
+     * @exception TCRLException if an encoding error occurs.
      */
-    public abstract byte[] getTBSCertList() throws CRLException;
+    public abstract byte[] getTBSCertList() throws TCRLException;
 
     /**
      * Gets the {@code signature} value (the raw signature bits) from

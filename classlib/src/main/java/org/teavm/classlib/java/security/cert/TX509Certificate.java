@@ -31,9 +31,8 @@ import java.security.cert.X509Extension;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
 import javax.security.auth.x500.X500Principal;
-
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
 /**
@@ -180,7 +179,7 @@ public abstract class TX509Certificate extends TCertificate
      *          distinguished name
      * @since 1.4
      */
-    public X500Principal getIssuerX500Principal() {
+    public TX500Principal getIssuerX500Principal() {
         if (issuerX500Principal == null) {
             issuerX500Principal = TX509CertImpl.getIssuerX500Principal(this);
         }

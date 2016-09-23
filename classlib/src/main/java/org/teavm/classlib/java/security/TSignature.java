@@ -22,9 +22,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import javax.crypto.Cipher;
-
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.lang.TBoolean;
 import org.teavm.classlib.java.lang.TString;
@@ -89,7 +87,7 @@ public abstract class TSignature extends TSignatureSpi {
     }
 
     // name of the special signature alg
-    private final static String RSA_SIGNATURE = "NONEwithRSA";
+    private final static TString RSA_SIGNATURE = TString.wrap("NONEwithRSA");
 
     // name of the equivalent cipher alg
     private final static String RSA_CIPHER = "RSA/ECB/PKCS1Padding";
@@ -105,23 +103,23 @@ public abstract class TSignature extends TSignatureSpi {
             }
     );
 
-    public static TSignature getInstance(String algorithm)
-            throws NoSuchAlgorithmException {
-        List<Provider.Service> list;
+    public static TSignature getInstance(TString algorithm)
+            throws TNoSuchAlgorithmException {
+        List<TProvider.Service> list;
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             list = TGetInstance.getServices(rsaIds);
         } else {
-            list = TGetInstance.getServices("Signature", algorithm);
+            list = TGetInstance.getServices(TString.wrap("Signature"), algorithm);
         }
-        Iterator<Provider.Service> t = list.iterator();
+        Iterator<TProvider.Service> t = list.iterator();
         if (t.hasNext() == false) {
-            throw new NoSuchAlgorithmException
-                    (algorithm + " Signature not available");
+            throw new TNoSuchAlgorithmException
+                    (TString.wrap(algorithm + " Signature not available"));
         }
         // try services until we find an Spi or a working Signature subclass
-        NoSuchAlgorithmException failure;
+        TNoSuchAlgorithmException failure;
         do {
-            Provider.Service s = t.next();
+            TProvider.Service s = t.next();
             if (isSpi(s)) {
                 return new TSignature.Delegate(s, t, algorithm);
             } else {
