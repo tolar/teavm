@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.java.security.cert;
 
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -32,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.security.auth.x500.X500Principal;
+import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
@@ -126,7 +126,7 @@ public abstract class TX509Certificate extends TCertificate
      *
      * @return the serial number.
      */
-    public abstract BigInteger getSerialNumber();
+    public abstract TBigInteger getSerialNumber();
 
     /**
      * <strong>Denigrated</strong>, replaced by {@linkplain
@@ -441,7 +441,7 @@ public abstract class TX509Certificate extends TCertificate
      * @since 1.4
      */
     public List<String> getExtendedKeyUsage() throws CertificateParsingException {
-        return X509CertImpl.getExtendedKeyUsage(this);
+        return TX509CertImpl.getExtendedKeyUsage(this);
     }
 
     /**

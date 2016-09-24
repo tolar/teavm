@@ -19,11 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
-
 import org.teavm.classlib.java.security.TPrincipal;
 
-import sun.security.util.DerValue;
-import sun.security.x509.X500Name;
 
 public final class TX500Principal implements TPrincipal, java.io.Serializable {
 

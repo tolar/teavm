@@ -42,7 +42,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.security.auth.x500.X500Principal;
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TPrincipal;
@@ -555,12 +557,12 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public AlgorithmId getSigAlgId() {
+    public TAlgorithmId getSigAlgId() {
         return this.sigAlgId;
     }
 
-    public KeyIdentifier getAuthKeyId() throws IOException {
-        AuthorityKeyIdentifierExtension var1 = this.getAuthKeyIdExtension();
+    public TKeyIdentifier getAuthKeyId() throws IOException {
+        TAuthorityKeyIdentifierExtension var1 = this.getAuthKeyIdExtension();
         if(var1 != null) {
             KeyIdentifier var2 = (KeyIdentifier)var1.get("key_id");
             return var2;
@@ -569,18 +571,18 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public AuthorityKeyIdentifierExtension getAuthKeyIdExtension() throws IOException {
-        Object var1 = this.getExtension(PKIXExtensions.AuthorityKey_Id);
-        return (AuthorityKeyIdentifierExtension)var1;
+    public TAuthorityKeyIdentifierExtension getAuthKeyIdExtension() throws IOException {
+        Object var1 = this.getExtension(TPKIXExtensions.AuthorityKey_Id);
+        return (TAuthorityKeyIdentifierExtension)var1;
     }
 
-    public CRLNumberExtension getCRLNumberExtension() throws IOException {
+    public TCRLNumberExtension getCRLNumberExtension() throws IOException {
         Object var1 = this.getExtension(PKIXExtensions.CRLNumber_Id);
-        return (CRLNumberExtension)var1;
+        return (TCRLNumberExtension)var1;
     }
 
     public BigInteger getCRLNumber() throws IOException {
-        CRLNumberExtension var1 = this.getCRLNumberExtension();
+        TCRLNumberExtension var1 = this.getCRLNumberExtension();
         if(var1 != null) {
             BigInteger var2 = var1.get("value");
             return var2;
@@ -834,9 +836,9 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public void derEncode(OutputStream var1) throws IOException {
+    public void derEncode(TOutputStream var1) throws TIOException {
         if(this.signedCRL == null) {
-            throw new IOException("Null CRL to encode");
+            throw new TIOException(TString.wrap("Null CRL to encode"));
         } else {
             var1.write((byte[])this.signedCRL.clone());
         }

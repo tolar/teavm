@@ -111,7 +111,7 @@ public class TOIDMap {
         addInternal("x509.info.extensions.SubjectAlternativeName", TPKIXExtensions.SubjectAlternativeName_Id, "sun.security.x509.SubjectAlternativeNameExtension");
         addInternal("x509.info.extensions.IssuerAlternativeName", TPKIXExtensions.IssuerAlternativeName_Id, "sun.security.x509.IssuerAlternativeNameExtension");
         addInternal("x509.info.extensions.BasicConstraints", TPKIXExtensions.BasicConstraints_Id, "sun.security.x509.BasicConstraintsExtension");
-        addInternal("x509.info.extensions.CRLNumber", TPKIXExtensions.CRLNumber_Id, "sun.security.x509.CRLNumberExtension");
+        addInternal("x509.info.extensions.CRLNumber", TPKIXExtensions.CRLNumber_Id, "sun.security.x509.TCRLNumberExtension");
         addInternal("x509.info.extensions.CRLReasonCode", TPKIXExtensions.ReasonCode_Id, "sun.security.x509.CRLReasonCodeExtension");
         addInternal("x509.info.extensions.NameConstraints", TPKIXExtensions.NameConstraints_Id, "sun.security.x509.NameConstraintsExtension");
         addInternal("x509.info.extensions.PolicyMappings", TPKIXExtensions.PolicyMappings_Id, "sun.security.x509.PolicyMappingsExtension");
