@@ -17,7 +17,6 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TClassNotFoundException;
@@ -112,7 +111,7 @@ public class TOIDMap {
         addInternal("x509.info.extensions.SubjectAlternativeName", TPKIXExtensions.SubjectAlternativeName_Id, "sun.security.x509.SubjectAlternativeNameExtension");
         addInternal("x509.info.extensions.IssuerAlternativeName", TPKIXExtensions.IssuerAlternativeName_Id, "sun.security.x509.IssuerAlternativeNameExtension");
         addInternal("x509.info.extensions.BasicConstraints", TPKIXExtensions.BasicConstraints_Id, "sun.security.x509.BasicConstraintsExtension");
-        addInternal("x509.info.extensions.CRLNumber", TPKIXExtensions.CRLNumber_Id, "sun.security.x509.CRLNumberExtension");
+        addInternal("x509.info.extensions.CRLNumber", TPKIXExtensions.CRLNumber_Id, "sun.security.x509.TCRLNumberExtension");
         addInternal("x509.info.extensions.CRLReasonCode", TPKIXExtensions.ReasonCode_Id, "sun.security.x509.CRLReasonCodeExtension");
         addInternal("x509.info.extensions.NameConstraints", TPKIXExtensions.NameConstraints_Id, "sun.security.x509.NameConstraintsExtension");
         addInternal("x509.info.extensions.PolicyMappings", TPKIXExtensions.PolicyMappings_Id, "sun.security.x509.PolicyMappingsExtension");
@@ -123,7 +122,7 @@ public class TOIDMap {
         addInternal("x509.info.extensions.ExtendedKeyUsage", TPKIXExtensions.ExtendedKeyUsage_Id, "sun.security.x509.ExtendedKeyUsageExtension");
         addInternal("x509.info.extensions.InhibitAnyPolicy", TPKIXExtensions.InhibitAnyPolicy_Id, "sun.security.x509.InhibitAnyPolicyExtension");
         addInternal("x509.info.extensions.CRLDistributionPoints", TPKIXExtensions.CRLDistributionPoints_Id, "sun.security.x509.CRLDistributionPointsExtension");
-        addInternal("x509.info.extensions.CertificateIssuer", TPKIXExtensions.CertificateIssuer_Id, "sun.security.x509.CertificateIssuerExtension");
+        addInternal("x509.info.extensions.CertificateIssuer", TPKIXExtensions.CertificateIssuer_Id, "sun.security.x509.TCertificateIssuerExtension");
         addInternal("x509.info.extensions.SubjectInfoAccess", TPKIXExtensions.SubjectInfoAccess_Id, "sun.security.x509.SubjectInfoAccessExtension");
         addInternal("x509.info.extensions.AuthorityInfoAccess", TPKIXExtensions.AuthInfoAccess_Id, "sun.security.x509.AuthorityInfoAccessExtension");
         addInternal("x509.info.extensions.IssuingDistributionPoint", TPKIXExtensions.IssuingDistributionPoint_Id, "sun.security.x509.IssuingDistributionPointExtension");

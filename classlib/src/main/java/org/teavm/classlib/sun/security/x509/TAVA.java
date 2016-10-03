@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.io.TReader;
@@ -678,7 +677,7 @@ public class TAVA implements TDerEncoder {
                     char var11 = var3.charAt(var10);
                     if(!var9 || var10 != 0 && var10 != var8 - 1) {
                         if(!TDerValue.isPrintableStringChar(var11) && ",+=\n<>#;\\\"".indexOf(var11) < 0) {
-//                            if(debug != null && Debug.isOn("ava")) {
+//                            if(debug != null && TDebug.isOn("ava")) {
 //                                var6 = false;
 //                                byte[] var12 = Character.toString(var11).getBytes("UTF8");
 //r
