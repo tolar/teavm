@@ -21,13 +21,11 @@ import java.io.OutputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 
 import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
 import sun.security.util.DerValue;
-import sun.security.x509.AttributeNameEnumeration;
 import sun.security.x509.DistributionPointName;
-import sun.security.x509.PKIXExtensions;
 import sun.security.x509.ReasonFlags;
 
 public class TIssuingDistributionPointExtension extends TExtension implements TCertAttrSet<String> {
@@ -39,7 +37,7 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
     public static final String ONLY_CA_CERTS = "only_ca_certs";
     public static final String ONLY_ATTRIBUTE_CERTS = "only_attribute_certs";
     public static final String INDIRECT_CRL = "indirect_crl";
-    private DistributionPointName distributionPoint = null;
+    private TDistributionPointName distributionPoint = null;
     private ReasonFlags revocationReasons = null;
     private boolean hasOnlyUserCerts = false;
     private boolean hasOnlyCACerts = false;
@@ -52,7 +50,7 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
     private static final byte TAG_INDIRECT_CRL = 4;
     private static final byte TAG_ONLY_ATTRIBUTE_CERTS = 5;
 
-    public TIssuingDistributionPointExtension(DistributionPointName var1, ReasonFlags var2, boolean var3, boolean var4, boolean var5, boolean var6) throws
+    public TIssuingDistributionPointExtension(TDistributionPointName var1, ReasonFlags var2, boolean var3, boolean var4, boolean var5, boolean var6) throws
             IOException {
         if((!var3 || !var4 && !var5) && (!var4 || !var3 && !var5) && (!var5 || !var3 && !var4)) {
             this.extensionId = TPKIXExtensions.IssuingDistributionPoint_Id;
@@ -70,7 +68,7 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
     }
 
     public TIssuingDistributionPointExtension(Boolean var1, Object var2) throws IOException {
-        this.extensionId = PKIXExtensions.IssuingDistributionPoint_Id;
+        this.extensionId = TPKIXExtensions.IssuingDistributionPoint_Id;
         this.critical = var1.booleanValue();
         if(!(var2 instanceof byte[])) {
             throw new IOException("Illegal argument type");
@@ -85,36 +83,36 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
                 while(true) {
                     if(var4 != null && var4.available() != 0) {
                         DerValue var5 = var4.getDerValue();
-                        if(var5.isContextSpecific(0) && var5.isConstructed()) {
-                            this.distributionPoint = new DistributionPointName(var5.data.getDerValue());
+                        if(var5.isContextSpecific((byte)0) && var5.isConstructed()) {
+                            this.distributionPoint = new TDistributionPointName(var5.data.getDerValue());
                             continue;
                         }
 
-                        if(var5.isContextSpecific(1) && !var5.isConstructed()) {
-                            var5.resetTag(1);
+                        if(var5.isContextSpecific((byte)1) && !var5.isConstructed()) {
+                            var5.resetTag((byte)1);
                             this.hasOnlyUserCerts = var5.getBoolean();
                             continue;
                         }
 
-                        if(var5.isContextSpecific(2) && !var5.isConstructed()) {
-                            var5.resetTag(1);
+                        if(var5.isContextSpecific((byte)2) && !var5.isConstructed()) {
+                            var5.resetTag((byte)1);
                             this.hasOnlyCACerts = var5.getBoolean();
                             continue;
                         }
 
-                        if(var5.isContextSpecific(3) && !var5.isConstructed()) {
+                        if(var5.isContextSpecific((byte)3) && !var5.isConstructed()) {
                             this.revocationReasons = new ReasonFlags(var5);
                             continue;
                         }
 
-                        if(var5.isContextSpecific(4) && !var5.isConstructed()) {
-                            var5.resetTag(1);
+                        if(var5.isContextSpecific((byte)4) && !var5.isConstructed()) {
+                            var5.resetTag((byte)1);
                             this.isIndirectCRL = var5.getBoolean();
                             continue;
                         }
 
-                        if(var5.isContextSpecific(5) && !var5.isConstructed()) {
-                            var5.resetTag(1);
+                        if(var5.isContextSpecific((byte)5) && !var5.isConstructed()) {
+                            var5.resetTag((byte)1);
                             this.hasOnlyAttributeCerts = var5.getBoolean();
                             continue;
                         }
@@ -133,9 +131,9 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
     }
 
     public void encode(OutputStream var1) throws IOException {
-        DerOutputStream var2 = new DerOutputStream();
+        TDerOutputStream var2 = new TDerOutputStream();
         if(this.extensionValue == null) {
-            this.extensionId = PKIXExtensions.IssuingDistributionPoint_Id;
+            this.extensionId = TPKIXExtensions.IssuingDistributionPoint_Id;
             this.critical = false;
             this.encodeThis();
         }
@@ -231,7 +229,7 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
     }
 
     public TEnumeration<String> getElements() {
-        AttributeNameEnumeration var1 = new AttributeNameEnumeration();
+        TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("point");
         var1.addElement("reasons");
         var1.addElement("only_user_certs");
@@ -245,45 +243,45 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
         if(this.distributionPoint == null && this.revocationReasons == null && !this.hasOnlyUserCerts && !this.hasOnlyCACerts && !this.hasOnlyAttributeCerts && !this.isIndirectCRL) {
             this.extensionValue = null;
         } else {
-            DerOutputStream var1 = new DerOutputStream();
-            DerOutputStream var2;
+            TDerOutputStream var1 = new TDerOutputStream();
+            TDerOutputStream var2;
             if(this.distributionPoint != null) {
-                var2 = new DerOutputStream();
+                var2 = new TDerOutputStream();
                 this.distributionPoint.encode(var2);
                 var1.writeImplicit(DerValue.createTag(-128, true, 0), var2);
             }
 
             if(this.hasOnlyUserCerts) {
-                var2 = new DerOutputStream();
+                var2 = new TDerOutputStream();
                 var2.putBoolean(this.hasOnlyUserCerts);
                 var1.writeImplicit(DerValue.createTag(-128, false, 1), var2);
             }
 
             if(this.hasOnlyCACerts) {
-                var2 = new DerOutputStream();
+                var2 = new TDerOutputStream();
                 var2.putBoolean(this.hasOnlyCACerts);
                 var1.writeImplicit(DerValue.createTag(-128, false, 2), var2);
             }
 
             if(this.revocationReasons != null) {
-                var2 = new DerOutputStream();
+                var2 = new TDerOutputStream();
                 this.revocationReasons.encode(var2);
                 var1.writeImplicit(DerValue.createTag(-128, false, 3), var2);
             }
 
             if(this.isIndirectCRL) {
-                var2 = new DerOutputStream();
+                var2 = new TDerOutputStream();
                 var2.putBoolean(this.isIndirectCRL);
                 var1.writeImplicit(DerValue.createTag(-128, false, 4), var2);
             }
 
             if(this.hasOnlyAttributeCerts) {
-                var2 = new DerOutputStream();
+                var2 = new TDerOutputStream();
                 var2.putBoolean(this.hasOnlyAttributeCerts);
                 var1.writeImplicit(DerValue.createTag(-128, false, 5), var2);
             }
 
-            var2 = new DerOutputStream();
+            var2 = new TDerOutputStream();
             var2.write(48, var1);
             this.extensionValue = var2.toByteArray();
         }
