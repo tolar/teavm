@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.java.security.cert;
 
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -34,6 +33,8 @@ import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
 /**
@@ -44,7 +45,7 @@ public abstract class TX509Certificate extends TCertificate
 
     private static final long serialVersionUID = -2491127588187038216L;
 
-    private transient X500Principal subjectX500Principal, issuerX500Principal;
+    private transient TX500Principal subjectX500Principal, issuerX500Principal;
 
     /**
      * Constructor for X.509 certificates.
@@ -127,7 +128,7 @@ public abstract class TX509Certificate extends TCertificate
      *
      * @return the serial number.
      */
-    public abstract BigInteger getSerialNumber();
+    public abstract TBigInteger getSerialNumber();
 
     /**
      * <strong>Denigrated</strong>, replaced by {@linkplain
@@ -180,7 +181,7 @@ public abstract class TX509Certificate extends TCertificate
      *          distinguished name
      * @since 1.4
      */
-    public X500Principal getIssuerX500Principal() {
+    public TX500Principal getIssuerX500Principal() {
         if (issuerX500Principal == null) {
             issuerX500Principal = TX509CertImpl.getIssuerX500Principal(this);
         }

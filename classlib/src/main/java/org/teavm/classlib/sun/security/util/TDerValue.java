@@ -330,25 +330,25 @@ public class TDerValue {
         }
     }
 
-    public int getEnumerated() throws IOException {
+    public int getEnumerated() throws TIOException {
         if(this.tag != 10) {
-            throw new IOException("DerValue.getEnumerated, incorrect tag: " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getEnumerated, incorrect tag: " + this.tag));
         } else {
             return this.buffer.getInteger(this.data.available());
         }
     }
 
-    public byte[] getBitString() throws IOException {
+    public byte[] getBitString() throws TIOException {
         if(this.tag != 3) {
-            throw new IOException("DerValue.getBitString, not a bit string " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getBitString, not a bit string " + this.tag));
         } else {
             return this.buffer.getBitString();
         }
     }
 
-    public TBitArray getUnalignedBitString() throws IOException {
+    public TBitArray getUnalignedBitString() throws TIOException {
         if(this.tag != 3) {
-            throw new IOException("DerValue.getBitString, not a bit string " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getBitString, not a bit string " + this.tag));
         } else {
             return this.buffer.getUnalignedBitString();
         }

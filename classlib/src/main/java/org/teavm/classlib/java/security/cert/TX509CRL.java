@@ -15,15 +15,23 @@
  */
 package org.teavm.classlib.java.security.cert;
 
-import javax.security.auth.x500.X500Principal;
-
+import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.security.TInvalidKeyException;
+import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
+import org.teavm.classlib.java.security.TNoSuchProviderException;
+import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.TSignatureException;
+import org.teavm.classlib.java.util.TArrays;
+import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.java.util.TSet;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CRLImpl;
-
-import sun.security.x509.X509CRLImpl;
 
 public abstract class TX509CRL extends TCRL implements TX509Extension {
 
-    private transient X500Principal issuerPrincipal;
+    private transient TX500Principal issuerPrincipal;
 
     /**
      * Constructor for X.509 CRLs.
@@ -53,10 +61,10 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
         }
         try {
             byte[] thisCRL = TX509CRLImpl.getEncodedInternal(this);
-            byte[] otherCRL = TX509CRLImpl.getEncodedInternal((java.security.cert.X509CRL)other);
+            byte[] otherCRL = TX509CRLImpl.getEncodedInternal((TX509CRL)other);
 
-            return Arrays.equals(thisCRL, otherCRL);
-        } catch (CRLException e) {
+            return TArrays.equals(thisCRL, otherCRL);
+        } catch (TCRLException e) {
             return false;
         }
     }
@@ -70,12 +78,12 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
     public int hashCode() {
         int retval = 0;
         try {
-            byte[] crlData = X509CRLImpl.getEncodedInternal(this);
+            byte[] crlData = TX509CRLImpl.getEncodedInternal(this);
             for (int i = 1; i < crlData.length; i++) {
                 retval += crlData[i] * i;
             }
             return retval;
-        } catch (CRLException e) {
+        } catch (TCRLException e) {
             return retval;
         }
     }
@@ -84,10 +92,10 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * Returns the ASN.1 DER-encoded form of this CRL.
      *
      * @return the encoded form of this certificate
-     * @exception CRLException if an encoding error occurs.
+     * @exception TCRLException if an encoding error occurs.
      */
     public abstract byte[] getEncoded()
-            throws CRLException;
+            throws TCRLException;
 
     /**
      * Verifies that this CRL was signed using the
@@ -100,12 +108,12 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * @exception InvalidKeyException on incorrect key.
      * @exception NoSuchProviderException if there's no default provider.
      * @exception SignatureException on signature errors.
-     * @exception CRLException on encoding errors.
+     * @exception TCRLException on encoding errors.
      */
-    public abstract void verify(PublicKey key)
-            throws CRLException,  NoSuchAlgorithmException,
-            InvalidKeyException, NoSuchProviderException,
-            SignatureException;
+    public abstract void verify(TPublicKey key)
+            throws TCRLException, TNoSuchAlgorithmException,
+            TInvalidKeyException, TNoSuchProviderException,
+            TSignatureException;
 
     /**
      * Verifies that this CRL was signed using the
@@ -121,12 +129,12 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * @exception InvalidKeyException on incorrect key.
      * @exception NoSuchProviderException on incorrect provider.
      * @exception SignatureException on signature errors.
-     * @exception CRLException on encoding errors.
+     * @exception TCRLException on encoding errors.
      */
-    public abstract void verify(PublicKey key, String sigProvider)
-            throws CRLException, NoSuchAlgorithmException,
-            InvalidKeyException, NoSuchProviderException,
-            SignatureException;
+    public abstract void verify(TPublicKey key, String sigProvider)
+            throws TCRLException, TNoSuchAlgorithmException,
+            TInvalidKeyException, TNoSuchProviderException,
+            TSignatureException;
 
     /**
      * Verifies that this CRL was signed using the
@@ -147,13 +155,13 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * algorithms.
      * @exception InvalidKeyException on incorrect key.
      * @exception SignatureException on signature errors.
-     * @exception CRLException on encoding errors.
+     * @exception TCRLException on encoding errors.
      * @since 1.8
      */
-    public void verify(PublicKey key, Provider sigProvider)
-            throws CRLException, NoSuchAlgorithmException,
-            InvalidKeyException, SignatureException {
-        X509CRLImpl.verify(this, key, sigProvider);
+    public void verify(TPublicKey key, TProvider sigProvider)
+            throws TCRLException, TNoSuchAlgorithmException,
+            TInvalidKeyException, TSignatureException {
+        TX509CRLImpl.verify(this, key, sigProvider);
     }
 
     /**
@@ -211,7 +219,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      *
      * @return a Principal whose name is the issuer distinguished name.
      */
-    public abstract Principal getIssuerDN();
+    public abstract TPrincipal getIssuerDN();
 
     /**
      * Returns the issuer (issuer distinguished name) value from the
@@ -223,9 +231,9 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      *          distinguished name
      * @since 1.4
      */
-    public X500Principal getIssuerX500Principal() {
+    public TX500Principal getIssuerX500Principal() {
         if (issuerPrincipal == null) {
-            issuerPrincipal = X509CRLImpl.getIssuerX500Principal(this);
+            issuerPrincipal = TX509CRLImpl.getIssuerX500Principal(this);
         }
         return issuerPrincipal;
     }
@@ -242,7 +250,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      *
      * @return the {@code thisUpdate} date from the CRL.
      */
-    public abstract Date getThisUpdate();
+    public abstract TDate getThisUpdate();
 
     /**
      * Gets the {@code nextUpdate} date from the CRL.
@@ -250,7 +258,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * @return the {@code nextUpdate} date from the CRL, or null if
      * not present.
      */
-    public abstract Date getNextUpdate();
+    public abstract TDate getNextUpdate();
 
     /**
      * Gets the CRL entry, if any, with the given certificate serialNumber.
@@ -259,10 +267,10 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * is to be looked up
      * @return the entry with the given serial number, or null if no such entry
      * exists in this CRL.
-     * @see X509CRLEntry
+     * @see TX509CRLEntry
      */
-    public abstract X509CRLEntry
-    getRevokedCertificate(BigInteger serialNumber);
+    public abstract TX509CRLEntry
+    getRevokedCertificate(TBigInteger serialNumber);
 
     /**
      * Get the CRL entry, if any, for the given certificate.
@@ -281,9 +289,9 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      *
      * @since 1.5
      */
-    public X509CRLEntry getRevokedCertificate(X509Certificate certificate) {
-        X500Principal certIssuer = certificate.getIssuerX500Principal();
-        X500Principal crlIssuer = getIssuerX500Principal();
+    public TX509CRLEntry getRevokedCertificate(TX509Certificate certificate) {
+        TX500Principal certIssuer = certificate.getIssuerX500Principal();
+        TX500Principal crlIssuer = getIssuerX500Principal();
         if (certIssuer.equals(crlIssuer) == false) {
             return null;
         }
@@ -295,9 +303,9 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * This returns a Set of X509CRLEntry objects.
      *
      * @return all the entries or null if there are none present.
-     * @see X509CRLEntry
+     * @see TX509CRLEntry
      */
-    public abstract Set<? extends X509CRLEntry> getRevokedCertificates();
+    public abstract TSet<? extends TX509CRLEntry> getRevokedCertificates();
 
     /**
      * Gets the DER-encoded CRL information, the
@@ -305,9 +313,9 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * This can be used to verify the signature independently.
      *
      * @return the DER-encoded CRL information.
-     * @exception CRLException if an encoding error occurs.
+     * @exception TCRLException if an encoding error occurs.
      */
-    public abstract byte[] getTBSCertList() throws CRLException;
+    public abstract byte[] getTBSCertList() throws TCRLException;
 
     /**
      * Gets the {@code signature} value (the raw signature bits) from

@@ -215,7 +215,7 @@ public class TX509CertImpl extends TX509Certificate {
 
     public byte[] getEncodedInternal() throws TCertificateEncodingException {
         if(this.signedCert == null) {
-            throw new TCertificateEncodingException("Null certificate to encode");
+            throw new TCertificateEncodingException(TString.wrap("Null certificate to encode"));
         } else {
             return this.signedCert;
         }
@@ -236,7 +236,7 @@ public class TX509CertImpl extends TX509Certificate {
                 throw new TSignatureException(TString.wrap("Signature does not match."));
             }
         } else if(this.signedCert == null) {
-            throw new TCertificateEncodingException("Uninitialized certificate");
+            throw new TCertificateEncodingException(TString.wrap("Uninitialized certificate"));
         } else {
             TSignature var3 = null;
             if(var2.length() == 0) {
@@ -1213,7 +1213,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public static X500Principal getIssuerX500Principal(X509Certificate var0) {
+    public static X500Principal getIssuerX500Principal(TX509Certificate var0) {
         try {
             return getX500Principal(var0, true);
         } catch (Exception var2) {
@@ -1225,8 +1225,8 @@ public class TX509CertImpl extends TX509Certificate {
         return var0 instanceof TX509CertImpl ?((TX509CertImpl)var0).getEncodedInternal():var0.getEncoded();
     }
 
-    public static TX509CertImpl toImpl(X509Certificate var0) throws TCertificateException {
-        return var0 instanceof TX509CertImpl?(TX509CertImpl)var0: X509Factory.intern(var0);
+    public static TX509CertImpl toImpl(TX509Certificate var0) throws TCertificateException {
+        return var0 instanceof TX509CertImpl?(TX509CertImpl)var0: TX509Factory.intern(var0);
     }
 
     public static boolean isSelfIssued(X509Certificate var0) {

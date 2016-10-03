@@ -30,6 +30,8 @@ import org.teavm.classlib.java.io.TReader;
 import org.teavm.classlib.java.lang.TByte;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.TStringBuilder;
+import org.teavm.classlib.java.util.TCollections;
+import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -65,15 +67,15 @@ public class TAVA implements TDerEncoder {
         this(var1, 1);
     }
 
-    TAVA(TReader var1, Map<TString, TString> var2) throws TIOException {
+    TAVA(TReader var1, TMap<TString, TString> var2) throws TIOException {
         this(var1, 1, var2);
     }
 
     TAVA(TReader var1, int var2) throws IOException {
-        this(var1, var2, Collections.emptyMap());
+        this(var1, var2, TCollections.emptyMap());
     }
 
-    TAVA(TReader var1, int var2, Map<TString, TString> var3) throws TIOException {
+    TAVA(TReader var1, int var2, TMap<TString, TString> var3) throws TIOException {
         TStringBuilder var4 = new TStringBuilder();
 
         while(true) {

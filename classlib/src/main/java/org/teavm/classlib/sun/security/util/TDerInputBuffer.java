@@ -156,7 +156,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    byte[] getBitString() throws IOException {
+    byte[] getBitString() throws TIOException {
         return this.getBitString(this.available());
     }
 

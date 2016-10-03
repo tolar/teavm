@@ -106,7 +106,7 @@ public abstract class TSignature extends TSignatureSpi {
     );
 
     public static TSignature getInstance(String algorithm)
-            throws NoSuchAlgorithmException {
+            throws TNoSuchAlgorithmException {
         List<Provider.Service> list;
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             list = TGetInstance.getServices(rsaIds);
@@ -115,8 +115,8 @@ public abstract class TSignature extends TSignatureSpi {
         }
         Iterator<Provider.Service> t = list.iterator();
         if (t.hasNext() == false) {
-            throw new NoSuchAlgorithmException
-                    (algorithm + " Signature not available");
+            throw new TNoSuchAlgorithmException
+                    (TString.wrap(algorithm + " Signature not available"));
         }
         // try services until we find an Spi or a working Signature subclass
         NoSuchAlgorithmException failure;

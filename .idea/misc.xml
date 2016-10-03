@@ -40,11 +40,12 @@
   </component>
   <component name="EclipseCodeFormatter">
     <option name="defaultSettings" value="true" />
+    <option name="eclipseVersion" value="ECLIPSE_44" />
     <option name="formatOtherFileTypesWithIntelliJ" value="false" />
     <option name="formatter" value="ECLIPSE" />
     <option name="id" value="1444027515602" />
     <option name="name" value="default" />
-    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../dcs/git_repo/dcs/formatter.java.kb.dcs.xml" />
+    <option name="pathToConfigFileJava" value="$PROJECT_DIR$/../../dcs/git_repo2/dcs/formatter.java.kb.dcs.xml" />
     <option name="selectedJavaProfile" value="formatter.java.kb.dcs" />
     <option name="useOldEclipseJavaFormatter" value="true" />
   </component>

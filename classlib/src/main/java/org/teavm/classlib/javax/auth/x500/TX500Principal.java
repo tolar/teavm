@@ -16,14 +16,16 @@
 package org.teavm.classlib.javax.auth.x500;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
 import java.util.Map;
 
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPrincipal;
-
-import sun.security.util.DerValue;
-import sun.security.x509.X500Name;
+import org.teavm.classlib.java.util.TCollections;
+import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.sun.security.util.TDerValue;
+import org.teavm.classlib.sun.security.x509.TX500Name;
 
 public final class TX500Principal implements TPrincipal, java.io.Serializable {
 
@@ -47,7 +49,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      *
      * NOTE: this field is reflectively accessed from within X500Name.
      */
-    private transient X500Name thisX500Name;
+    private transient TX500Name thisX500Name;
 
     /**
      * Creates an X500Principal by wrapping an X500Name.
@@ -56,7 +58,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      * using privileged reflection from classes in sun.security.*.
      * Currently referenced from sun.security.x509.X500Name.asX500Principal().
      */
-    TX500Principal(X500Name x500Name) {
+    TX500Principal(TX500Name x500Name) {
         thisX500Name = x500Name;
     }
 
@@ -88,8 +90,8 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      * @exception IllegalArgumentException if the {@code name}
      *                  is improperly specified
      */
-    public TX500Principal(String name) {
-        this(name, Collections.<String, String>emptyMap());
+    public TX500Principal(TString name) {
+        this(name, TCollections.<TString, TString>emptyMap());
     }
 
     /**
@@ -129,7 +131,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      *   OID that is not in the correct form
      * @since 1.6
      */
-    public TX500Principal(String name, Map<String, String> keywordMap) {
+    public TX500Principal(TString name, TMap<TString, TString> keywordMap) {
         if (name == null) {
             throw new NullPointerException
                     (sun.security.util.ResourcesMgr.getString
@@ -142,7 +144,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
         }
 
         try {
-            thisX500Name = new X500Name(name, keywordMap);
+            thisX500Name = new TX500Name(name, keywordMap);
         } catch (Exception e) {
             IllegalArgumentException iae = new IllegalArgumentException
                     ("improperly specified input name: " + name);
@@ -187,7 +189,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      */
     public TX500Principal(byte[] name) {
         try {
-            thisX500Name = new X500Name(name);
+            thisX500Name = new TX500Name(name);
         } catch (Exception e) {
             IllegalArgumentException iae = new IllegalArgumentException
                     ("improperly specified input name");
@@ -214,7 +216,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      * @exception IllegalArgumentException if an encoding error occurs
      *          (incorrect form for DN)
      */
-    public TX500Principal(InputStream is) {
+    public TX500Principal(TInputStream is) {
         if (is == null) {
             throw new NullPointerException("provided null input stream");
         }
@@ -222,13 +224,13 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
         try {
             if (is.markSupported())
                 is.mark(is.available() + 1);
-            DerValue der = new DerValue(is);
-            thisX500Name = new X500Name(der.data);
+            TDerValue der = new TDerValue(is);
+            thisX500Name = new TX500Name(der.data);
         } catch (Exception e) {
             if (is.markSupported()) {
                 try {
                     is.reset();
-                } catch (IOException ioe) {
+                } catch (TIOException ioe) {
                     IllegalArgumentException iae = new IllegalArgumentException
                             ("improperly specified input stream " +
                                     ("and unable to reset input stream"));
@@ -472,6 +474,6 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
             ClassNotFoundException {
 
         // re-create thisX500Name
-        thisX500Name = new X500Name((byte[])s.readObject());
+        thisX500Name = new TX500Name((byte[])s.readObject());
     }
 }

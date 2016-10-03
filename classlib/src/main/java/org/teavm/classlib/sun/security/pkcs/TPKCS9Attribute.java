@@ -30,8 +30,6 @@ import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 import org.teavm.classlib.sun.security.x509.TCertificateExtensions;
 
-import sun.security.pkcs.SignerInfo;
-
 /**
  * Created by vasek on 18. 8. 2016.
  */

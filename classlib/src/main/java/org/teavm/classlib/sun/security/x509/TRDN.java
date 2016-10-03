@@ -27,6 +27,8 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TStringReader;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TArrays;
+import org.teavm.classlib.java.util.TCollections;
+import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -41,10 +43,10 @@ public class TRDN {
     private volatile String canonicalString;
 
     public TRDN(TString var1) throws IOException {
-        this(var1, Collections.emptyMap());
+        this(var1, TCollections.emptyMap());
     }
 
-    public TRDN(TString var1, Map<TString, TString> var2) throws TIOException {
+    public TRDN(TString var1, TMap<TString, TString> var2) throws TIOException {
         int var3 = 0;
         int var4 = 0;
         int var5 = 0;

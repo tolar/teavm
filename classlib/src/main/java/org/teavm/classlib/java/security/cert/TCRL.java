@@ -15,8 +15,6 @@
  */
 package org.teavm.classlib.java.security.cert;
 
-import java.security.cert.Certificate;
-
 public abstract class TCRL {
 
     // the CRL type
@@ -58,5 +56,5 @@ public abstract class TCRL {
      * @return true if the given certificate is on this CRL,
      * false otherwise.
      */
-    public abstract boolean isRevoked(Certificate cert);
+    public abstract boolean isRevoked(TCertificate cert);
 }

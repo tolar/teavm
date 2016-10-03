@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
@@ -58,7 +59,7 @@ class TAVAKeyword {
         }
     }
 
-    static TObjectIdentifier getOID(TString var0, int var1, Map<TString, TString> var2) throws TIOException {
+    static TObjectIdentifier getOID(TString var0, int var1, TMap<TString, TString> var2) throws TIOException {
         var0 = var0.toUpperCase(Locale.ENGLISH);
         if(var1 == 3) {
             if(var0.startsWith(TString.wrap(" ")) || var0.endsWith(TString.wrap(" "))) {

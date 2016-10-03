@@ -32,6 +32,9 @@ import javax.security.auth.x500.X500Principal;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.util.TCollections;
+import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -46,7 +49,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     private String rfc2253Dn;
     private String canonicalDn;
     private TRDN[] names;
-    private X500Principal x500Principal;
+    private TX500Principal x500Principal;
     private byte[] encoded;
     private volatile List<TRDN> rdnList;
     private volatile List<TAVA> allAvaList;
@@ -85,14 +88,14 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
     public static final TObjectIdentifier DOMAIN_COMPONENT_OID;
     public static final TObjectIdentifier userid_oid;
     public static final TObjectIdentifier SERIALNUMBER_OID;
-    private static final Constructor<X500Principal> principalConstructor;
+    private static final Constructor<TX500Principal> principalConstructor;
     private static final Field principalField;
 
     public TX500Name(TString var1) throws TIOException {
-        this(var1, Collections.emptyMap());
+        this(var1, TCollections.emptyMap());
     }
 
-    public TX500Name(TString var1, Map<TString, TString> var2) throws TIOException {
+    public TX500Name(TString var1, TMap<TString, TString> var2) throws TIOException {
         this.parseDN(var1, var2);
     }
 
@@ -107,7 +110,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
                     throw new TIOException(TString.wrap("Unsupported format " + var2));
                 }
 
-                this.parseDN(var1, Collections.emptyMap());
+                this.parseDN(var1, TCollections.emptyMap());
             }
 
         }
@@ -507,7 +510,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return (byte[])this.getEncodedInternal().clone();
     }
 
-    private void parseDN(TString var1, Map<TString, TString> var2) throws TIOException {
+    private void parseDN(TString var1, TMap<TString, TString> var2) throws TIOException {
         if(var1 != null && var1.length() != 0) {
             ArrayList var3 = new ArrayList();
             int var4 = 0;
@@ -747,11 +750,11 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         }
     }
 
-    public X500Principal asX500Principal() {
+    public TX500Principal asX500Principal() {
         if(this.x500Principal == null) {
             try {
                 Object[] var1 = new Object[]{this};
-                this.x500Principal = (X500Principal)principalConstructor.newInstance(var1);
+                this.x500Principal = (TX500Principal)principalConstructor.newInstance(var1);
             } catch (Exception var2) {
                 throw new RuntimeException("Unexpected exception", var2);
             }

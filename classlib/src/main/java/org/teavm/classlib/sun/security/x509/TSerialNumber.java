@@ -51,7 +51,7 @@ public class TSerialNumber {
         this.construct(var2);
     }
 
-    public TSerialNumber(TDerValue var1) throws IOException {
+    public TSerialNumber(TDerValue var1) throws TIOException {
         this.construct(var1);
     }
 
