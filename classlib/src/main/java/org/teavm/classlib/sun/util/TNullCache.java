@@ -13,13 +13,39 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.security;
+package org.teavm.classlib.sun.util;
 
-import org.teavm.classlib.java.lang.TString;
 
-public final class TSecurity {
+class TNullCache<K, V> extends TCache<K, V> {
 
-    public static TProvider getProvider(TString provider) {
+    static final TCache<Object, Object> INSTANCE = new TNullCache();
+
+    private TNullCache() {
+    }
+
+    public int size() {
+        return 0;
+    }
+
+    public void clear() {
+    }
+
+    public void put(K var1, V var2) {
+    }
+
+    public V get(Object var1) {
         return null;
+    }
+
+    public void remove(Object var1) {
+    }
+
+    public void setCapacity(int var1) {
+    }
+
+    public void setTimeout(int var1) {
+    }
+
+    public void accept(TCache.CacheVisitor<K, V> var1) {
     }
 }

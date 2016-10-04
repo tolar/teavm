@@ -123,9 +123,9 @@ public class TGetInstance {
         }
     }
 
-    public static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Object var3) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(TString var0, Class<?> var1, TString var2, Object var3) throws NoSuchAlgorithmException {
         List var4 = getServices(var0, var2);
-        NoSuchAlgorithmException var5 = null;
+        TNoSuchAlgorithmException var5 = null;
         Iterator var6 = var4.iterator();
 
         while(var6.hasNext()) {
@@ -145,7 +145,7 @@ public class TGetInstance {
         }
     }
 
-    public static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, String var2, String var3) throws
+    public static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, TString var2, TString var3) throws
             TNoSuchAlgorithmException, TNoSuchProviderException {
         return getInstance(getService(var0, var2, var3), var1);
     }
@@ -168,7 +168,7 @@ public class TGetInstance {
         return new TGetInstance.Instance(var0.getProvider(), var2);
     }
 
-    public static TGetInstance.Instance getInstance(Provider.Service var0, Class<?> var1, Object var2) throws NoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(TProvider.Service var0, Class<?> var1, Object var2) throws TNoSuchAlgorithmException {
         Object var3 = var0.newInstance(var2);
         checkSuperClass(var0, var3.getClass(), var1);
         return new TGetInstance.Instance(var0.getProvider(), var3);

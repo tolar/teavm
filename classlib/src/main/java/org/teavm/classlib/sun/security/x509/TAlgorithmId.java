@@ -417,4 +417,30 @@ public class TAlgorithmId {
     public final TObjectIdentifier getOID() {
         return this.algid;
     }
+
+    public static String getEncAlgFromSigAlg(String var0) {
+        var0 = var0.toUpperCase(Locale.ENGLISH);
+        int var1 = var0.indexOf("WITH");
+        String var2 = null;
+        if(var1 > 0) {
+            int var3 = var0.indexOf("AND", var1 + 4);
+            if(var3 > 0) {
+                var2 = var0.substring(var1 + 4, var3);
+            } else {
+                var2 = var0.substring(var1 + 4);
+            }
+
+            if(var2.equalsIgnoreCase("ECDSA")) {
+                var2 = "EC";
+            }
+        }
+
+        return var2;
+    }
+
+    public static String getDigAlgFromSigAlg(String var0) {
+        var0 = var0.toUpperCase(Locale.ENGLISH);
+        int var1 = var0.indexOf("WITH");
+        return var1 > 0?var0.substring(0, var1):null;
+    }
 }

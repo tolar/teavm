@@ -31,9 +31,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.security.TPrincipal;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
@@ -169,7 +168,7 @@ public abstract class TX509Certificate extends TCertificate
      *
      * @return a Principal whose name is the issuer distinguished name.
      */
-    public abstract Principal getIssuerDN();
+    public abstract TPrincipal getIssuerDN();
 
     /**
      * Returns the issuer (issuer distinguished name) value from the
@@ -224,7 +223,7 @@ public abstract class TX509Certificate extends TCertificate
      *          distinguished name
      * @since 1.4
      */
-    public X500Principal getSubjectX500Principal() {
+    public TX500Principal getSubjectX500Principal() {
         if (subjectX500Principal == null) {
             subjectX500Principal = TX509CertImpl.getSubjectX500Principal(this);
         }
@@ -443,7 +442,7 @@ public abstract class TX509Certificate extends TCertificate
      * @since 1.4
      */
     public List<String> getExtendedKeyUsage() throws CertificateParsingException {
-        return X509CertImpl.getExtendedKeyUsage(this);
+        return TX509CertImpl.getExtendedKeyUsage(this);
     }
 
     /**

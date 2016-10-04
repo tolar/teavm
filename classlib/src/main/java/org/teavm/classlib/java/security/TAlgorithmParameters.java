@@ -46,7 +46,7 @@ public class TAlgorithmParameters {
         return null;
     }
 
-    public final byte[] getEncoded() throws IOException
+    public final byte[] getEncoded() throws TIOException
     {
         return null;
     }

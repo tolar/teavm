@@ -77,7 +77,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
     public TX509CertInfo() {
     }
 
-    public TX509CertInfo(byte[] var1) throws CertificateParsingException {
+    public TX509CertInfo(byte[] var1) throws TCertificateParsingException {
         try {
             TDerValue var2 = new TDerValue(var1);
             this.parse(var2);
@@ -86,11 +86,11 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    public TX509CertInfo(TDerValue var1) throws CertificateParsingException {
+    public TX509CertInfo(TDerValue var1) throws TCertificateParsingException {
         try {
             this.parse(var1);
-        } catch (IOException var3) {
-            throw new CertificateParsingException(var3);
+        } catch (TIOException var3) {
+            throw new TCertificateParsingException(var3);
         }
     }
 
@@ -459,9 +459,9 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private void parse(TDerValue var1) throws CertificateParsingException, IOException {
+    private void parse(TDerValue var1) throws TCertificateParsingException, TIOException {
         if(var1.tag != 48) {
-            throw new CertificateParsingException("signed fields invalid");
+            throw new TCertificateParsingException(TString.wrap("signed fields invalid"));
         } else {
             this.rawCertInfo = var1.toByteArray();
             TDerInputStream var2 = var1.data;

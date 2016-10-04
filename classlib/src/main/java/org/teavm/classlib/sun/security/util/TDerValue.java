@@ -151,7 +151,7 @@ public class TDerValue {
         this.data = this.init(true, new TByteArrayInputStream(var1, var2, var3));
     }
 
-    public TDerValue(TInputStream var1) throws IOException {
+    public TDerValue(TInputStream var1) throws TIOException {
         this.data = this.init(false, var1);
     }
 

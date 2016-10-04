@@ -16,6 +16,7 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -41,12 +42,12 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         return this.version;
     }
 
-    private void construct(TDerValue var1) throws IOException {
+    private void construct(TDerValue var1) throws TIOException {
         if(var1.isConstructed() && var1.isContextSpecific()) {
             var1 = var1.data.getDerValue();
             this.version = var1.getInteger();
             if(var1.data.available() != 0) {
-                throw new IOException("X.509 version, bad format");
+                throw new TIOException(TString.wrap("X.509 version, bad format"));
             }
         }
 
@@ -64,19 +65,19 @@ public class TCertificateVersion implements TCertAttrSet<String> {
         }
     }
 
-    public TCertificateVersion(TDerInputStream var1) throws IOException {
+    public TCertificateVersion(TDerInputStream var1) throws TIOException {
         this.version = 0;
         TDerValue var2 = var1.getDerValue();
         this.construct(var2);
     }
 
-    public TCertificateVersion(TInputStream var1) throws IOException {
+    public TCertificateVersion(TInputStream var1) throws TIOException {
         this.version = 0;
         TDerValue var2 = new TDerValue(var1);
         this.construct(var2);
     }
 
-    public TCertificateVersion(TDerValue var1) throws IOException {
+    public TCertificateVersion(TDerValue var1) throws TIOException {
         this.version = 0;
         this.construct(var1);
     }

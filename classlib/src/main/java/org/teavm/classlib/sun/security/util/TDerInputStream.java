@@ -73,33 +73,33 @@ public class TDerInputStream {
         return this.buffer.toByteArray();
     }
 
-    public int getInteger() throws IOException {
+    public int getInteger() throws TIOException {
         if(this.buffer.read() != 2) {
-            throw new IOException("DER input, Integer tag error");
+            throw new TIOException(TString.wrap("DER input, Integer tag error"));
         } else {
             return this.buffer.getInteger(getLength(this.buffer));
         }
     }
 
-    public TBigInteger getBigInteger() throws IOException {
+    public TBigInteger getBigInteger() throws TIOException {
         if(this.buffer.read() != 2) {
-            throw new IOException("DER input, Integer tag error");
+            throw new TIOException(TString.wrap("DER input, Integer tag error"));
         } else {
             return this.buffer.getBigInteger(getLength(this.buffer), false);
         }
     }
 
-    public TBigInteger getPositiveBigInteger() throws IOException {
+    public TBigInteger getPositiveBigInteger() throws TIOException {
         if(this.buffer.read() != 2) {
-            throw new IOException("DER input, Integer tag error");
+            throw new TIOException(TString.wrap("DER input, Integer tag error"));
         } else {
             return this.buffer.getBigInteger(getLength(this.buffer), true);
         }
     }
 
-    public int getEnumerated() throws IOException {
+    public int getEnumerated() throws TIOException {
         if(this.buffer.read() != 10) {
-            throw new IOException("DER input, Enumerated tag error");
+            throw new TIOException(TString.wrap("DER input, Enumerated tag error"));
         } else {
             return this.buffer.getInteger(getLength(this.buffer));
         }
@@ -300,7 +300,7 @@ public class TDerInputStream {
         return 255 & this.buffer.read();
     }
 
-    public int peekByte() throws IOException {
+    public int peekByte() throws TIOException {
         return this.buffer.peek();
     }
 

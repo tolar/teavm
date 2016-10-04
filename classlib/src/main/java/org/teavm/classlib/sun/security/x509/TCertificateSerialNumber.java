@@ -52,7 +52,7 @@ public class TCertificateSerialNumber implements TCertAttrSet<String> {
         this.serial = new TSerialNumber(var1);
     }
 
-    public TCertificateSerialNumber(TDerValue var1) throws IOException {
+    public TCertificateSerialNumber(TDerValue var1) throws TIOException {
         this.serial = new TSerialNumber(var1);
     }
 

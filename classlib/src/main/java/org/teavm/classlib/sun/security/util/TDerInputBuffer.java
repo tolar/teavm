@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.io.IOException;
 import java.util.Date;
 
 import org.teavm.classlib.java.io.TByteArrayInputStream;
@@ -59,9 +58,9 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    int peek() throws IOException {
+    int peek() throws TIOException {
         if(this.pos >= this.count) {
-            throw new IOException("out of data");
+            throw new TIOException(TString.wrap("out of data"));
         } else {
             return this.buf[this.pos];
         }

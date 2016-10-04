@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -38,12 +37,12 @@ public class TCertificateAlgorithmId implements TCertAttrSet<String> {
         this.algId = var1;
     }
 
-    public TCertificateAlgorithmId(TDerInputStream var1) throws IOException {
+    public TCertificateAlgorithmId(TDerInputStream var1) throws TIOException {
         TDerValue var2 = var1.getDerValue();
         this.algId = TAlgorithmId.parse(var2);
     }
 
-    public TCertificateAlgorithmId(TInputStream var1) throws IOException {
+    public TCertificateAlgorithmId(TInputStream var1) throws TIOException {
         TDerValue var2 = new TDerValue(var1);
         this.algId = TAlgorithmId.parse(var2);
     }

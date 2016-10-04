@@ -105,23 +105,23 @@ public abstract class TSignature extends TSignatureSpi {
             }
     );
 
-    public static TSignature getInstance(String algorithm)
+    public static TSignature getInstance(TString algorithm)
             throws TNoSuchAlgorithmException {
-        List<Provider.Service> list;
-        if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
+        List<TProvider.Service> list;
+        if (algorithm.equalsIgnoreCase(TString.wrap(RSA_SIGNATURE))) {
             list = TGetInstance.getServices(rsaIds);
         } else {
-            list = TGetInstance.getServices("Signature", algorithm);
+            list = TGetInstance.getServices(TString.wrap("Signature"), algorithm);
         }
-        Iterator<Provider.Service> t = list.iterator();
+        Iterator<TProvider.Service> t = list.iterator();
         if (t.hasNext() == false) {
             throw new TNoSuchAlgorithmException
                     (TString.wrap(algorithm + " Signature not available"));
         }
         // try services until we find an Spi or a working Signature subclass
-        NoSuchAlgorithmException failure;
+        TNoSuchAlgorithmException failure;
         do {
-            Provider.Service s = t.next();
+            TProvider.Service s = t.next();
             if (isSpi(s)) {
                 return new TSignature.Delegate(s, t, algorithm);
             } else {
@@ -194,9 +194,9 @@ public abstract class TSignature extends TSignatureSpi {
         return result.booleanValue();
     }
 
-    public static TSignature getInstance(String algorithm, String provider)
+    public static TSignature getInstance(TString algorithm, TString provider)
             throws TNoSuchAlgorithmException, TNoSuchProviderException {
-        if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
+        if (algorithm.equalsIgnoreCase(TString.wrap(RSA_SIGNATURE))) {
             // exception compatibility with existing code
             if ((provider == null) || (provider.length() == 0)) {
                 throw new IllegalArgumentException("missing provider");
@@ -243,7 +243,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @since 1.4
      */
     public static TSignature getInstance(String algorithm, TProvider provider)
-            throws NoSuchAlgorithmException {
+            throws TNoSuchAlgorithmException {
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             // exception compatibility with existing code
             if (provider == null) {
@@ -263,7 +263,7 @@ public abstract class TSignature extends TSignatureSpi {
         // try Signature first
         Provider.Service s = p.getService("Signature", RSA_SIGNATURE);
         if (s != null) {
-            GetInstance.Instance instance = GetInstance.getInstance(s, SignatureSpi.class);
+            TGetInstance.Instance instance = TGetInstance.getInstance(s, TSignatureSpi.class);
             return getInstance(instance, RSA_SIGNATURE);
         }
         // check Cipher

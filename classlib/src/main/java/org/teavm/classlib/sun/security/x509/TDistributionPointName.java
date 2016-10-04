@@ -18,6 +18,7 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.IOException;
 import java.util.Objects;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
@@ -67,7 +68,7 @@ public class TDistributionPointName {
         return this.relativeName;
     }
 
-    public void encode(TDerOutputStream var1) throws IOException {
+    public void encode(TDerOutputStream var1) throws TIOException {
         TDerOutputStream var2 = new TDerOutputStream();
         if(this.fullName != null) {
             this.fullName.encode(var2);

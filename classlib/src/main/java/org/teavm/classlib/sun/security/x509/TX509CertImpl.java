@@ -18,7 +18,6 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -55,18 +54,26 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TInputStreamReader;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.java.security.TNoSuchProviderException;
+import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.TSignature;
 import org.teavm.classlib.java.security.TSignatureException;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TCertificateParsingException;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
+import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
+import org.teavm.classlib.sun.security.provider.TX509Factory;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
@@ -110,7 +117,7 @@ public class TX509CertImpl extends TX509Certificate {
     public TX509CertImpl() {
     }
 
-    public TX509CertImpl(byte[] var1) throws CertificateException {
+    public TX509CertImpl(byte[] var1) throws TCertificateException {
         try {
             this.parse(new TDerValue(var1));
         } catch (IOException var3) {
@@ -180,12 +187,12 @@ public class TX509CertImpl extends TX509Certificate {
         this.info = var1;
     }
 
-    public TX509CertImpl(TDerValue var1) throws CertificateException {
+    public TX509CertImpl(TDerValue var1) throws TCertificateException {
         try {
             this.parse(var1);
-        } catch (IOException var3) {
+        } catch (TIOException var3) {
             this.signedCert = null;
-            throw new CertificateException("Unable to initialize, " + var3, var3);
+            throw new TCertificateException(TString.wrap("Unable to initialize, " + var3), var3);
         }
     }
 
@@ -257,15 +264,15 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public synchronized void verify(TPublicKey var1, Provider var2) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public synchronized void verify(TPublicKey var1, TProvider var2) throws TCertificateException, TNoSuchAlgorithmException, TInvalidKeyException, TSignatureException {
         if(this.signedCert == null) {
-            throw new CertificateEncodingException("Uninitialized certificate");
+            throw new TCertificateEncodingException(TString.wrap("Uninitialized certificate"));
         } else {
-            Signature var3 = null;
+            TSignature var3 = null;
             if(var2 == null) {
-                var3 = Signature.getInstance(this.algId.getName());
+                var3 = TSignature.getInstance(this.algId.getName());
             } else {
-                var3 = Signature.getInstance(this.algId.getName(), var2);
+                var3 = TSignature.getInstance(this.algId.getName(), var2);
             }
 
             var3.initVerify(var1);
@@ -301,15 +308,15 @@ public class TX509CertImpl extends TX509Certificate {
 
                 var4.initSign(var1);
                 this.algId = TAlgorithmId.get(var4.getAlgorithm());
-                DerOutputStream var5 = new DerOutputStream();
-                DerOutputStream var6 = new DerOutputStream();
+                TDerOutputStream var5 = new TDerOutputStream();
+                TDerOutputStream var6 = new TDerOutputStream();
                 this.info.encode(var6);
                 byte[] var7 = var6.toByteArray();
                 this.algId.encode(var6);
                 var4.update(var7, 0, var7.length);
                 this.signature = var4.sign();
                 var6.putBitString(this.signature);
-                var5.write(48, var6);
+                var5.write((byte)48, var6);
                 this.signedCert = var5.toByteArray();
                 this.readOnly = true;
             }
@@ -324,10 +331,10 @@ public class TX509CertImpl extends TX509Certificate {
     }
 
     public void checkValidity(Date var1) throws CertificateExpiredException, CertificateNotYetValidException {
-        CertificateValidity var2 = null;
+        TCertificateValidity var2 = null;
 
         try {
-            var2 = (CertificateValidity)this.info.get("validity");
+            var2 = (TCertificateValidity)this.info.get(TString.wrap("validity"));
         } catch (Exception var4) {
             throw new CertificateNotYetValidException("Incorrect validity period");
         }
@@ -342,30 +349,30 @@ public class TX509CertImpl extends TX509Certificate {
     public Object get(TString var1) throws CertificateParsingException {
         TX509AttributeName var2 = new TX509AttributeName(var1);
         TString var3 = var2.getPrefix();
-        if(!var3.equalsIgnoreCase("x509")) {
+        if(!var3.equalsIgnoreCase(TString.wrap("x509"))) {
             throw new CertificateParsingException("Invalid root of attribute name, expected [x509], received [" + var3 + "]");
         } else {
             var2 = new TX509AttributeName(var2.getSuffix());
             var3 = var2.getPrefix();
-            if(var3.equalsIgnoreCase("info")) {
+            if(var3.equalsIgnoreCase(TString.wrap("info"))) {
                 if(this.info == null) {
                     return null;
                 } else if(var2.getSuffix() != null) {
                     try {
                         return this.info.get(var2.getSuffix());
-                    } catch (IOException var5) {
+                    } catch (TIOException var5) {
                         throw new CertificateParsingException(var5.toString());
-                    } catch (CertificateException var6) {
+                    } catch (TCertificateException var6) {
                         throw new CertificateParsingException(var6.toString());
                     }
                 } else {
                     return this.info;
                 }
-            } else if(var3.equalsIgnoreCase("algorithm")) {
+            } else if(var3.equalsIgnoreCase(TString.wrap("algorithm"))) {
                 return this.algId;
-            } else if(var3.equalsIgnoreCase("signature")) {
+            } else if(var3.equalsIgnoreCase(TString.wrap("signature"))) {
                 return this.signature != null?this.signature.clone():null;
-            } else if(var3.equalsIgnoreCase("signed_cert")) {
+            } else if(var3.equalsIgnoreCase(TString.wrap("signed_cert"))) {
                 return this.signedCert != null?this.signedCert.clone():null;
             } else {
                 throw new CertificateParsingException("Attribute name not recognized or get() not allowed for the same: " + var3);
@@ -373,18 +380,18 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public void set(String var1, Object var2) throws CertificateException, IOException {
+    public void set(TString var1, Object var2) throws CertificateException, IOException {
         if(this.readOnly) {
             throw new CertificateException("cannot over-write existing certificate");
         } else {
-            X509AttributeName var3 = new X509AttributeName(var1);
-            String var4 = var3.getPrefix();
-            if(!var4.equalsIgnoreCase("x509")) {
+            TX509AttributeName var3 = new TX509AttributeName(var1);
+            TString var4 = var3.getPrefix();
+            if(!var4.equalsIgnoreCase(TString.wrap("x509"))) {
                 throw new CertificateException("Invalid root of attribute name, expected [x509], received " + var4);
             } else {
-                var3 = new X509AttributeName(var3.getSuffix());
+                var3 = new TX509AttributeName(var3.getSuffix());
                 var4 = var3.getPrefix();
-                if(var4.equalsIgnoreCase("info")) {
+                if(var4.equalsIgnoreCase(TString.wrap("info"))) {
                     if(var3.getSuffix() == null) {
                         if(!(var2 instanceof TX509CertInfo)) {
                             throw new CertificateException("Attribute value should be of type TX509CertInfo.");
@@ -404,29 +411,29 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public void delete(String var1) throws CertificateException, IOException {
+    public void delete(TString var1) throws CertificateException, IOException {
         if(this.readOnly) {
             throw new CertificateException("cannot over-write existing certificate");
         } else {
-            X509AttributeName var2 = new X509AttributeName(var1);
-            String var3 = var2.getPrefix();
-            if(!var3.equalsIgnoreCase("x509")) {
+            TX509AttributeName var2 = new TX509AttributeName(var1);
+            TString var3 = var2.getPrefix();
+            if(!var3.equalsIgnoreCase(TString.wrap("x509"))) {
                 throw new CertificateException("Invalid root of attribute name, expected [x509], received " + var3);
             } else {
-                var2 = new X509AttributeName(var2.getSuffix());
+                var2 = new TX509AttributeName(var2.getSuffix());
                 var3 = var2.getPrefix();
-                if(var3.equalsIgnoreCase("info")) {
+                if(var3.equalsIgnoreCase(TString.wrap("info"))) {
                     if(var2.getSuffix() != null) {
                         this.info = null;
                     } else {
                         this.info.delete(var2.getSuffix());
                     }
-                } else if(var3.equalsIgnoreCase("algorithm")) {
+                } else if(var3.equalsIgnoreCase(TString.wrap("algorithm"))) {
                     this.algId = null;
-                } else if(var3.equalsIgnoreCase("signature")) {
+                } else if(var3.equalsIgnoreCase(TString.wrap("signature"))) {
                     this.signature = null;
                 } else {
-                    if(!var3.equalsIgnoreCase("signed_cert")) {
+                    if(!var3.equalsIgnoreCase(TString.wrap("signed_cert"))) {
                         throw new CertificateException("Attribute name not recognized or delete() not allowed for the same: " + var3);
                     }
 
@@ -456,7 +463,7 @@ public class TX509CertImpl extends TX509Certificate {
             var1.append("[\n");
             var1.append(this.info.toString() + "\n");
             var1.append("  Algorithm: [" + this.algId.toString() + "]\n");
-            HexDumpEncoder var2 = new HexDumpEncoder();
+            THexDumpEncoder var2 = new THexDumpEncoder();
             var1.append("  Signature:\n" + var2.encodeBuffer(this.signature));
             var1.append("\n]");
             return var1.toString();
@@ -470,7 +477,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                TPublicKey var1 = (TPublicKey)this.info.get("key.value");
+                TPublicKey var1 = (TPublicKey)this.info.get(TString.wrap("key.value"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -483,7 +490,7 @@ public class TX509CertImpl extends TX509Certificate {
             return -1;
         } else {
             try {
-                int var1 = ((Integer)this.info.get("version.number")).intValue();
+                int var1 = ((Integer)this.info.get(TString.wrap("version.number"))).intValue();
                 return var1 + 1;
             } catch (Exception var2) {
                 return -1;
@@ -491,7 +498,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public BigInteger getSerialNumber() {
+    public TBigInteger getSerialNumber() {
         TSerialNumber var1 = this.getSerialNumberObject();
         return var1 != null?var1.getNumber():null;
     }
@@ -501,7 +508,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                TSerialNumber var1 = (TSerialNumber)this.info.get("serialNumber.number");
+                TSerialNumber var1 = (TSerialNumber)this.info.get(TString.wrap("serialNumber.number"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -514,7 +521,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                Principal var1 = (Principal)this.info.get("subject.dname");
+                Principal var1 = (Principal)this.info.get(TString.wrap("subject.dname"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -522,12 +529,12 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public X500Principal getSubjectX500Principal() {
+    public TX500Principal getSubjectX500Principal() {
         if(this.info == null) {
             return null;
         } else {
             try {
-                X500Principal var1 = (X500Principal)this.info.get("subject.x500principal");
+                TX500Principal var1 = (TX500Principal)this.info.get(TString.wrap("subject.x500principal"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -535,12 +542,12 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public Principal getIssuerDN() {
+    public TPrincipal getIssuerDN() {
         if(this.info == null) {
             return null;
         } else {
             try {
-                Principal var1 = (Principal)this.info.get("issuer.dname");
+                TPrincipal var1 = (TPrincipal)this.info.get(TString.wrap("issuer.dname"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -548,12 +555,12 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public X500Principal getIssuerX500Principal() {
+    public TX500Principal getIssuerX500Principal() {
         if(this.info == null) {
             return null;
         } else {
             try {
-                X500Principal var1 = (X500Principal)this.info.get("issuer.x500principal");
+                TX500Principal var1 = (TX500Principal)this.info.get(TString.wrap("issuer.x500principal"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -566,7 +573,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                Date var1 = (Date)this.info.get("validity.notBefore");
+                Date var1 = (Date)this.info.get(TString.wrap("validity.notBefore"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -579,7 +586,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                Date var1 = (Date)this.info.get("validity.notAfter");
+                Date var1 = (Date)this.info.get(TString.wrap("validity.notAfter"));
                 return var1;
             } catch (Exception var2) {
                 return null;
@@ -607,7 +614,7 @@ public class TX509CertImpl extends TX509Certificate {
         if(this.algId == null) {
             return null;
         } else {
-            ObjectIdentifier var1 = this.algId.getOID();
+            TObjectIdentifier var1 = this.algId.getOID();
             return var1.toString();
         }
     }
@@ -618,7 +625,7 @@ public class TX509CertImpl extends TX509Certificate {
         } else {
             try {
                 return this.algId.getEncodedParams();
-            } catch (IOException var2) {
+            } catch (TIOException var2) {
                 return null;
             }
         }
@@ -629,7 +636,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                UniqueIdentity var1 = (UniqueIdentity)this.info.get("issuerID");
+                TUniqueIdentity var1 = (TUniqueIdentity)this.info.get(TString.wrap("issuerID"));
                 return var1 == null?null:var1.getId();
             } catch (Exception var2) {
                 return null;
@@ -642,7 +649,7 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                UniqueIdentity var1 = (UniqueIdentity)this.info.get("subjectID");
+                TUniqueIdentity var1 = (TUniqueIdentity)this.info.get(TString.wrap("subjectID"));
                 return var1 == null?null:var1.getId();
             } catch (Exception var2) {
                 return null;
@@ -655,7 +662,7 @@ public class TX509CertImpl extends TX509Certificate {
         if(var1 != null) {
             try {
                 return (TKeyIdentifier)var1.get("key_id");
-            } catch (IOException var3) {
+            } catch (TIOException var3) {
                 ;
             }
         }
@@ -667,8 +674,8 @@ public class TX509CertImpl extends TX509Certificate {
         TSubjectKeyIdentifierExtension var1 = this.getSubjectKeyIdentifierExtension();
         if(var1 != null) {
             try {
-                return var1.get("key_id");
-            } catch (IOException var3) {
+                return var1.get(TString.wrap("key_id"));
+            } catch (TIOException var3) {
                 ;
             }
         }
@@ -729,7 +736,7 @@ public class TX509CertImpl extends TX509Certificate {
             return false;
         } else {
             try {
-                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get("extensions");
+                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get(TString.wrap("extensions"));
                 return var1 == null?false:var1.hasUnsupportedCriticalExtension();
             } catch (Exception var2) {
                 return false;
@@ -742,12 +749,12 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get("extensions");
+                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get(TString.wrap("extensions"));
                 if(var1 == null) {
                     return null;
                 } else {
                     TreeSet var2 = new TreeSet();
-                    Iterator var3 = var1.getAllExtensions().iterator();
+                    TIterator var3 = var1.getAllExtensions().iterator();
 
                     while(var3.hasNext()) {
                         TExtension var4 = (TExtension)var3.next();
@@ -769,12 +776,12 @@ public class TX509CertImpl extends TX509Certificate {
             return null;
         } else {
             try {
-                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get("extensions");
+                TCertificateExtensions var1 = (TCertificateExtensions)this.info.get(TString.wrap("extensions"));
                 if(var1 == null) {
                     return null;
                 } else {
                     TreeSet var2 = new TreeSet();
-                    Iterator var3 = var1.getAllExtensions().iterator();
+                    TIterator var3 = var1.getAllExtensions().iterator();
 
                     while(var3.hasNext()) {
                         TExtension var4 = (TExtension)var3.next();
@@ -799,8 +806,8 @@ public class TX509CertImpl extends TX509Certificate {
             try {
                 TCertificateExtensions var2;
                 try {
-                    var2 = (TCertificateExtensions)this.info.get("extensions");
-                } catch (CertificateException var6) {
+                    var2 = (TCertificateExtensions)this.info.get(TString.wrap("extensions"));
+                } catch (TCertificateException var6) {
                     return null;
                 }
 
@@ -825,7 +832,7 @@ public class TX509CertImpl extends TX509Certificate {
                         return var5;
                     }
                 }
-            } catch (IOException var7) {
+            } catch (TIOException var7) {
                 return null;
             }
         }
@@ -838,24 +845,24 @@ public class TX509CertImpl extends TX509Certificate {
             try {
                 TCertificateExtensions var2;
                 try {
-                    var2 = (TCertificateExtensions)this.info.get("extensions");
-                } catch (CertificateException var4) {
+                    var2 = (TCertificateExtensions)this.info.get(TString.wrap("extensions"));
+                } catch (TCertificateException var4) {
                     return null;
                 }
 
                 return var2 == null?null:(TExtension)var2.getUnparseableExtensions().get(var1.toString());
-            } catch (IOException var5) {
+            } catch (TIOException var5) {
                 return null;
             }
         }
     }
 
-    public byte[] getExtensionValue(String var1) {
+    public byte[] getExtensionValue(TString var1) {
         try {
             TObjectIdentifier var2 = new TObjectIdentifier(var1);
             TString var3 = TOIDMap.getName(var2);
             TExtension var4 = null;
-            TCertificateExtensions var5 = (TCertificateExtensions)this.info.get("extensions");
+            TCertificateExtensions var5 = (TCertificateExtensions)this.info.get(TString.wrap("extensions"));
             if(var3 == null) {
                 if(var5 == null) {
                     return null;
@@ -893,7 +900,7 @@ public class TX509CertImpl extends TX509Certificate {
             if(var11 == null) {
                 return null;
             } else {
-                DerOutputStream var12 = new DerOutputStream();
+                TDerOutputStream var12 = new TDerOutputStream();
                 var12.putOctetString(var11);
                 return var12.toByteArray();
             }
@@ -904,11 +911,11 @@ public class TX509CertImpl extends TX509Certificate {
 
     public boolean[] getKeyUsage() {
         try {
-            String var1 = TOIDMap.getName(TPKIXExtensions.KeyUsage_Id);
+            TString var1 = TOIDMap.getName(TPKIXExtensions.KeyUsage_Id);
             if(var1 == null) {
                 return null;
             } else {
-                KeyUsageExtension var2 = (KeyUsageExtension)this.get(var1);
+                TKeyUsageExtension var2 = (TKeyUsageExtension)this.get(var1);
                 if(var2 == null) {
                     return null;
                 } else {
@@ -941,13 +948,13 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public static List<String> getExtendedKeyUsage(X509Certificate var0) throws CertificateParsingException {
+    public static List<String> getExtendedKeyUsage(TX509Certificate var0) throws CertificateParsingException {
         try {
             byte[] var1 = var0.getExtensionValue("2.5.29.37");
             if(var1 == null) {
                 return null;
             } else {
-                DerValue var2 = new DerValue(var1);
+                TDerValue var2 = new TDerValue(var1);
                 byte[] var3 = var2.getOctetString();
                 TExtendedKeyUsageExtension var4 = new TExtendedKeyUsageExtension(Boolean.FALSE, var3);
                 return Collections.unmodifiableList(var4.getExtendedKeyUsage());
@@ -959,7 +966,7 @@ public class TX509CertImpl extends TX509Certificate {
 
     public int getBasicConstraints() {
         try {
-            String var1 = TOIDMap.getName(TPKIXExtensions.BasicConstraints_Id);
+            TString var1 = TOIDMap.getName(TPKIXExtensions.BasicConstraints_Id);
             if(var1 == null) {
                 return -1;
             } else {
@@ -980,7 +987,7 @@ public class TX509CertImpl extends TX509Certificate {
             ArrayList var5;
             for(Iterator var2 = var0.names().iterator(); var2.hasNext(); var1.add(Collections.unmodifiableList(var5))) {
                 TGeneralName var3 = (TGeneralName)var2.next();
-                GeneralNameInterface var4 = var3.getName();
+                TGeneralNameInterface var4 = var3.getName();
                 var5 = new ArrayList(2);
                 var5.add(Integer.valueOf(var4.getType()));
                 switch(var4.getType()) {
@@ -993,11 +1000,11 @@ public class TX509CertImpl extends TX509Certificate {
                     case 3:
                     case 5:
                     default:
-                        DerOutputStream var6 = new DerOutputStream();
+                        TDerOutputStream var6 = new TDerOutputStream();
 
                         try {
                             var4.encode(var6);
-                        } catch (IOException var8) {
+                        } catch (TIOException var8) {
                             throw new RuntimeException("name cannot be encoded", var8);
                         }
 
@@ -1062,14 +1069,14 @@ public class TX509CertImpl extends TX509Certificate {
         if(this.readOnly && this.subjectAlternativeNames != null) {
             return cloneAltNames(this.subjectAlternativeNames);
         } else {
-            SubjectAlternativeNameExtension var1 = this.getSubjectAlternativeNameExtension();
+            TSubjectAlternativeNameExtension var1 = this.getSubjectAlternativeNameExtension();
             if(var1 == null) {
                 return null;
             } else {
                 TGeneralNames var2;
                 try {
                     var2 = var1.get("subject_name");
-                } catch (IOException var4) {
+                } catch (TIOException var4) {
                     return Collections.emptySet();
                 }
 
@@ -1085,14 +1092,14 @@ public class TX509CertImpl extends TX509Certificate {
             if(var1 == null) {
                 return null;
             } else {
-                DerValue var2 = new DerValue(var1);
+                TDerValue var2 = new TDerValue(var1);
                 byte[] var3 = var2.getOctetString();
-                SubjectAlternativeNameExtension var4 = new SubjectAlternativeNameExtension(Boolean.FALSE, var3);
+                TSubjectAlternativeNameExtension var4 = new TSubjectAlternativeNameExtension(Boolean.FALSE, var3);
 
                 TGeneralNames var5;
                 try {
                     var5 = var4.get("subject_name");
-                } catch (IOException var7) {
+                } catch (TIOException var7) {
                     return Collections.emptySet();
                 }
 
@@ -1114,7 +1121,7 @@ public class TX509CertImpl extends TX509Certificate {
                 TGeneralNames var2;
                 try {
                     var2 = var1.get("issuer_name");
-                } catch (IOException var4) {
+                } catch (TIOException var4) {
                     return Collections.emptySet();
                 }
 
@@ -1130,14 +1137,14 @@ public class TX509CertImpl extends TX509Certificate {
             if(var1 == null) {
                 return null;
             } else {
-                DerValue var2 = new DerValue(var1);
+                TDerValue var2 = new TDerValue(var1);
                 byte[] var3 = var2.getOctetString();
                 TIssuerAlternativeNameExtension var4 = new TIssuerAlternativeNameExtension(Boolean.FALSE, var3);
 
                 TGeneralNames var5;
                 try {
                     var5 = var4.get("issuer_name");
-                } catch (IOException var7) {
+                } catch (TIOException var7) {
                     return Collections.emptySet();
                 }
 
@@ -1149,48 +1156,48 @@ public class TX509CertImpl extends TX509Certificate {
     }
 
     public TAuthorityInfoAccessExtension getAuthorityInfoAccessExtension() {
-        return (AuthorityInfoAccessExtension)this.getExtension(TPKIXExtensions.AuthInfoAccess_Id);
+        return (TAuthorityInfoAccessExtension)this.getExtension(TPKIXExtensions.AuthInfoAccess_Id);
     }
 
-    private void parse(TDerValue var1) throws CertificateException, IOException {
+    private void parse(TDerValue var1) throws TCertificateException, TIOException {
         if(this.readOnly) {
-            throw new CertificateParsingException("cannot over-write existing certificate");
+            throw new TCertificateParsingException(TString.wrap("cannot over-write existing certificate"));
         } else if(var1.data != null && var1.tag == 48) {
             this.signedCert = var1.toByteArray();
             TDerValue[] var2 = new TDerValue[]{var1.data.getDerValue(), var1.data.getDerValue(), var1.data.getDerValue()};
             if(var1.data.available() != 0) {
-                throw new CertificateParsingException("signed overrun, bytes = " + var1.data.available());
+                throw new TCertificateParsingException(TString.wrap("signed overrun, bytes = " + var1.data.available()));
             } else if(var2[0].tag != 48) {
-                throw new CertificateParsingException("signed fields invalid");
+                throw new TCertificateParsingException(TString.wrap("signed fields invalid"));
             } else {
                 this.algId = TAlgorithmId.parse(var2[1]);
                 this.signature = var2[2].getBitString();
                 if(var2[1].data.available() != 0) {
-                    throw new CertificateParsingException("algid field overrun");
+                    throw new TCertificateParsingException(TString.wrap("algid field overrun"));
                 } else if(var2[2].data.available() != 0) {
-                    throw new CertificateParsingException("signed fields overrun");
+                    throw new TCertificateParsingException(TString.wrap("signed fields overrun"));
                 } else {
                     this.info = new TX509CertInfo(var2[0]);
-                    AlgorithmId var3 = (AlgorithmId)this.info.get("algorithmID.algorithm");
+                    TAlgorithmId var3 = (TAlgorithmId)this.info.get(TString.wrap("algorithmID.algorithm"));
                     if(!this.algId.equals(var3)) {
-                        throw new CertificateException("Signature algorithm mismatch");
+                        throw new TCertificateParsingException(TString.wrap("Signature algorithm mismatch"));
                     } else {
                         this.readOnly = true;
                     }
                 }
             }
         } else {
-            throw new CertificateParsingException("invalid DER-encoded certificate data");
+            throw new TCertificateParsingException(TString.wrap("invalid DER-encoded certificate data"));
         }
     }
 
-    private static X500Principal getX500Principal(TX509Certificate var0, boolean var1) throws Exception {
+    private static TX500Principal getX500Principal(TX509Certificate var0, boolean var1) throws Exception {
         byte[] var2 = var0.getEncoded();
         TDerInputStream var3 = new TDerInputStream(var2);
         TDerValue var4 = var3.getSequence(3)[0];
         TDerInputStream var5 = var4.data;
         TDerValue var6 = var5.getDerValue();
-        if(var6.isContextSpecific(0)) {
+        if(var6.isContextSpecific((byte)0)) {
             var6 = var5.getDerValue();
         }
 
@@ -1202,10 +1209,10 @@ public class TX509CertImpl extends TX509Certificate {
         }
 
         byte[] var7 = var6.toByteArray();
-        return new X500Principal(var7);
+        return new TX500Principal(var7);
     }
 
-    public static X500Principal getSubjectX500Principal(TX509Certificate var0) {
+    public static TX500Principal getSubjectX500Principal(TX509Certificate var0) {
         try {
             return getX500Principal(var0, false);
         } catch (Exception var2) {
@@ -1213,7 +1220,7 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public static X500Principal getIssuerX500Principal(TX509Certificate var0) {
+    public static TX500Principal getIssuerX500Principal(TX509Certificate var0) {
         try {
             return getX500Principal(var0, true);
         } catch (Exception var2) {

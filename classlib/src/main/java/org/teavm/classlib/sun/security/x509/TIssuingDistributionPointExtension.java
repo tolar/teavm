@@ -21,12 +21,9 @@ import java.io.OutputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
-
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.DistributionPointName;
-import sun.security.x509.ReasonFlags;
+import org.teavm.classlib.sun.security.util.TDerValue;
 
 public class TIssuingDistributionPointExtension extends TExtension implements TCertAttrSet<String> {
     public static final String IDENT = "x509.info.extensions.IssuingDistributionPoint";
@@ -38,7 +35,7 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
     public static final String ONLY_ATTRIBUTE_CERTS = "only_attribute_certs";
     public static final String INDIRECT_CRL = "indirect_crl";
     private TDistributionPointName distributionPoint = null;
-    private ReasonFlags revocationReasons = null;
+    private TReasonFlags revocationReasons = null;
     private boolean hasOnlyUserCerts = false;
     private boolean hasOnlyCACerts = false;
     private boolean hasOnlyAttributeCerts = false;
@@ -50,7 +47,7 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
     private static final byte TAG_INDIRECT_CRL = 4;
     private static final byte TAG_ONLY_ATTRIBUTE_CERTS = 5;
 
-    public TIssuingDistributionPointExtension(TDistributionPointName var1, ReasonFlags var2, boolean var3, boolean var4, boolean var5, boolean var6) throws
+    public TIssuingDistributionPointExtension(TDistributionPointName var1, TReasonFlags var2, boolean var3, boolean var4, boolean var5, boolean var6) throws
             IOException {
         if((!var3 || !var4 && !var5) && (!var4 || !var3 && !var5) && (!var5 || !var3 && !var4)) {
             this.extensionId = TPKIXExtensions.IssuingDistributionPoint_Id;
@@ -74,15 +71,15 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
             throw new IOException("Illegal argument type");
         } else {
             this.extensionValue = (byte[])((byte[])var2);
-            DerValue var3 = new DerValue(this.extensionValue);
+            TDerValue var3 = new TDerValue(this.extensionValue);
             if(var3.tag != 48) {
                 throw new IOException("Invalid encoding for IssuingDistributionPointExtension.");
             } else if(var3.data != null && var3.data.available() != 0) {
-                DerInputStream var4 = var3.data;
+                TDerInputStream var4 = var3.data;
 
                 while(true) {
                     if(var4 != null && var4.available() != 0) {
-                        DerValue var5 = var4.getDerValue();
+                        TDerValue var5 = var4.getDerValue();
                         if(var5.isContextSpecific((byte)0) && var5.isConstructed()) {
                             this.distributionPoint = new TDistributionPointName(var5.data.getDerValue());
                             continue;
@@ -101,7 +98,7 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
                         }
 
                         if(var5.isContextSpecific((byte)3) && !var5.isConstructed()) {
-                            this.revocationReasons = new ReasonFlags(var5);
+                            this.revocationReasons = new TReasonFlags(var5);
                             continue;
                         }
 
@@ -142,44 +139,44 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws IOException {
-        if(var1.equalsIgnoreCase("point")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("point"))) {
             if(!(var2 instanceof DistributionPointName)) {
-                throw new IOException("Attribute value should be of type DistributionPointName.");
+                throw new TIOException(TString.wrap("Attribute value should be of type DistributionPointName."));
             }
 
-            this.distributionPoint = (DistributionPointName)var2;
-        } else if(var1.equalsIgnoreCase("reasons")) {
+            this.distributionPoint = (TDistributionPointName)var2;
+        } else if(var1.equalsIgnoreCase(TString.wrap("reasons"))) {
             if(!(var2 instanceof ReasonFlags)) {
-                throw new IOException("Attribute value should be of type ReasonFlags.");
+                throw new TIOException(TString.wrap("Attribute value should be of type ReasonFlags."));
             }
 
-            this.revocationReasons = (ReasonFlags)var2;
-        } else if(var1.equalsIgnoreCase("indirect_crl")) {
+            this.revocationReasons = (TReasonFlags)var2;
+        } else if(var1.equalsIgnoreCase(TString.wrap("indirect_crl"))) {
             if(!(var2 instanceof Boolean)) {
-                throw new IOException("Attribute value should be of type Boolean.");
+                throw new TIOException(TString.wrap("Attribute value should be of type Boolean."));
             }
 
             this.isIndirectCRL = ((Boolean)var2).booleanValue();
-        } else if(var1.equalsIgnoreCase("only_user_certs")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("only_user_certs"))) {
             if(!(var2 instanceof Boolean)) {
-                throw new IOException("Attribute value should be of type Boolean.");
+                throw new TIOException(TString.wrap("Attribute value should be of type Boolean."));
             }
 
             this.hasOnlyUserCerts = ((Boolean)var2).booleanValue();
-        } else if(var1.equalsIgnoreCase("only_ca_certs")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("only_ca_certs"))) {
             if(!(var2 instanceof Boolean)) {
-                throw new IOException("Attribute value should be of type Boolean.");
+                throw new TIOException(TString.wrap("Attribute value should be of type Boolean."));
             }
 
             this.hasOnlyCACerts = ((Boolean)var2).booleanValue();
         } else {
-            if(!var1.equalsIgnoreCase("only_attribute_certs")) {
-                throw new IOException("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:IssuingDistributionPointExtension.");
+            if(!var1.equalsIgnoreCase(TString.wrap("only_attribute_certs"))) {
+                throw new TIOException(TString.wrap("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:IssuingDistributionPointExtension."));
             }
 
             if(!(var2 instanceof Boolean)) {
-                throw new IOException("Attribute value should be of type Boolean.");
+                throw new TIOException(TString.wrap("Attribute value should be of type Boolean."));
             }
 
             this.hasOnlyAttributeCerts = ((Boolean)var2).booleanValue();
@@ -248,41 +245,41 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
             if(this.distributionPoint != null) {
                 var2 = new TDerOutputStream();
                 this.distributionPoint.encode(var2);
-                var1.writeImplicit(DerValue.createTag(-128, true, 0), var2);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, true, (byte)0), var2);
             }
 
             if(this.hasOnlyUserCerts) {
                 var2 = new TDerOutputStream();
                 var2.putBoolean(this.hasOnlyUserCerts);
-                var1.writeImplicit(DerValue.createTag(-128, false, 1), var2);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, false, (byte)1), var2);
             }
 
             if(this.hasOnlyCACerts) {
                 var2 = new TDerOutputStream();
                 var2.putBoolean(this.hasOnlyCACerts);
-                var1.writeImplicit(DerValue.createTag(-128, false, 2), var2);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, false, (byte)2), var2);
             }
 
             if(this.revocationReasons != null) {
                 var2 = new TDerOutputStream();
                 this.revocationReasons.encode(var2);
-                var1.writeImplicit(DerValue.createTag(-128, false, 3), var2);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, false, (byte)3), var2);
             }
 
             if(this.isIndirectCRL) {
                 var2 = new TDerOutputStream();
                 var2.putBoolean(this.isIndirectCRL);
-                var1.writeImplicit(DerValue.createTag(-128, false, 4), var2);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, false, (byte)4), var2);
             }
 
             if(this.hasOnlyAttributeCerts) {
                 var2 = new TDerOutputStream();
                 var2.putBoolean(this.hasOnlyAttributeCerts);
-                var1.writeImplicit(DerValue.createTag(-128, false, 5), var2);
+                var1.writeImplicit(TDerValue.createTag((byte)-128, false, (byte)5), var2);
             }
 
             var2 = new TDerOutputStream();
-            var2.write(48, var1);
+            var2.write((byte)48, var1);
             this.extensionValue = var2.toByteArray();
         }
     }

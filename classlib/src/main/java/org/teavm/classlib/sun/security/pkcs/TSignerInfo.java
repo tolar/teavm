@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.pkcs;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,10 +34,14 @@ import java.util.Arrays;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.sun.misc.THexDumpEncoder;
+import org.teavm.classlib.sun.security.timestamp.TTimestampToken;
+import org.teavm.classlib.sun.security.util.TDebug;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
+import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 import org.teavm.classlib.sun.security.x509.TAlgorithmId;
 import org.teavm.classlib.sun.security.x509.TX500Name;
 
@@ -77,11 +80,11 @@ public class TSignerInfo implements TDerEncoder {
         this.unauthenticatedAttributes = var7;
     }
 
-    public TSignerInfo(TDerInputStream var1) throws TIOException, ParsingException {
+    public TSignerInfo(TDerInputStream var1) throws TIOException, TParsingException {
         this(var1, false);
     }
 
-    public TSignerInfo(TDerInputStream var1, boolean var2) throws IOException, ParsingException {
+    public TSignerInfo(TDerInputStream var1, boolean var2) throws TIOException, TParsingException {
         this.hasTimestamp = true;
         this.version = var1.getBigInteger();
         TDerValue[] var3 = var1.getSequence(2);
@@ -183,7 +186,7 @@ public class TSignerInfo implements TDerEncoder {
         }
     }
 
-    sun.security.pkcs.SignerInfo verify(TPKCS7 var1, byte[] var2) throws NoSuchAlgorithmException, SignatureException {
+    TSignerInfo verify(TPKCS7 var1, byte[] var2) throws NoSuchAlgorithmException, SignatureException {
         try {
             TContentInfo var3 = var1.getContentInfo();
             if(var2 == null) {
@@ -195,12 +198,12 @@ public class TSignerInfo implements TDerEncoder {
             if(this.authenticatedAttributes == null) {
                 var5 = var2;
             } else {
-                ObjectIdentifier var6 = (ObjectIdentifier)this.authenticatedAttributes.getAttributeValue(PKCS9Attribute.CONTENT_TYPE_OID);
+                TObjectIdentifier var6 = (TObjectIdentifier)this.authenticatedAttributes.getAttributeValue(TPKCS9Attribute.CONTENT_TYPE_OID);
                 if(var6 == null || !var6.equals(var3.contentType)) {
                     return null;
                 }
 
-                byte[] var7 = (byte[])((byte[])this.authenticatedAttributes.getAttributeValue(PKCS9Attribute.MESSAGE_DIGEST_OID));
+                byte[] var7 = (byte[])((byte[])this.authenticatedAttributes.getAttributeValue(TPKCS9Attribute.MESSAGE_DIGEST_OID));
                 if(var7 == null) {
                     return null;
                 }
@@ -221,12 +224,12 @@ public class TSignerInfo implements TDerEncoder {
             }
 
             String var18 = this.getDigestEncryptionAlgorithmId().getName();
-            String var19 = AlgorithmId.getEncAlgFromSigAlg(var18);
+            String var19 = TAlgorithmId.getEncAlgFromSigAlg(var18);
             if(var19 != null) {
                 var18 = var19;
             }
 
-            String var20 = AlgorithmId.makeSigAlg(var4, var18);
+            String var20 = TAlgorithmId.makeSigAlg(var4, var18);
             Signature var21 = Signature.getInstance(var20);
             X509Certificate var22 = this.getCertificate(var1);
             if(var22 == null) {
@@ -270,27 +273,27 @@ public class TSignerInfo implements TDerEncoder {
         return this.verify(var1, (byte[])null);
     }
 
-    public BigInteger getVersion() {
+    public TBigInteger getVersion() {
         return this.version;
     }
 
-    public X500Name getIssuerName() {
+    public TX500Name getIssuerName() {
         return this.issuerName;
     }
 
-    public BigInteger getCertificateSerialNumber() {
+    public TBigInteger getCertificateSerialNumber() {
         return this.certificateSerialNumber;
     }
 
-    public AlgorithmId getDigestAlgorithmId() {
+    public TAlgorithmId getDigestAlgorithmId() {
         return this.digestAlgorithmId;
     }
 
-    public PKCS9Attributes getAuthenticatedAttributes() {
+    public TPKCS9Attributes getAuthenticatedAttributes() {
         return this.authenticatedAttributes;
     }
 
-    public AlgorithmId getDigestEncryptionAlgorithmId() {
+    public TAlgorithmId getDigestEncryptionAlgorithmId() {
         return this.digestEncryptionAlgorithmId;
     }
 
@@ -298,7 +301,7 @@ public class TSignerInfo implements TDerEncoder {
         return this.encryptedDigest;
     }
 
-    public PKCS9Attributes getUnauthenticatedAttributes() {
+    public TPKCS9Attributes getUnauthenticatedAttributes() {
         return this.unauthenticatedAttributes;
     }
 
@@ -309,18 +312,18 @@ public class TSignerInfo implements TDerEncoder {
                 this.hasTimestamp = false;
                 return null;
             } else {
-                PKCS9Attribute var1 = this.unauthenticatedAttributes.getAttribute(PKCS9Attribute.SIGNATURE_TIMESTAMP_TOKEN_OID);
+                TPKCS9Attribute var1 = this.unauthenticatedAttributes.getAttribute(TPKCS9Attribute.SIGNATURE_TIMESTAMP_TOKEN_OID);
                 if(var1 == null) {
                     this.hasTimestamp = false;
                     return null;
                 } else {
                     TPKCS7 var2 = new TPKCS7((byte[])((byte[])var1.getValue()));
                     byte[] var3 = var2.getContentInfo().getData();
-                    sun.security.pkcs.SignerInfo[] var4 = var2.verify(var3);
+                    TSignerInfo[] var4 = var2.verify(var3);
                     ArrayList var5 = var4[0].getCertificateChain(var2);
                     CertificateFactory var6 = CertificateFactory.getInstance("X.509");
                     CertPath var7 = var6.generateCertPath(var5);
-                    TimestampToken var8 = new TimestampToken(var3);
+                    TTimestampToken var8 = new TTimestampToken(var3);
                     this.verifyTimestamp(var8);
                     this.timestamp = new Timestamp(var8.getDate(), var7);
                     return this.timestamp;
@@ -331,26 +334,19 @@ public class TSignerInfo implements TDerEncoder {
         }
     }
 
-    private void verifyTimestamp(TimestampToken var1) throws NoSuchAlgorithmException, SignatureException {
+    private void verifyTimestamp(TTimestampToken var1) throws NoSuchAlgorithmException, SignatureException {
         MessageDigest var2 = MessageDigest.getInstance(var1.getHashAlgorithm().getName());
         if(!Arrays.equals(var1.getHashedMessage(), var2.digest(this.encryptedDigest))) {
             throw new SignatureException("Signature timestamp (#" + var1.getSerialNumber() + ") generated on " + var1.getDate() + " is inapplicable");
-        } else {
-            if(debug != null) {
-                debug.println();
-                debug.println("Detected signature timestamp (#" + var1.getSerialNumber() + ") generated on " + var1.getDate());
-                debug.println();
-            }
-
         }
     }
 
     public String toString() {
-        HexDumpEncoder var1 = new HexDumpEncoder();
+        THexDumpEncoder var1 = new THexDumpEncoder();
         String var2 = "";
         var2 = var2 + "Signer Info for (issuer): " + this.issuerName + "\n";
-        var2 = var2 + "\tversion: " + Debug.toHexString(this.version) + "\n";
-        var2 = var2 + "\tcertificateSerialNumber: " + Debug.toHexString(this.certificateSerialNumber) + "\n";
+        var2 = var2 + "\tversion: " + TDebug.toHexString(this.version) + "\n";
+        var2 = var2 + "\tcertificateSerialNumber: " + TDebug.toHexString(this.certificateSerialNumber) + "\n";
         var2 = var2 + "\tdigestAlgorithmId: " + this.digestAlgorithmId + "\n";
         if(this.authenticatedAttributes != null) {
             var2 = var2 + "\tauthenticatedAttributes: " + this.authenticatedAttributes + "\n";

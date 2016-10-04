@@ -23,15 +23,10 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
-import sun.security.pkcs.PKCS9Attribute;
-import sun.security.pkcs.ParsingException;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
 
 public class TPKCS9Attributes {
     private final Hashtable<TObjectIdentifier, TPKCS9Attribute> attributes;
@@ -67,12 +62,12 @@ public class TPKCS9Attributes {
         this.permittedAttributes = null;
     }
 
-    public TPKCS9Attributes(PKCS9Attribute[] var1) throws IllegalArgumentException, IOException {
+    public TPKCS9Attributes(TPKCS9Attribute[] var1) throws IllegalArgumentException, IOException {
         this.attributes = new Hashtable(3);
         this.ignoreUnsupportedAttributes = false;
 
         for(int var3 = 0; var3 < var1.length; ++var3) {
-            ObjectIdentifier var2 = var1[var3].getOID();
+            TObjectIdentifier var2 = var1[var3].getOID();
             if(this.attributes.containsKey(var2)) {
                 throw new IllegalArgumentException("PKCSAttribute " + var1[var3].getOID() + " duplicated while constructing " + "PKCS9Attributes.");
             }
@@ -88,15 +83,15 @@ public class TPKCS9Attributes {
         TDerValue var2 = var1.getDerValue();
         byte[] var3 = var2.toByteArray();
         var3[0] = 49;
-        DerInputStream var4 = new DerInputStream(var3);
-        DerValue[] var5 = var4.getSet(3, true);
+        TDerInputStream var4 = new TDerInputStream(var3);
+        TDerValue[] var5 = var4.getSet(3, true);
         boolean var8 = true;
 
         for(int var9 = 0; var9 < var5.length; ++var9) {
             TPKCS9Attribute var6;
             try {
                 var6 = new TPKCS9Attribute(var5[var9]);
-            } catch (ParsingException var11) {
+            } catch (TParsingException var11) {
                 if(this.ignoreUnsupportedAttributes) {
                     var8 = false;
                     continue;
@@ -126,9 +121,9 @@ public class TPKCS9Attributes {
     }
 
     private byte[] generateDerEncoding() throws IOException {
-        DerOutputStream var1 = new DerOutputStream();
+        TDerOutputStream var1 = new TDerOutputStream();
         Object[] var2 = this.attributes.values().toArray();
-        var1.putOrderedSetOf(49, castToDerEncoder(var2));
+        var1.putOrderedSetOf((byte)49, castToDerEncoder(var2));
         return var1.toByteArray();
     }
 
@@ -158,7 +153,7 @@ public class TPKCS9Attributes {
         return var1;
     }
 
-    public Object getAttributeValue(ObjectIdentifier var1) throws IOException {
+    public Object getAttributeValue(TObjectIdentifier var1) throws IOException {
         try {
             Object var2 = this.getAttribute(var1).getValue();
             return var2;
@@ -168,7 +163,7 @@ public class TPKCS9Attributes {
     }
 
     public Object getAttributeValue(String var1) throws IOException {
-        ObjectIdentifier var2 = PKCS9Attribute.getOID(var1);
+        TObjectIdentifier var2 = TPKCS9Attribute.getOID(var1);
         if(var2 == null) {
             throw new IOException("Attribute name " + var1 + " not recognized or not supported.");
         } else {
