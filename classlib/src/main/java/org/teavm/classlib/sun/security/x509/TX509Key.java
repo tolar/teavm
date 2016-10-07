@@ -24,7 +24,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
@@ -70,9 +69,9 @@ public class TX509Key implements TPublicKey {
         return (TBitArray)this.bitStringKey.clone();
     }
 
-    public static TPublicKey parse(TDerValue var0) throws IOException {
+    public static TPublicKey parse(TDerValue var0) throws TIOException {
         if(var0.tag != 48) {
-            throw new IOException("corrupt subject key");
+            throw new TIOException(TString.wrap("corrupt subject key"));
         } else {
             TAlgorithmId var1 = TAlgorithmId.parse(var0.data.getDerValue());
 

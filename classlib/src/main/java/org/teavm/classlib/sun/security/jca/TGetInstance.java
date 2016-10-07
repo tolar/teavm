@@ -20,7 +20,6 @@ import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.util.Iterator;
 import java.util.List;
-
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
@@ -163,7 +162,7 @@ public class TGetInstance {
     }
 
     public static TGetInstance.Instance getInstance(TProvider.Service var0, TClass<?> var1) throws TNoSuchAlgorithmException {
-        Object var2 = var0.newInstance((Object)null);
+        Object var2 = var0.newInstance((TObject)null);
         checkSuperClass(var0, var2.getClass(), var1);
         return new TGetInstance.Instance(var0.getProvider(), var2);
     }

@@ -18,8 +18,6 @@ package org.teavm.classlib.sun.security.util;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
-
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -27,6 +25,7 @@ import org.teavm.classlib.java.lang.TInteger;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.text.TSimpleDateFormat;
+import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TLocale;
 import org.teavm.classlib.java.util.TTimeZone;
 
@@ -235,15 +234,15 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
         this.write(var4);
     }
 
-    public void putUTCTime(Date var1) throws TIOException {
+    public void putUTCTime(TDate var1) throws TIOException {
         this.putTime(var1, (byte) 23);
     }
 
-    public void putGeneralizedTime(Date var1) throws TIOException {
+    public void putGeneralizedTime(TDate var1) throws TIOException {
         this.putTime(var1, (byte) 24);
     }
 
-    private void putTime(Date var1, byte var2) throws TIOException {
+    private void putTime(TDate var1, byte var2) throws TIOException {
         TTimeZone var3 = TTimeZone.getTimeZone("GMT");
         String var4 = null;
         if(var2 == 23) {

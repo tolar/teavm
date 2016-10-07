@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -37,7 +36,7 @@ public class TCertificateX509Key implements TCertAttrSet<String> {
         this.key = var1;
     }
 
-    public TCertificateX509Key(TDerInputStream var1) throws IOException {
+    public TCertificateX509Key(TDerInputStream var1) throws TIOException {
         TDerValue var2 = var1.getDerValue();
         this.key = TX509Key.parse(var2);
     }

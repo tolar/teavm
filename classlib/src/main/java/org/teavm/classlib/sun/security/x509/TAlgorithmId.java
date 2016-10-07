@@ -23,7 +23,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
@@ -43,7 +42,7 @@ public class TAlgorithmId {
     protected TDerValue params;
     private static boolean initOidTable = false;
     private static Map<String, TObjectIdentifier> oidTable;
-    private static final Map<TObjectIdentifier, String> nameTable;
+    private static final Map<TObjectIdentifier, TString> nameTable;
     public static final TObjectIdentifier MD2_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 2, 2});
     public static final TObjectIdentifier MD5_oid = TObjectIdentifier.newInternal(new int[]{1, 2, 840, 113549, 2, 5});
     public static final TObjectIdentifier SHA_oid = TObjectIdentifier.newInternal(new int[]{1, 3, 14, 3, 2, 26});
@@ -122,46 +121,46 @@ public class TAlgorithmId {
         sha1WithDSA_OIW_oid = TObjectIdentifier.newInternal(sha1WithDSA_OIW_data);
         sha1WithDSA_oid = TObjectIdentifier.newInternal(dsaWithSHA1_PKIX_data);
         nameTable = new HashMap();
-        nameTable.put(MD5_oid, "MD5");
-        nameTable.put(MD2_oid, "MD2");
-        nameTable.put(SHA_oid, "SHA-1");
-        nameTable.put(SHA224_oid, "SHA-224");
-        nameTable.put(SHA256_oid, "SHA-256");
-        nameTable.put(SHA384_oid, "SHA-384");
-        nameTable.put(SHA512_oid, "SHA-512");
-        nameTable.put(RSAEncryption_oid, "RSA");
-        nameTable.put(RSA_oid, "RSA");
-        nameTable.put(DH_oid, "Diffie-Hellman");
-        nameTable.put(DH_PKIX_oid, "Diffie-Hellman");
-        nameTable.put(DSA_oid, "DSA");
-        nameTable.put(DSA_OIW_oid, "DSA");
-        nameTable.put(EC_oid, "EC");
-        nameTable.put(ECDH_oid, "ECDH");
-        nameTable.put(AES_oid, "AES");
-        nameTable.put(sha1WithECDSA_oid, "SHA1withECDSA");
-        nameTable.put(sha224WithECDSA_oid, "SHA224withECDSA");
-        nameTable.put(sha256WithECDSA_oid, "SHA256withECDSA");
-        nameTable.put(sha384WithECDSA_oid, "SHA384withECDSA");
-        nameTable.put(sha512WithECDSA_oid, "SHA512withECDSA");
-        nameTable.put(md5WithRSAEncryption_oid, "MD5withRSA");
-        nameTable.put(md2WithRSAEncryption_oid, "MD2withRSA");
-        nameTable.put(sha1WithDSA_oid, "SHA1withDSA");
-        nameTable.put(sha1WithDSA_OIW_oid, "SHA1withDSA");
-        nameTable.put(shaWithDSA_OIW_oid, "SHA1withDSA");
-        nameTable.put(sha224WithDSA_oid, "SHA224withDSA");
-        nameTable.put(sha256WithDSA_oid, "SHA256withDSA");
-        nameTable.put(sha1WithRSAEncryption_oid, "SHA1withRSA");
-        nameTable.put(sha1WithRSAEncryption_OIW_oid, "SHA1withRSA");
-        nameTable.put(sha224WithRSAEncryption_oid, "SHA224withRSA");
-        nameTable.put(sha256WithRSAEncryption_oid, "SHA256withRSA");
-        nameTable.put(sha384WithRSAEncryption_oid, "SHA384withRSA");
-        nameTable.put(sha512WithRSAEncryption_oid, "SHA512withRSA");
-        nameTable.put(pbeWithMD5AndDES_oid, "PBEWithMD5AndDES");
-        nameTable.put(pbeWithMD5AndRC2_oid, "PBEWithMD5AndRC2");
-        nameTable.put(pbeWithSHA1AndDES_oid, "PBEWithSHA1AndDES");
-        nameTable.put(pbeWithSHA1AndRC2_oid, "PBEWithSHA1AndRC2");
-        nameTable.put(pbeWithSHA1AndDESede_oid, "PBEWithSHA1AndDESede");
-        nameTable.put(pbeWithSHA1AndRC2_40_oid, "PBEWithSHA1AndRC2_40");
+        nameTable.put(MD5_oid, TString.wrap("MD5"));
+        nameTable.put(MD2_oid, TString.wrap("MD2"));
+        nameTable.put(SHA_oid, TString.wrap("SHA-1"));
+        nameTable.put(SHA224_oid, TString.wrap("SHA-224"));
+        nameTable.put(SHA256_oid, TString.wrap("SHA-256"));
+        nameTable.put(SHA384_oid, TString.wrap("SHA-384"));
+        nameTable.put(SHA512_oid, TString.wrap("SHA-512"));
+        nameTable.put(RSAEncryption_oid, TString.wrap("RSA"));
+        nameTable.put(RSA_oid, TString.wrap("RSA"));
+        nameTable.put(DH_oid, TString.wrap("Diffie-Hellman"));
+        nameTable.put(DH_PKIX_oid, TString.wrap("Diffie-Hellman"));
+        nameTable.put(DSA_oid, TString.wrap("DSA"));
+        nameTable.put(DSA_OIW_oid, TString.wrap("DSA"));
+        nameTable.put(EC_oid, TString.wrap("EC"));
+        nameTable.put(ECDH_oid, TString.wrap("ECDH"));
+        nameTable.put(AES_oid, TString.wrap("AES"));
+        nameTable.put(sha1WithECDSA_oid, TString.wrap("SHA1withECDSA"));
+        nameTable.put(sha224WithECDSA_oid, TString.wrap("SHA224withECDSA"));
+        nameTable.put(sha256WithECDSA_oid, TString.wrap("SHA256withECDSA"));
+        nameTable.put(sha384WithECDSA_oid, TString.wrap("SHA384withECDSA"));
+        nameTable.put(sha512WithECDSA_oid, TString.wrap("SHA512withECDSA"));
+        nameTable.put(md5WithRSAEncryption_oid, TString.wrap("MD5withRSA"));
+        nameTable.put(md2WithRSAEncryption_oid, TString.wrap("MD2withRSA"));
+        nameTable.put(sha1WithDSA_oid, TString.wrap("SHA1withDSA"));
+        nameTable.put(sha1WithDSA_OIW_oid, TString.wrap("SHA1withDSA"));
+        nameTable.put(shaWithDSA_OIW_oid, TString.wrap("SHA1withDSA"));
+        nameTable.put(sha224WithDSA_oid, TString.wrap("SHA224withDSA"));
+        nameTable.put(sha256WithDSA_oid, TString.wrap("SHA256withDSA"));
+        nameTable.put(sha1WithRSAEncryption_oid, TString.wrap("SHA1withRSA"));
+        nameTable.put(sha1WithRSAEncryption_OIW_oid, TString.wrap("SHA1withRSA"));
+        nameTable.put(sha224WithRSAEncryption_oid, TString.wrap("SHA224withRSA"));
+        nameTable.put(sha256WithRSAEncryption_oid, TString.wrap("SHA256withRSA"));
+        nameTable.put(sha384WithRSAEncryption_oid, TString.wrap("SHA384withRSA"));
+        nameTable.put(sha512WithRSAEncryption_oid, TString.wrap("SHA512withRSA"));
+        nameTable.put(pbeWithMD5AndDES_oid, TString.wrap("PBEWithMD5AndDES"));
+        nameTable.put(pbeWithMD5AndRC2_oid, TString.wrap("PBEWithMD5AndRC2"));
+        nameTable.put(pbeWithSHA1AndDES_oid, TString.wrap("PBEWithSHA1AndDES"));
+        nameTable.put(pbeWithSHA1AndRC2_oid, TString.wrap("PBEWithSHA1AndRC2"));
+        nameTable.put(pbeWithSHA1AndDESede_oid, TString.wrap("PBEWithSHA1AndDESede"));
+        nameTable.put(pbeWithSHA1AndRC2_40_oid, TString.wrap("PBEWithSHA1AndRC2_40"));
     }
 
 
@@ -382,22 +381,22 @@ public class TAlgorithmId {
         var1.write(var3.toByteArray());
     }
 
-    public String getName() {
-        String var1 = (String)nameTable.get(this.algid);
+    public TString getName() {
+        TString var1 = (TString)nameTable.get(this.algid);
         if(var1 != null) {
             return var1;
         } else {
             if(this.params != null && this.algid.equals(specifiedWithECDSA_oid)) {
                 try {
                     TAlgorithmId var2 = parse(new TDerValue(this.getEncodedParams()));
-                    String var3 = var2.getName();
-                    var1 = makeSigAlg(var3, "EC");
+                    TString var3 = var2.getName();
+                    var1 = makeSigAlg(var3, TString.wrap("EC"));
                 } catch (TIOException var4) {
                     ;
                 }
             }
 
-            return var1 == null?this.algid.toString():var1;
+            return var1 == null?TString.wrap(this.algid.toString()):var1;
         }
     }
 
@@ -405,13 +404,13 @@ public class TAlgorithmId {
         return this.params == null?null:this.params.toByteArray();
     }
 
-    public static String makeSigAlg(String var0, String var1) {
-        var0 = var0.replace("-", "");
-        if(var1.equalsIgnoreCase("EC")) {
-            var1 = "ECDSA";
+    public static TString makeSigAlg(TString var0, TString var1) {
+        var0 = var0.replace(TString.wrap("-"), TString.wrap(""));
+        if(var1.equalsIgnoreCase(TString.wrap("EC"))) {
+            var1 = TString.wrap("ECDSA");
         }
 
-        return var0 + "with" + var1;
+        return TString.wrap(var0 + "with" + var1);
     }
 
     public final TObjectIdentifier getOID() {

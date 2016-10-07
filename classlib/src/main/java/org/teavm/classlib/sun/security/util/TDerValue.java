@@ -17,7 +17,6 @@ package org.teavm.classlib.sun.security.util;
 
 import java.io.IOException;
 import java.util.Date;
-
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
@@ -254,11 +253,11 @@ public class TDerValue {
         return this.tag;
     }
 
-    public boolean getBoolean() throws IOException {
+    public boolean getBoolean() throws TIOException {
         if(this.tag != 1) {
-            throw new IOException("DerValue.getBoolean, not a BOOLEAN " + this.tag);
+            throw new TIOException(TString.wrap("DerValue.getBoolean, not a BOOLEAN " + this.tag));
         } else if(this.length != 1) {
-            throw new IOException("DerValue.getBoolean, invalid length " + this.length);
+            throw new TIOException(TString.wrap("DerValue.getBoolean, invalid length " + this.length));
         } else {
             return this.buffer.read() != 0;
         }

@@ -15,12 +15,9 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-import java.security.cert.CertificateParsingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
@@ -81,8 +78,8 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         try {
             TDerValue var2 = new TDerValue(var1);
             this.parse(var2);
-        } catch (IOException var3) {
-            throw new CertificateParsingException(var3);
+        } catch (TIOException var3) {
+            throw new TCertificateParsingException(var3);
         }
     }
 
@@ -475,17 +472,17 @@ public class TX509CertInfo implements TCertAttrSet<String> {
             this.algId = new TCertificateAlgorithmId(var2);
             this.issuer = new TX500Name(var2);
             if(this.issuer.isEmpty()) {
-                throw new CertificateParsingException("Empty issuer DN not allowed in X509Certificates");
+                throw new TCertificateParsingException(TString.wrap("Empty issuer DN not allowed in X509Certificates"));
             } else {
                 this.interval = new TCertificateValidity(var2);
                 this.subject = new TX500Name(var2);
                 if(this.version.compare(0) == 0 && this.subject.isEmpty()) {
-                    throw new CertificateParsingException("Empty subject DN not allowed in v1 certificate");
+                    throw new TCertificateParsingException(TString.wrap("Empty subject DN not allowed in v1 certificate"));
                 } else {
                     this.pubKey = new TCertificateX509Key(var2);
                     if(var2.available() != 0) {
                         if(this.version.compare(0) == 0) {
-                            throw new CertificateParsingException("no more data allowed for version 1 certificate");
+                            throw new TCertificateParsingException(TString.wrap("no more data allowed for version 1 certificate"));
                         } else {
                             var3 = var2.getDerValue();
                             if(var3.isContextSpecific((byte) 1)) {
@@ -507,7 +504,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                             }
 
                             if(this.version.compare(2) != 0) {
-                                throw new CertificateParsingException("Extensions not allowed in v2 certificate");
+                                throw new TCertificateParsingException(TString.wrap("Extensions not allowed in v2 certificate"));
                             } else {
                                 if(var3.isConstructed() && var3.isContextSpecific((byte) 3)) {
                                     this.extensions = new TCertificateExtensions(var3.data);
@@ -522,10 +519,10 @@ public class TX509CertInfo implements TCertAttrSet<String> {
         }
     }
 
-    private void verifyCert(TX500Name var1, TCertificateExtensions var2) throws CertificateParsingException, IOException {
+    private void verifyCert(TX500Name var1, TCertificateExtensions var2) throws TCertificateParsingException, TIOException {
         if(var1.isEmpty()) {
             if(var2 == null) {
-                throw new CertificateParsingException("X.509 Certificate is incomplete: subject field is empty, and certificate has no extensions");
+                throw new TCertificateParsingException(TString.wrap("X.509 Certificate is incomplete: subject field is empty, and certificate has no extensions"));
             }
 
             TSubjectAlternativeNameExtension var3 = null;
@@ -536,15 +533,15 @@ public class TX509CertInfo implements TCertAttrSet<String> {
                 var3 = (TSubjectAlternativeNameExtension)var2.get(TString.wrap("SubjectAlternativeName"));
                 var5 = var3.get("subject_name");
             } catch (TIOException var7) {
-                throw new CertificateParsingException("X.509 Certificate is incomplete: subject field is empty, and SubjectAlternativeName extension is absent");
+                throw new TCertificateParsingException(TString.wrap("X.509 Certificate is incomplete: subject field is empty, and SubjectAlternativeName extension is absent"));
             }
 
             if(var5 == null || var5.isEmpty()) {
-                throw new CertificateParsingException("X.509 Certificate is incomplete: subject field is empty, and SubjectAlternativeName extension is empty");
+                throw new TCertificateParsingException(TString.wrap("X.509 Certificate is incomplete: subject field is empty, and SubjectAlternativeName extension is empty"));
             }
 
             if(!var3.isCritical()) {
-                throw new CertificateParsingException("X.509 Certificate is incomplete: SubjectAlternativeName extension MUST be marked critical when subject field is empty");
+                throw new TCertificateParsingException(TString.wrap("X.509 Certificate is incomplete: SubjectAlternativeName extension MUST be marked critical when subject field is empty"));
             }
         }
 

@@ -22,9 +22,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import javax.crypto.Cipher;
-
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.lang.TBoolean;
 import org.teavm.classlib.java.lang.TString;
@@ -35,7 +33,9 @@ import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 import org.teavm.classlib.java.util.THashMap;
 import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.javax.crypto.TBadPaddingException;
+import org.teavm.classlib.javax.crypto.TCipher;
 import org.teavm.classlib.javax.crypto.TIllegalBlockSizeException;
+import org.teavm.classlib.javax.crypto.TNoSuchPaddingException;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
 import org.teavm.classlib.sun.security.jca.TServiceId;
 
@@ -47,10 +47,10 @@ public abstract class TSignature extends TSignatureSpi {
      * This value is used to map an OID to the particular algorithm.
      * The mapping is done in AlgorithmObject.algOID(String algorithm)
      */
-    private String algorithm;
+    private TString algorithm;
 
     // The provider
-    Provider provider;
+    TProvider provider;
 
     /**
      * Possible {@link #state} value, signifying that
@@ -84,7 +84,7 @@ public abstract class TSignature extends TSignatureSpi {
      * Java Cryptography Architecture Standard Algorithm Name Documentation</a>
      * for information about standard algorithm names.
      */
-    protected TSignature(String algorithm) {
+    protected TSignature(TString algorithm) {
         this.algorithm = algorithm;
     }
 
@@ -138,7 +138,7 @@ public abstract class TSignature extends TSignatureSpi {
         throw failure;
     }
 
-    private static TSignature getInstance(TGetInstance.Instance instance, String algorithm) {
+    private static TSignature getInstance(TGetInstance.Instance instance, TString algorithm) {
         TSignature sig;
         if (instance.impl instanceof TSignature) {
             sig = (TSignature)instance.impl;
@@ -803,7 +803,7 @@ public abstract class TSignature extends TSignatureSpi {
         private Iterator<Provider.Service> serviceIterator;
 
         // constructor
-        Delegate(TSignatureSpi sigSpi, String algorithm) {
+        Delegate(TSignatureSpi sigSpi, TString algorithm) {
             super(algorithm);
             this.sigSpi = sigSpi;
             this.lock = null; // no lock needed
@@ -811,7 +811,7 @@ public abstract class TSignature extends TSignatureSpi {
 
         // used with delayed provider selection
         Delegate(Provider.Service service,
-                Iterator<Provider.Service> iterator, String algorithm) {
+                Iterator<Provider.Service> iterator, TString algorithm) {
             super(algorithm);
             this.firstService = service;
             this.serviceIterator = iterator;
@@ -847,14 +847,14 @@ public abstract class TSignature extends TSignatureSpi {
             if (s.getType().equals("Cipher")) {
                 // must be NONEwithRSA
                 try {
-                    Cipher c = Cipher.getInstance(RSA_CIPHER, s.getProvider());
+                    TCipher c = TCipher.getInstance(RSA_CIPHER, s.getProvider());
                     return new TSignature.CipherAdapter(c);
-                } catch (NoSuchPaddingException e) {
+                } catch (TNoSuchPaddingException e) {
                     throw new NoSuchAlgorithmException(e);
                 }
             } else {
                 Object o = s.newInstance(null);
-                if (o instanceof SignatureSpi == false) {
+                if (o instanceof TSignatureSpi == false) {
                     throw new NoSuchAlgorithmException
                             ("Not a SignatureSpi: " + o.getClass().getName());
                 }
@@ -877,18 +877,6 @@ public abstract class TSignature extends TSignatureSpi {
             synchronized (lock) {
                 if (sigSpi != null) {
                     return;
-                }
-                if (debug != null) {
-                    int w = --warnCount;
-                    if (w >= 0) {
-                        debug.println("Signature.init() not first method "
-                                + "called, disabling delayed provider selection");
-                        if (w == 0) {
-                            debug.println("Further warnings of this type will "
-                                    + "be suppressed");
-                        }
-                        new Exception("Call trace").printStackTrace();
-                    }
                 }
                 Exception lastException = null;
                 while ((firstService != null) || serviceIterator.hasNext()) {

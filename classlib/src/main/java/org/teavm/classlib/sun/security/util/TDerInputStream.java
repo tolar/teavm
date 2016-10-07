@@ -18,7 +18,6 @@ package org.teavm.classlib.sun.security.util;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
-
 import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
@@ -113,15 +112,15 @@ public class TDerInputStream {
         }
     }
 
-    public TBitArray getUnalignedBitString() throws IOException {
+    public TBitArray getUnalignedBitString() throws TIOException {
         if(this.buffer.read() != 3) {
-            throw new IOException("DER input not a bit string");
+            throw new TIOException(TString.wrap("DER input not a bit string"));
         } else {
             int var1 = getLength(this.buffer) - 1;
             int var2 = var1 * 8 - this.buffer.read();
             byte[] var3 = new byte[var1];
             if(var1 != 0 && this.buffer.read(var3) != var1) {
-                throw new IOException("short read of DER bit string");
+                throw new TIOException(TString.wrap("short read of DER bit string"));
             } else {
                 return new TBitArray(var2, var3);
             }
@@ -280,9 +279,9 @@ public class TDerInputStream {
         }
     }
 
-    public Date getUTCTime() throws IOException {
+    public Date getUTCTime() throws TIOException {
         if(this.buffer.read() != 23) {
-            throw new IOException("DER input, UTCtime tag invalid ");
+            throw new TIOException(TString.wrap("DER input, UTCtime tag invalid "));
         } else {
             return this.buffer.getUTCTime(getLength(this.buffer));
         }

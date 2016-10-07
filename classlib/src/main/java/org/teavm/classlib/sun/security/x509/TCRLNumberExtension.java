@@ -18,7 +18,6 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
@@ -79,16 +78,16 @@ public class TCRLNumberExtension extends TExtension implements TCertAttrSet<Stri
         this.extensionLabel = var5;
     }
 
-    public void set(String var1, Object var2) throws IOException {
-        if(var1.equalsIgnoreCase("value")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("value"))) {
             if(!(var2 instanceof BigInteger)) {
-                throw new IOException("Attribute must be of type BigInteger.");
+                throw new TIOException(TString.wrap("Attribute must be of type BigInteger."));
             } else {
                 this.crlNumber = (TBigInteger)var2;
                 this.encodeThis();
             }
         } else {
-            throw new IOException("Attribute name not recognized by CertAttrSet:" + this.extensionName + ".");
+            throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:" + this.extensionName + "."));
         }
     }
 

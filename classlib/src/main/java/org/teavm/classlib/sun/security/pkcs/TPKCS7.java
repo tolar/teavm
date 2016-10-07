@@ -27,14 +27,13 @@ import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
-
+import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
@@ -46,6 +45,10 @@ import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TCertificateFactory;
 import org.teavm.classlib.java.security.cert.TX509CRL;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.timestamp.TTSRequest;
+import org.teavm.classlib.sun.security.timestamp.TTSResponse;
+import org.teavm.classlib.sun.security.timestamp.TTimestampToken;
+import org.teavm.classlib.sun.security.timestamp.TTimestamper;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -173,16 +176,16 @@ public class TPKCS7 {
         TDerInputStream var2 = new TDerInputStream(var1.toByteArray());
         TDerValue[] var3 = var2.getSequence(2);
         this.certificates = new TX509Certificate[var3.length];
-        CertificateFactory var4 = null;
+        TCertificateFactory var4 = null;
 
         try {
-            var4 = CertificateFactory.getInstance("X.509");
+            var4 = TCertificateFactory.getInstance("X.509");
         } catch (CertificateException var16) {
             ;
         }
 
         for(int var5 = 0; var5 < var3.length; ++var5) {
-            ByteArrayInputStream var6 = null;
+            TByteArrayInputStream var6 = null;
 
             try {
                 TParsingException var8;
@@ -191,7 +194,7 @@ public class TPKCS7 {
                         this.certificates[var5] = new TX509CertImpl(var3[var5]);
                     } else {
                         byte[] var7 = var3[var5].toByteArray();
-                        var6 = new ByteArrayInputStream(var7);
+                        var6 = new TByteArrayInputStream(var7);
                         this.certificates[var5] = (TX509Certificate)var4.generateCertificate(var6);
                         var6.close();
                         var6 = null;
@@ -234,10 +237,10 @@ public class TPKCS7 {
         }
 
         this.contentInfo = new TContentInfo(var2);
-        CertificateFactory var35 = null;
+        TCertificateFactory var35 = null;
 
         try {
-            var35 = CertificateFactory.getInstance("X.509");
+            var35 = TCertificateFactory.getInstance("X.509");
         } catch (CertificateException var29) {
             ;
         }
@@ -625,9 +628,9 @@ public class TPKCS7 {
         return var16.toByteArray();
     }
 
-    private static byte[] generateTimestampToken(Timestamper var0, String var1, byte[] var2) throws IOException, CertificateException {
+    private static byte[] generateTimestampToken(TTimestamper var0, String var1, byte[] var2) throws IOException, CertificateException {
         MessageDigest var3 = null;
-        TSRequest var4 = null;
+        TTSRequest var4 = null;
 
         try {
             var3 = MessageDigest.getInstance("SHA-1");
@@ -637,37 +640,37 @@ public class TPKCS7 {
         }
 
         BigInteger var5 = null;
-        if(sun.security.pkcs.PKCS7.SecureRandomHolder.RANDOM != null) {
-            var5 = new BigInteger(64, sun.security.pkcs.PKCS7.SecureRandomHolder.RANDOM);
+        if(TPKCS7.SecureRandomHolder.RANDOM != null) {
+            var5 = new BigInteger(64, TPKCS7.SecureRandomHolder.RANDOM);
             var4.setNonce(var5);
         }
 
         var4.requestCertificate(true);
-        TSResponse var6 = var0.generateTimestamp(var4);
+        TTSResponse var6 = var0.generateTimestamp(var4);
         int var7 = var6.getStatusCode();
         if(var7 != 0 && var7 != 1) {
             throw new IOException("Error generating timestamp: " + var6.getStatusCodeAsText() + " " + var6.getFailureCodeAsText());
         } else if(var1 != null && !var1.equals(var6.getTimestampToken().getPolicyID())) {
             throw new IOException("TSAPolicyID changed in timestamp token");
         } else {
-            sun.security.pkcs.PKCS7 var8 = var6.getToken();
-            TimestampToken var9 = var6.getTimestampToken();
+            TPKCS7 var8 = var6.getToken();
+            TTimestampToken var9 = var6.getTimestampToken();
             if(!var9.getHashAlgorithm().getName().equals("SHA-1")) {
                 throw new IOException("Digest algorithm not SHA-1 in timestamp token");
             } else if(!MessageDigest.isEqual(var9.getHashedMessage(), var4.getHashedMessage())) {
                 throw new IOException("Digest octets changed in timestamp token");
             } else {
-                BigInteger var10 = var9.getNonce();
+                TBigInteger var10 = var9.getNonce();
                 if(var10 == null && var5 != null) {
                     throw new IOException("Nonce missing in timestamp token");
                 } else if(var10 != null && !var10.equals(var5)) {
                     throw new IOException("Nonce changed in timestamp token");
                 } else {
-                    SignerInfo[] var11 = var8.getSignerInfos();
+                    TSignerInfo[] var11 = var8.getSignerInfos();
                     int var12 = var11.length;
 
                     for(int var13 = 0; var13 < var12; ++var13) {
-                        SignerInfo var14 = var11[var13];
+                        TSignerInfo var14 = var11[var13];
                         X509Certificate var15 = var14.getCertificate(var8);
                         if(var15 == null) {
                             throw new CertificateException("Certificate not included in timestamp token");

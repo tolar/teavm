@@ -17,7 +17,6 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.util.Map;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TClass;
@@ -45,11 +44,11 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
     public TCertificateExtensions() {
     }
 
-    public TCertificateExtensions(TDerInputStream var1) throws IOException {
+    public TCertificateExtensions(TDerInputStream var1) throws TIOException {
         this.init(var1);
     }
 
-    private void init(TDerInputStream var1) throws IOException {
+    private void init(TDerInputStream var1) throws TIOException {
         TDerValue[] var2 = var1.getSequence(5);
 
         for(int var3 = 0; var3 < var2.length; ++var3) {

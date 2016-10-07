@@ -16,29 +16,21 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRLEntry;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -46,19 +38,28 @@ import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
+import org.teavm.classlib.java.security.TNoSuchProviderException;
 import org.teavm.classlib.java.security.TPrincipal;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.TSignature;
 import org.teavm.classlib.java.security.TSignatureException;
 import org.teavm.classlib.java.security.cert.TCRLException;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509CRL;
 import org.teavm.classlib.java.security.cert.TX509CRLEntry;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TLinkedList;
+import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.java.util.TSet;
 import org.teavm.classlib.java.util.TTreeMap;
+import org.teavm.classlib.java.util.TTreeSet;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
+import org.teavm.classlib.sun.security.provider.TX509Factory;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -74,15 +75,15 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
     private TAlgorithmId infoSigAlgId;
     private TX500Name issuer;
     private TX500Principal issuerPrincipal;
-    private Date thisUpdate;
-    private Date nextUpdate;
+    private TDate thisUpdate;
+    private TDate nextUpdate;
     private TMap<TX509CRLImpl.X509IssuerSerial, TX509CRLEntry> revokedMap;
-    private List<X509CRLEntry> revokedList;
+    private TList<TX509CRLEntry> revokedList;
     private TCRLExtensions extensions;
     private static final boolean isExplicit = true;
     private static final long YR_2050 = 2524636800000L;
     private boolean readOnly;
-    private PublicKey verifiedPublicKey;
+    private TPublicKey verifiedPublicKey;
     private String verifiedProvider;
 
     private TX509CRLImpl() {
@@ -95,7 +96,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.thisUpdate = null;
         this.nextUpdate = null;
         this.revokedMap = new TTreeMap();
-        this.revokedList = new LinkedList();
+        this.revokedList = new TLinkedList();
         this.extensions = null;
         this.readOnly = false;
     }
@@ -110,7 +111,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.thisUpdate = null;
         this.nextUpdate = null;
         this.revokedMap = new TTreeMap();
-        this.revokedList = new LinkedList();
+        this.revokedList = new TLinkedList();
         this.extensions = null;
         this.readOnly = false;
 
@@ -132,7 +133,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.thisUpdate = null;
         this.nextUpdate = null;
         this.revokedMap = new TTreeMap();
-        this.revokedList = new LinkedList();
+        this.revokedList = new TLinkedList();
         this.extensions = null;
         this.readOnly = false;
 
@@ -154,7 +155,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.thisUpdate = null;
         this.nextUpdate = null;
         this.revokedMap = new TTreeMap();
-        this.revokedList = new LinkedList();
+        this.revokedList = new TLinkedList();
         this.extensions = null;
         this.readOnly = false;
 
@@ -166,7 +167,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public TX509CRLImpl(TX500Name var1, Date var2, Date var3) {
+    public TX509CRLImpl(TX500Name var1, TDate var2, TDate var3) {
         this.signedCRL = null;
         this.signature = null;
         this.tbsCertList = null;
@@ -176,7 +177,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.thisUpdate = null;
         this.nextUpdate = null;
         this.revokedMap = new TTreeMap();
-        this.revokedList = new LinkedList();
+        this.revokedList = new TLinkedList();
         this.extensions = null;
         this.readOnly = false;
         this.issuer = var1;
@@ -184,7 +185,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.nextUpdate = var3;
     }
 
-    public TX509CRLImpl(TX500Name var1, Date var2, Date var3, X509CRLEntry[] var4) throws CRLException {
+    public TX509CRLImpl(TX500Name var1, TDate var2, TDate var3, TX509CRLEntry[] var4) throws CRLException {
         this.signedCRL = null;
         this.signature = null;
         this.tbsCertList = null;
@@ -194,7 +195,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.thisUpdate = null;
         this.nextUpdate = null;
         this.revokedMap = new TTreeMap();
-        this.revokedList = new LinkedList();
+        this.revokedList = new TLinkedList();
         this.extensions = null;
         this.readOnly = false;
         this.issuer = var1;
@@ -225,7 +226,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
     }
 
-    public TX509CRLImpl(TX500Name var1, Date var2, Date var3, X509CRLEntry[] var4, TCRLExtensions var5) throws CRLException {
+    public TX509CRLImpl(TX500Name var1, TDate var2, TDate var3, TX509CRLEntry[] var4, TCRLExtensions var5) throws CRLException {
         this(var1, var2, var3, var4);
         if(var5 != null) {
             this.extensions = var5;
@@ -275,7 +276,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
                 }
 
                 if(!this.revokedList.isEmpty()) {
-                    Iterator var5 = this.revokedList.iterator();
+                    TIterator var5 = this.revokedList.iterator();
 
                     while(var5.hasNext()) {
                         TX509CRLEntry var6 = (TX509CRLEntry)var5.next();
@@ -289,43 +290,43 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
                     this.extensions.encode(var2, true);
                 }
 
-                var4.write(48, var2);
+                var4.write((byte)48, var2);
                 this.tbsCertList = var4.toByteArray();
                 var1.write(this.tbsCertList);
             }
-        } catch (IOException var7) {
-            throw new CRLException("Encoding error: " + var7.getMessage());
+        } catch (TIOException var7) {
+            throw new TCRLException(TString.wrap("Encoding error: " + var7.getMessage()));
         }
     }
 
-    public void verify(PublicKey var1) throws CRLException, NoSuchAlgorithmException, InvalidKeyException,
-            NoSuchProviderException, SignatureException {
+    public void verify(TPublicKey var1) throws TCRLException, TNoSuchAlgorithmException, TInvalidKeyException,
+            TNoSuchProviderException, TSignatureException {
         this.verify(var1, "");
     }
 
-    public synchronized void verify(PublicKey var1, String var2) throws CRLException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
+    public synchronized void verify(TPublicKey var1, String var2) throws TCRLException, TNoSuchAlgorithmException, TInvalidKeyException, TNoSuchProviderException, TSignatureException {
         if(var2 == null) {
             var2 = "";
         }
 
         if(this.verifiedPublicKey == null || !this.verifiedPublicKey.equals(var1) || !var2.equals(this.verifiedProvider)) {
             if(this.signedCRL == null) {
-                throw new CRLException("Uninitialized CRL");
+                throw new TCRLException(TString.wrap("Uninitialized CRL"));
             } else {
-                Signature var3 = null;
+                TSignature var3 = null;
                 if(var2.length() == 0) {
-                    var3 = Signature.getInstance(this.sigAlgId.getName());
+                    var3 = TSignature.getInstance(this.sigAlgId.getName());
                 } else {
-                    var3 = Signature.getInstance(this.sigAlgId.getName(), var2);
+                    var3 = TSignature.getInstance(this.sigAlgId.getName(), var2);
                 }
 
                 var3.initVerify(var1);
                 if(this.tbsCertList == null) {
-                    throw new CRLException("Uninitialized CRL");
+                    throw new TCRLException(TString.wrap("Uninitialized CRL"));
                 } else {
                     var3.update(this.tbsCertList, 0, this.tbsCertList.length);
                     if(!var3.verify(this.signature)) {
-                        throw new SignatureException("Signature does not match.");
+                        throw new TSignatureException(TString.wrap("Signature does not match."));
                     } else {
                         this.verifiedPublicKey = var1;
                         this.verifiedProvider = var2;
@@ -335,15 +336,15 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public synchronized void verify(PublicKey var1, Provider var2) throws CRLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public synchronized void verify(TPublicKey var1, TProvider var2) throws TCRLException, TNoSuchAlgorithmException, TInvalidKeyException, TSignatureException {
         if(this.signedCRL == null) {
-            throw new CRLException("Uninitialized CRL");
+            throw new TCRLException(TString.wrap("Uninitialized CRL"));
         } else {
-            Signature var3 = null;
+            TSignature var3 = null;
             if(var2 == null) {
-                var3 = Signature.getInstance(this.sigAlgId.getName());
+                var3 = TSignature.getInstance(this.sigAlgId.getName());
             } else {
-                var3 = Signature.getInstance(this.sigAlgId.getName(), var2);
+                var3 = TSignature.getInstance(this.sigAlgId.getName(), var2);
             }
 
             var3.initVerify(var1);
@@ -496,20 +497,19 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
         return this.issuerPrincipal;
     }
-
-    public Date getThisUpdate() {
-        return new Date(this.thisUpdate.getTime());
+    public TDate getThisUpdate() {
+        return new TDate(this.thisUpdate.getTime());
     }
 
-    public Date getNextUpdate() {
-        return this.nextUpdate == null?null:new Date(this.nextUpdate.getTime());
+    public TDate getNextUpdate() {
+        return this.nextUpdate == null?null:new TDate(this.nextUpdate.getTime());
     }
 
     public TX509CRLEntry getRevokedCertificate(TBigInteger var1) {
         if(this.revokedMap.isEmpty()) {
             return null;
         } else {
-            TX509CRLImpl.X509IssuerSerial var2 = TX509CRLImpl.X509IssuerSerial(this.getIssuerX500Principal(), var1);
+            TX509CRLImpl.X509IssuerSerial var2 = new TX509CRLImpl.X509IssuerSerial(this.getIssuerX500Principal(), var1);
             return (TX509CRLEntry)this.revokedMap.get(var2);
         }
     }
@@ -523,13 +523,13 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public Set<TX509CRLEntry> getRevokedCertificates() {
-        return this.revokedList.isEmpty()?null:new TreeSet(this.revokedList);
+    public TSet<TX509CRLEntry> getRevokedCertificates() {
+        return this.revokedList.isEmpty()?null:new TTreeSet(this.revokedList);
     }
 
-    public byte[] getTBSCertList() throws CRLException {
+    public byte[] getTBSCertList() throws TCRLException {
         if(this.tbsCertList == null) {
-            throw new CRLException("Uninitialized CRL");
+            throw new TCRLException(TString.wrap("Uninitialized CRL"));
         } else {
             return (byte[])this.tbsCertList.clone();
         }
@@ -547,7 +547,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         if(this.sigAlgId == null) {
             return null;
         } else {
-            ObjectIdentifier var1 = this.sigAlgId.getOID();
+            TObjectIdentifier var1 = this.sigAlgId.getOID();
             return var1.toString();
         }
     }
@@ -832,10 +832,10 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         return var0 instanceof TX509CRLImpl ?(TX509CRLImpl)var0: TX509Factory.intern(var0);
     }
 
-    private X500Principal getCertIssuer(TX509CRLEntryImpl var1, X500Principal var2) throws IOException {
+    private TX500Principal getCertIssuer(TX509CRLEntryImpl var1, TX500Principal var2) throws IOException {
         TCertificateIssuerExtension var3 = var1.getCertificateIssuerExtension();
         if(var3 != null) {
-            TGeneralNames var4 = var3.get("issuer");
+            TGeneralNames var4 = var3.get(TString.wrap("issuer"));
             TX500Name var5 = (TX500Name)var4.get(0).getName();
             return var5.asX500Principal();
         } else {
@@ -843,7 +843,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public void derEncode(OutputStream var1) throws IOException {
+    public void derEncode(TOutputStream var1) throws TIOException {
         if(this.signedCRL == null) {
             throw new IOException("Null CRL to encode");
         } else {
@@ -853,10 +853,10 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
     private static final class X509IssuerSerial implements Comparable<TX509CRLImpl.X509IssuerSerial> {
         final TX500Principal issuer;
-        final BigInteger serial;
+        final TBigInteger serial;
         volatile int hashcode;
 
-        X509IssuerSerial(TX500Principal var1, BigInteger var2) {
+        X509IssuerSerial(TX500Principal var1, TBigInteger var2) {
             this.hashcode = 0;
             this.issuer = var1;
             this.serial = var2;
@@ -866,11 +866,11 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
             this(var1.getIssuerX500Principal(), var1.getSerialNumber());
         }
 
-        X500Principal getIssuer() {
+        TX500Principal getIssuer() {
             return this.issuer;
         }
 
-        BigInteger getSerial() {
+        TBigInteger getSerial() {
             return this.serial;
         }
 

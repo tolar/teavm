@@ -44,16 +44,16 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         return new Date(this.notAfter.getTime());
     }
 
-    private void construct(TDerValue var1) throws IOException {
+    private void construct(TDerValue var1) throws TIOException {
         if(var1.tag != 48) {
-            throw new IOException("Invalid encoded CertificateValidity, starting sequence tag missing.");
+            throw new TIOException(TString.wrap("Invalid encoded CertificateValidity, starting sequence tag missing."));
         } else if(var1.data.available() == 0) {
-            throw new IOException("No data encoded for CertificateValidity");
+            throw new TIOException(TString.wrap("No data encoded for CertificateValidity"));
         } else {
             TDerInputStream var2 = new TDerInputStream(var1.toByteArray());
             TDerValue[] var3 = var2.getSequence(2);
             if(var3.length != 2) {
-                throw new IOException("Invalid encoding for CertificateValidity");
+                throw new TIOException(TString.wrap("Invalid encoding for CertificateValidity"));
             } else {
                 if(var3[0].tag == 23) {
                     this.notBefore = var1.data.getUTCTime();
@@ -87,7 +87,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         this.notAfter = var2;
     }
 
-    public TCertificateValidity(TDerInputStream var1) throws IOException {
+    public TCertificateValidity(TDerInputStream var1) throws TIOException {
         TDerValue var2 = var1.getDerValue();
         this.construct(var2);
     }

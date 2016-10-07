@@ -59,11 +59,11 @@ public class TContentInfo {
         this.content = var2;
     }
 
-    public TContentInfo(TDerInputStream var1) throws TIOException, ParsingException {
+    public TContentInfo(TDerInputStream var1) throws TIOException, TParsingException {
         this(var1, false);
     }
 
-    public TContentInfo(TDerInputStream var1, boolean var2) throws TIOException, ParsingException {
+    public TContentInfo(TDerInputStream var1, boolean var2) throws TIOException, TParsingException {
         TDerValue[] var7 = var1.getSequence(2);
         TDerValue var5 = var7[0];
         TDerInputStream var3 = new TDerInputStream(var5.toByteArray());

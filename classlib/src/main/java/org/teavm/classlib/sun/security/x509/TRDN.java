@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TStringReader;
 import org.teavm.classlib.java.lang.TString;
@@ -82,10 +81,10 @@ public class TRDN {
     }
 
     TRDN(TString var1, TString var2) throws TIOException {
-        this(var1, var2, Collections.emptyMap());
+        this(var1, var2, TCollections.emptyMap());
     }
 
-    TRDN(TString var1, TString var2, Map<TString, TString> var3) throws TIOException {
+    TRDN(TString var1, TString var2, TMap<TString, TString> var3) throws TIOException {
         if(!var2.equalsIgnoreCase(TString.wrap("RFC2253"))) {
             throw new TIOException(TString.wrap("Unsupported format " + var2));
         } else {

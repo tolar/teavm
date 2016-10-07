@@ -17,7 +17,6 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
@@ -38,7 +37,7 @@ public class TExtension implements org.teavm.classlib.java.security.cert.TExtens
     public TExtension() {
     }
 
-    public TExtension(TDerValue var1) throws IOException {
+    public TExtension(TDerValue var1) throws TIOException {
         TDerInputStream var2 = var1.toDerInputStream();
         this.extensionId = var2.getOID();
         TDerValue var3 = var2.getDerValue();

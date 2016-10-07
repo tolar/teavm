@@ -26,9 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPrincipal;
@@ -763,7 +761,7 @@ public class TX500Name implements TGeneralNameInterface, TPrincipal {
         return this.x500Principal;
     }
 
-    public static TX500Name asX500Name(X500Principal var0) {
+    public static TX500Name asX500Name(TX500Principal var0) {
         try {
             TX500Name var1 = (TX500Name)principalField.get(var0);
             var1.x500Principal = var0;

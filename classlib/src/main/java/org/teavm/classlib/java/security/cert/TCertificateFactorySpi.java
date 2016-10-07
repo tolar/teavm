@@ -25,6 +25,7 @@ import java.security.cert.CertificateFactory;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import org.teavm.classlib.java.io.TInputStream;
 
 public abstract class TCertificateFactorySpi {
 
@@ -64,8 +65,8 @@ public abstract class TCertificateFactorySpi {
      *
      * @exception CertificateException on parsing errors.
      */
-    public abstract Certificate engineGenerateCertificate(InputStream inStream)
-            throws CertificateException;
+    public abstract TCertificate engineGenerateCertificate(TInputStream inStream)
+            throws TCertificateException;
 
     /**
      * Generates a {@code CertPath} object and initializes it with

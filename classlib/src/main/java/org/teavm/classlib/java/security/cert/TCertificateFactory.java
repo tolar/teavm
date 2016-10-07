@@ -29,11 +29,9 @@ import java.security.cert.CertificateFactorySpi;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
+import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
-
-import sun.security.jca.GetInstance;
 
 public class TCertificateFactory {
 
@@ -245,8 +243,8 @@ public class TCertificateFactory {
      *
      * @exception CertificateException on parsing errors.
      */
-    public final TCertificate generateCertificate(InputStream inStream)
-            throws CertificateException
+    public final TCertificate generateCertificate(TInputStream inStream)
+            throws TCertificateException
     {
         return certFacSpi.engineGenerateCertificate(inStream);
     }
