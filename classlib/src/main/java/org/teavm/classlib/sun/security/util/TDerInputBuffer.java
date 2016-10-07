@@ -15,14 +15,13 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.util.Date;
-
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TCloneNotSupportedException;
 import org.teavm.classlib.java.lang.TCloneable;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TTimeZone;
 import org.teavm.classlib.sun.util.calendar.TCalendarDate;
 import org.teavm.classlib.sun.util.calendar.TCalendarSystem;
@@ -178,7 +177,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    public Date getUTCTime(int var1) throws TIOException {
+    public TDate getUTCTime(int var1) throws TIOException {
         if(var1 > this.available()) {
             throw new TIOException(TString.wrap("short read of DER UTC Time"));
         } else if(var1 >= 11 && var1 <= 17) {
@@ -188,7 +187,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    public Date getGeneralizedTime(int var1) throws TIOException {
+    public TDate getGeneralizedTime(int var1) throws TIOException {
         if(var1 > this.available()) {
             throw new TIOException(TString.wrap("short read of DER Generalized Time"));
         } else if(var1 >= 13 && var1 <= 23) {
@@ -198,7 +197,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
         }
     }
 
-    private Date getTime(int var1, boolean var2) throws TIOException {
+    private TDate getTime(int var1, boolean var2) throws TIOException {
         String var10 = null;
         int var3;
         if(var2) {
@@ -305,7 +304,7 @@ class TDerInputBuffer extends TByteArrayInputStream implements TCloneable {
                         throw new TIOException(TString.wrap("Parse " + var10 + " time, garbage offset"));
                 }
 
-                return new Date(var13);
+                return new TDate(var13);
             }
         } else {
             throw new TIOException(TString.wrap("Parse " + var10 + " time, invalid format"));

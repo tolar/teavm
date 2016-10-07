@@ -16,7 +16,6 @@
 package org.teavm.classlib.java.security;
 
 import static java.util.Locale.ENGLISH;
-
 import java.lang.ref.Reference;
 import java.security.InvalidParameterException;
 import java.security.Key;
@@ -29,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TProperties;
 
@@ -236,7 +234,7 @@ public abstract class TProvider extends TProperties {
         addEngine("CertStore",                          false,
                 "java.security.cert.CertStoreParameters");
         // JCE
-        addEngine("Cipher",                             true,  null);
+        addEngine("TCipher",                             true,  null);
         addEngine("ExemptionMechanism",                 false, null);
         addEngine("Mac",                                true,  null);
         addEngine("KeyAgreement",                       true,  null);

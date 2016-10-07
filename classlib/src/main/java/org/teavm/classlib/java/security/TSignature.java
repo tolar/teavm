@@ -31,6 +31,7 @@ import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 import org.teavm.classlib.java.util.THashMap;
+import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.javax.crypto.TBadPaddingException;
 import org.teavm.classlib.javax.crypto.TCipher;
@@ -89,26 +90,26 @@ public abstract class TSignature extends TSignatureSpi {
     }
 
     // name of the special signature alg
-    private final static String RSA_SIGNATURE = "NONEwithRSA";
+    private final static TString RSA_SIGNATURE = TString.wrap("NONEwithRSA");
 
     // name of the equivalent cipher alg
-    private final static String RSA_CIPHER = "RSA/ECB/PKCS1Padding";
+    private final static TString RSA_CIPHER = TString.wrap("RSA/ECB/PKCS1Padding");
 
-    // all the services we need to lookup for compatibility with Cipher
+    // all the services we need to lookup for compatibility with TCipher
     private final static List<TServiceId> rsaIds = Arrays.asList(
             new TServiceId[] {
                     new TServiceId("Signature", "NONEwithRSA"),
-                    new TServiceId("Cipher", "RSA/ECB/PKCS1Padding"),
-                    new TServiceId("Cipher", "RSA/ECB"),
-                    new TServiceId("Cipher", "RSA//PKCS1Padding"),
-                    new TServiceId("Cipher", "RSA"),
+                    new TServiceId("TCipher", "RSA/ECB/PKCS1Padding"),
+                    new TServiceId("TCipher", "RSA/ECB"),
+                    new TServiceId("TCipher", "RSA//PKCS1Padding"),
+                    new TServiceId("TCipher", "RSA"),
             }
     );
 
     public static TSignature getInstance(TString algorithm)
             throws TNoSuchAlgorithmException {
         List<TProvider.Service> list;
-        if (algorithm.equalsIgnoreCase(TString.wrap(RSA_SIGNATURE))) {
+        if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             list = TGetInstance.getServices(rsaIds);
         } else {
             list = TGetInstance.getServices(TString.wrap("Signature"), algorithm);
@@ -170,7 +171,7 @@ public abstract class TSignature extends TSignatureSpi {
     }
 
     private static boolean isSpi(TProvider.Service s) {
-        if (s.getType().equals("Cipher")) {
+        if (s.getType().equals("TCipher")) {
             // must be a CipherSpi, which we can wrap with the CipherAdapter
             return true;
         }
@@ -196,7 +197,7 @@ public abstract class TSignature extends TSignatureSpi {
 
     public static TSignature getInstance(TString algorithm, TString provider)
             throws TNoSuchAlgorithmException, TNoSuchProviderException {
-        if (algorithm.equalsIgnoreCase(TString.wrap(RSA_SIGNATURE))) {
+        if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             // exception compatibility with existing code
             if ((provider == null) || (provider.length() == 0)) {
                 throw new IllegalArgumentException("missing provider");
@@ -242,7 +243,7 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @since 1.4
      */
-    public static TSignature getInstance(String algorithm, TProvider provider)
+    public static TSignature getInstance(TString algorithm, TProvider provider)
             throws TNoSuchAlgorithmException {
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             // exception compatibility with existing code
@@ -257,7 +258,7 @@ public abstract class TSignature extends TSignatureSpi {
     }
 
     // return an implementation for NONEwithRSA, which is a special case
-    // because of the Cipher.RSA/ECB/PKCS1Padding compatibility wrapper
+    // because of the TCipher.RSA/ECB/PKCS1Padding compatibility wrapper
     private static TSignature getInstanceRSA(TProvider p)
             throws NoSuchAlgorithmException {
         // try Signature first
@@ -266,13 +267,13 @@ public abstract class TSignature extends TSignatureSpi {
             TGetInstance.Instance instance = TGetInstance.getInstance(s, TSignatureSpi.class);
             return getInstance(instance, RSA_SIGNATURE);
         }
-        // check Cipher
+        // check TCipher
         try {
-            Cipher c = Cipher.getInstance(RSA_CIPHER, p);
+            TCipher c = TCipher.getInstance(RSA_CIPHER, p);
             return new TSignature.Delegate(new TSignature.CipherAdapter(c), RSA_SIGNATURE);
         } catch (TGeneralSecurityException e) {
             // throw Signature style exception message to avoid confusion,
-            // but append Cipher exception as cause
+            // but append TCipher exception as cause
             throw new NoSuchAlgorithmException("no such algorithm: "
                     + RSA_SIGNATURE + " for provider " + p.getName(), e);
         }
@@ -796,11 +797,11 @@ public abstract class TSignature extends TSignatureSpi {
 
         // next service to try in provider selection
         // null once provider is selected
-        private Provider.Service firstService;
+        private TProvider.Service firstService;
 
         // remaining services to try in provider selection
         // null once provider is selected
-        private Iterator<Provider.Service> serviceIterator;
+        private TIterator<Provider.Service> serviceIterator;
 
         // constructor
         Delegate(TSignatureSpi sigSpi, TString algorithm) {
@@ -810,8 +811,8 @@ public abstract class TSignature extends TSignatureSpi {
         }
 
         // used with delayed provider selection
-        Delegate(Provider.Service service,
-                Iterator<Provider.Service> iterator, TString algorithm) {
+        Delegate(TProvider.Service service,
+                TIterator<Provider.Service> iterator, TString algorithm) {
             super(algorithm);
             this.firstService = service;
             this.serviceIterator = iterator;
@@ -844,7 +845,7 @@ public abstract class TSignature extends TSignatureSpi {
 
         private static TSignatureSpi newInstance(Provider.Service s)
                 throws NoSuchAlgorithmException {
-            if (s.getType().equals("Cipher")) {
+            if (s.getType().equals("TCipher")) {
                 // must be NONEwithRSA
                 try {
                     TCipher c = TCipher.getInstance(RSA_CIPHER, s.getProvider());
@@ -1123,7 +1124,7 @@ public abstract class TSignature extends TSignatureSpi {
             byte[] out = cipher.update(b, off, len);
             if ((out != null) && (out.length != 0)) {
                 throw new TSignatureException
-                        (TString.wrap("Cipher unexpectedly returned data"));
+                        (TString.wrap("TCipher unexpectedly returned data"));
             }
         }
 

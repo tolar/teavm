@@ -15,6 +15,7 @@
  */
 package org.teavm.classlib.java.security.cert;
 
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
@@ -349,7 +350,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      *
      * @return the signature algorithm name.
      */
-    public abstract String getSigAlgName();
+    public abstract TString getSigAlgName();
 
     /**
      * Gets the signature algorithm OID string from the CRL.
@@ -366,7 +367,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      *
      * @return the signature algorithm OID string.
      */
-    public abstract String getSigAlgOID();
+    public abstract TString getSigAlgOID();
 
     /**
      * Gets the DER-encoded signature algorithm parameters from this

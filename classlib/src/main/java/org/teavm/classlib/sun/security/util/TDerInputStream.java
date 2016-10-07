@@ -16,13 +16,13 @@
 package org.teavm.classlib.sun.security.util;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Vector;
 import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.util.TDate;
 
 public class TDerInputStream {
     TDerInputBuffer buffer;
@@ -279,7 +279,7 @@ public class TDerInputStream {
         }
     }
 
-    public Date getUTCTime() throws TIOException {
+    public TDate getUTCTime() throws TIOException {
         if(this.buffer.read() != 23) {
             throw new TIOException(TString.wrap("DER input, UTCtime tag invalid "));
         } else {
@@ -287,9 +287,9 @@ public class TDerInputStream {
         }
     }
 
-    public Date getGeneralizedTime() throws IOException {
+    public TDate getGeneralizedTime() throws TIOException {
         if(this.buffer.read() != 24) {
-            throw new IOException("DER input, GeneralizedTime tag invalid ");
+            throw new TIOException(TString.wrap("DER input, GeneralizedTime tag invalid "));
         } else {
             return this.buffer.getGeneralizedTime(getLength(this.buffer));
         }

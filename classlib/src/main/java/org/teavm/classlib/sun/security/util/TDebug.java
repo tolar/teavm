@@ -19,7 +19,6 @@ import java.security.AccessController;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.teavm.classlib.java.math.TBigInteger;
 
 public class TDebug {
@@ -74,7 +73,7 @@ public class TDebug {
         System.err.println("engine=<engines>");
         System.err.println("              only dump output for the specified list");
         System.err.println("              of JCA engines. Supported values:");
-        System.err.println("              Cipher, KeyAgreement, KeyGenerator,");
+        System.err.println("              TCipher, KeyAgreement, KeyGenerator,");
         System.err.println("              KeyPairGenerator, KeyStore, Mac,");
         System.err.println("              MessageDigest, SecureRandom, Signature.");
         System.err.println();

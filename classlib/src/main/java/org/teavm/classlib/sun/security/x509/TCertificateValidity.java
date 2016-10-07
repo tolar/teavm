@@ -15,13 +15,13 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.Date;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -33,8 +33,8 @@ public class TCertificateValidity implements TCertAttrSet<String> {
     public static final String NOT_BEFORE = "notBefore";
     public static final String NOT_AFTER = "notAfter";
     private static final long YR_2050 = 2524636800000L;
-    private Date notBefore;
-    private Date notAfter;
+    private TDate notBefore;
+    private TDate notAfter;
 
     private Date getNotBefore() {
         return new Date(this.notBefore.getTime());
@@ -59,7 +59,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
                     this.notBefore = var1.data.getUTCTime();
                 } else {
                     if(var3[0].tag != 24) {
-                        throw new IOException("Invalid encoding for CertificateValidity");
+                        throw new TIOException(TString.wrap("Invalid encoding for CertificateValidity"));
                     }
 
                     this.notBefore = var1.data.getGeneralizedTime();
@@ -69,7 +69,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
                     this.notAfter = var1.data.getUTCTime();
                 } else {
                     if(var3[1].tag != 24) {
-                        throw new IOException("Invalid encoding for CertificateValidity");
+                        throw new TIOException(TString.wrap("Invalid encoding for CertificateValidity"));
                     }
 
                     this.notAfter = var1.data.getGeneralizedTime();
@@ -82,7 +82,7 @@ public class TCertificateValidity implements TCertAttrSet<String> {
     public TCertificateValidity() {
     }
 
-    public TCertificateValidity(Date var1, Date var2) {
+    public TCertificateValidity(TDate var1, TDate var2) {
         this.notBefore = var1;
         this.notAfter = var2;
     }
@@ -124,13 +124,13 @@ public class TCertificateValidity implements TCertAttrSet<String> {
             throw new TIOException(TString.wrap("Attribute must be of type Date."));
         } else {
             if(var1.equalsIgnoreCase(TString.wrap("notBefore"))) {
-                this.notBefore = (Date)var2;
+                this.notBefore = (TDate)var2;
             } else {
                 if(!var1.equalsIgnoreCase(TString.wrap("notAfter"))) {
                     throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet: CertificateValidity."));
                 }
 
-                this.notAfter = (Date)var2;
+                this.notAfter = (TDate)var2;
             }
 
         }
@@ -171,11 +171,11 @@ public class TCertificateValidity implements TCertAttrSet<String> {
     }
 
     public void valid() throws CertificateNotYetValidException, CertificateExpiredException {
-        Date var1 = new Date();
+        TDate var1 = new TDate();
         this.valid(var1);
     }
 
-    public void valid(Date var1) throws CertificateNotYetValidException, CertificateExpiredException {
+    public void valid(TDate var1) throws CertificateNotYetValidException, CertificateExpiredException {
         if(this.notBefore.after(var1)) {
             throw new CertificateNotYetValidException("NotBefore: " + this.notBefore.toString());
         } else if(this.notAfter.before(var1)) {

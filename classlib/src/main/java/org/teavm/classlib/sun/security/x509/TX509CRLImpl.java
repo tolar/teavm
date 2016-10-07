@@ -84,7 +84,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
     private static final long YR_2050 = 2524636800000L;
     private boolean readOnly;
     private TPublicKey verifiedPublicKey;
-    private String verifiedProvider;
+    private TString verifiedProvider;
 
     private TX509CRLImpl() {
         this.signedCRL = null;
@@ -304,9 +304,9 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.verify(var1, "");
     }
 
-    public synchronized void verify(TPublicKey var1, String var2) throws TCRLException, TNoSuchAlgorithmException, TInvalidKeyException, TNoSuchProviderException, TSignatureException {
+    public synchronized void verify(TPublicKey var1, TString var2) throws TCRLException, TNoSuchAlgorithmException, TInvalidKeyException, TNoSuchProviderException, TSignatureException {
         if(var2 == null) {
-            var2 = "";
+            var2 = TString.wrap("");
         }
 
         if(this.verifiedPublicKey == null || !this.verifiedPublicKey.equals(var1) || !var2.equals(this.verifiedProvider)) {
@@ -349,11 +349,11 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
             var3.initVerify(var1);
             if(this.tbsCertList == null) {
-                throw new CRLException("Uninitialized CRL");
+                throw new TCRLException(TString.wrap("Uninitialized CRL"));
             } else {
                 var3.update(this.tbsCertList, 0, this.tbsCertList.length);
                 if(!var3.verify(this.signature)) {
-                    throw new SignatureException("Signature does not match.");
+                    throw new TSignatureException(TString.wrap("Signature does not match."));
                 } else {
                     this.verifiedPublicKey = var1;
                 }
@@ -425,7 +425,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         } else {
             var1.append("\nRevoked Certificates: " + this.revokedList.size());
             int var2 = 1;
-            Iterator var3 = this.revokedList.iterator();
+            TIterator var3 = this.revokedList.iterator();
 
             while(var3.hasNext()) {
                 X509CRLEntry var4 = (X509CRLEntry)var3.next();
@@ -539,16 +539,16 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         return this.signature == null?null:(byte[])this.signature.clone();
     }
 
-    public String getSigAlgName() {
+    public TString getSigAlgName() {
         return this.sigAlgId == null?null:this.sigAlgId.getName();
     }
 
-    public String getSigAlgOID() {
+    public TString getSigAlgOID() {
         if(this.sigAlgId == null) {
             return null;
         } else {
             TObjectIdentifier var1 = this.sigAlgId.getOID();
-            return var1.toString();
+            return TString.wrap(var1.toString());
         }
     }
 
@@ -571,7 +571,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
     public TKeyIdentifier getAuthKeyId() throws IOException {
         TAuthorityKeyIdentifierExtension var1 = this.getAuthKeyIdExtension();
         if(var1 != null) {
-            KeyIdentifier var2 = (KeyIdentifier)var1.get("key_id");
+            TKeyIdentifier var2 = (TKeyIdentifier)var1.get("key_id");
             return var2;
         } else {
             return null;
@@ -635,7 +635,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
             Iterator var2 = this.extensions.getAllExtensions().iterator();
 
             while(var2.hasNext()) {
-                Extension var3 = (Extension)var2.next();
+                TExtension var3 = (TExtension)var2.next();
                 if(var3.isCritical()) {
                     var1.add(var3.getExtensionId().toString());
                 }
@@ -653,7 +653,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
             Iterator var2 = this.extensions.getAllExtensions().iterator();
 
             while(var2.hasNext()) {
-                Extension var3 = (Extension)var2.next();
+                TExtension var3 = (TExtension)var2.next();
                 if(!var3.isCritical()) {
                     var1.add(var3.getExtensionId().toString());
                 }
@@ -668,16 +668,16 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
             return null;
         } else {
             try {
-                String var2 = OIDMap.getName(new ObjectIdentifier(var1));
-                Extension var3 = null;
+                String var2 = TOIDMap.getName(new TObjectIdentifier(var1));
+                TExtension var3 = null;
                 if(var2 == null) {
-                    ObjectIdentifier var4 = new ObjectIdentifier(var1);
-                    Extension var5 = null;
+                    TObjectIdentifier var4 = new TObjectIdentifier(var1);
+                    TExtension var5 = null;
                     Enumeration var7 = this.extensions.getElements();
 
                     while(var7.hasMoreElements()) {
-                        var5 = (Extension)var7.nextElement();
-                        ObjectIdentifier var6 = var5.getExtensionId();
+                        var5 = (TExtension)var7.nextElement();
+                        TObjectIdentifier var6 = var5.getExtensionId();
                         if(var6.equals(var4)) {
                             var3 = var5;
                             break;
@@ -694,7 +694,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
                     if(var9 == null) {
                         return null;
                     } else {
-                        DerOutputStream var10 = new DerOutputStream();
+                        TDerOutputStream var10 = new TDerOutputStream();
                         var10.putOctetString(var9);
                         return var10.toByteArray();
                     }
