@@ -16,6 +16,7 @@
 package org.teavm.classlib.java.security.cert;
 
 import java.util.Set;
+import org.teavm.classlib.java.lang.TString;
 
 public interface TX509Extension {
 
@@ -132,5 +133,5 @@ public interface TX509Extension {
      * @return the DER-encoded octet string of the extension value or
      * null if it is not present.
      */
-    public byte[] getExtensionValue(String oid);
+    public byte[] getExtensionValue(TString oid);
 }

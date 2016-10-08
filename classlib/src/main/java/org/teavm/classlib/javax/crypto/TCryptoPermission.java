@@ -18,6 +18,7 @@ package org.teavm.classlib.javax.crypto;
 import java.security.spec.AlgorithmParameterSpec;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPermission;
+import org.teavm.classlib.java.security.TPermissionCollection;
 import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 
 class TCryptoPermission extends TPermission {
@@ -126,7 +127,7 @@ class TCryptoPermission extends TPermission {
         return null;
     }
 
-    public PermissionCollection newPermissionCollection() {
+    public TPermissionCollection newPermissionCollection() {
         return new CryptoPermissionCollection();
     }
 

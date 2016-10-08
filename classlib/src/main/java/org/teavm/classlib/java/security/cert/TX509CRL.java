@@ -132,7 +132,7 @@ public abstract class TX509CRL extends TCRL implements TX509Extension {
      * @exception SignatureException on signature errors.
      * @exception TCRLException on encoding errors.
      */
-    public abstract void verify(TPublicKey key, String sigProvider)
+    public abstract void verify(TPublicKey key, TString sigProvider)
             throws TCRLException, TNoSuchAlgorithmException,
             TInvalidKeyException, TNoSuchProviderException,
             TSignatureException;
