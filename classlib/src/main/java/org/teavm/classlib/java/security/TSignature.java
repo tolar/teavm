@@ -172,7 +172,7 @@ public abstract class TSignature extends TSignatureSpi {
 
     private static boolean isSpi(TProvider.Service s) {
         if (s.getType().equals("TCipher")) {
-            // must be a CipherSpi, which we can wrap with the CipherAdapter
+            // must be a TCipherSpi, which we can wrap with the CipherAdapter
             return true;
         }
         TString className = s.getClassName();
@@ -902,7 +902,7 @@ public abstract class TSignature extends TSignatureSpi {
                         lastException = e;
                     }
                 }
-                ProviderException e = new ProviderException
+                TProviderException e = new TProviderException
                         ("Could not construct SignatureSpi instance");
                 if (lastException != null) {
                     e.initCause(lastException);
@@ -946,7 +946,7 @@ public abstract class TSignature extends TSignatureSpi {
                     } catch (Exception e) {
                         // NoSuchAlgorithmException from newInstance()
                         // InvalidKeyException from init()
-                        // RuntimeException (ProviderException) from init()
+                        // RuntimeException (TProviderException) from init()
                         if (lastException == null) {
                             lastException = e;
                         }
@@ -1081,17 +1081,17 @@ public abstract class TSignature extends TSignatureSpi {
     @SuppressWarnings("deprecation")
     private static class CipherAdapter extends TSignatureSpi {
 
-        private final Cipher cipher;
+        private final TCipher cipher;
 
         private TByteArrayOutputStream data;
 
-        CipherAdapter(Cipher cipher) {
+        CipherAdapter(TCipher cipher) {
             this.cipher = cipher;
         }
 
         protected void engineInitVerify(TPublicKey publicKey)
                 throws TInvalidKeyException {
-            cipher.init(Cipher.DECRYPT_MODE, publicKey);
+            cipher.init(TCipher.DECRYPT_MODE, publicKey);
             if (data == null) {
                 data = new TByteArrayOutputStream(128);
             } else {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vtolar.
+ *  Copyright 2016 vasek.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,13 +18,16 @@ package org.teavm.classlib.javax.crypto;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TGeneralSecurityException;
 
-public class TNoSuchPaddingException extends TGeneralSecurityException {
-    private static final long serialVersionUID = -4572885201200175466L;
+/**
+ * Created by vasek on 8. 10. 2016.
+ */
+public class TShortBufferException extends TGeneralSecurityException {
+    private static final long serialVersionUID = 8427718640832943747L;
 
-    public TNoSuchPaddingException() {
+    public TShortBufferException() {
     }
 
-    public TNoSuchPaddingException(TString var1) {
+    public TShortBufferException(TString var1) {
         super(var1);
     }
 }
