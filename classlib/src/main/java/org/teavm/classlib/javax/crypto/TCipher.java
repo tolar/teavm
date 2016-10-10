@@ -44,7 +44,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
+
 import javax.crypto.NoSuchPaddingException;
+
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.nio.TByteBuffer;
 import org.teavm.classlib.java.security.TKey;
@@ -316,7 +318,7 @@ public class TCipher {
             this.cryptoPerm = getConfiguredPermission(this.transformation);
             String var1 = this.cryptoPerm.getExemptionMechanism();
             if(var1 != null) {
-                this.exmech = ExemptionMechanism.getInstance(var1);
+                this.exmech = TExemptionMechanism.getInstance(var1);
             }
 
         }
@@ -467,7 +469,7 @@ public class TCipher {
                                         var10 = null;
                                     }
                                 } while(!var9.supportsParameter(var3));
-                            } while(!JceSecurity.canUseProvider(var9.getProvider()));
+                            } while(!TJceSecurity.canUseProvider(var9.getProvider()));
 
                             var11 = getTransform(var9, this.transforms);
                         } while(var11 == null);
@@ -698,7 +700,7 @@ public class TCipher {
     }
 
     public final void init(int var1, Certificate var2) throws InvalidKeyException {
-        this.init(var1, var2, JceSecurity.RANDOM);
+        this.init(var1, var2, TJceSecurity.RANDOM);
     }
 
     public final void init(int var1, Certificate var2, SecureRandom var3) throws InvalidKeyException {

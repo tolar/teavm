@@ -17,13 +17,15 @@ package org.teavm.classlib.javax.crypto;
 
 import java.net.URL;
 import java.security.AccessController;
-import java.security.PermissionCollection;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.TPermissionCollection;
 
 final class TJceSecurityManager extends SecurityManager {
     private static final TCryptoPermissions defaultPolicy = TJceSecurity.getDefaultPolicy();
@@ -37,7 +39,7 @@ final class TJceSecurityManager extends SecurityManager {
     private TJceSecurityManager() {
     }
 
-    TCryptoPermission getCryptoPermission(String var1) {
+    TCryptoPermission getCryptoPermission(TString var1) {
         var1 = var1.toUpperCase(Locale.ENGLISH);
         TCryptoPermission var2 = this.getDefaultPermission(var1);
         if(var2 == TCryptoAllPermission.INSTANCE) {
@@ -77,7 +79,7 @@ final class TJceSecurityManager extends SecurityManager {
                     if(var14.implies(allPerm)) {
                         return allPerm;
                     } else {
-                        PermissionCollection var7 = var14.getPermissionCollection(var1);
+                        TPermissionCollection var7 = var14.getPermissionCollection(var1);
                         if(var7 == null) {
                             return var2;
                         } else {
@@ -90,7 +92,7 @@ final class TJceSecurityManager extends SecurityManager {
                                 }
                             }
 
-                            PermissionCollection var15 = exemptPolicy.getPermissionCollection(var1);
+                            TPermissionCollection var15 = exemptPolicy.getPermissionCollection(var1);
                             if(var15 == null) {
                                 return var2;
                             } else {
@@ -141,7 +143,7 @@ final class TJceSecurityManager extends SecurityManager {
         }
     }
 
-    private TCryptoPermission getDefaultPermission(String var1) {
+    private TCryptoPermission getDefaultPermission(TString var1) {
         Enumeration var2 = defaultPolicy.getPermissionCollection(var1).elements();
         return (TCryptoPermission)var2.nextElement();
     }

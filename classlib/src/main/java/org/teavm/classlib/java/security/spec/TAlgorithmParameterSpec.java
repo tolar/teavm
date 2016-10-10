@@ -15,5 +15,5 @@
  */
 package org.teavm.classlib.java.security.spec;
 
-public class TAlgorithmParameterSpec {
+public interface TAlgorithmParameterSpec {
 }

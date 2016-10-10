@@ -20,6 +20,7 @@ import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.util.Iterator;
 import java.util.List;
+
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
@@ -31,9 +32,9 @@ public class TGetInstance {
     private TGetInstance() {
     }
 
-    public static Provider.Service getService(TString var0, TString var1) throws NoSuchAlgorithmException {
+    public static TProvider.Service getService(TString var0, TString var1) throws NoSuchAlgorithmException {
         TProviderList var2 = TProviders.getProviderList();
-        Provider.Service var3 = var2.getService(var0, var1);
+        TProvider.Service var3 = var2.getService(var0, var1);
         if(var3 == null) {
             throw new NoSuchAlgorithmException(var1 + " " + var0 + " not available");
         } else {
@@ -182,10 +183,10 @@ public class TGetInstance {
     }
 
     public static final class Instance {
-        public final Provider provider;
+        public final TProvider provider;
         public final Object impl;
 
-        private Instance(Provider var1, Object var2) {
+        private Instance(TProvider var1, Object var2) {
             this.provider = var1;
             this.impl = var2;
         }

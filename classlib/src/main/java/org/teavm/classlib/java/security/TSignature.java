@@ -22,7 +22,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import javax.crypto.Cipher;
+
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.lang.TBoolean;
 import org.teavm.classlib.java.lang.TString;
@@ -262,7 +264,7 @@ public abstract class TSignature extends TSignatureSpi {
     private static TSignature getInstanceRSA(TProvider p)
             throws NoSuchAlgorithmException {
         // try Signature first
-        Provider.Service s = p.getService("Signature", RSA_SIGNATURE);
+        Provider.Service s = p.getService(TString.wrap("Signature"), RSA_SIGNATURE);
         if (s != null) {
             TGetInstance.Instance instance = TGetInstance.getInstance(s, TSignatureSpi.class);
             return getInstance(instance, RSA_SIGNATURE);

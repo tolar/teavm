@@ -15,13 +15,14 @@
  */
 package org.teavm.classlib.javax.crypto.spec;
 
-import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
+
+import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 
 /**
  * Created by vasek on 8. 10. 2016.
  */
-public class TRC2ParameterSpec implements AlgorithmParameterSpec {
+public class TRC2ParameterSpec implements TAlgorithmParameterSpec {
     private byte[] iv;
     private int effectiveKeyBits;
 
