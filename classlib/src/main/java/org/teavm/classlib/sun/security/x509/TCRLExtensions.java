@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.cert.CRLException;
 import java.util.Collection;
@@ -23,7 +22,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TBoolean;
@@ -65,8 +63,8 @@ public class TCRLExtensions {
                 this.parseExtension(var6);
             }
 
-        } catch (IOException var7) {
-            throw new CRLException("Parsing error: " + var7.toString());
+        } catch (TIOException var7) {
+            throw new TCRLException(TString.wrap("Parsing error: " + var7.toString()));
         }
     }
 
@@ -168,10 +166,10 @@ public class TCRLExtensions {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.CRLExtensions)) {
+        } else if(!(var1 instanceof TCRLExtensions)) {
             return false;
         } else {
-            Collection var2 = ((sun.security.x509.CRLExtensions)var1).getAllExtensions();
+            Collection var2 = ((TCRLExtensions)var1).getAllExtensions();
             Object[] var3 = var2.toArray();
             int var4 = var3.length;
             if(var4 != this.map.size()) {

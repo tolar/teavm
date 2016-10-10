@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
 
@@ -43,8 +43,8 @@ final class TJceSecurity {
     static final SecureRandom RANDOM = new SecureRandom();
     private static TCryptoPermissions defaultPolicy = null;
     private static TCryptoPermissions exemptPolicy = null;
-    private static final Map<Provider, Object> verificationResults = new IdentityHashMap();
-    private static final Map<Provider, Object> verifyingProviders = new IdentityHashMap();
+    private static final Map<TProvider, Object> verificationResults = new IdentityHashMap();
+    private static final Map<TProvider, Object> verifyingProviders = new IdentityHashMap();
     private static boolean isRestricted = true;
     private static final Object PROVIDER_VERIFIED;
     private static final URL NULL_URL;
@@ -53,7 +53,7 @@ final class TJceSecurity {
     private TJceSecurity() {
     }
 
-    static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, String var3) throws
+    static TGetInstance.Instance getInstance(TString var0, Class<?> var1, TString var2, TString var3) throws
             NoSuchAlgorithmException, NoSuchProviderException {
         TProvider.Service var4 = TGetInstance.getService(var0, var2, var3);
         Exception var5 = getVerificationResult(var4.getProvider());
@@ -111,7 +111,7 @@ final class TJceSecurity {
         var1.verify();
     }
 
-    static synchronized Exception getVerificationResult(Provider var0) {
+    static synchronized Exception getVerificationResult(TProvider var0) {
         Object var1 = verificationResults.get(var0);
         if(var1 == PROVIDER_VERIFIED) {
             return null;
