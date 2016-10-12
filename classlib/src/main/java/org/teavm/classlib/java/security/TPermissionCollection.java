@@ -15,8 +15,9 @@
  */
 package org.teavm.classlib.java.security;
 
-import java.util.Enumeration;
 import java.util.NoSuchElementException;
+
+import org.teavm.classlib.java.util.TEnumeration;
 
 public abstract class TPermissionCollection implements java.io.Serializable {
 
@@ -54,7 +55,7 @@ public abstract class TPermissionCollection implements java.io.Serializable {
      *
      * @return an enumeration of all the Permissions.
      */
-    public abstract Enumeration<TPermission> elements();
+    public abstract TEnumeration<TPermission> elements();
 
     /**
      * Marks this PermissionCollection object as "readonly". After
@@ -104,7 +105,7 @@ public abstract class TPermissionCollection implements java.io.Serializable {
      *
      */
     public String toString() {
-        Enumeration<TPermission> enum_ = elements();
+        TEnumeration<TPermission> enum_ = elements();
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString()+" (\n");
         while (enum_.hasMoreElements()) {

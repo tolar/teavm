@@ -61,7 +61,7 @@ public class TOIDName implements TGeneralNameInterface {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.OIDName)) {
+        } else if(!(var1 instanceof TOIDName)) {
             return false;
         } else {
             TOIDName var2 = (TOIDName)var1;

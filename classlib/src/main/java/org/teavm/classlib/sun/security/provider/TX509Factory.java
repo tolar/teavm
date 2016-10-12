@@ -34,12 +34,17 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertPath;
+import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TCertificateFactorySpi;
 import org.teavm.classlib.java.security.cert.TX509CRL;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.provider.certpath.TX509CertPath;
+import org.teavm.classlib.sun.security.provider.certpath.TX509CertificatePair;
 import org.teavm.classlib.sun.security.x509.TX509CRLImpl;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 import org.teavm.classlib.sun.util.TCache;
@@ -54,20 +59,20 @@ public class TX509Factory extends TCertificateFactorySpi {
     public TX509Factory() {
     }
 
-    public Certificate engineGenerateCertificate(InputStream var1) throws CertificateException {
+    public TCertificate engineGenerateCertificate(InputStream var1) throws CertificateException {
         if(var1 == null) {
             certCache.clear();
-            X509CertificatePair.clearCache();
+            TX509CertificatePair.clearCache();
             throw new CertificateException("Missing input stream");
         } else {
             try {
                 byte[] var2 = readOneBlock(var1);
                 if(var2 != null) {
-                    X509CertImpl var3 = (X509CertImpl)getFromCache(certCache, var2);
+                    TX509CertImpl var3 = (TX509CertImpl)getFromCache(certCache, var2);
                     if(var3 != null) {
                         return var3;
                     } else {
-                        var3 = new X509CertImpl(var2);
+                        var3 = new TX509CertImpl(var2);
                         addToCache(certCache, var3.getEncodedInternal(), var3);
                         return var3;
                     }
@@ -174,9 +179,9 @@ public class TX509Factory extends TCertificateFactorySpi {
             try {
                 byte[] var2 = readOneBlock(var1);
                 if(var2 != null) {
-                    return new X509CertPath(new ByteArrayInputStream(var2));
+                    return new TX509CertPath(new TByteArrayInputStream(var2));
                 } else {
-                    throw new TIOException("Empty input");
+                    throw new TIOException(TString.wrap("Empty input"));
                 }
             } catch (IOException var3) {
                 throw new CertificateException(var3.getMessage());

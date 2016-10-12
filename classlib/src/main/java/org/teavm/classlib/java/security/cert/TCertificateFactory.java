@@ -29,6 +29,7 @@ import java.security.cert.CertificateFactorySpi;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
@@ -401,8 +402,8 @@ public class TCertificateFactory {
      *
      * @exception CRLException on parsing errors.
      */
-    public final CRL generateCRL(InputStream inStream)
-            throws CRLException
+    public final TCRL generateCRL(TInputStream inStream)
+            throws TCRLException
     {
         return certFacSpi.engineGenerateCRL(inStream);
     }

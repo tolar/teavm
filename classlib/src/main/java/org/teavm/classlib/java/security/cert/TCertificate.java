@@ -15,6 +15,7 @@
  */
 package org.teavm.classlib.java.security.cert;
 
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.java.security.TNoSuchProviderException;
@@ -122,7 +123,7 @@ public abstract class TCertificate {
             TSignatureException;
 
 
-    public abstract void verify(TPublicKey key, String sigProvider)
+    public abstract void verify(TPublicKey key, TString sigProvider)
             throws TCertificateException, TNoSuchAlgorithmException,
             TInvalidKeyException, TNoSuchProviderException,
             TSignatureException;

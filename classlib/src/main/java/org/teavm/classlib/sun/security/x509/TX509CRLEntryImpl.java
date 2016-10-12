@@ -16,9 +16,7 @@
 package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
-import java.security.cert.CRLException;
 import java.security.cert.CRLReason;
-import java.security.cert.X509CRLEntry;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -29,13 +27,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.cert.TCRLException;
 import org.teavm.classlib.java.security.cert.TX509CRLEntry;
+import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -45,19 +42,19 @@ import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
 public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509CRLEntryImpl> {
     private TSerialNumber serialNumber = null;
-    private Date revocationDate = null;
+    private TDate revocationDate = null;
     private TCRLExtensions extensions = null;
     private byte[] revokedCert = null;
     private TX500Principal certIssuer;
     private static final boolean isExplicit = false;
     private static final long YR_2050 = 2524636800000L;
 
-    public TX509CRLEntryImpl(TBigInteger var1, Date var2) {
+    public TX509CRLEntryImpl(TBigInteger var1, TDate var2) {
         this.serialNumber = new TSerialNumber(var1);
         this.revocationDate = var2;
     }
 
-    public TX509CRLEntryImpl(TBigInteger var1, Date var2, TCRLExtensions var3) {
+    public TX509CRLEntryImpl(TBigInteger var1, TDate var2, TCRLExtensions var3) {
         this.serialNumber = new TSerialNumber(var1);
         this.revocationDate = var2;
         this.extensions = var3;
@@ -68,16 +65,16 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
             this.parse(new TDerValue(var1));
         } catch (TIOException var3) {
             this.revokedCert = null;
-            throw new TCRLException("Parsing error: " + var3.toString());
+            throw new TCRLException(TString.wrap("Parsing error: " + var3.toString()));
         }
     }
 
-    public TX509CRLEntryImpl(TDerValue var1) throws CRLException {
+    public TX509CRLEntryImpl(TDerValue var1) throws TCRLException {
         try {
             this.parse(var1);
-        } catch (IOException var3) {
+        } catch (TIOException var3) {
             this.revokedCert = null;
-            throw new CRLException("Parsing error: " + var3.toString());
+            throw new TCRLException(TString.wrap("Parsing error: " + var3.toString()));
         }
     }
 
@@ -85,7 +82,7 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
         return this.extensions != null;
     }
 
-    public void encode(TDerOutputStream var1) throws CRLException {
+    public void encode(TDerOutputStream var1) throws TCRLException {
         try {
             if(this.revokedCert == null) {
                 TDerOutputStream var2 = new TDerOutputStream();
@@ -107,15 +104,15 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
 
             var1.write(this.revokedCert);
         } catch (TIOException var4) {
-            throw new CRLException("Encoding error: " + var4.toString());
+            throw new TCRLException(TString.wrap("Encoding error: " + var4.toString()));
         }
     }
 
-    public byte[] getEncoded() throws CRLException {
+    public byte[] getEncoded() throws TCRLException {
         return (byte[])this.getEncoded0().clone();
     }
 
-    private byte[] getEncoded0() throws CRLException {
+    private byte[] getEncoded0() throws TCRLException {
         if(this.revokedCert == null) {
             this.encode(new TDerOutputStream());
         }
@@ -123,7 +120,7 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
         return this.revokedCert;
     }
 
-    public X500Principal getCertificateIssuer() {
+    public TX500Principal getCertificateIssuer() {
         return this.certIssuer;
     }
 
@@ -156,7 +153,7 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
 
     public static CRLReason getRevocationReason(TX509CRLEntry var0) {
         try {
-            byte[] var1 = var0.getExtensionValue("2.5.29.21");
+            byte[] var1 = var0.getExtensionValue(TString.wrap("2.5.29.21"));
             if(var1 == null) {
                 return null;
             } else {
@@ -307,11 +304,11 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
         return this.extensions == null?null:this.extensions.get(TOIDMap.getName(var1));
     }
 
-    private void parse(TDerValue var1) throws CRLException, TIOException {
+    private void parse(TDerValue var1) throws TCRLException, TIOException {
         if(var1.tag != 48) {
-            throw new CRLException("Invalid encoded RevokedCertificate, starting sequence tag missing.");
+            throw new TCRLException(TString.wrap("Invalid encoded RevokedCertificate, starting sequence tag missing."));
         } else if(var1.data.available() == 0) {
-            throw new CRLException("No data encoded for RevokedCertificates");
+            throw new TCRLException(TString.wrap("No data encoded for RevokedCertificates"));
         } else {
             this.revokedCert = var1.toByteArray();
             TDerInputStream var2 = var1.toDerInputStream();
@@ -322,7 +319,7 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
                 this.revocationDate = var1.data.getUTCTime();
             } else {
                 if((byte)var4 != 24) {
-                    throw new CRLException("Invalid encoding for revocation date");
+                    throw new TCRLException(TString.wrap("Invalid encoding for revocation date"));
                 }
 
                 this.revocationDate = var1.data.getGeneralizedTime();
@@ -334,9 +331,9 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
         }
     }
 
-    public static sun.security.x509.X509CRLEntryImpl toImpl(X509CRLEntry var0) throws CRLException {
-        return var0 instanceof sun.security.x509.X509CRLEntryImpl
-                ?(sun.security.x509.X509CRLEntryImpl)var0:new sun.security.x509.X509CRLEntryImpl(var0.getEncoded());
+    public static TX509CRLEntryImpl toImpl(TX509CRLEntry var0) throws TCRLException {
+        return var0 instanceof TX509CRLEntryImpl
+                ?(TX509CRLEntryImpl)var0:new TX509CRLEntryImpl(var0.getEncoded());
     }
 
     TCertificateIssuerExtension getCertificateIssuerExtension() {
@@ -378,7 +375,7 @@ public class TX509CRLEntryImpl extends TX509CRLEntry implements Comparable<TX509
                 }
 
                 return var3.length - var4.length;
-            } catch (CRLException var8) {
+            } catch (TCRLException var8) {
                 return -1;
             }
         }

@@ -184,7 +184,7 @@ public class TIPAddressName implements TGeneralNameInterface {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.IPAddressName)) {
+        } else if(!(var1 instanceof TIPAddressName)) {
             return false;
         } else {
             TIPAddressName var2 = (TIPAddressName)var1;

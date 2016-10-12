@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -121,7 +122,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         }
     }
 
-    public TX509CRLImpl(TDerValue var1) throws CRLException {
+    public TX509CRLImpl(TDerValue var1) throws TCRLException {
         this.signedCRL = null;
         this.signature = null;
         this.tbsCertList = null;
@@ -139,7 +140,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
             this.parse(var1);
         } catch (IOException var3) {
             this.signedCRL = null;
-            throw new CRLException("Parsing error: " + var3.getMessage());
+            throw new TCRLException(TString.wrap("Parsing error: " + var3.getMessage()));
         }
     }
 
@@ -707,23 +708,23 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         return this.extensions == null?null:this.extensions.get(TOIDMap.getName(var1));
     }
 
-    private void parse(TDerValue var1) throws CRLException, IOException {
+    private void parse(TDerValue var1) throws TCRLException, TIOException {
         if(this.readOnly) {
-            throw new CRLException("cannot over-write existing CRL");
+            throw new TCRLException(TString.wrap("cannot over-write existing CRL"));
         } else if(var1.getData() != null && var1.tag == 48) {
             this.signedCRL = var1.toByteArray();
             TDerValue[] var2 = new TDerValue[]{var1.data.getDerValue(), var1.data.getDerValue(), var1.data.getDerValue()};
             if(var1.data.available() != 0) {
-                throw new CRLException("signed overrun, bytes = " + var1.data.available());
+                throw new TCRLException(TString.wrap("signed overrun, bytes = " + var1.data.available()));
             } else if(var2[0].tag != 48) {
-                throw new CRLException("signed CRL fields invalid");
+                throw new TCRLException(TString.wrap("signed CRL fields invalid"));
             } else {
                 this.sigAlgId = TAlgorithmId.parse(var2[1]);
                 this.signature = var2[2].getBitString();
                 if(var2[1].data.available() != 0) {
-                    throw new CRLException("AlgorithmId field overrun");
+                    throw new TCRLException(TString.wrap("AlgorithmId field overrun"));
                 } else if(var2[2].data.available() != 0) {
-                    throw new CRLException("Signature field overrun");
+                    throw new TCRLException(TString.wrap("Signature field overrun"));
                 } else {
                     this.tbsCertList = var2[0].toByteArray();
                     TDerInputStream var3 = var2[0].data;
@@ -732,26 +733,26 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
                     if(var5 == 2) {
                         this.version = var3.getInteger();
                         if(this.version != 1) {
-                            throw new CRLException("Invalid version");
+                            throw new TCRLException(TString.wrap("Invalid version"));
                         }
                     }
 
                     TDerValue var4 = var3.getDerValue();
                     TAlgorithmId var6 = TAlgorithmId.parse(var4);
                     if(!var6.equals(this.sigAlgId)) {
-                        throw new CRLException("Signature algorithm mismatch");
+                        throw new TCRLException(TString.wrap("Signature algorithm mismatch"));
                     } else {
                         this.infoSigAlgId = var6;
                         this.issuer = new TX500Name(var3);
                         if(this.issuer.isEmpty()) {
-                            throw new CRLException("Empty issuer DN not allowed in X509CRLs");
+                            throw new TCRLException(TString.wrap("Empty issuer DN not allowed in X509CRLs"));
                         } else {
                             var5 = (byte)var3.peekByte();
                             if(var5 == 23) {
                                 this.thisUpdate = var3.getUTCTime();
                             } else {
                                 if(var5 != 24) {
-                                    throw new CRLException("Invalid encoding for thisUpdate (tag=" + var5 + ")");
+                                    throw new TCRLException(TString.wrap("Invalid encoding for thisUpdate (tag=" + var5 + ")"));
                                 }
 
                                 this.thisUpdate = var3.getGeneralizedTime();

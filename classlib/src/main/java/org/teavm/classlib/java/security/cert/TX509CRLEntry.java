@@ -15,13 +15,12 @@
  */
 package org.teavm.classlib.java.security.cert;
 
-import java.math.BigInteger;
 import java.security.cert.CRLException;
 import java.security.cert.CRLReason;
 import java.util.Date;
 
-import javax.security.auth.x500.X500Principal;
-
+import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CRLEntryImpl;
 
 public abstract class TX509CRLEntry implements TX509Extension {
@@ -83,7 +82,7 @@ public abstract class TX509CRLEntry implements TX509Extension {
      * @return the encoded form of this certificate
      * @exception CRLException if an encoding error occurs.
      */
-    public abstract byte[] getEncoded() throws CRLException;
+    public abstract byte[] getEncoded() throws TCRLException;
 
     /**
      * Gets the serial number from this X509CRLEntry,
@@ -91,7 +90,7 @@ public abstract class TX509CRLEntry implements TX509Extension {
      *
      * @return the serial number.
      */
-    public abstract BigInteger getSerialNumber();
+    public abstract TBigInteger getSerialNumber();
 
     /**
      * Get the issuer of the X509Certificate described by this entry. If
@@ -107,7 +106,7 @@ public abstract class TX509CRLEntry implements TX509Extension {
      *
      * @since 1.5
      */
-    public X500Principal getCertificateIssuer() {
+    public TX500Principal getCertificateIssuer() {
         return null;
     }
 

@@ -88,7 +88,7 @@ public abstract class TCache<K, V> {
         public boolean equals(Object var1) {
             if(this == var1) {
                 return true;
-            } else if(!(var1 instanceof sun.security.util.Cache.EqualByteArray)) {
+            } else if(!(var1 instanceof TCache.EqualByteArray)) {
                 return false;
             } else {
                 TCache.EqualByteArray var2 = (TCache.EqualByteArray)var1;

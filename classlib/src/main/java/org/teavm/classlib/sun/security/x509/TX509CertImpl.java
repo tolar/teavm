@@ -53,6 +53,7 @@ import org.teavm.classlib.java.io.TBufferedReader;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TInputStreamReader;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TInvalidKeyException;
@@ -72,12 +73,13 @@ import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.cert.TCertificateEncodingException;
 import org.teavm.classlib.sun.security.provider.TX509Factory;
+import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
-public class TX509CertImpl extends TX509Certificate {
+public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
 
     private static final long serialVersionUID = -3457612960190864406L;
     private static final String DOT = ".";
@@ -110,7 +112,7 @@ public class TX509CertImpl extends TX509Certificate {
     private List<String> extKeyUsage;
     private Set<TAccessDescription> authInfoAccess;
     private TPublicKey verifiedPublicKey;
-    private String verifiedProvider;
+    private TString verifiedProvider;
     private boolean verificationResult;
     private ConcurrentHashMap<String, String> fingerprints = new ConcurrentHashMap(2);
 
@@ -120,9 +122,9 @@ public class TX509CertImpl extends TX509Certificate {
     public TX509CertImpl(byte[] var1) throws TCertificateException {
         try {
             this.parse(new TDerValue(var1));
-        } catch (IOException var3) {
+        } catch (TIOException var3) {
             this.signedCert = null;
-            throw new CertificateException("Unable to initialize, " + var3, var3);
+            throw new TCertificateException(TString.wrap("Unable to initialize, " + var3), var3);
         }
     }
 
@@ -137,16 +139,16 @@ public class TX509CertImpl extends TX509Certificate {
             try {
                 var3.reset();
                 var2 = new TDerValue(var3);
-            } catch (IOException var7) {
-                throw new CertificateException("Input stream must be either DER-encoded bytes or RFC1421 hex-encoded DER-encoded bytes: " + var7.getMessage(), var7);
+            } catch (TIOException var7) {
+                throw new TCertificateException(TString.wrap("Input stream must be either DER-encoded bytes or RFC1421 hex-encoded DER-encoded bytes: " + var7.getMessage()), var7);
             }
         }
 
         try {
             this.parse(var2);
-        } catch (IOException var6) {
+        } catch (TIOException var6) {
             this.signedCert = null;
-            throw new CertificateException("Unable to parse DER value of certificate, " + var6, var6);
+            throw new TCertificateException(TString.wrap("Unable to parse DER value of certificate, " + var6), var6);
         }
     }
 
@@ -161,14 +163,14 @@ public class TX509CertImpl extends TX509Certificate {
             throw new TIOException(TString.wrap("Unable to read InputStream: " + var7.getMessage()));
         }
 
-        if(!var3.equals("-----BEGIN CERTIFICATE-----")) {
+        if(!var3.equals(TString.wrap("-----BEGIN CERTIFICATE-----"))) {
             throw new IOException("InputStream is not RFC1421 hex-encoded DER bytes");
         } else {
             ByteArrayOutputStream var5 = new ByteArrayOutputStream();
 
             try {
                 while((var3 = var4.readLine()) != null) {
-                    if(var3.equals("-----END CERTIFICATE-----")) {
+                    if(var3.equals(TString.wrap("-----END CERTIFICATE-----"))) {
                         var2 = new TDerValue(var5.toByteArray());
                         break;
                     }
@@ -208,9 +210,9 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public void derEncode(OutputStream var1) throws IOException {
+    public void derEncode(TOutputStream var1) throws TIOException {
         if(this.signedCert == null) {
-            throw new IOException("Null certificate to encode");
+            throw new TIOException(TString.wrap("Null certificate to encode"));
         } else {
             var1.write((byte[])this.signedCert.clone());
         }
@@ -233,9 +235,9 @@ public class TX509CertImpl extends TX509Certificate {
         this.verify(var1, "");
     }
 
-    public synchronized void verify(TPublicKey var1, String var2) throws TCertificateException, TNoSuchAlgorithmException, TInvalidKeyException, TNoSuchProviderException, TSignatureException {
+    public synchronized void verify(TPublicKey var1, TString var2) throws TCertificateException, TNoSuchAlgorithmException, TInvalidKeyException, TNoSuchProviderException, TSignatureException {
         if(var2 == null) {
-            var2 = "";
+            var2 = TString.wrap("");
         }
 
         if(this.verifiedPublicKey != null && this.verifiedPublicKey.equals(var1) && var2.equals(this.verifiedProvider)) {
@@ -1086,9 +1088,9 @@ public class TX509CertImpl extends TX509Certificate {
         }
     }
 
-    public static Collection<List<?>> getSubjectAlternativeNames(X509Certificate var0) throws CertificateParsingException {
+    public static Collection<List<?>> getSubjectAlternativeNames(TX509Certificate var0) throws CertificateParsingException {
         try {
-            byte[] var1 = var0.getExtensionValue("2.5.29.17");
+            byte[] var1 = var0.getExtensionValue(TString.wrap("2.5.29.17"));
             if(var1 == null) {
                 return null;
             } else {

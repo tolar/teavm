@@ -26,7 +26,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateParsingException;
-import java.security.cert.X509Extension;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +39,7 @@ import org.teavm.classlib.sun.security.x509.TX509CertImpl;
  * Created by vasek on 14. 7. 2016.
  */
 public abstract class TX509Certificate extends TCertificate
-        implements X509Extension {
+        implements TX509Extension {
 
     private static final long serialVersionUID = -2491127588187038216L;
 
@@ -539,7 +538,7 @@ public abstract class TX509Certificate extends TCertificate
      */
     public Collection<List<?>> getSubjectAlternativeNames()
             throws CertificateParsingException {
-        return X509CertImpl.getSubjectAlternativeNames(this);
+        return TX509CertImpl.getSubjectAlternativeNames(this);
     }
 
     /**

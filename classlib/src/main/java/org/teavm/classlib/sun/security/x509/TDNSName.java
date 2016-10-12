@@ -88,7 +88,7 @@ public class TDNSName implements TGeneralNameInterface {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.security.x509.DNSName)) {
+        } else if(!(var1 instanceof TDNSName)) {
             return false;
         } else {
             TDNSName var2 = (TDNSName)var1;

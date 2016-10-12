@@ -15,10 +15,7 @@
  */
 package org.teavm.classlib.sun.security.pkcs;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.security.MessageDigest;
@@ -27,13 +24,14 @@ import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
+
 import org.teavm.classlib.java.io.TByteArrayInputStream;
+import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TDataInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
@@ -41,24 +39,29 @@ import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.cert.TCRLException;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TCertificateFactory;
 import org.teavm.classlib.java.security.cert.TX509CRL;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.timestamp.THttpTimestamper;
 import org.teavm.classlib.sun.security.timestamp.TTSRequest;
 import org.teavm.classlib.sun.security.timestamp.TTSResponse;
 import org.teavm.classlib.sun.security.timestamp.TTimestampToken;
 import org.teavm.classlib.sun.security.timestamp.TTimestamper;
+import org.teavm.classlib.sun.security.util.TDebug;
+import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 import org.teavm.classlib.sun.security.x509.TAlgorithmId;
 import org.teavm.classlib.sun.security.x509.TX500Name;
+import org.teavm.classlib.sun.security.x509.TX509CRLImpl;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 import org.teavm.classlib.sun.security.x509.TX509CertInfo;
 
-public class TPKCS7 {
+public class TPKCS7  {
     private TObjectIdentifier contentType;
     private TBigInteger version;
     private TAlgorithmId[] digestAlgorithmIds;
@@ -254,7 +257,7 @@ public class TPKCS7 {
             var7 = 0;
 
             for(int var8 = 0; var8 < var4; ++var8) {
-                ByteArrayInputStream var9 = null;
+                TByteArrayInputStream var9 = null;
 
                 try {
                     TParsingException var11;
@@ -265,7 +268,7 @@ public class TPKCS7 {
                                 this.certificates[var7] = new TX509CertImpl(var37[var8]);
                             } else {
                                 byte[] var42 = var37[var8].toByteArray();
-                                var9 = new ByteArrayInputStream(var42);
+                                var9 = new TByteArrayInputStream(var42);
                                 this.certificates[var7] = (TX509Certificate)var35.generateCertificate(var9);
                                 var9.close();
                                 var9 = null;
@@ -301,20 +304,20 @@ public class TPKCS7 {
             this.crls = new TX509CRL[var4];
 
             for(var7 = 0; var7 < var4; ++var7) {
-                ByteArrayInputStream var38 = null;
+                TByteArrayInputStream var38 = null;
 
                 try {
                     if(var35 == null) {
-                        this.crls[var7] = new X509CRLImpl(var37[var7]);
+                        this.crls[var7] = new TX509CRLImpl(var37[var7]);
                     } else {
                         byte[] var41 = var37[var7].toByteArray();
-                        var38 = new ByteArrayInputStream(var41);
-                        this.crls[var7] = (X509CRL)var35.generateCRL(var38);
+                        var38 = new TByteArrayInputStream(var41);
+                        this.crls[var7] = (TX509CRL)var35.generateCRL(var38);
                         var38.close();
                         var38 = null;
                     }
-                } catch (CRLException var28) {
-                    ParsingException var40 = new ParsingException(var28.getMessage());
+                } catch (TCRLException var28) {
+                    TParsingException var40 = new TParsingException(TString.wrap(var28.getMessage()));
                     var40.initCause(var28);
                     throw var40;
                 } finally {
@@ -367,7 +370,7 @@ public class TPKCS7 {
         this.certificates = new TX509Certificate[var4];
 
         for(int var7 = 0; var7 < var4; ++var7) {
-            ByteArrayInputStream var8 = null;
+            TByteArrayInputStream var8 = null;
 
             try {
                 TParsingException var10;
@@ -376,16 +379,16 @@ public class TPKCS7 {
                         this.certificates[var7] = new TX509CertImpl(var23[var7]);
                     } else {
                         byte[] var9 = var23[var7].toByteArray();
-                        var8 = new ByteArrayInputStream(var9);
+                        var8 = new TByteArrayInputStream(var9);
                         this.certificates[var7] = (TX509Certificate)var22.generateCertificate(var8);
                         var8.close();
                         var8 = null;
                     }
-                } catch (CertificateException var17) {
+                } catch (TCertificateException var17) {
                     var10 = new TParsingException(TString.wrap(var17.getMessage()));
                     var10.initCause(var17);
                     throw var10;
-                } catch (IOException var18) {
+                } catch (TIOException var18) {
                     var10 = new TParsingException(TString.wrap(var18.getMessage()));
                     var10.initCause(var18);
                     throw var10;
@@ -419,7 +422,7 @@ public class TPKCS7 {
     public void encodeSignedData(TDerOutputStream var1) throws IOException {
         TDerOutputStream var2 = new TDerOutputStream();
         var2.putInteger(this.version);
-        var2.putOrderedSetOf(49, this.digestAlgorithmIds);
+        var2.putOrderedSetOf((byte)49, this.digestAlgorithmIds);
         this.contentInfo.encode(var2);
         if(this.certificates != null && this.certificates.length != 0) {
             TX509CertImpl[] var3 = new TX509CertImpl[this.certificates.length];
@@ -437,34 +440,34 @@ public class TPKCS7 {
                 }
             }
 
-            var2.putOrderedSetOf(-96, var3);
+            var2.putOrderedSetOf((byte)-96, var3);
         }
 
         if(this.crls != null && this.crls.length != 0) {
             HashSet var11 = new HashSet(this.crls.length);
-            X509CRL[] var13 = this.crls;
+            TX509CRL[] var13 = this.crls;
             int var15 = var13.length;
 
             for(int var6 = 0; var6 < var15; ++var6) {
-                X509CRL var7 = var13[var6];
-                if(var7 instanceof X509CRLImpl) {
-                    var11.add((X509CRLImpl)var7);
+                TX509CRL var7 = var13[var6];
+                if(var7 instanceof TX509CRLImpl) {
+                    var11.add((TX509CRLImpl)var7);
                 } else {
                     try {
                         byte[] var8 = var7.getEncoded();
-                        var11.add(new X509CRLImpl(var8));
+                        var11.add(new TX509CRLImpl(var8));
                     } catch (CRLException var9) {
                         throw new IOException(var9);
                     }
                 }
             }
 
-            var2.putOrderedSetOf(-95, (DerEncoder[])var11.toArray(new X509CRLImpl[var11.size()]));
+            var2.putOrderedSetOf((byte)-95, (TDerEncoder[])var11.toArray(new TX509CRLImpl[var11.size()]));
         }
 
-        var2.putOrderedSetOf(49, this.signerInfos);
-        DerValue var12 = new DerValue(48, var2.toByteArray());
-        ContentInfo var14 = new ContentInfo(ContentInfo.SIGNED_DATA_OID, var12);
+        var2.putOrderedSetOf((byte)49, this.signerInfos);
+        TDerValue var12 = new TDerValue((byte)48, var2.toByteArray());
+        TContentInfo var14 = new TContentInfo(TContentInfo.SIGNED_DATA_OID, var12);
         var14.encode(var1);
     }
 
@@ -563,7 +566,7 @@ public class TPKCS7 {
         String var1 = "";
         var1 = var1 + this.contentInfo + "\n";
         if(this.version != null) {
-            var1 = var1 + "PKCS7 :: version: " + Debug.toHexString(this.version) + "\n";
+            var1 = var1 + "PKCS7 :: version: " + TDebug.toHexString(this.version) + "\n";
         }
 
         int var2;
@@ -606,42 +609,42 @@ public class TPKCS7 {
         return this.oldStyle;
     }
 
-    public static byte[] generateSignedData(byte[] var0, X509Certificate[] var1, byte[] var2, String var3, URI var4, String var5) throws CertificateException, IOException, NoSuchAlgorithmException {
-        PKCS9Attributes var6 = null;
+    public static byte[] generateSignedData(byte[] var0, TX509Certificate[] var1, byte[] var2, String var3, URI var4, TString var5) throws CertificateException, IOException, NoSuchAlgorithmException {
+        TPKCS9Attributes var6 = null;
         if(var4 != null) {
-            HttpTimestamper var7 = new HttpTimestamper(var4);
+            THttpTimestamper var7 = new THttpTimestamper(var4);
             byte[] var8 = generateTimestampToken(var7, var5, var0);
-            var6 = new PKCS9Attributes(new PKCS9Attribute[]{new PKCS9Attribute("SignatureTimestampToken", var8)});
+            var6 = new TPKCS9Attributes(new TPKCS9Attribute[]{new TPKCS9Attribute("SignatureTimestampToken", var8)});
         }
 
-        X500Name var17 = X500Name.asX500Name(var1[0].getIssuerX500Principal());
-        BigInteger var18 = var1[0].getSerialNumber();
-        String var9 = AlgorithmId.getEncAlgFromSigAlg(var3);
-        String var10 = AlgorithmId.getDigAlgFromSigAlg(var3);
-        SignerInfo var11 = new SignerInfo(var17, var18, AlgorithmId.get(var10), (PKCS9Attributes)null, AlgorithmId.get(var9), var0, var6);
-        SignerInfo[] var12 = new SignerInfo[]{var11};
-        AlgorithmId[] var13 = new AlgorithmId[]{var11.getDigestAlgorithmId()};
-        ContentInfo var14 = var2 == null?new ContentInfo(ContentInfo.DATA_OID, (DerValue)null):new ContentInfo(var2);
-        sun.security.pkcs.PKCS7 var15 = new sun.security.pkcs.PKCS7(var13, var14, var1, var12);
-        ByteArrayOutputStream var16 = new ByteArrayOutputStream();
-        var15.encodeSignedData((OutputStream)var16);
+        TX500Name var17 = TX500Name.asX500Name(var1[0].getIssuerX500Principal());
+        TBigInteger var18 = var1[0].getSerialNumber();
+        String var9 = TAlgorithmId.getEncAlgFromSigAlg(var3);
+        String var10 = TAlgorithmId.getDigAlgFromSigAlg(var3);
+        TSignerInfo var11 = new TSignerInfo(var17, var18, TAlgorithmId.get(var10), (TPKCS9Attributes)null, TAlgorithmId.get(var9), var0, var6);
+        TSignerInfo[] var12 = new TSignerInfo[]{var11};
+        TAlgorithmId[] var13 = new TAlgorithmId[]{var11.getDigestAlgorithmId()};
+        TContentInfo var14 = var2 == null?new TContentInfo(TContentInfo.DATA_OID, (TDerValue)null):new TContentInfo(var2);
+        TPKCS7 var15 = new TPKCS7(var13, var14, var1, var12);
+        TByteArrayOutputStream var16 = new TByteArrayOutputStream();
+        var15.encodeSignedData((TOutputStream)var16);
         return var16.toByteArray();
     }
 
-    private static byte[] generateTimestampToken(TTimestamper var0, String var1, byte[] var2) throws IOException, CertificateException {
+    private static byte[] generateTimestampToken(TTimestamper var0, TString var1, byte[] var2) throws IOException, CertificateException {
         MessageDigest var3 = null;
         TTSRequest var4 = null;
 
         try {
             var3 = MessageDigest.getInstance("SHA-1");
-            var4 = new TSRequest(var1, var2, var3);
+            var4 = new TTSRequest(var1, var2, var3);
         } catch (NoSuchAlgorithmException var17) {
             ;
         }
 
-        BigInteger var5 = null;
+        TBigInteger var5 = null;
         if(TPKCS7.SecureRandomHolder.RANDOM != null) {
-            var5 = new BigInteger(64, TPKCS7.SecureRandomHolder.RANDOM);
+            var5 = new TBigInteger(64, TPKCS7.SecureRandomHolder.RANDOM);
             var4.setNonce(var5);
         }
 

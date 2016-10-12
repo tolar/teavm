@@ -15,10 +15,14 @@
  */
 package org.teavm.classlib.javax.crypto;
 
+import javax.crypto.spec.PBEParameterSpec;
+
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPermission;
 import org.teavm.classlib.java.security.TPermissionCollection;
 import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
+import org.teavm.classlib.javax.crypto.spec.TPBEParameterSpec;
+import org.teavm.classlib.javax.crypto.spec.TRC2ParameterSpec;
 
 class TCryptoPermission extends TPermission {
     private static final long serialVersionUID = 8987399626114087514L;
@@ -96,10 +100,10 @@ class TCryptoPermission extends TPermission {
     public boolean equals(Object var1) {
         if(var1 == this) {
             return true;
-        } else if(!(var1 instanceof javax.crypto.CryptoPermission)) {
+        } else if(!(var1 instanceof TCryptoPermission)) {
             return false;
         } else {
-            javax.crypto.CryptoPermission var2 = (javax.crypto.CryptoPermission)var1;
+            TCryptoPermission var2 = (TCryptoPermission)var1;
             return this.alg.equalsIgnoreCase(var2.alg) && this.maxKeySize == var2.maxKeySize?(this.checkParam != var2.checkParam?false:this.equalObjects(this.exemptionMechanism, var2.exemptionMechanism) && this.equalObjects(this.algParamSpec, var2.algParamSpec)):false;
         }
     }
@@ -154,10 +158,10 @@ class TCryptoPermission extends TPermission {
         StringBuilder var1 = new StringBuilder(100);
         var1.append("(TCryptoPermission " + this.alg + " " + this.maxKeySize);
         if(this.algParamSpec != null) {
-            if(this.algParamSpec instanceof RC2ParameterSpec) {
-                var1.append(" , effective " + ((RC2ParameterSpec)this.algParamSpec).getEffectiveKeyBits());
-            } else if(this.algParamSpec instanceof RC5ParameterSpec) {
-                var1.append(" , rounds " + ((RC5ParameterSpec)this.algParamSpec).getRounds());
+            if(this.algParamSpec instanceof TRC2ParameterSpec) {
+                var1.append(" , effective " + ((TRC2ParameterSpec)this.algParamSpec).getEffectiveKeyBits());
+            } else if(this.algParamSpec instanceof TRC2ParameterSpec) {
+                var1.append(" , rounds " + ((TRC2ParameterSpec)this.algParamSpec).getRounds());
             }
         }
 
@@ -174,8 +178,8 @@ class TCryptoPermission extends TPermission {
     }
 
     private boolean impliesParameterSpec(boolean var1, TAlgorithmParameterSpec var2) {
-        return this.checkParam && var1?(var2 == null?true:(this.algParamSpec == null?false:(this.algParamSpec.getClass() != var2.getClass()?false:(var2 instanceof RC2ParameterSpec && ((RC2ParameterSpec)var2).getEffectiveKeyBits() <= ((RC2ParameterSpec)((RC2ParameterSpec)this.algParamSpec)).getEffectiveKeyBits()?true:(var2 instanceof RC5ParameterSpec && ((RC5ParameterSpec)var2).getRounds() <= ((RC5ParameterSpec)this.algParamSpec).getRounds()?true:(var2 instanceof PBEParameterSpec
-                && ((PBEParameterSpec)var2).getIterationCount() <= ((PBEParameterSpec)this.algParamSpec).getIterationCount()?true:this.algParamSpec.equals(var2))))))):!this.checkParam;
+        return this.checkParam && var1?(var2 == null?true:(this.algParamSpec == null?false:(this.algParamSpec.getClass() != var2.getClass()?false:(var2 instanceof TRC2ParameterSpec && ((RC2ParameterSpec)var2).getEffectiveKeyBits() <= ((RC2ParameterSpec)((RC2ParameterSpec)this.algParamSpec)).getEffectiveKeyBits()?true:(var2 instanceof RC5ParameterSpec && ((RC5ParameterSpec)var2).getRounds() <= ((RC5ParameterSpec)this.algParamSpec).getRounds()?true:(var2 instanceof PBEParameterSpec
+                && ((TPBEParameterSpec)var2).getIterationCount() <= ((PBEParameterSpec)this.algParamSpec).getIterationCount()?true:this.algParamSpec.equals(var2))))))):!this.checkParam;
     }
 
     private boolean equalObjects(Object var1, Object var2) {

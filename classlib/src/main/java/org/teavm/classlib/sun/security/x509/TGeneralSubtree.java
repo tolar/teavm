@@ -87,7 +87,7 @@ public class TGeneralSubtree {
     }
 
     public boolean equals(Object var1) {
-        if(!(var1 instanceof sun.security.x509.GeneralSubtree)) {
+        if(!(var1 instanceof TGeneralSubtree)) {
             return false;
         } else {
             TGeneralSubtree var2 = (TGeneralSubtree)var1;

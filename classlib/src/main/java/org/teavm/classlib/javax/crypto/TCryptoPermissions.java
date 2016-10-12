@@ -31,11 +31,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPermission;
 import org.teavm.classlib.java.security.TPermissionCollection;
+import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
 
 final class TCryptoPermissions extends TPermissionCollection implements Serializable {
     private static final long serialVersionUID = 4946547168093391015L;
     private static final ObjectStreamField[] serialPersistentFields = new ObjectStreamField[]{new ObjectStreamField("perms", Hashtable.class)};
-    private transient ConcurrentHashMap<TString, TPermissionCollection> perms = new ConcurrentHashMap(7);
+    private transient TConcurrentHashMap<TString, TPermissionCollection> perms = new TConcurrentHashMap(7);
 
     TCryptoPermissions() {
     }
@@ -77,7 +79,7 @@ final class TCryptoPermissions extends TPermissionCollection implements Serializ
         }
     }
 
-    public Enumeration<TPermission> elements() {
+    public TEnumeration<TPermission> elements() {
         return new TPermissionsEnumerator(this.perms.elements());
     }
 

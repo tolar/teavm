@@ -23,17 +23,19 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TAlgorithmParameters;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
+import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
-public class TAlgorithmId {
+public class TAlgorithmId implements TDerEncoder {
 
     private static final long serialVersionUID = 7205873507486557157L;
     private TObjectIdentifier algid;

@@ -194,7 +194,7 @@ public class TX509CertPath extends TCertPath {
     }
 
     private byte[] encodePKCS7() throws CertificateEncodingException {
-        TPKCS7 var1 = new TPKCS7(new TAlgorithmId[0], new TContentInfo(TContentInfo.DATA_OID, (TDerValue)null), (X509Certificate[])this.certs.toArray(new X509Certificate[this.certs.size()]), new TSignerInfo[0]);
+        TPKCS7 var1 = new TPKCS7(new TAlgorithmId[0], new TContentInfo(TContentInfo.DATA_OID, (TDerValue)null), (TX509Certificate[])this.certs.toArray(new TX509Certificate[this.certs.size()]), new TSignerInfo[0]);
         TDerOutputStream var2 = new TDerOutputStream();
 
         try {

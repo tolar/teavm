@@ -338,7 +338,7 @@ public class TZoneInfo extends TTimeZone {
     public boolean equals(Object var1) {
         if(this == var1) {
             return true;
-        } else if(!(var1 instanceof sun.util.calendar.ZoneInfo)) {
+        } else if(!(var1 instanceof TZoneInfo)) {
             return false;
         } else {
             TZoneInfo var2 = (TZoneInfo)var1;

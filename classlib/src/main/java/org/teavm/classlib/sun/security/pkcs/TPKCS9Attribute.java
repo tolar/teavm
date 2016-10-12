@@ -16,16 +16,18 @@
 package org.teavm.classlib.sun.security.pkcs;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.security.cert.CertificateException;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 import org.teavm.classlib.sun.security.x509.TCertificateExtensions;
@@ -152,7 +154,7 @@ public class TPKCS9Attribute implements TDerEncoder {
                         TSignerInfo[] var9 = new TSignerInfo[var5.length];
 
                         for(var8 = 0; var8 < var5.length; ++var8) {
-                            var9[var8] = new SignerInfo(var5[var8].toDerInputStream());
+                            var9[var8] = new TSignerInfo(var5[var8].toDerInputStream());
                         }
 
                         this.value = var9;
@@ -161,19 +163,19 @@ public class TPKCS9Attribute implements TDerEncoder {
                         this.value = var5[0].getAsString();
                         break;
                     case 9:
-                        throw new IOException("PKCS9 extended-certificate attribute not supported.");
+                        throw new TIOException(TString.wrap("PKCS9 extended-certificate attribute not supported."));
                     case 10:
-                        throw new IOException("PKCS9 IssuerAndSerialNumberattribute not supported.");
+                        throw new TIOException(TString.wrap("PKCS9 IssuerAndSerialNumberattribute not supported."));
                     case 11:
                     case 12:
-                        throw new IOException("PKCS9 RSA DSI attributes11 and 12, not supported.");
+                        throw new TIOException(TString.wrap("PKCS9 RSA DSI attributes11 and 12, not supported."));
                     case 13:
-                        throw new IOException("PKCS9 attribute #13 not supported.");
+                        throw new TIOException(TString.wrap("PKCS9 attribute #13 not supported."));
                     case 14:
                         this.value = new TCertificateExtensions(new TDerInputStream(var5[0].toByteArray()));
                         break;
                     case 15:
-                        throw new IOException("PKCS9 SMIMECapability attribute not supported.");
+                        throw new TIOException(TString.wrap("PKCS9 SMIMECapability attribute not supported."));
                     case 16:
                         this.value = new SigningCertificateInfo(var5[0].toByteArray());
                         break;
@@ -185,13 +187,13 @@ public class TPKCS9Attribute implements TDerEncoder {
         }
     }
 
-    public void derEncode(OutputStream var1) throws IOException {
-        DerOutputStream var2 = new DerOutputStream();
+    public void derEncode(TOutputStream var1) throws TIOException {
+        TDerOutputStream var2 = new TDerOutputStream();
         var2.putOID(this.oid);
-        DerOutputStream var3;
+        TDerOutputStream var3;
         int var5;
-        String[] var7;
-        DerOutputStream[] var8;
+        TString[] var7;
+        TDerOutputStream[] var8;
         switch(this.index) {
             case -1:
                 var2.write((byte[])((byte[])this.value));
@@ -200,49 +202,49 @@ public class TPKCS9Attribute implements TDerEncoder {
                 break;
             case 1:
             case 2:
-                var7 = (String[])((String[])this.value);
-                var8 = new DerOutputStream[var7.length];
+                var7 = (TString[])((TString[])this.value);
+                var8 = new TDerOutputStream[var7.length];
 
                 for(var5 = 0; var5 < var7.length; ++var5) {
-                    var8[var5] = new DerOutputStream();
+                    var8[var5] = new TDerOutputStream();
                     var8[var5].putIA5String(var7[var5]);
                 }
 
-                var2.putOrderedSetOf(49, var8);
+                var2.putOrderedSetOf((byte)49, var8);
                 break;
             case 3:
-                var3 = new DerOutputStream();
+                var3 = new TDerOutputStream();
                 var3.putOID((TObjectIdentifier)this.value);
-                var2.write(49, var3.toByteArray());
+                var2.write((byte)49, var3.toByteArray());
                 break;
             case 4:
-                var3 = new DerOutputStream();
+                var3 = new TDerOutputStream();
                 var3.putOctetString((byte[])((byte[])this.value));
-                var2.write(49, var3.toByteArray());
+                var2.write((byte)49, var3.toByteArray());
                 break;
             case 5:
-                var3 = new DerOutputStream();
-                var3.putUTCTime((Date)this.value);
-                var2.write(49, var3.toByteArray());
+                var3 = new TDerOutputStream();
+                var3.putUTCTime((TDate)this.value);
+                var2.write((byte)49, var3.toByteArray());
                 break;
             case 6:
-                var2.putOrderedSetOf(49, (DerEncoder[])((DerEncoder[])this.value));
+                var2.putOrderedSetOf((byte)49, (TDerEncoder[])((TDerEncoder[])this.value));
                 break;
             case 7:
-                var3 = new DerOutputStream();
-                var3.putPrintableString((String)this.value);
-                var2.write(49, var3.toByteArray());
+                var3 = new TDerOutputStream();
+                var3.putPrintableString((TString)this.value);
+                var2.write((byte)49, var3.toByteArray());
                 break;
             case 8:
-                var7 = (String[])((String[])this.value);
-                var8 = new DerOutputStream[var7.length];
+                var7 = (TString[])((TString[])this.value);
+                var8 = new TDerOutputStream[var7.length];
 
                 for(var5 = 0; var5 < var7.length; ++var5) {
-                    var8[var5] = new DerOutputStream();
+                    var8[var5] = new TDerOutputStream();
                     var8[var5].putPrintableString(var7[var5]);
                 }
 
-                var2.putOrderedSetOf(49, var8);
+                var2.putOrderedSetOf((byte)49, var8);
                 break;
             case 9:
                 throw new IOException("PKCS9 extended-certificate attribute not supported.");
@@ -254,27 +256,27 @@ public class TPKCS9Attribute implements TDerEncoder {
             case 13:
                 throw new IOException("PKCS9 attribute #13 not supported.");
             case 14:
-                var3 = new DerOutputStream();
-                CertificateExtensions var4 = (CertificateExtensions)this.value;
+                var3 = new TDerOutputStream();
+                TCertificateExtensions var4 = (TCertificateExtensions)this.value;
 
                 try {
                     var4.encode(var3, true);
-                } catch (CertificateException var6) {
-                    throw new IOException(var6.toString());
+                } catch (TCertificateException var6) {
+                    throw new TIOException(TString.wrap(var6.toString()));
                 }
 
-                var2.write(49, var3.toByteArray());
+                var2.write((byte)49, var3.toByteArray());
                 break;
             case 15:
                 throw new IOException("PKCS9 attribute #15 not supported.");
             case 16:
                 throw new IOException("PKCS9 SigningCertificate attribute not supported.");
             case 17:
-                var2.write(49, (byte[])((byte[])this.value));
+                var2.write((byte)49, (byte[])((byte[])this.value));
         }
 
-        var3 = new DerOutputStream();
-        var3.write(48, var2.toByteArray());
+        var3 = new TDerOutputStream();
+        var3.write((byte)48, var2.toByteArray());
         var1.write(var3.toByteArray());
     }
 
@@ -333,7 +335,7 @@ public class TPKCS9Attribute implements TDerEncoder {
             return var1.toString();
         } else {
             if(this.value instanceof byte[]) {
-                HexDumpEncoder var2 = new HexDumpEncoder();
+                THexDumpEncoder var2 = new THexDumpEncoder();
                 var1.append(var2.encodeBuffer((byte[])((byte[])this.value)));
             } else {
                 var1.append(this.value.toString());
@@ -443,7 +445,7 @@ public class TPKCS9Attribute implements TDerEncoder {
         OID_NAME_TABLE.put(PKCS9_OIDS[15], "SMIMECapability");
         OID_NAME_TABLE.put(PKCS9_OIDS[16], "SigningCertificate");
         OID_NAME_TABLE.put(PKCS9_OIDS[17], "SignatureTimestampToken");
-        PKCS9_VALUE_TAGS = new Byte[][]{null, {new Byte(22)}, {new Byte(22), new Byte(19)}, {new Byte(6)}, {new Byte(4)}, {new Byte(23)}, {new Byte(48)}, {new Byte(19), new Byte(20)}, {new Byte(19), new Byte(20)}, {new Byte(49)}, {new Byte(48)}, null, null, null, {new Byte(48)}, {new Byte(48)}, {new Byte(48)}, {new Byte(48)}};
+        PKCS9_VALUE_TAGS = new Byte[][]{null, {new Byte((byte)22)}, {new Byte((byte)22), new Byte((byte)19)}, {new Byte((byte)6)}, {new Byte((byte)4)}, {new Byte((byte)23)}, {new Byte((byte)48)}, {new Byte((byte)19), new Byte((byte)20)}, {new Byte((byte)19), new Byte((byte)20)}, {new Byte((byte)49)}, {new Byte((byte)48)}, null, null, null, {new Byte((byte)48)}, {new Byte((byte)48)}, {new Byte((byte)48)}, {new Byte((byte)48)}};
         VALUE_CLASSES = new Class[18];
 
         try {

@@ -15,8 +15,9 @@
  */
 package org.teavm.classlib.javax.crypto;
 
-import java.security.PermissionCollection;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPermission;
+import org.teavm.classlib.java.security.TPermissionCollection;
 
 final class TCryptoAllPermission extends TCryptoPermission {
     private static final long serialVersionUID = -5066513634293192112L;
@@ -24,7 +25,7 @@ final class TCryptoAllPermission extends TCryptoPermission {
     static final TCryptoAllPermission INSTANCE = new TCryptoAllPermission();
 
     private TCryptoAllPermission() {
-        super("TCryptoAllPermission");
+        super(TString.wrap("TCryptoAllPermission"));
     }
 
     public boolean implies(TPermission var1) {
@@ -39,7 +40,7 @@ final class TCryptoAllPermission extends TCryptoPermission {
         return 1;
     }
 
-    public PermissionCollection newPermissionCollection() {
-        return new CryptoAllPermissionCollection();
+    public TPermissionCollection newPermissionCollection() {
+        return new TCryptoAllPermissionCollection();
     }
 }

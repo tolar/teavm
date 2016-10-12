@@ -269,7 +269,7 @@ public class TSignerInfo implements TDerEncoder {
         }
     }
 
-    sun.security.pkcs.SignerInfo verify(TPKCS7 var1) throws NoSuchAlgorithmException, SignatureException {
+    TSignerInfo verify(TPKCS7 var1) throws NoSuchAlgorithmException, SignatureException {
         return this.verify(var1, (byte[])null);
     }
 

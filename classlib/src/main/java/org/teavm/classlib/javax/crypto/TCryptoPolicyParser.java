@@ -15,32 +15,35 @@
  */
 package org.teavm.classlib.javax.crypto;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StreamTokenizer;
-import java.lang.reflect.Constructor;
 import java.security.GeneralSecurityException;
-import java.security.spec.AlgorithmParameterSpec;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
 
+import org.teavm.classlib.java.io.TBufferedReader;
+import org.teavm.classlib.java.io.TReader;
+import org.teavm.classlib.java.io.TStreamTokenizer;
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.reflect.TConstructor;
+import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
+
 final class TCryptoPolicyParser {
     private Vector<TCryptoPolicyParser.GrantEntry> grantEntries = new Vector();
-    private StreamTokenizer st;
+    private TStreamTokenizer st;
     private int lookahead;
 
     TCryptoPolicyParser() {
     }
 
-    void read(Reader var1) throws TCryptoPolicyParser.ParsingException, IOException {
-        if(!(var1 instanceof BufferedReader)) {
-            var1 = new BufferedReader((Reader)var1);
+    void read(TReader var1) throws TCryptoPolicyParser.ParsingException, IOException {
+        if(!(var1 instanceof TBufferedReader)) {
+            var1 = new TBufferedReader((TReader)var1);
         }
 
-        this.st = new StreamTokenizer((Reader)var1);
+        this.st = new TStreamTokenizer((TReader)var1);
         this.st.resetSyntax();
         this.st.wordChars(97, 122);
         this.st.wordChars(65, 90);
@@ -92,12 +95,12 @@ final class TCryptoPolicyParser {
         return var2;
     }
 
-    private TCryptoPolicyParser.CryptoPermissionEntry parsePermissionEntry(Hashtable<String, Vector<String>> var1) throws TCryptoPolicyParser.ParsingException, IOException {
+    private TCryptoPolicyParser.CryptoPermissionEntry parsePermissionEntry(Hashtable<TString, Vector<TString>> var1) throws TCryptoPolicyParser.ParsingException, IOException {
         TCryptoPolicyParser.CryptoPermissionEntry var2 = new TCryptoPolicyParser.CryptoPermissionEntry();
         this.match("Permission");
         var2.cryptoPermission = this.match("permission type");
         if(var2.cryptoPermission.equals("javax.crypto.CryptoAllPermission")) {
-            var2.alg = "CryptoAllPermission";
+            var2.alg = TString.wrap("CryptoAllPermission");
             var2.maxKeySize = 2147483647;
             return var2;
         } else {
@@ -109,7 +112,7 @@ final class TCryptoPolicyParser {
                 }
 
                 this.match("*");
-                var2.alg = "*";
+                var2.alg = TString.wrap("*");
             }
 
             this.peekAndMatch(",");
@@ -136,7 +139,7 @@ final class TCryptoPolicyParser {
 
                 this.peekAndMatch(",");
                 if(this.peek("\"")) {
-                    String var3 = this.match("quoted string");
+                    TString var3 = this.match("quoted string");
                     Vector var4 = new Vector(1);
 
                     while(this.peek(",")) {
@@ -164,19 +167,19 @@ final class TCryptoPolicyParser {
         }
     }
 
-    private static final AlgorithmParameterSpec getInstance(String var0, Integer[] var1) throws TCryptoPolicyParser.ParsingException {
-        AlgorithmParameterSpec var2 = null;
+    private static final TAlgorithmParameterSpec getInstance(TString var0, Integer[] var1) throws TCryptoPolicyParser.ParsingException {
+        TAlgorithmParameterSpec var2 = null;
 
         try {
-            Class var3 = Class.forName(var0);
-            Class[] var4 = new Class[var1.length];
+            TClass var3 = TClass.forName(var0);
+            TClass[] var4 = new TClass[var1.length];
 
             for(int var5 = 0; var5 < var1.length; ++var5) {
                 var4[var5] = Integer.TYPE;
             }
 
-            Constructor var7 = var3.getConstructor(var4);
-            var2 = (AlgorithmParameterSpec)var7.newInstance((Object[])var1);
+            TConstructor var7 = var3.getConstructor(var4);
+            var2 = (TAlgorithmParameterSpec)var7.newInstance((Object[])var1);
             return var2;
         } catch (Exception var6) {
             throw new TCryptoPolicyParser.ParsingException("Cannot call the constructor of " + var0 + var6);
@@ -263,8 +266,8 @@ final class TCryptoPolicyParser {
         }
     }
 
-    private String match(String var1) throws TCryptoPolicyParser.ParsingException, IOException {
-        String var2 = null;
+    private TString match(String var1) throws TCryptoPolicyParser.ParsingException, IOException {
+        TString var2 = null;
         switch(this.lookahead) {
             case -3:
                 if(var1.equalsIgnoreCase(this.st.sval)) {
@@ -362,8 +365,8 @@ final class TCryptoPolicyParser {
         return var6;
     }
 
-    private boolean isConsistent(String var1, String var2, Hashtable<String, Vector<String>> var3) {
-        String var4 = var2 == null?"none":var2;
+    private boolean isConsistent(TString var1, TString var2, Hashtable<TString, Vector<TString>> var3) {
+        TString var4 = var2 == null?TString.wrap("none"):var2;
         Vector var5;
         if(var3 == null) {
             var3 = new Hashtable();
@@ -406,12 +409,12 @@ final class TCryptoPolicyParser {
     }
 
     private static class CryptoPermissionEntry {
-        String cryptoPermission;
-        String alg = null;
-        String exemptionMechanism = null;
+        TString cryptoPermission;
+        TString alg = null;
+        TString exemptionMechanism = null;
         int maxKeySize = 0;
         boolean checkParam = false;
-        AlgorithmParameterSpec algParamSpec = null;
+        TAlgorithmParameterSpec algParamSpec = null;
 
         CryptoPermissionEntry() {
         }

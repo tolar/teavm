@@ -22,11 +22,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
-import org.teavm.classlib.java.lang.TBoolean;
 import org.teavm.classlib.java.lang.TClass;
-import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.reflect.TConstructor;
 import org.teavm.classlib.java.security.cert.TCRLException;
@@ -38,7 +37,7 @@ import org.teavm.classlib.sun.security.util.TDerValue;
 public class TCRLExtensions {
     private Map<String, TExtension> map = Collections.synchronizedMap(new TreeMap());
     private boolean unsupportedCritExt = false;
-    private static final TClass[] PARAMS = new TClass[]{TBoolean.TYPE, TObject.class};
+    private static final Class[] PARAMS = new Class[]{Boolean.TYPE, Object.class };
 
     public TCRLExtensions() {
     }
