@@ -36,6 +36,7 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.security.cert.TCertPath;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.sun.security.pkcs.TContentInfo;
 import org.teavm.classlib.sun.security.pkcs.TPKCS7;
 import org.teavm.classlib.sun.security.pkcs.TSignerInfo;
@@ -238,7 +239,7 @@ public class TX509CertPath extends TCertPath {
         return getEncodingsStatic();
     }
 
-    public List<X509Certificate> getCertificates() {
+    public TList<TX509Certificate> getCertificates() {
         return this.certs;
     }
 

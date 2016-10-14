@@ -26,6 +26,8 @@ import java.security.cert.CertificateFactory;
 import java.util.Iterator;
 import java.util.List;
 
+import org.teavm.classlib.java.util.TList;
+
 public abstract class TCertPath implements Serializable {
 
     private static final long serialVersionUID = 6068470306649138683L;
@@ -95,7 +97,7 @@ public abstract class TCertPath implements Serializable {
         if (! otherCP.getType().equals(type))
             return false;
 
-        List<? extends Certificate> thisCertList = this.getCertificates();
+        TList<? extends TCertificate> thisCertList = this.getCertificates();
         List<? extends Certificate> otherCertList = otherCP.getCertificates();
         return(thisCertList.equals(otherCertList));
     }
@@ -180,7 +182,7 @@ public abstract class TCertPath implements Serializable {
      * @return an immutable {@code List} of {@code Certificate}s
      *         (may be empty, but not null)
      */
-    public abstract List<? extends Certificate> getCertificates();
+    public abstract TList<? extends TCertificate> getCertificates();
 
     /**
      * Replaces the {@code CertPath} to be serialized with a

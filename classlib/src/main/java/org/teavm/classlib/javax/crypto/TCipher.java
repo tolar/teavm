@@ -49,8 +49,11 @@ import javax.crypto.NoSuchPaddingException;
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.nio.TByteBuffer;
+import org.teavm.classlib.java.security.TAlgorithmParameters;
 import org.teavm.classlib.java.security.TKey;
 import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.java.security.TSecureRandom;
+import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 import org.teavm.classlib.java.util.TArrayList;
 import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TList;
@@ -332,22 +335,11 @@ public class TCipher {
             Object var1 = this.lock;
             synchronized(this.lock) {
                 if(this.spi == null) {
-                    if(debug != null) {
-                        int var2 = --warnCount;
-                        if(var2 >= 0) {
-                            debug.println("TCipher.init() not first method called, disabling delayed provider selection");
-                            if(var2 == 0) {
-                                debug.println("Further warnings of this type will be suppressed");
-                            }
-
-                            (new Exception("Call trace")).printStackTrace();
-                        }
-                    }
 
                     Exception var10 = null;
 
                     while(true) {
-                        Provider.Service var3;
+                        TProvider.Service var3;
                         TCipherSpi var4;
                         TCipher.Transform var5;
                         do {
@@ -368,7 +360,7 @@ public class TCipher {
                                         this.firstService = null;
                                         this.firstSpi = null;
                                     } else {
-                                        var3 = (Provider.Service)this.serviceIterator.next();
+                                        var3 = (TProvider.Service)this.serviceIterator.next();
                                         var4 = null;
                                     }
                                 } while(!TJceSecurity.canUseProvider(var3.getProvider()));
@@ -404,7 +396,7 @@ public class TCipher {
         }
     }
 
-    private void implInit(TCipherSpi var1, int var2, int var3, Key var4, AlgorithmParameterSpec var5, AlgorithmParameters var6, SecureRandom var7) throws
+    private void implInit(TCipherSpi var1, int var2, int var3, TKey var4, TAlgorithmParameterSpec var5, TAlgorithmParameters var6, TSecureRandom var7) throws
             InvalidKeyException, InvalidAlgorithmParameterException {
         switch(var2) {
             case 1:
@@ -567,7 +559,7 @@ public class TCipher {
         }
     }
 
-    private void checkCryptoPerm(TCipherSpi var1, Key var2, AlgorithmParameters var3) throws InvalidKeyException, InvalidAlgorithmParameterException {
+    private void checkCryptoPerm(TCipherSpi var1, TKey var2, TAlgorithmParameters var3) throws InvalidKeyException, InvalidAlgorithmParameterException {
         if(this.cryptoPerm != TCryptoAllPermission.INSTANCE) {
             AlgorithmParameterSpec var4;
             try {
@@ -915,11 +907,11 @@ public class TCipher {
         }
     }
 
-    private AlgorithmParameterSpec getAlgorithmParameterSpec(AlgorithmParameters var1) throws InvalidParameterSpecException {
+    private AlgorithmParameterSpec getAlgorithmParameterSpec(TAlgorithmParameters var1) throws InvalidParameterSpecException {
         if(var1 == null) {
             return null;
         } else {
-            String var2 = var1.getAlgorithm().toUpperCase(Locale.ENGLISH);
+            TString var2 = var1.getAlgorithm().toUpperCase(Locale.ENGLISH);
             return var2.equalsIgnoreCase("RC2")?var1.getParameterSpec(RC2ParameterSpec.class):(var2.equalsIgnoreCase("RC5")?var1.getParameterSpec(RC5ParameterSpec.class):(var2.startsWith("PBE")?var1.getParameterSpec(PBEParameterSpec.class):(var2.startsWith("DES")?var1.getParameterSpec(IvParameterSpec.class):null)));
         }
     }
