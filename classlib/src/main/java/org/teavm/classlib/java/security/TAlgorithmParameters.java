@@ -97,8 +97,8 @@ public class TAlgorithmParameters {
     public static TAlgorithmParameters getInstance(TString algorithm)
             throws NoSuchAlgorithmException {
         try {
-            Object[] objs = TSecurity.getImpl(algorithm, "TAlgorithmParameters",
-                    (String)null);
+            Object[] objs = TSecurity.getImpl(algorithm, TString.wrap("TAlgorithmParameters"),
+                    (TString)null);
             return new TAlgorithmParameters((TAlgorithmParametersSpi)objs[0],
                     (TProvider)objs[1],
                     algorithm);
