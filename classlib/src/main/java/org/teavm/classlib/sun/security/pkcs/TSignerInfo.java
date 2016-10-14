@@ -16,11 +16,7 @@
 package org.teavm.classlib.sun.security.pkcs;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.Signature;
 import java.security.SignatureException;
 import java.security.Timestamp;
 import java.security.cert.CertPath;
@@ -34,8 +30,11 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TMessageDigest;
 import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.TSignature;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.timestamp.TTimestampToken;
@@ -46,6 +45,7 @@ import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 import org.teavm.classlib.sun.security.x509.TAlgorithmId;
+import org.teavm.classlib.sun.security.x509.TKeyUsageExtension;
 import org.teavm.classlib.sun.security.x509.TX500Name;
 
 
@@ -226,15 +226,15 @@ public class TSignerInfo implements TDerEncoder {
                 var5 = this.authenticatedAttributes.getDerEncoding();
             }
 
-            String var18 = this.getDigestEncryptionAlgorithmId().getName();
-            String var19 = TAlgorithmId.getEncAlgFromSigAlg(var18);
+            TString var18 = this.getDigestEncryptionAlgorithmId().getName();
+            TString var19 = TAlgorithmId.getEncAlgFromSigAlg(var18);
             if(var19 != null) {
                 var18 = var19;
             }
 
-            String var20 = TAlgorithmId.makeSigAlg(var4, var18);
-            Signature var21 = Signature.getInstance(var20);
-            X509Certificate var22 = this.getCertificate(var1);
+            TString var20 = TAlgorithmId.makeSigAlg(var4, var18);
+            TSignature var21 = TSignature.getInstance(var20);
+            TX509Certificate var22 = this.getCertificate(var1);
             if(var22 == null) {
                 return null;
             } else if(var22.hasUnsupportedCriticalExtension()) {
@@ -242,21 +242,21 @@ public class TSignerInfo implements TDerEncoder {
             } else {
                 boolean[] var11 = var22.getKeyUsage();
                 if(var11 != null) {
-                    KeyUsageExtension var12;
+                    TKeyUsageExtension var12;
                     try {
-                        var12 = new KeyUsageExtension(var11);
+                        var12 = new TKeyUsageExtension(var11);
                     } catch (IOException var15) {
                         throw new SignatureException("Failed to parse keyUsage extension");
                     }
 
-                    boolean var13 = var12.get("digital_signature").booleanValue();
-                    boolean var14 = var12.get("non_repudiation").booleanValue();
+                    boolean var13 = var12.get(TString.wrap("digital_signature")).booleanValue();
+                    boolean var14 = var12.get(TString.wrap("non_repudiation")).booleanValue();
                     if(!var13 && !var14) {
                         throw new SignatureException("Key usage restricted: cannot be used for digital signatures");
                     }
                 }
 
-                PublicKey var23 = var22.getPublicKey();
+                TPublicKey var23 = var22.getPublicKey();
                 var21.initVerify(var23);
                 var21.update(var5);
                 if(var21.verify(this.encryptedDigest)) {
@@ -267,7 +267,7 @@ public class TSignerInfo implements TDerEncoder {
             }
         } catch (IOException var16) {
             throw new SignatureException("IO error verifying signature:\n" + var16.getMessage());
-        } catch (InvalidKeyException var17) {
+        } catch (TInvalidKeyException var17) {
             throw new SignatureException("InvalidKey: " + var17.getMessage());
         }
     }
@@ -338,7 +338,7 @@ public class TSignerInfo implements TDerEncoder {
     }
 
     private void verifyTimestamp(TTimestampToken var1) throws NoSuchAlgorithmException, SignatureException {
-        MessageDigest var2 = MessageDigest.getInstance(var1.getHashAlgorithm().getName());
+        TMessageDigest var2 = TMessageDigest.getInstance(var1.getHashAlgorithm().getName());
         if(!Arrays.equals(var1.getHashedMessage(), var2.digest(this.encryptedDigest))) {
             throw new SignatureException("Signature timestamp (#" + var1.getSerialNumber() + ") generated on " + var1.getDate() + " is inapplicable");
         }

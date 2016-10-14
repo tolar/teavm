@@ -220,7 +220,7 @@ public class TAlgorithmId implements TDerEncoder {
         }
     }
 
-    public static TAlgorithmId get(String var0) throws TNoSuchAlgorithmException {
+    public static TAlgorithmId get(TString var0) throws TNoSuchAlgorithmException {
         TObjectIdentifier var1;
         try {
             var1 = algOID(var0);
@@ -235,45 +235,45 @@ public class TAlgorithmId implements TDerEncoder {
         }
     }
 
-    private static TObjectIdentifier algOID(String var0) throws TIOException {
+    private static TObjectIdentifier algOID(TString var0) throws TIOException {
         if(var0.indexOf(46) != -1) {
-            return var0.startsWith("OID.")?new TObjectIdentifier(TString.wrap(var0.substring("OID.".length()))):new TObjectIdentifier(TString.wrap(var0));
-        } else if(var0.equalsIgnoreCase("MD5")) {
+            return var0.startsWith(TString.wrap("OID."))?new TObjectIdentifier(var0.substring("OID.".length())):new TObjectIdentifier(var0);
+        } else if(var0.equalsIgnoreCase(TString.wrap("MD5"))) {
             return MD5_oid;
-        } else if(var0.equalsIgnoreCase("MD2")) {
+        } else if(var0.equalsIgnoreCase(TString.wrap("MD2"))) {
             return MD2_oid;
-        } else if(!var0.equalsIgnoreCase("SHA") && !var0.equalsIgnoreCase("SHA1") && !var0.equalsIgnoreCase("SHA-1")) {
-            if(!var0.equalsIgnoreCase("SHA-256") && !var0.equalsIgnoreCase("SHA256")) {
-                if(!var0.equalsIgnoreCase("SHA-384") && !var0.equalsIgnoreCase("SHA384")) {
-                    if(!var0.equalsIgnoreCase("SHA-512") && !var0.equalsIgnoreCase("SHA512")) {
-                        if(!var0.equalsIgnoreCase("SHA-224") && !var0.equalsIgnoreCase("SHA224")) {
-                            if(var0.equalsIgnoreCase("RSA")) {
+        } else if(!var0.equalsIgnoreCase(TString.wrap("SHA")) && !var0.equalsIgnoreCase(TString.wrap("SHA1")) && !var0.equalsIgnoreCase(TString.wrap("SHA-1"))) {
+            if(!var0.equalsIgnoreCase(TString.wrap("SHA-256")) && !var0.equalsIgnoreCase(TString.wrap("SHA256"))) {
+                if(!var0.equalsIgnoreCase(TString.wrap("SHA-384")) && !var0.equalsIgnoreCase(TString.wrap("SHA384"))) {
+                    if(!var0.equalsIgnoreCase(TString.wrap("SHA-512")) && !var0.equalsIgnoreCase(TString.wrap("SHA512"))) {
+                        if(!var0.equalsIgnoreCase(TString.wrap("SHA-224")) && !var0.equalsIgnoreCase(TString.wrap("SHA224"))) {
+                            if(var0.equalsIgnoreCase(TString.wrap("RSA"))) {
                                 return RSAEncryption_oid;
-                            } else if(!var0.equalsIgnoreCase("Diffie-Hellman") && !var0.equalsIgnoreCase("DH")) {
-                                if(var0.equalsIgnoreCase("DSA")) {
+                            } else if(!var0.equalsIgnoreCase(TString.wrap("Diffie-Hellman")) && !var0.equalsIgnoreCase(TString.wrap("DH"))) {
+                                if(var0.equalsIgnoreCase(TString.wrap("DSA"))) {
                                     return DSA_oid;
-                                } else if(var0.equalsIgnoreCase("EC")) {
+                                } else if(var0.equalsIgnoreCase(TString.wrap("EC"))) {
                                     return EC_oid;
-                                } else if(var0.equalsIgnoreCase("ECDH")) {
+                                } else if(var0.equalsIgnoreCase(TString.wrap("ECDH"))) {
                                     return ECDH_oid;
-                                } else if(var0.equalsIgnoreCase("AES")) {
+                                } else if(var0.equalsIgnoreCase(TString.wrap("AES"))) {
                                     return AES_oid;
-                                } else if(!var0.equalsIgnoreCase("MD5withRSA") && !var0.equalsIgnoreCase("MD5/RSA")) {
-                                    if(!var0.equalsIgnoreCase("MD2withRSA") && !var0.equalsIgnoreCase("MD2/RSA")) {
-                                        if(!var0.equalsIgnoreCase("SHAwithDSA") && !var0.equalsIgnoreCase("SHA1withDSA") && !var0.equalsIgnoreCase("SHA/DSA") && !var0.equalsIgnoreCase("SHA1/DSA") && !var0.equalsIgnoreCase("DSAWithSHA1") && !var0.equalsIgnoreCase("DSS") && !var0.equalsIgnoreCase("SHA-1/DSA")) {
-                                            if(var0.equalsIgnoreCase("SHA224WithDSA")) {
+                                } else if(!var0.equalsIgnoreCase(TString.wrap("MD5withRSA")) && !var0.equalsIgnoreCase(TString.wrap("MD5/RSA"))) {
+                                    if(!var0.equalsIgnoreCase(TString.wrap("MD2withRSA")) && !var0.equalsIgnoreCase(TString.wrap("MD2/RSA"))) {
+                                        if(!var0.equalsIgnoreCase(TString.wrap("SHAwithDSA")) && !var0.equalsIgnoreCase(TString.wrap("SHA1withDSA")) && !var0.equalsIgnoreCase(TString.wrap("SHA/DSA")) && !var0.equalsIgnoreCase(TString.wrap("SHA1/DSA")) && !var0.equalsIgnoreCase(TString.wrap("DSAWithSHA1")) && !var0.equalsIgnoreCase(TString.wrap("DSS")) && !var0.equalsIgnoreCase(TString.wrap("SHA-1/DSA"))) {
+                                            if(var0.equalsIgnoreCase(TString.wrap("SHA224WithDSA"))) {
                                                 return sha224WithDSA_oid;
-                                            } else if(var0.equalsIgnoreCase("SHA256WithDSA")) {
+                                            } else if(var0.equalsIgnoreCase(TString.wrap("SHA256WithDSA"))) {
                                                 return sha256WithDSA_oid;
-                                            } else if(!var0.equalsIgnoreCase("SHA1WithRSA") && !var0.equalsIgnoreCase("SHA1/RSA")) {
-                                                if(!var0.equalsIgnoreCase("SHA1withECDSA") && !var0.equalsIgnoreCase("ECDSA")) {
-                                                    if(var0.equalsIgnoreCase("SHA224withECDSA")) {
+                                            } else if(!var0.equalsIgnoreCase(TString.wrap("SHA1WithRSA")) && !var0.equalsIgnoreCase(TString.wrap("SHA1/RSA"))) {
+                                                if(!var0.equalsIgnoreCase(TString.wrap("SHA1withECDSA")) && !var0.equalsIgnoreCase(TString.wrap("ECDSA"))) {
+                                                    if(var0.equalsIgnoreCase(TString.wrap("SHA224withECDSA"))) {
                                                         return sha224WithECDSA_oid;
-                                                    } else if(var0.equalsIgnoreCase("SHA256withECDSA")) {
+                                                    } else if(var0.equalsIgnoreCase(TString.wrap("SHA256withECDSA"))) {
                                                         return sha256WithECDSA_oid;
-                                                    } else if(var0.equalsIgnoreCase("SHA384withECDSA")) {
+                                                    } else if(var0.equalsIgnoreCase(TString.wrap("SHA384withECDSA"))) {
                                                         return sha384WithECDSA_oid;
-                                                    } else if(var0.equalsIgnoreCase("SHA512withECDSA")) {
+                                                    } else if(var0.equalsIgnoreCase(TString.wrap("SHA512withECDSA"))) {
                                                         return sha512WithECDSA_oid;
                                                     } else {
                                                         if(!initOidTable) {
@@ -419,29 +419,29 @@ public class TAlgorithmId implements TDerEncoder {
         return this.algid;
     }
 
-    public static String getEncAlgFromSigAlg(String var0) {
+    public static TString getEncAlgFromSigAlg(TString var0) {
         var0 = var0.toUpperCase(Locale.ENGLISH);
-        int var1 = var0.indexOf("WITH");
-        String var2 = null;
+        int var1 = var0.indexOf(TString.wrap("WITH"));
+        TString var2 = null;
         if(var1 > 0) {
-            int var3 = var0.indexOf("AND", var1 + 4);
+            int var3 = var0.indexOf(TString.wrap("AND"), var1 + 4);
             if(var3 > 0) {
                 var2 = var0.substring(var1 + 4, var3);
             } else {
                 var2 = var0.substring(var1 + 4);
             }
 
-            if(var2.equalsIgnoreCase("ECDSA")) {
-                var2 = "EC";
+            if(var2.equalsIgnoreCase(TString.wrap("ECDSA"))) {
+                var2 = TString.wrap("EC");
             }
         }
 
         return var2;
     }
 
-    public static String getDigAlgFromSigAlg(String var0) {
+    public static TString getDigAlgFromSigAlg(TString var0) {
         var0 = var0.toUpperCase(Locale.ENGLISH);
-        int var1 = var0.indexOf("WITH");
+        int var1 = var0.indexOf(TString.wrap("WITH"));
         return var1 > 0?var0.substring(0, var1):null;
     }
 }

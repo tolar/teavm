@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
@@ -52,7 +51,10 @@ import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.nio.TByteBuffer;
 import org.teavm.classlib.java.security.TKey;
 import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.java.util.TArrayList;
 import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TList;
+import org.teavm.classlib.java.util.TStringTokenizer;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
 import org.teavm.classlib.sun.security.jca.TServiceId;
 
@@ -64,7 +66,7 @@ public class TCipher {
     public static final int PUBLIC_KEY = 1;
     public static final int PRIVATE_KEY = 2;
     public static final int SECRET_KEY = 3;
-    private Provider provider;
+    private TProvider provider;
     private TCipherSpi spi;
     private String transformation;
     private TCryptoPermission cryptoPerm;
@@ -88,7 +90,7 @@ public class TCipher {
     private static final int I_PARAMS = 3;
     private static final int I_CERT = 4;
 
-    protected TCipher(TCipherSpi var1, Provider var2, String var3) {
+    protected TCipher(TCipherSpi var1, TProvider var2, String var3) {
         if(!TJceSecurityManager.INSTANCE.isCallerTrusted()) {
             throw new NullPointerException();
         } else {
@@ -116,17 +118,17 @@ public class TCipher {
         this.lock = new Object();
     }
 
-    private static String[] tokenizeTransformation(TString var0) throws NoSuchAlgorithmException {
+    private static TString[] tokenizeTransformation(TString var0) throws NoSuchAlgorithmException {
         if(var0 == null) {
             throw new NoSuchAlgorithmException("No transformation given");
         } else {
-            String[] var1 = new String[3];
+            TString[] var1 = new TString[3];
             int var2 = 0;
-            StringTokenizer var3 = new StringTokenizer(var0.toString(), "/");
+            TStringTokenizer var3 = new TStringTokenizer(var0.toString(), "/");
 
             try {
                 while(var3.hasMoreTokens() && var2 < 3) {
-                    var1[var2++] = var3.nextToken().trim();
+                    var1[var2++] = TString.wrap(var3.nextToken().trim());
                 }
 
                 if(var2 == 0 || var2 == 2 || var3.hasMoreTokens()) {
@@ -145,10 +147,10 @@ public class TCipher {
     }
 
     private static List<TCipher.Transform> getTransforms(TString var0) throws NoSuchAlgorithmException {
-        String[] var1 = tokenizeTransformation(var0);
-        String var2 = var1[0];
-        String var3 = var1[1];
-        String var4 = var1[2];
+        TString[] var1 = tokenizeTransformation(var0);
+        TString var2 = var1[0];
+        TString var3 = var1[1];
+        TString var4 = var1[2];
         if(var3 != null && var3.length() == 0) {
             var3 = null;
         }
@@ -158,20 +160,20 @@ public class TCipher {
         }
 
         if(var3 == null && var4 == null) {
-            TCipher.Transform var6 = new TCipher.Transform(var2, "", (String)null, (String)null);
+            TCipher.Transform var6 = new TCipher.Transform(var2, TString.wrap(""), (TString)null, (TString)null);
             return Collections.singletonList(var6);
         } else {
             ArrayList var5 = new ArrayList(4);
-            var5.add(new TCipher.Transform(var2, "/" + var3 + "/" + var4, (String)null, (String)null));
-            var5.add(new TCipher.Transform(var2, "/" + var3, (String)null, var4));
-            var5.add(new TCipher.Transform(var2, "//" + var4, var3, (String)null));
-            var5.add(new TCipher.Transform(var2, "", var3, var4));
+            var5.add(new TCipher.Transform(var2, TString.wrap("/" + var3 + "/" + var4), (TString)null, (TString)null));
+            var5.add(new TCipher.Transform(var2, TString.wrap("/" + var3), (TString)null, var4));
+            var5.add(new TCipher.Transform(var2, TString.wrap("//" + var4), var3, (TString)null));
+            var5.add(new TCipher.Transform(var2, TString.wrap(""), var3, var4));
             return var5;
         }
     }
 
     private static TCipher.Transform getTransform(TProvider.Service var0, List<TCipher.Transform> var1) {
-        String var2 = var0.getAlgorithm().toUpperCase(Locale.ENGLISH);
+        TString var2 = TString.wrap(var0.getAlgorithm().toUpperCase(Locale.ENGLISH));
         Iterator var3 = var1.iterator();
 
         TCipher.Transform var4;
@@ -189,16 +191,16 @@ public class TCipher {
     public static final TCipher getInstance(TString var0) throws NoSuchAlgorithmException,
             TNoSuchPaddingException {
         List var1 = getTransforms(var0);
-        ArrayList var2 = new ArrayList(var1.size());
+        TArrayList var2 = new TArrayList(var1.size());
         Iterator var3 = var1.iterator();
 
         while(var3.hasNext()) {
             TCipher.Transform var4 = (TCipher.Transform)var3.next();
-            var2.add(new TServiceId("TCipher", var4.transform));
+            var2.add(new TServiceId(TString.wrap("TCipher"), var4.transform));
         }
 
-        List var11 = TGetInstance.getServices(var2);
-        Iterator var12 = var11.iterator();
+        TList var11 = TGetInstance.getServices(var2);
+        TIterator var12 = var11.iterator();
         Exception var5 = null;
 
         while(true) {
@@ -262,7 +264,7 @@ public class TCipher {
             while(true) {
                 while(true) {
                     TCipher.Transform var7;
-                    Provider.Service var8;
+                    TProvider.Service var8;
                     do {
                         do {
                             if(!var6.hasNext()) {
@@ -540,7 +542,7 @@ public class TCipher {
         return this.exmech;
     }
 
-    private void checkCryptoPerm(TCipherSpi var1, Key var2) throws InvalidKeyException {
+    private void checkCryptoPerm(TCipherSpi var1, TKey var2) throws InvalidKeyException {
         if(this.cryptoPerm != TCryptoAllPermission.INSTANCE) {
             AlgorithmParameterSpec var3;
             try {
@@ -555,7 +557,7 @@ public class TCipher {
         }
     }
 
-    private void checkCryptoPerm(TCipherSpi var1, Key var2, AlgorithmParameterSpec var3) throws InvalidKeyException, InvalidAlgorithmParameterException {
+    private void checkCryptoPerm(TCipherSpi var1, TKey var2, AlgorithmParameterSpec var3) throws InvalidKeyException, InvalidAlgorithmParameterException {
         if(this.cryptoPerm != TCryptoAllPermission.INSTANCE) {
             if(!this.passCryptoPermCheck(var1, var2, (AlgorithmParameterSpec)null)) {
                 throw new InvalidKeyException("Illegal key size");
@@ -578,8 +580,8 @@ public class TCipher {
         }
     }
 
-    private boolean passCryptoPermCheck(TCipherSpi var1, Key var2, AlgorithmParameterSpec var3) throws InvalidKeyException {
-        String var4 = this.cryptoPerm.getExemptionMechanism();
+    private boolean passCryptoPermCheck(TCipherSpi var1, TKey var2, AlgorithmParameterSpec var3) throws InvalidKeyException {
+        TString var4 = this.cryptoPerm.getExemptionMechanism();
         int var5 = var1.engineGetKeySize(var2);
         int var7 = this.transformation.indexOf(47);
         String var6;
@@ -630,11 +632,11 @@ public class TCipher {
         }
     }
 
-    public final void init(int var1, Key var2) throws InvalidKeyException {
+    public final void init(int var1, TKey var2) throws InvalidKeyException {
         this.init(var1, var2, TJceSecurity.RANDOM);
     }
 
-    public final void init(int var1, Key var2, SecureRandom var3) throws InvalidKeyException {
+    public final void init(int var1, TKey var2, SecureRandom var3) throws InvalidKeyException {
         this.initialized = false;
         checkOpmode(var1);
         if(this.spi != null) {

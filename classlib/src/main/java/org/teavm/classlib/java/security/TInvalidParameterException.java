@@ -16,6 +16,29 @@
 package org.teavm.classlib.java.security;
 
 import org.teavm.classlib.java.lang.TIllegalArgumentException;
+import org.teavm.classlib.java.lang.TString;
 
 public class TInvalidParameterException extends TIllegalArgumentException {
+
+    private static final long serialVersionUID = -857968536935667808L;
+
+    /**
+     * Constructs an InvalidParameterException with no detail message.
+     * A detail message is a String that describes this particular
+     * exception.
+     */
+    public TInvalidParameterException() {
+        super();
+    }
+
+    /**
+     * Constructs an InvalidParameterException with the specified
+     * detail message.  A detail message is a String that describes
+     * this particular exception.
+     *
+     * @param msg the detail message.
+     */
+    public TInvalidParameterException(TString msg) {
+        super(msg);
+    }
 }

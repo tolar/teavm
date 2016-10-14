@@ -15,14 +15,9 @@
  */
 package org.teavm.classlib.sun.security.provider;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
-import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -33,8 +28,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.teavm.classlib.java.io.TByteArrayInputStream;
+import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.io.TPushbackInputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCRL;
 import org.teavm.classlib.java.security.cert.TCRLException;
@@ -83,12 +80,12 @@ public class TX509Factory extends TCertificateFactorySpi {
                     throw new TIOException(TString.wrap("Empty input"));
                 }
             } catch (TIOException var4) {
-                throw new TCertificateException("Could not parse certificate: " + var4.toString(), var4);
+                throw new TCertificateException(TString.wrap("Could not parse certificate: " + var4.toString()), var4);
             }
         }
     }
 
-    private static int readFully(TInputStream var0, ByteArrayOutputStream var1, int var2) throws IOException {
+    private static int readFully(TInputStream var0, TByteArrayOutputStream var1, int var2) throws TIOException {
         int var3 = 0;
 
         int var5;
@@ -175,7 +172,7 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    public TCertPath engineGenerateCertPath(InputStream var1) throws CertificateException {
+    public TCertPath engineGenerateCertPath(TInputStream var1) throws CertificateException {
         if(var1 == null) {
             throw new CertificateException("Missing input stream");
         } else {
@@ -186,20 +183,20 @@ public class TX509Factory extends TCertificateFactorySpi {
                 } else {
                     throw new TIOException(TString.wrap("Empty input"));
                 }
-            } catch (IOException var3) {
+            } catch (TIOException var3) {
                 throw new CertificateException(var3.getMessage());
             }
         }
     }
 
-    public CertPath engineGenerateCertPath(InputStream var1, String var2) throws CertificateException {
+    public TCertPath engineGenerateCertPath(TInputStream var1, String var2) throws CertificateException {
         if(var1 == null) {
             throw new CertificateException("Missing input stream");
         } else {
             try {
                 byte[] var3 = readOneBlock(var1);
                 if(var3 != null) {
-                    return new X509CertPath(new ByteArrayInputStream(var3), var2);
+                    return new TX509CertPath(new TByteArrayInputStream(var3), var2);
                 } else {
                     throw new IOException("Empty input");
                 }
@@ -209,7 +206,7 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    public CertPath engineGenerateCertPath(List<? extends Certificate> var1) throws CertificateException {
+    public TCertPath engineGenerateCertPath(List<? extends Certificate> var1) throws CertificateException {
         return new TX509CertPath(var1);
     }
 
@@ -246,15 +243,15 @@ public class TX509Factory extends TCertificateFactorySpi {
                         return var3;
                     }
                 } else {
-                    throw new IOException("Empty input");
+                    throw new TIOException(TString.wrap("Empty input"));
                 }
-            } catch (IOException var4) {
-                throw new CRLException(var4.getMessage());
+            } catch (TIOException var4) {
+                throw new TCRLException(TString.wrap(var4.getMessage()));
             }
         }
     }
 
-    public Collection<? extends CRL> engineGenerateCRLs(InputStream var1) throws CRLException {
+    public Collection<? extends CRL> engineGenerateCRLs(TInputStream var1) throws CRLException {
         if(var1 == null) {
             throw new CRLException("Missing input stream");
         } else {
@@ -266,8 +263,8 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    private Collection<? extends Certificate> parseX509orPKCS7Cert(InputStream var1) throws CertificateException, IOException {
-        PushbackInputStream var4 = new PushbackInputStream(var1);
+    private Collection<? extends Certificate> parseX509orPKCS7Cert(TInputStream var1) throws CertificateException, IOException {
+        TPushbackInputStream var4 = new TPushbackInputStream(var1);
         ArrayList var5 = new ArrayList();
         int var2 = var4.read();
         if(var2 == -1) {
@@ -294,8 +291,8 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    private Collection<? extends CRL> parseX509orPKCS7CRL(InputStream var1) throws CRLException, IOException {
-        PushbackInputStream var4 = new PushbackInputStream(var1);
+    private Collection<? extends CRL> parseX509orPKCS7CRL(TInputStream var1) throws CRLException, IOException {
+        TPushbackInputStream var4 = new TPushbackInputStream(var1);
         ArrayList var5 = new ArrayList();
         int var2 = var4.read();
         if(var2 == -1) {
@@ -327,7 +324,7 @@ public class TX509Factory extends TCertificateFactorySpi {
         if(var1 == -1) {
             return null;
         } else if(var1 == 48) {
-            ByteArrayOutputStream var10 = new ByteArrayOutputStream(2048);
+            TByteArrayOutputStream var10 = new TByteArrayOutputStream(2048);
             var10.write(var1);
             readBERInternal(var0, var10, var1);
             return var10.toByteArray();
@@ -358,7 +355,7 @@ public class TX509Factory extends TCertificateFactorySpi {
             while(true) {
                 var8 = var0.read();
                 if(var8 == -1) {
-                    throw new IOException("Incomplete data");
+                    throw new TIOException(TString.wrap("Incomplete data"));
                 }
 
                 if(var8 == 10) {
@@ -369,7 +366,7 @@ public class TX509Factory extends TCertificateFactorySpi {
                 if(var8 == 13) {
                     var8 = var0.read();
                     if(var8 == -1) {
-                        throw new IOException("Incomplete data");
+                        throw new TIOException(TString.wrap("Incomplete data"));
                     }
 
                     if(var8 == 10) {
@@ -387,7 +384,7 @@ public class TX509Factory extends TCertificateFactorySpi {
             while(true) {
                 var8 = var0.read();
                 if(var8 == -1) {
-                    throw new IOException("Incomplete data");
+                    throw new TIOException(TString.wrap("Incomplete data"));
                 }
 
                 if(var8 == 45) {
@@ -414,31 +411,31 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    private static void checkHeaderFooter(String var0, String var1) throws IOException {
+    private static void checkHeaderFooter(String var0, String var1) throws TIOException {
         if(var0.length() >= 16 && var0.startsWith("-----BEGIN ") && var0.endsWith("-----")) {
             if(var1.length() >= 14 && var1.startsWith("-----END ") && var1.endsWith("-----")) {
                 String var2 = var0.substring(11, var0.length() - 5);
                 String var3 = var1.substring(9, var1.length() - 5);
                 if(!var2.equals(var3)) {
-                    throw new IOException("Header and footer do not match: " + var0 + " " + var1);
+                    throw new TIOException(TString.wrap("Header and footer do not match: " + var0 + " " + var1));
                 }
             } else {
-                throw new IOException("Illegal footer: " + var1);
+                throw new TIOException(TString.wrap("Illegal footer: " + var1));
             }
         } else {
-            throw new IOException("Illegal header: " + var0);
+            throw new TIOException(TString.wrap("Illegal header: " + var0));
         }
     }
 
-    private static int readBERInternal(TInputStream var0, ByteArrayOutputStream var1, int var2) throws IOException {
+    private static int readBERInternal(TInputStream var0, TByteArrayOutputStream var1, int var2) throws TIOException {
         if(var2 == -1) {
             var2 = var0.read();
             if(var2 == -1) {
-                throw new IOException("BER/DER tag info absent");
+                throw new TIOException(TString.wrap("BER/DER tag info absent"));
             }
 
             if((var2 & 31) == 31) {
-                throw new IOException("Multi octets tag not supported");
+                throw new TIOException(TString.wrap("Multi octets tag not supported"));
             }
 
             var1.write(var2);
@@ -446,13 +443,13 @@ public class TX509Factory extends TCertificateFactorySpi {
 
         int var3 = var0.read();
         if(var3 == -1) {
-            throw new IOException("BER/DER length info absent");
+            throw new TIOException(TString.wrap("BER/DER length info absent"));
         } else {
             var1.write(var3);
             int var5;
             if(var3 == 128) {
                 if((var2 & 32) != 32) {
-                    throw new IOException("Non constructed encoding must have definite length");
+                    throw new TIOException(TString.wrap("Non constructed encoding must have definite length"));
                 }
 
                 do {
@@ -465,7 +462,7 @@ public class TX509Factory extends TCertificateFactorySpi {
                 } else if(var3 == 129) {
                     var4 = var0.read();
                     if(var4 == -1) {
-                        throw new IOException("Incomplete BER/DER length info");
+                        throw new TIOException(TString.wrap("Incomplete BER/DER length info"));
                     }
 
                     var1.write(var4);
@@ -475,7 +472,7 @@ public class TX509Factory extends TCertificateFactorySpi {
                         var5 = var0.read();
                         var6 = var0.read();
                         if(var6 == -1) {
-                            throw new IOException("Incomplete BER/DER length info");
+                            throw new TIOException(TString.wrap("Incomplete BER/DER length info"));
                         }
 
                         var1.write(var5);
@@ -488,7 +485,7 @@ public class TX509Factory extends TCertificateFactorySpi {
                             var6 = var0.read();
                             var7 = var0.read();
                             if(var7 == -1) {
-                                throw new IOException("Incomplete BER/DER length info");
+                                throw new TIOException(TString.wrap("Incomplete BER/DER length info"));
                             }
 
                             var1.write(var5);
@@ -497,7 +494,7 @@ public class TX509Factory extends TCertificateFactorySpi {
                             var4 = var5 << 16 | var6 << 8 | var7;
                         } else {
                             if(var3 != 132) {
-                                throw new IOException("Invalid BER/DER data (too huge?)");
+                                throw new TIOException(TString.wrap("Invalid BER/DER data (too huge?)"));
                             }
 
                             var5 = var0.read();
@@ -505,11 +502,11 @@ public class TX509Factory extends TCertificateFactorySpi {
                             var7 = var0.read();
                             int var8 = var0.read();
                             if(var8 == -1) {
-                                throw new IOException("Incomplete BER/DER length info");
+                                throw new TIOException(TString.wrap("Incomplete BER/DER length info"));
                             }
 
                             if(var5 > 127) {
-                                throw new IOException("Invalid BER/DER data (a little huge?)");
+                                throw new TIOException(TString.wrap("Invalid BER/DER data (a little huge?)"));
                             }
 
                             var1.write(var5);
@@ -522,7 +519,7 @@ public class TX509Factory extends TCertificateFactorySpi {
                 }
 
                 if(readFully(var0, var1, var4) != var4) {
-                    throw new IOException("Incomplete BER/DER data");
+                    throw new TIOException(TString.wrap("Incomplete BER/DER data"));
                 }
             }
 

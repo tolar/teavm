@@ -15,11 +15,13 @@
  */
 package org.teavm.classlib.sun.security.jca;
 
-public final class TServiceId {
-    public final String type;
-    public final String algorithm;
+import org.teavm.classlib.java.lang.TString;
 
-    public TServiceId(String var1, String var2) {
+public final class TServiceId {
+    public final TString type;
+    public final TString algorithm;
+
+    public TServiceId(TString var1, TString var2) {
         this.type = var1;
         this.algorithm = var2;
     }

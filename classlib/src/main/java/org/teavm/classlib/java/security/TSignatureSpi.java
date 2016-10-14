@@ -20,10 +20,10 @@ import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
 import java.security.ProviderException;
 import java.security.SignatureException;
-import java.security.spec.AlgorithmParameterSpec;
 
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.nio.TByteBuffer;
+import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 import org.teavm.classlib.sun.security.jca.TJCAUtil;
 
 public abstract class TSignatureSpi {
@@ -296,8 +296,8 @@ public abstract class TSignatureSpi {
      * overridden by a provider and the given parameters
      * are inappropriate for this signature engine
      */
-    protected void engineSetParameter(AlgorithmParameterSpec params)
-            throws InvalidAlgorithmParameterException {
+    protected void engineSetParameter(TAlgorithmParameterSpec params)
+            throws TInvalidAlgorithmParameterException {
         throw new UnsupportedOperationException();
     }
 
@@ -346,7 +346,7 @@ public abstract class TSignatureSpi {
      * @deprecated
      */
     @Deprecated
-    protected abstract Object engineGetParameter(String param)
+    protected abstract Object engineGetParameter(TString param)
             throws InvalidParameterException;
 
     /**

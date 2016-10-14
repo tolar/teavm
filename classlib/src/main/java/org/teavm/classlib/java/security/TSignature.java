@@ -16,7 +16,6 @@
 package org.teavm.classlib.java.security;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.Provider;
 import java.util.Arrays;
 import java.util.List;
@@ -587,7 +586,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @param param the string identifier of the parameter.
      * @param value the parameter value.
      *
-     * @exception InvalidParameterException if {@code param} is an
+     * @exception TInvalidParameterException if {@code param} is an
      * invalid parameter for this signature algorithm engine,
      * the parameter is already set
      * and cannot be set again, a security exception occurs, and so on.
@@ -653,7 +652,7 @@ public abstract class TSignature extends TSignatureSpi {
      * @return the object that represents the parameter value, or null if
      * there is none.
      *
-     * @exception InvalidParameterException if {@code param} is an invalid
+     * @exception TInvalidParameterException if {@code param} is an invalid
      * parameter for this engine, or another exception occurs while
      * trying to get this parameter.
      *
@@ -1011,9 +1010,9 @@ public abstract class TSignature extends TSignatureSpi {
             }
         }
 
-        protected void engineInitSign(PrivateKey privateKey)
+        protected void engineInitSign(TPrivateKey privateKey)
                 throws TInvalidKeyException {
-            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+            cipher.init(TCipher.ENCRYPT_MODE, privateKey);
             data = null;
         }
 
@@ -1044,9 +1043,9 @@ public abstract class TSignature extends TSignatureSpi {
             try {
                 return cipher.doFinal();
             } catch (TIllegalBlockSizeException e) {
-                throw new TSignatureException(TString.wrap("doFinal() failed"), e);
+                throw new TSignatureException(TString.wrap("doFinal() failed"));
             } catch (TBadPaddingException e) {
-                throw new TSignatureException(TString.wrap("doFinal() failed"), e);
+                throw new TSignatureException(TString.wrap("doFinal() failed"));
             }
         }
 
@@ -1062,18 +1061,18 @@ public abstract class TSignature extends TSignatureSpi {
                 // return false rather than throwing exception
                 return false;
             } catch (TIllegalBlockSizeException e) {
-                throw new TSignatureException("doFinal() failed", e);
+                throw new TSignatureException(TString.wrap("doFinal() failed"));
             }
         }
 
         protected void engineSetParameter(String param, Object value)
                 throws TInvalidParameterException {
-            throw new TInvalidParameterException("Parameters not supported");
+            throw new TInvalidParameterException(TString.wrap("Parameters not supported"));
         }
 
         protected Object engineGetParameter(String param)
                 throws TInvalidParameterException {
-            throw new TInvalidParameterException("Parameters not supported");
+            throw new TInvalidParameterException(TString.wrap("Parameters not supported"));
         }
 
     }

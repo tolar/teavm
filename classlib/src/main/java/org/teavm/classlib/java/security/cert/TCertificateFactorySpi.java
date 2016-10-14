@@ -137,7 +137,7 @@ public abstract class TCertificateFactorySpi {
      * @exception UnsupportedOperationException if the method is not supported
      * @since 1.4
      */
-    public CertPath
+    public TCertPath
     engineGenerateCertPath(List<? extends Certificate> certificates)
             throws CertificateException
     {
@@ -207,7 +207,7 @@ public abstract class TCertificateFactorySpi {
      * @exception CertificateException on parsing errors.
      */
     public abstract Collection<? extends Certificate>
-    engineGenerateCertificates(InputStream inStream)
+    engineGenerateCertificates(TInputStream inStream)
             throws CertificateException;
 
     /**
@@ -276,5 +276,5 @@ public abstract class TCertificateFactorySpi {
      * @exception CRLException on parsing errors.
      */
     public abstract Collection<? extends CRL> engineGenerateCRLs
-    (InputStream inStream) throws CRLException;
+    (TInputStream inStream) throws CRLException;
 }

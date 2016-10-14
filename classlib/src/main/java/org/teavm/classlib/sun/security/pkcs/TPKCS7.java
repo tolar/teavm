@@ -21,9 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
-import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -455,7 +453,7 @@ public class TPKCS7  {
                     try {
                         byte[] var8 = var7.getEncoded();
                         var11.add(new TX509CRLImpl(var8));
-                    } catch (CRLException var9) {
+                    } catch (TCRLException var9) {
                         throw new IOException(var9);
                     }
                 }
@@ -608,7 +606,7 @@ public class TPKCS7  {
         return this.oldStyle;
     }
 
-    public static byte[] generateSignedData(byte[] var0, TX509Certificate[] var1, byte[] var2, String var3, URI var4, TString var5) throws CertificateException, IOException, NoSuchAlgorithmException {
+    public static byte[] generateSignedData(byte[] var0, TX509Certificate[] var1, byte[] var2, TString var3, URI var4, TString var5) throws CertificateException, IOException, NoSuchAlgorithmException {
         TPKCS9Attributes var6 = null;
         if(var4 != null) {
             THttpTimestamper var7 = new THttpTimestamper(var4);
@@ -618,8 +616,8 @@ public class TPKCS7  {
 
         TX500Name var17 = TX500Name.asX500Name(var1[0].getIssuerX500Principal());
         TBigInteger var18 = var1[0].getSerialNumber();
-        String var9 = TAlgorithmId.getEncAlgFromSigAlg(var3);
-        String var10 = TAlgorithmId.getDigAlgFromSigAlg(var3);
+        TString var9 = TAlgorithmId.getEncAlgFromSigAlg(var3);
+        TString var10 = TAlgorithmId.getDigAlgFromSigAlg(var3);
         TSignerInfo var11 = new TSignerInfo(var17, var18, TAlgorithmId.get(var10), (TPKCS9Attributes)null, TAlgorithmId.get(var9), var0, var6);
         TSignerInfo[] var12 = new TSignerInfo[]{var11};
         TAlgorithmId[] var13 = new TAlgorithmId[]{var11.getDigestAlgorithmId()};
@@ -673,7 +671,7 @@ public class TPKCS7  {
 
                     for(int var13 = 0; var13 < var12; ++var13) {
                         TSignerInfo var14 = var11[var13];
-                        X509Certificate var15 = var14.getCertificate(var8);
+                        TX509Certificate var15 = var14.getCertificate(var8);
                         if(var15 == null) {
                             throw new CertificateException("Certificate not included in timestamp token");
                         }
