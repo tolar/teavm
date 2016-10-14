@@ -105,8 +105,8 @@ public class TPolicyMappingsExtension extends TExtension implements TCertAttrSet
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("map")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("map"))) {
             if(!(var2 instanceof List)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type List."));
             } else {
@@ -118,16 +118,16 @@ public class TPolicyMappingsExtension extends TExtension implements TCertAttrSet
         }
     }
 
-    public List<TCertificatePolicyMap> get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("map")) {
+    public List<TCertificatePolicyMap> get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("map"))) {
             return this.maps;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:PolicyMappingsExtension."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("map")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("map"))) {
             this.maps = null;
             this.encodeThis();
         } else {

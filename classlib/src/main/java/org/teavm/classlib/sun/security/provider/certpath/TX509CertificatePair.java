@@ -16,12 +16,12 @@
 package org.teavm.classlib.sun.security.provider.certpath;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.interfaces.DSAPublicKey;
 
+import org.teavm.classlib.java.security.TGeneralSecurityException;
+import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.provider.TX509Factory;
@@ -191,7 +191,7 @@ public class TX509CertificatePair {
             TX500Principal var4 = this.reverse.getIssuerX500Principal();
             if(var2.equals(var3) && var4.equals(var1)) {
                 try {
-                    PublicKey var5 = this.reverse.getPublicKey();
+                    TPublicKey var5 = this.reverse.getPublicKey();
                     if(!(var5 instanceof DSAPublicKey) || ((DSAPublicKey)var5).getParams() != null) {
                         this.forward.verify(var5);
                     }
@@ -201,7 +201,7 @@ public class TX509CertificatePair {
                         this.reverse.verify(var5);
                     }
 
-                } catch (GeneralSecurityException var6) {
+                } catch (TGeneralSecurityException var6) {
                     throw new CertificateException("invalid signature: " + var6.getMessage());
                 }
             } else {

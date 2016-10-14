@@ -24,8 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Principal;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
@@ -39,7 +37,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -68,6 +65,8 @@ import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TCertificateParsingException;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
@@ -232,7 +231,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
 
     public void verify(TPublicKey var1) throws TCertificateException, TNoSuchAlgorithmException, TInvalidKeyException,
             TNoSuchProviderException, TSignatureException {
-        this.verify(var1, "");
+        this.verify(var1, TString.wrap(""));
     }
 
     public synchronized void verify(TPublicKey var1, TString var2) throws TCertificateException, TNoSuchAlgorithmException, TInvalidKeyException, TNoSuchProviderException, TSignatureException {
@@ -283,12 +282,12 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
             this.verificationResult = var3.verify(this.signature);
             this.verifiedPublicKey = var1;
             if(!this.verificationResult) {
-                throw new SignatureException("Signature does not match.");
+                throw new TSignatureException(TString.wrap("Signature does not match."));
             }
         }
     }
 
-    public static void verify(X509Certificate var0, PublicKey var1, Provider var2) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public static void verify(TX509Certificate var0, TPublicKey var1, TProvider var2) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         var0.verify(var1, var2);
     }
 
@@ -328,11 +327,11 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
     }
 
     public void checkValidity() throws CertificateExpiredException, CertificateNotYetValidException {
-        Date var1 = new Date();
+        TDate var1 = new TDate();
         this.checkValidity(var1);
     }
 
-    public void checkValidity(Date var1) throws CertificateExpiredException, CertificateNotYetValidException {
+    public void checkValidity(TDate var1) throws CertificateExpiredException, CertificateNotYetValidException {
         TCertificateValidity var2 = null;
 
         try {
@@ -446,7 +445,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         }
     }
 
-    public Enumeration<String> getElements() {
+    public TEnumeration<String> getElements() {
         TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("x509.info");
         var1.addElement("x509.algorithm");
@@ -608,7 +607,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         return this.signature == null?null:(byte[])this.signature.clone();
     }
 
-    public String getSigAlgName() {
+    public TString getSigAlgName() {
         return this.algId == null?null:this.algId.getName();
     }
 
@@ -952,7 +951,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
 
     public static List<String> getExtendedKeyUsage(TX509Certificate var0) throws CertificateParsingException {
         try {
-            byte[] var1 = var0.getExtensionValue("2.5.29.37");
+            byte[] var1 = var0.getExtensionValue(TString.wrap("2.5.29.37"));
             if(var1 == null) {
                 return null;
             } else {
@@ -973,7 +972,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
                 return -1;
             } else {
                 TBasicConstraintsExtension var2 = (TBasicConstraintsExtension)this.get(var1);
-                return var2 == null?-1:(((Boolean)var2.get("is_ca")).booleanValue()?((Integer)var2.get("path_len")).intValue():-1);
+                return var2 == null?-1:(((Boolean)var2.get(TString.wrap("is_ca"))).booleanValue()?((Integer)var2.get(TString.wrap("path_len"))).intValue():-1);
             }
         } catch (Exception var3) {
             return -1;
@@ -1133,9 +1132,9 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         }
     }
 
-    public static Collection<List<?>> getIssuerAlternativeNames(X509Certificate var0) throws CertificateParsingException {
+    public static Collection<List<?>> getIssuerAlternativeNames(TX509Certificate var0) throws CertificateParsingException {
         try {
-            byte[] var1 = var0.getExtensionValue("2.5.29.18");
+            byte[] var1 = var0.getExtensionValue(TString.wrap("2.5.29.18"));
             if(var1 == null) {
                 return null;
             } else {
@@ -1263,8 +1262,8 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
     }
 
     public String getFingerprint(String var1) {
-        return (String)this.fingerprints.computeIfAbsent(var1, (var1) -> {
-            return this.getCertificateFingerPrint(var1);
+        return (String)this.fingerprints.computeIfAbsent(var1, (var2) -> {
+            return this.getCertificateFingerPrint(var2);
         });
     }
 

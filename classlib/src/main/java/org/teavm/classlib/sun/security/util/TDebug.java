@@ -15,15 +15,15 @@
  */
 package org.teavm.classlib.sun.security.util;
 
-import java.security.AccessController;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.teavm.classlib.java.math.TBigInteger;
 
 public class TDebug {
     private String prefix;
-    private static String args = (String) AccessController.doPrivileged(new GetPropertyAction("java.security.debug"));
+    //private static String args = (String) AccessController.doPrivileged(new TGetPropertyAction(TString.wrap("java.security.debug")));
     private static final char[] hexDigits;
 
     public TDebug() {
@@ -96,7 +96,7 @@ public class TDebug {
     }
 
     public static boolean isOn(String var0) {
-        return args == null?false:(args.indexOf("all") != -1?true:args.indexOf(var0) != -1);
+        return false;
     }
 
     public void println(String var1) {
@@ -205,20 +205,6 @@ public class TDebug {
     }
 
     static {
-        String var0 = (String)AccessController.doPrivileged(new GetPropertyAction("java.security.auth.debug"));
-        if(args == null) {
-            args = var0;
-        } else if(var0 != null) {
-            args = args + "," + var0;
-        }
-
-        if(args != null) {
-            args = marshal(args);
-            if(args.equals("help")) {
-                Help();
-            }
-        }
-
         hexDigits = "0123456789abcdef".toCharArray();
     }
 }

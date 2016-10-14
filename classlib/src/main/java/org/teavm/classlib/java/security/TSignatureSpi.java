@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.java.security;
 
-import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
@@ -24,6 +23,7 @@ import java.security.SignatureException;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.nio.TByteBuffer;
 import org.teavm.classlib.sun.security.jca.TJCAUtil;
 
 public abstract class TSignatureSpi {
@@ -89,7 +89,7 @@ public abstract class TSignatureSpi {
      * @exception SignatureException if the engine is not initialized
      * properly.
      */
-    protected abstract void engineUpdate(byte b) throws SignatureException;
+    protected abstract void engineUpdate(byte b) throws TSignatureException;
 
     /**
      * Updates the data to be signed or verified, using the
@@ -115,7 +115,7 @@ public abstract class TSignatureSpi {
      * @param input the ByteBuffer
      * @since 1.5
      */
-    protected void engineUpdate(ByteBuffer input) {
+    protected void engineUpdate(TByteBuffer input) {
         if (input.hasRemaining() == false) {
             return;
         }
@@ -137,7 +137,7 @@ public abstract class TSignatureSpi {
                     len -= chunk;
                 }
             }
-        } catch (SignatureException e) {
+        } catch (TSignatureException e) {
             // is specified to only occur when the engine is not initialized
             // this case should never occur as it is caught in Signature.java
             throw new ProviderException("update() failed", e);

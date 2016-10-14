@@ -16,10 +16,10 @@
 package org.teavm.classlib.sun.security.pkcs;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Hashtable;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerEncoder;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -50,11 +50,11 @@ public class TPKCS9Attributes {
         this.derEncoding = this.decode(var2);
     }
 
-    public TPKCS9Attributes(TDerInputStream var1) throws IOException {
+    public TPKCS9Attributes(TDerInputStream var1) throws TIOException {
         this(var1, false);
     }
 
-    public TPKCS9Attributes(TDerInputStream var1, boolean var2) throws IOException {
+    public TPKCS9Attributes(TDerInputStream var1, boolean var2) throws TIOException {
         this.attributes = new Hashtable(3);
         this.ignoreUnsupportedAttributes = false;
         this.ignoreUnsupportedAttributes = var2;
@@ -79,7 +79,7 @@ public class TPKCS9Attributes {
         this.permittedAttributes = null;
     }
 
-    private byte[] decode(TDerInputStream var1) throws IOException {
+    private byte[] decode(TDerInputStream var1) throws TIOException {
         TDerValue var2 = var1.getDerValue();
         byte[] var3 = var2.toByteArray();
         var3[0] = 49;
@@ -115,12 +115,12 @@ public class TPKCS9Attributes {
         return var8?var3:this.generateDerEncoding();
     }
 
-    public void encode(byte var1, OutputStream var2) throws IOException {
+    public void encode(byte var1, TOutputStream var2) throws TIOException {
         var2.write(var1);
         var2.write(this.derEncoding, 1, this.derEncoding.length - 1);
     }
 
-    private byte[] generateDerEncoding() throws IOException {
+    private byte[] generateDerEncoding() throws TIOException {
         TDerOutputStream var1 = new TDerOutputStream();
         Object[] var2 = this.attributes.values().toArray();
         var1.putOrderedSetOf((byte)49, castToDerEncoder(var2));

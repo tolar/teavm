@@ -141,13 +141,13 @@ public class TIssuingDistributionPointExtension extends TExtension implements TC
 
     public void set(TString var1, Object var2) throws TIOException {
         if(var1.equalsIgnoreCase(TString.wrap("point"))) {
-            if(!(var2 instanceof DistributionPointName)) {
+            if(!(var2 instanceof TDistributionPointName)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type DistributionPointName."));
             }
 
             this.distributionPoint = (TDistributionPointName)var2;
         } else if(var1.equalsIgnoreCase(TString.wrap("reasons"))) {
-            if(!(var2 instanceof ReasonFlags)) {
+            if(!(var2 instanceof TReasonFlags)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type ReasonFlags."));
             }
 

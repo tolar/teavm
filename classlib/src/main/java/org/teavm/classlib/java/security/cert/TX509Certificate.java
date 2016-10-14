@@ -18,8 +18,6 @@ package org.teavm.classlib.java.security.cert;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
-import java.security.Provider;
-import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -30,8 +28,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.security.TInvalidKeyException;
+import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.TSignatureException;
+import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
@@ -95,7 +100,7 @@ public abstract class TX509Certificate extends TCertificate
      *
      * @see #checkValidity()
      */
-    public abstract void checkValidity(Date date)
+    public abstract void checkValidity(TDate date)
             throws CertificateExpiredException, CertificateNotYetValidException;
 
     /**
@@ -303,7 +308,7 @@ public abstract class TX509Certificate extends TCertificate
      *
      * @return the signature algorithm name.
      */
-    public abstract String getSigAlgName();
+    public abstract TString getSigAlgName();
 
     /**
      * Gets the signature algorithm OID string from the certificate.
@@ -580,7 +585,7 @@ public abstract class TX509Certificate extends TCertificate
      */
     public Collection<List<?>> getIssuerAlternativeNames()
             throws CertificateParsingException {
-        return X509CertImpl.getIssuerAlternativeNames(this);
+        return TX509CertImpl.getIssuerAlternativeNames(this);
     }
 
     /**
@@ -606,9 +611,9 @@ public abstract class TX509Certificate extends TCertificate
      * @exception UnsupportedOperationException if the method is not supported
      * @since 1.8
      */
-    public void verify(PublicKey key, Provider sigProvider)
-            throws CertificateException, NoSuchAlgorithmException,
-            InvalidKeyException, SignatureException {
-        X509CertImpl.verify(this, key, sigProvider);
+    public void verify(TPublicKey key, TProvider sigProvider)
+            throws TCertificateException, TNoSuchAlgorithmException,
+            TInvalidKeyException, TSignatureException {
+        TX509CertImpl.verify(this, key, sigProvider);
     }
 }

@@ -179,8 +179,8 @@ public class TCertificateFactory {
     public static final TCertificateFactory getInstance(String type,
             Provider provider) throws CertificateException {
         try {
-            GetInstance.Instance instance = GetInstance.getInstance("CertificateFactory",
-                    CertificateFactorySpi.class, type, provider);
+            TGetInstance.Instance instance = TGetInstance.getInstance("TCertificateFactory",
+                    TCertificateFactorySpi.class, type, provider);
             return new TCertificateFactory((CertificateFactorySpi)instance.impl,
                     instance.provider, type);
         } catch (NoSuchAlgorithmException e) {

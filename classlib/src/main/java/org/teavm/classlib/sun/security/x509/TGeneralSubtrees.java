@@ -190,7 +190,7 @@ public class TGeneralSubtrees implements Cloneable {
                     var2 = new TGeneralName(new TX400Address((byte[])null));
                     break;
                 case 4:
-                    var2 = new TGeneralName(new TX500Name(""));
+                    var2 = new TGeneralName(new TX500Name(TString.wrap("")));
                     break;
                 case 5:
                     var2 = new TGeneralName(new TEDIPartyName(TString.wrap("")));

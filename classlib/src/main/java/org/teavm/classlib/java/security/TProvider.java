@@ -16,19 +16,25 @@
 package org.teavm.classlib.java.security;
 
 import static java.util.Locale.ENGLISH;
+
 import java.lang.ref.Reference;
 import java.security.InvalidParameterException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TArrayList;
+import org.teavm.classlib.java.util.TCollections;
+import org.teavm.classlib.java.util.THashMap;
+import org.teavm.classlib.java.util.TList;
+import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.java.util.TProperties;
 
 /**
@@ -100,14 +106,14 @@ public abstract class TProvider extends TProperties {
     private final static String ALIAS_PREFIX_LOWER = "alg.alias.";
     private final static int ALIAS_LENGTH = ALIAS_PREFIX.length();
 
-    private String[] getTypeAndAlgorithm(String key) {
+    private TString[] getTypeAndAlgorithm(String key) {
         int i = key.indexOf(".");
         if (i < 1) {
             return null;
         }
         String type = key.substring(0, i);
         String alg = key.substring(i + 1);
-        return new String[] {type, alg};
+        return new TString[] {TString.wrap(type), TString.wrap(alg)};
     }
 
     private void parseLegacyPut(String name, String value) {
@@ -116,12 +122,12 @@ public abstract class TProvider extends TProperties {
             // aliasKey ~ MessageDigest.SHA
             String stdAlg = value;
             String aliasKey = name.substring(ALIAS_LENGTH);
-            String[] typeAndAlg = getTypeAndAlgorithm(aliasKey);
+            TString[] typeAndAlg = getTypeAndAlgorithm(aliasKey);
             if (typeAndAlg == null) {
                 return;
             }
             TString type = getEngineName(TString.wrap(typeAndAlg[0]));
-            String aliasAlg = typeAndAlg[1].intern();
+            TString aliasAlg = typeAndAlg[1].intern();
             TProvider.ServiceKey key = new TProvider.ServiceKey(type, TString.wrap(stdAlg), true);
             TProvider.Service s = legacyMap.get(key);
             if (s == null) {
@@ -295,10 +301,10 @@ public abstract class TProvider extends TProperties {
 
     // Wrapped String that behaves in a case insensitive way for equals/hashCode
     private static class UString {
-        final String string;
-        final String lowerString;
+        final TString string;
+        final TString lowerString;
 
-        UString(String s) {
+        UString(TString s) {
             this.string = s;
             this.lowerString = s.toLowerCase(ENGLISH);
         }
@@ -319,7 +325,7 @@ public abstract class TProvider extends TProperties {
         }
 
         public String toString() {
-            return string;
+            return string.toString();
         }
     }
 
@@ -328,8 +334,8 @@ public abstract class TProvider extends TProperties {
 
         private TString type, algorithm, className;
         private final TProvider provider;
-        private List<String> aliases;
-        private Map<TProvider.UString,String> attributes;
+        private TList<TString> aliases;
+        private TMap<UString,TString> attributes;
 
         // Reference to the cached implementation Class object
         private volatile Reference<Class<?>> classRef;
@@ -356,24 +362,24 @@ public abstract class TProvider extends TProperties {
 
         private Service(TProvider provider) {
             this.provider = provider;
-            aliases = Collections.<String>emptyList();
-            attributes = Collections.<TProvider.UString,String>emptyMap();
+            aliases = TCollections.<TString>emptyList();
+            attributes = TCollections.<TProvider.UString,TString>emptyMap();
         }
 
         private boolean isValid() {
             return (type != null) && (algorithm != null) && (className != null);
         }
 
-        private void addAlias(String alias) {
+        private void addAlias(TString alias) {
             if (aliases.isEmpty()) {
-                aliases = new ArrayList<String>(2);
+                aliases = new TArrayList<TString>(2);
             }
             aliases.add(alias);
         }
 
-        void addAttribute(String type, String value) {
+        void addAttribute(TString type, TString value) {
             if (attributes.isEmpty()) {
-                attributes = new HashMap<TProvider.UString,String>(8);
+                attributes = new THashMap<UString,TString>(8);
             }
             attributes.put(new TProvider.UString(type), value);
         }
@@ -393,7 +399,7 @@ public abstract class TProvider extends TProperties {
          * className is null
          */
         public Service(TProvider provider, String type, String algorithm,
-                String className, List<String> aliases,
+                String className, List<TString> aliases,
                 Map<String,String> attributes) {
             if ((provider == null) || (type == null) ||
                     (algorithm == null) || (className == null)) {
@@ -404,12 +410,12 @@ public abstract class TProvider extends TProperties {
             this.algorithm = TString.wrap(algorithm);
             this.className = TString.wrap(className);
             if (aliases == null) {
-                this.aliases = Collections.<String>emptyList();
+                this.aliases = TCollections.<TString>emptyList();
             } else {
-                this.aliases = new ArrayList<String>(aliases);
+                this.aliases = new TArrayList<TString>(aliases);
             }
             if (attributes == null) {
-                this.attributes = Collections.<TProvider.UString,String>emptyMap();
+                this.attributes = TCollections.<TProvider.UString,TString>emptyMap();
             } else {
                 this.attributes = new HashMap<TProvider.UString,String>();
                 for (Map.Entry<String,String> entry : attributes.entrySet()) {
@@ -456,7 +462,7 @@ public abstract class TProvider extends TProperties {
         }
 
         // internal only
-        private final List<String> getAliases() {
+        private final TList<TString> getAliases() {
             return aliases;
         }
 
@@ -478,7 +484,7 @@ public abstract class TProvider extends TProperties {
          *
          * @throws NullPointerException if name is null
          */
-        public final String getAttribute(String name) {
+        public final TString getAttribute(TString name) {
             if (name == null) {
                 throw new NullPointerException();
             }
@@ -694,12 +700,12 @@ public abstract class TProvider extends TProperties {
             Boolean b = hasKeyAttributes;
             if (b == null) {
                 synchronized (this) {
-                    String s;
-                    s = getAttribute("SupportedKeyFormats");
+                    TString s;
+                    s = getAttribute(TString.wrap("SupportedKeyFormats"));
                     if (s != null) {
                         supportedFormats = s.split("\\|");
                     }
-                    s = getAttribute("SupportedKeyClasses");
+                    s = getAttribute(TString.wrap("SupportedKeyClasses"));
                     if (s != null) {
                         String[] classNames = s.split("\\|");
                         List<Class<?>> classList =
@@ -784,7 +790,7 @@ public abstract class TProvider extends TProperties {
 
     }
 
-    private TString getName() {
+    public TString getName() {
         return name;
     }
 

@@ -17,15 +17,14 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.cert.X509Certificate;
 import java.util.Iterator;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.pkcs.TPKCS9Attribute;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
@@ -165,15 +164,15 @@ public class TNameConstraintsExtension extends TExtension implements TCertAttrSe
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("permitted_subtrees")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("permitted_subtrees"))) {
             if(!(var2 instanceof TGeneralSubtrees)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type GeneralSubtrees."));
             }
 
             this.permitted = (TGeneralSubtrees)var2;
         } else {
-            if(!var1.equalsIgnoreCase("excluded_subtrees")) {
+            if(!var1.equalsIgnoreCase(TString.wrap("excluded_subtrees"))) {
                 throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:NameConstraintsExtension."));
             }
 
@@ -187,21 +186,21 @@ public class TNameConstraintsExtension extends TExtension implements TCertAttrSe
         this.encodeThis();
     }
 
-    public TGeneralSubtrees get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("permitted_subtrees")) {
+    public TGeneralSubtrees get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("permitted_subtrees"))) {
             return this.permitted;
-        } else if(var1.equalsIgnoreCase("excluded_subtrees")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("excluded_subtrees"))) {
             return this.excluded;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:NameConstraintsExtension."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("permitted_subtrees")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("permitted_subtrees"))) {
             this.permitted = null;
         } else {
-            if(!var1.equalsIgnoreCase("excluded_subtrees")) {
+            if(!var1.equalsIgnoreCase(TString.wrap("excluded_subtrees"))) {
                 throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:NameConstraintsExtension."));
             }
 
@@ -224,14 +223,14 @@ public class TNameConstraintsExtension extends TExtension implements TCertAttrSe
 
     public void merge(TNameConstraintsExtension var1) throws IOException {
         if(var1 != null) {
-            TGeneralSubtrees var2 = var1.get("excluded_subtrees");
+            TGeneralSubtrees var2 = var1.get(TString.wrap("excluded_subtrees"));
             if(this.excluded == null) {
                 this.excluded = var2 != null?(TGeneralSubtrees)var2.clone():null;
             } else if(var2 != null) {
                 this.excluded.union(var2);
             }
 
-            TGeneralSubtrees var3 = var1.get("permitted_subtrees");
+            TGeneralSubtrees var3 = var1.get(TString.wrap("permitted_subtrees"));
             if(this.permitted == null) {
                 this.permitted = var3 != null?(TGeneralSubtrees)var3.clone():null;
             } else if(var3 != null) {
@@ -253,7 +252,7 @@ public class TNameConstraintsExtension extends TExtension implements TCertAttrSe
         }
     }
 
-    public boolean verify(X509Certificate var1) throws IOException {
+    public boolean verify(TX509Certificate var1) throws IOException {
         if(var1 == null) {
             throw new IOException("Certificate is null");
         } else {
@@ -266,7 +265,7 @@ public class TNameConstraintsExtension extends TExtension implements TCertAttrSe
             } else if(this.hasMax) {
                 throw new IOException("Maximum BaseDistance in name constraints not supported");
             } else {
-                X500Principal var2 = var1.getSubjectX500Principal();
+                TX500Principal var2 = var1.getSubjectX500Principal();
                 TX500Name var3 = TX500Name.asX500Name(var2);
                 if(!var3.isEmpty() && !this.verify((TGeneralNameInterface)var3)) {
                     return false;

@@ -19,16 +19,18 @@ import java.security.DigestException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
+import org.teavm.classlib.java.lang.TString;
+
 public class TMessageDigest {
 
     protected TMessageDigest(String algorithm) {
     }
 
-    public static TMessageDigest getInstance(String algorithm) throws NoSuchAlgorithmException {
+    public static TMessageDigest getInstance(TString algorithm) throws NoSuchAlgorithmException {
         return null;
     }
 
-    public static TMessageDigest getInstance(String algorithm, String provider)
+    public static TMessageDigest getInstance(TString algorithm, TString provider)
             throws NoSuchAlgorithmException, NoSuchProviderException
     {
         return null;

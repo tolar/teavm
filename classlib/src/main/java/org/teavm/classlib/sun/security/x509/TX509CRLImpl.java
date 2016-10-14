@@ -100,7 +100,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         this.readOnly = false;
     }
 
-    public TX509CRLImpl(byte[] var1) throws CRLException {
+    public TX509CRLImpl(byte[] var1) throws TCRLException {
         this.signedCRL = null;
         this.signature = null;
         this.tbsCertList = null;
@@ -116,9 +116,9 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
         try {
             this.parse(new TDerValue(var1));
-        } catch (IOException var3) {
+        } catch (TIOException var3) {
             this.signedCRL = null;
-            throw new CRLException("Parsing error: " + var3.getMessage());
+            throw new TCRLException(TString.wrap("Parsing error: " + var3.getMessage()));
         }
     }
 
@@ -138,7 +138,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
         try {
             this.parse(var1);
-        } catch (IOException var3) {
+        } catch (TIOException var3) {
             this.signedCRL = null;
             throw new TCRLException(TString.wrap("Parsing error: " + var3.getMessage()));
         }
@@ -160,9 +160,9 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
         try {
             this.parse(new TDerValue(var1));
-        } catch (IOException var3) {
+        } catch (TIOException var3) {
             this.signedCRL = null;
-            throw new CRLException("Parsing error: " + var3.getMessage());
+            throw new TCRLException(TString.wrap("Parsing error: " + var3.getMessage()));
         }
     }
 
@@ -209,7 +209,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
 
                 try {
                     var6 = this.getCertIssuer(var8, var6);
-                } catch (IOException var10) {
+                } catch (TIOException var10) {
                     throw new CRLException(var10);
                 }
 
@@ -798,7 +798,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
                 }
             }
         } else {
-            throw new CRLException("Invalid DER-encoded CRL data");
+            throw new TCRLException(TString.wrap("Invalid DER-encoded CRL data"));
         }
     }
 
@@ -831,7 +831,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         return var0 instanceof TX509CRLImpl ?(TX509CRLImpl)var0: TX509Factory.intern(var0);
     }
 
-    private TX500Principal getCertIssuer(TX509CRLEntryImpl var1, TX500Principal var2) throws IOException {
+    private TX500Principal getCertIssuer(TX509CRLEntryImpl var1, TX500Principal var2) throws TIOException {
         TCertificateIssuerExtension var3 = var1.getCertificateIssuerExtension();
         if(var3 != null) {
             TGeneralNames var4 = var3.get(TString.wrap("issuer"));

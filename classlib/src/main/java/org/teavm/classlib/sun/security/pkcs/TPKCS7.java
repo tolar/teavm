@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.pkcs;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -522,7 +521,7 @@ public class TPKCS7  {
         return this.signerInfos;
     }
 
-    public TX509Certificate getCertificate(BigInteger var1, TX500Name var2) {
+    public TX509Certificate getCertificate(TBigInteger var1, TX500Name var2) {
         if(this.certificates != null) {
             if(this.certIssuerNames == null) {
                 this.populateCertIssuerNames();

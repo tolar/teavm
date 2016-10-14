@@ -23,6 +23,7 @@ import org.teavm.classlib.java.security.TPermissionCollection;
 import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 import org.teavm.classlib.javax.crypto.spec.TPBEParameterSpec;
 import org.teavm.classlib.javax.crypto.spec.TRC2ParameterSpec;
+import org.teavm.classlib.javax.crypto.spec.TRC5ParameterSpec;
 
 class TCryptoPermission extends TPermission {
     private static final long serialVersionUID = 8987399626114087514L;
@@ -178,7 +179,7 @@ class TCryptoPermission extends TPermission {
     }
 
     private boolean impliesParameterSpec(boolean var1, TAlgorithmParameterSpec var2) {
-        return this.checkParam && var1?(var2 == null?true:(this.algParamSpec == null?false:(this.algParamSpec.getClass() != var2.getClass()?false:(var2 instanceof TRC2ParameterSpec && ((RC2ParameterSpec)var2).getEffectiveKeyBits() <= ((RC2ParameterSpec)((RC2ParameterSpec)this.algParamSpec)).getEffectiveKeyBits()?true:(var2 instanceof RC5ParameterSpec && ((RC5ParameterSpec)var2).getRounds() <= ((RC5ParameterSpec)this.algParamSpec).getRounds()?true:(var2 instanceof PBEParameterSpec
+        return this.checkParam && var1?(var2 == null?true:(this.algParamSpec == null?false:(this.algParamSpec.getClass() != var2.getClass()?false:(var2 instanceof TRC2ParameterSpec && ((TRC2ParameterSpec)var2).getEffectiveKeyBits() <= ((TRC2ParameterSpec)((TRC2ParameterSpec)this.algParamSpec)).getEffectiveKeyBits()?true:(var2 instanceof TRC5ParameterSpec && ((TRC5ParameterSpec)var2).getRounds() <= ((TRC5ParameterSpec)this.algParamSpec).getRounds()?true:(var2 instanceof PBEParameterSpec
                 && ((TPBEParameterSpec)var2).getIterationCount() <= ((PBEParameterSpec)this.algParamSpec).getIterationCount()?true:this.algParamSpec.equals(var2))))))):!this.checkParam;
     }
 

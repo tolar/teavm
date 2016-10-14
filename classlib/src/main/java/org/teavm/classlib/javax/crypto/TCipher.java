@@ -48,6 +48,7 @@ import java.util.regex.Pattern;
 import javax.crypto.NoSuchPaddingException;
 
 import org.teavm.classlib.java.lang.TException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.nio.TByteBuffer;
 import org.teavm.classlib.java.security.TKey;
 import org.teavm.classlib.java.security.TProvider;
@@ -115,13 +116,13 @@ public class TCipher {
         this.lock = new Object();
     }
 
-    private static String[] tokenizeTransformation(String var0) throws NoSuchAlgorithmException {
+    private static String[] tokenizeTransformation(TString var0) throws NoSuchAlgorithmException {
         if(var0 == null) {
             throw new NoSuchAlgorithmException("No transformation given");
         } else {
             String[] var1 = new String[3];
             int var2 = 0;
-            StringTokenizer var3 = new StringTokenizer(var0, "/");
+            StringTokenizer var3 = new StringTokenizer(var0.toString(), "/");
 
             try {
                 while(var3.hasMoreTokens() && var2 < 3) {
@@ -143,7 +144,7 @@ public class TCipher {
         }
     }
 
-    private static List<TCipher.Transform> getTransforms(String var0) throws NoSuchAlgorithmException {
+    private static List<TCipher.Transform> getTransforms(TString var0) throws NoSuchAlgorithmException {
         String[] var1 = tokenizeTransformation(var0);
         String var2 = var1[0];
         String var3 = var1[1];
@@ -169,7 +170,7 @@ public class TCipher {
         }
     }
 
-    private static TCipher.Transform getTransform(Provider.Service var0, List<TCipher.Transform> var1) {
+    private static TCipher.Transform getTransform(TProvider.Service var0, List<TCipher.Transform> var1) {
         String var2 = var0.getAlgorithm().toUpperCase(Locale.ENGLISH);
         Iterator var3 = var1.iterator();
 
@@ -185,7 +186,7 @@ public class TCipher {
         return var4;
     }
 
-    public static final TCipher getInstance(String var0) throws NoSuchAlgorithmException,
+    public static final TCipher getInstance(TString var0) throws NoSuchAlgorithmException,
             TNoSuchPaddingException {
         List var1 = getTransforms(var0);
         ArrayList var2 = new ArrayList(var1.size());
@@ -201,7 +202,7 @@ public class TCipher {
         Exception var5 = null;
 
         while(true) {
-            Provider.Service var6;
+            TProvider.Service var6;
             TCipher.Transform var7;
             int var8;
             do {
@@ -211,7 +212,7 @@ public class TCipher {
                             throw new NoSuchAlgorithmException("Cannot find any provider supporting " + var0, var5);
                         }
 
-                        var6 = (Provider.Service)var12.next();
+                        var6 = (TProvider.Service)var12.next();
                     } while(!TJceSecurity.canUseProvider(var6.getProvider()));
 
                     var7 = getTransform(var6, var1);
@@ -248,7 +249,7 @@ public class TCipher {
         }
     }
 
-    public static final TCipher getInstance(String var0, Provider var1) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    public static final TCipher getInstance(TString var0, TProvider var1) throws NoSuchAlgorithmException, NoSuchPaddingException {
         if(var1 == null) {
             throw new IllegalArgumentException("Missing provider");
         } else {
@@ -277,7 +278,7 @@ public class TCipher {
                             }
 
                             var7 = (TCipher.Transform)var6.next();
-                            var8 = var1.getService("TCipher", var7.transform);
+                            var8 = var1.getService(TString.wrap("TCipher"), var7.transform);
                         } while(var8 == null);
 
                         if(!var4) {
@@ -960,7 +961,7 @@ public class TCipher {
         }
     }
 
-    public final void updateAAD(ByteBuffer var1) {
+    public final void updateAAD(TByteBuffer var1) {
         this.checkCipherState();
         if(var1 == null) {
             throw new IllegalArgumentException("src ByteBuffer is null");
@@ -973,14 +974,14 @@ public class TCipher {
     }
 
     private static class Transform {
-        final String transform;
-        final String suffix;
-        final String mode;
-        final String pad;
+        final TString transform;
+        final TString suffix;
+        final TString mode;
+        final TString pad;
         private static final ConcurrentMap<String, Pattern> patternCache = new ConcurrentHashMap();
 
-        Transform(String var1, String var2, String var3, String var4) {
-            this.transform = var1 + var2;
+        Transform(TString var1, TString var2, TString var3, TString var4) {
+            this.transform = TString.wrap(var1.toString() + var2.toString());
             this.suffix = var2.toUpperCase(Locale.ENGLISH);
             this.mode = var3;
             this.pad = var4;
@@ -997,7 +998,7 @@ public class TCipher {
 
         }
 
-        int supportsModePadding(Provider.Service var1) {
+        int supportsModePadding(TProvider.Service var1) {
             int var2 = this.supportsMode(var1);
             if(var2 == 0) {
                 return var2;
@@ -1007,19 +1008,19 @@ public class TCipher {
             }
         }
 
-        int supportsMode(Provider.Service var1) {
+        int supportsMode(TProvider.Service var1) {
             return supports(var1, "SupportedModes", this.mode);
         }
 
-        int supportsPadding(Provider.Service var1) {
+        int supportsPadding(TProvider.Service var1) {
             return supports(var1, "SupportedPaddings", this.pad);
         }
 
-        private static int supports(Provider.Service var0, String var1, String var2) {
+        private static int supports(TProvider.Service var0, TString var1, TString var2) {
             if(var2 == null) {
                 return 2;
             } else {
-                String var3 = var0.getAttribute(var1);
+                TString var3 = var0.getAttribute(var1);
                 return var3 == null?1:(matches(var3, var2)?2:0);
             }
         }

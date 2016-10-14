@@ -17,10 +17,10 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
@@ -119,15 +119,15 @@ public class TBasicConstraintsExtension extends TExtension implements TCertAttrS
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("is_ca")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("is_ca"))) {
             if(!(var2 instanceof Boolean)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type Boolean."));
             }
 
             this.ca = ((Boolean)var2).booleanValue();
         } else {
-            if(!var1.equalsIgnoreCase("path_len")) {
+            if(!var1.equalsIgnoreCase(TString.wrap("path_len"))) {
                 throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:BasicConstraints."));
             }
 
@@ -141,22 +141,22 @@ public class TBasicConstraintsExtension extends TExtension implements TCertAttrS
         this.encodeThis();
     }
 
-    public Object get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("is_ca")) {
+    public Object get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("is_ca"))) {
             return Boolean.valueOf(this.ca);
-        } else if(var1.equalsIgnoreCase("path_len")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("path_len"))) {
             return Integer.valueOf(this.pathLen);
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:BasicConstraints."));
         }
     }
 
-    public void delete(String var1) throws IOException {
-        if(var1.equalsIgnoreCase("is_ca")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("is_ca"))) {
             this.ca = false;
         } else {
-            if(!var1.equalsIgnoreCase("path_len")) {
-                throw new IOException("Attribute name not recognized by CertAttrSet:BasicConstraints.");
+            if(!var1.equalsIgnoreCase(TString.wrap("path_len"))) {
+                throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:BasicConstraints."));
             }
 
             this.pathLen = -1;
@@ -165,8 +165,8 @@ public class TBasicConstraintsExtension extends TExtension implements TCertAttrS
         this.encodeThis();
     }
 
-    public Enumeration<String> getElements() {
-        AttributeNameEnumeration var1 = new AttributeNameEnumeration();
+    public TEnumeration<String> getElements() {
+        TAttributeNameEnumeration var1 = new TAttributeNameEnumeration();
         var1.addElement("is_ca");
         var1.addElement("path_len");
         return var1.elements();

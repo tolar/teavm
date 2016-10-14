@@ -30,9 +30,9 @@ public abstract class TCipherSpi {
     public TCipherSpi() {
     }
 
-    protected abstract void engineSetMode(String var1) throws TNoSuchAlgorithmException;
+    protected abstract void engineSetMode(TString var1) throws TNoSuchAlgorithmException;
 
-    protected abstract void engineSetPadding(String var1) throws TNoSuchPaddingException;
+    protected abstract void engineSetPadding(TString var1) throws TNoSuchPaddingException;
 
     protected abstract int engineGetBlockSize();
 

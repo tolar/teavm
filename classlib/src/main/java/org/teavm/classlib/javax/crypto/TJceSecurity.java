@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
@@ -139,7 +140,7 @@ final class TJceSecurity {
         }
     }
 
-    static boolean canUseProvider(Provider var0) {
+    static boolean canUseProvider(TProvider var0) {
         return getVerificationResult(var0) == null;
     }
 

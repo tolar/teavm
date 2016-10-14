@@ -19,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +33,7 @@ import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 import org.teavm.classlib.java.util.THashMap;
 import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.javax.crypto.TBadPaddingException;
 import org.teavm.classlib.javax.crypto.TCipher;
@@ -110,13 +110,13 @@ public abstract class TSignature extends TSignatureSpi {
 
     public static TSignature getInstance(TString algorithm)
             throws TNoSuchAlgorithmException {
-        List<TProvider.Service> list;
+        TList<TProvider.Service> list;
         if (algorithm.equalsIgnoreCase(RSA_SIGNATURE)) {
             list = TGetInstance.getServices(rsaIds);
         } else {
             list = TGetInstance.getServices(TString.wrap("Signature"), algorithm);
         }
-        Iterator<TProvider.Service> t = list.iterator();
+        TIterator<TProvider.Service> t = list.iterator();
         if (t.hasNext() == false) {
             throw new TNoSuchAlgorithmException
                     (TString.wrap(algorithm + " Signature not available"));
@@ -264,7 +264,7 @@ public abstract class TSignature extends TSignatureSpi {
     private static TSignature getInstanceRSA(TProvider p)
             throws NoSuchAlgorithmException {
         // try Signature first
-        Provider.Service s = p.getService(TString.wrap("Signature"), RSA_SIGNATURE);
+        TProvider.Service s = p.getService(TString.wrap("Signature"), RSA_SIGNATURE);
         if (s != null) {
             TGetInstance.Instance instance = TGetInstance.getInstance(s, TSignatureSpi.class);
             return getInstance(instance, RSA_SIGNATURE);
@@ -348,18 +348,15 @@ public abstract class TSignature extends TSignatureSpi {
                 boolean[] keyUsageInfo = cert.getKeyUsage();
                 // keyUsageInfo[0] is for digitalSignature.
                 if ((keyUsageInfo != null) && (keyUsageInfo[0] == false))
-                    throw new TInvalidKeyException("Wrong key usage");
+                    throw new TInvalidKeyException(TString.wrap("Wrong key usage"));
             }
         }
 
-        PublicKey publicKey = certificate.getPublicKey();
+        TPublicKey publicKey = certificate.getPublicKey();
         engineInitVerify(publicKey);
         state = VERIFY;
 
-        if (!skipDebug && pdebug != null) {
-            pdebug.println("Signature." + algorithm +
-                    " verification algorithm from: " + this.provider.getName());
-        }
+
     }
 
     /**
@@ -465,66 +462,20 @@ public abstract class TSignature extends TSignatureSpi {
                     ("Output buffer too small for specified offset and length");
         }
         if (state != SIGN) {
-            throw new TSignatureException("object not initialized for " +
-                    "signing");
+            throw new TSignatureException(TString.wrap("object not initialized for " +
+                    "signing"));
         }
         return engineSign(outbuf, offset, len);
     }
 
-    /**
-     * Verifies the passed-in signature.
-     *
-     * <p>A call to this method resets this signature object to the state
-     * it was in when previously initialized for verification via a
-     * call to {@code initVerify(PublicKey)}. That is, the object is
-     * reset and available to verify another signature from the identity
-     * whose public key was specified in the call to {@code initVerify}.
-     *
-     * @param signature the signature bytes to be verified.
-     *
-     * @return true if the signature was verified, false if not.
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly, the passed-in signature is improperly
-     * encoded or of the wrong type, if this signature algorithm is unable to
-     * process the input data provided, etc.
-     */
     public final boolean verify(byte[] signature) throws TSignatureException {
         if (state == VERIFY) {
             return engineVerify(signature);
         }
-        throw new TSignatureException("object not initialized for " +
-                "verification");
+        throw new TSignatureException(TString.wrap("object not initialized for " +
+                "verification"));
     }
 
-    /**
-     * Verifies the passed-in signature in the specified array
-     * of bytes, starting at the specified offset.
-     *
-     * <p>A call to this method resets this signature object to the state
-     * it was in when previously initialized for verification via a
-     * call to {@code initVerify(PublicKey)}. That is, the object is
-     * reset and available to verify another signature from the identity
-     * whose public key was specified in the call to {@code initVerify}.
-     *
-     *
-     * @param signature the signature bytes to be verified.
-     * @param offset the offset to start from in the array of bytes.
-     * @param length the number of bytes to use, starting at offset.
-     *
-     * @return true if the signature was verified, false if not.
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly, the passed-in signature is improperly
-     * encoded or of the wrong type, if this signature algorithm is unable to
-     * process the input data provided, etc.
-     * @exception IllegalArgumentException if the {@code signature}
-     * byte array is null, or the {@code offset} or {@code length}
-     * is less than 0, or the sum of the {@code offset} and
-     * {@code length} is greater than the length of the
-     * {@code signature} byte array.
-     * @since 1.4
-     */
     public final boolean verify(byte[] signature, int offset, int length)
             throws TSignatureException {
         if (state == VERIFY) {
@@ -542,51 +493,23 @@ public abstract class TSignature extends TSignatureSpi {
 
             return engineVerify(signature, offset, length);
         }
-        throw new SignatureException("object not initialized for " +
-                "verification");
+        throw new TSignatureException(TString.wrap("object not initialized for " +
+                "verification"));
     }
 
-    /**
-     * Updates the data to be signed or verified by a byte.
-     *
-     * @param b the byte to use for the update.
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly.
-     */
     public final void update(byte b) throws TSignatureException {
         if (state == VERIFY || state == SIGN) {
             engineUpdate(b);
         } else {
-            throw new TSignatureException("object not initialized for "
-                    + "signature or verification");
+            throw new TSignatureException(TString.wrap("object not initialized for "
+                    + "signature or verification"));
         }
     }
 
-    /**
-     * Updates the data to be signed or verified, using the specified
-     * array of bytes.
-     *
-     * @param data the byte array to use for the update.
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly.
-     */
     public final void update(byte[] data) throws TSignatureException {
         update(data, 0, data.length);
     }
 
-    /**
-     * Updates the data to be signed or verified, using the specified
-     * array of bytes, starting at the specified offset.
-     *
-     * @param data the array of bytes.
-     * @param off the offset to start from in the array of bytes.
-     * @param len the number of bytes to use, starting at offset.
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly.
-     */
     public final void update(byte[] data, int off, int len)
             throws TSignatureException {
         if (state == SIGN || state == VERIFY) {
@@ -602,28 +525,15 @@ public abstract class TSignature extends TSignatureSpi {
             }
             engineUpdate(data, off, len);
         } else {
-            throw new TSignatureException("object not initialized for "
-                    + "signature or verification");
+            throw new TSignatureException(TString.wrap("object not initialized for "
+                    + "signature or verification"));
         }
     }
 
-    /**
-     * Updates the data to be signed or verified using the specified
-     * ByteBuffer. Processes the {@code data.remaining()} bytes
-     * starting at at {@code data.position()}.
-     * Upon return, the buffer's position will be equal to its limit;
-     * its limit will not have changed.
-     *
-     * @param data the ByteBuffer
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly.
-     * @since 1.5
-     */
     public final void update(TByteBuffer data) throws TSignatureException {
         if ((state != SIGN) && (state != VERIFY)) {
-            throw new TSignatureException("object not initialized for "
-                    + "signature or verification");
+            throw new TSignatureException(TString.wrap("object not initialized for "
+                    + "signature or verification"));
         }
         if (data == null) {
             throw new NullPointerException();
@@ -803,7 +713,7 @@ public abstract class TSignature extends TSignatureSpi {
 
         // remaining services to try in provider selection
         // null once provider is selected
-        private TIterator<Provider.Service> serviceIterator;
+        private TIterator<TProvider.Service> serviceIterator;
 
         // constructor
         Delegate(TSignatureSpi sigSpi, TString algorithm) {
@@ -814,7 +724,7 @@ public abstract class TSignature extends TSignatureSpi {
 
         // used with delayed provider selection
         Delegate(TProvider.Service service,
-                TIterator<Provider.Service> iterator, TString algorithm) {
+                TIterator<TProvider.Service> iterator, TString algorithm) {
             super(algorithm);
             this.firstService = service;
             this.serviceIterator = iterator;
@@ -845,7 +755,7 @@ public abstract class TSignature extends TSignatureSpi {
             }
         }
 
-        private static TSignatureSpi newInstance(Provider.Service s)
+        private static TSignatureSpi newInstance(TProvider.Service s)
                 throws NoSuchAlgorithmException {
             if (s.getType().equals("TCipher")) {
                 // must be NONEwithRSA

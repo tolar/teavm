@@ -18,19 +18,20 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TInvalidKeyException;
+import org.teavm.classlib.java.security.TKeyFactory;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.spec.TInvalidKeySpecException;
+import org.teavm.classlib.java.security.spec.TX509EncodedKeySpec;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.util.TBitArray;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -97,10 +98,10 @@ public class TX509Key implements TPublicKey {
     static TPublicKey buildX509Key(TAlgorithmId var0, TBitArray var1) throws TIOException, TInvalidKeyException {
         TDerOutputStream var2 = new TDerOutputStream();
         encode(var2, var0, var1);
-        X509EncodedKeySpec var3 = new X509EncodedKeySpec(var2.toByteArray());
+        TX509EncodedKeySpec var3 = new TX509EncodedKeySpec(var2.toByteArray());
 
         try {
-            KeyFactory var18 = KeyFactory.getInstance(var0.getName());
+            TKeyFactory var18 = TKeyFactory.getInstance(var0.getName());
             return var18.generatePublic(var3);
         } catch (NoSuchAlgorithmException var15) {
             String var4 = "";

@@ -131,8 +131,8 @@ public class TExtendedKeyUsageExtension extends TExtension implements TCertAttrS
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("usages")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("usages"))) {
             if(!(var2 instanceof Vector)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type Vector."));
             } else {
@@ -144,16 +144,16 @@ public class TExtendedKeyUsageExtension extends TExtension implements TCertAttrS
         }
     }
 
-    public Vector<TObjectIdentifier> get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("usages")) {
+    public Vector<TObjectIdentifier> get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("usages"))) {
             return this.keyUsages;
         } else {
             throw new TIOException(TString.wrap("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:ExtendedKeyUsageExtension."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("usages")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("usages"))) {
             this.keyUsages = null;
             this.encodeThis();
         } else {

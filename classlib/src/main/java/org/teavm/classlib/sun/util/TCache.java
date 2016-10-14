@@ -51,7 +51,7 @@ public abstract class TCache<K, V> {
     }
 
     public static <K, V> TCache<K, V> newNullCache() {
-        return TNullCache.INSTANCE;
+        return (TCache<K, V>) TNullCache.INSTANCE;
     }
 
     public static <K, V> TCache<K, V> newHardMemoryCache(int var0, int var1) {

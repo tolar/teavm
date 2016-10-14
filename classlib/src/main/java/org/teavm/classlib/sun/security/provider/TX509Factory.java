@@ -25,8 +25,6 @@ import java.security.cert.CRLException;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -36,13 +34,18 @@ import java.util.List;
 
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.cert.TCRL;
+import org.teavm.classlib.java.security.cert.TCRLException;
 import org.teavm.classlib.java.security.cert.TCertPath;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TCertificateFactorySpi;
 import org.teavm.classlib.java.security.cert.TX509CRL;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.pkcs.TPKCS7;
+import org.teavm.classlib.sun.security.pkcs.TParsingException;
 import org.teavm.classlib.sun.security.provider.certpath.TX509CertPath;
 import org.teavm.classlib.sun.security.provider.certpath.TX509CertificatePair;
 import org.teavm.classlib.sun.security.x509.TX509CRLImpl;
@@ -59,11 +62,11 @@ public class TX509Factory extends TCertificateFactorySpi {
     public TX509Factory() {
     }
 
-    public TCertificate engineGenerateCertificate(InputStream var1) throws CertificateException {
+    public TCertificate engineGenerateCertificate(TInputStream var1) throws TCertificateException {
         if(var1 == null) {
             certCache.clear();
             TX509CertificatePair.clearCache();
-            throw new CertificateException("Missing input stream");
+            throw new TCertificateException(TString.wrap("Missing input stream"));
         } else {
             try {
                 byte[] var2 = readOneBlock(var1);
@@ -77,15 +80,15 @@ public class TX509Factory extends TCertificateFactorySpi {
                         return var3;
                     }
                 } else {
-                    throw new IOException("Empty input");
+                    throw new TIOException(TString.wrap("Empty input"));
                 }
-            } catch (IOException var4) {
-                throw new CertificateException("Could not parse certificate: " + var4.toString(), var4);
+            } catch (TIOException var4) {
+                throw new TCertificateException("Could not parse certificate: " + var4.toString(), var4);
             }
         }
     }
 
-    private static int readFully(InputStream var0, ByteArrayOutputStream var1, int var2) throws IOException {
+    private static int readFully(TInputStream var0, ByteArrayOutputStream var1, int var2) throws IOException {
         int var3 = 0;
 
         int var5;
@@ -207,14 +210,14 @@ public class TX509Factory extends TCertificateFactorySpi {
     }
 
     public CertPath engineGenerateCertPath(List<? extends Certificate> var1) throws CertificateException {
-        return new X509CertPath(var1);
+        return new TX509CertPath(var1);
     }
 
     public Iterator<String> engineGetCertPathEncodings() {
-        return X509CertPath.getEncodingsStatic();
+        return TX509CertPath.getEncodingsStatic();
     }
 
-    public Collection<? extends Certificate> engineGenerateCertificates(InputStream var1) throws CertificateException {
+    public Collection<? extends Certificate> engineGenerateCertificates(TInputStream var1) throws CertificateException {
         if(var1 == null) {
             throw new CertificateException("Missing input stream");
         } else {
@@ -226,19 +229,19 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    public CRL engineGenerateCRL(InputStream var1) throws CRLException {
+    public TCRL engineGenerateCRL(TInputStream var1) throws TCRLException {
         if(var1 == null) {
             crlCache.clear();
-            throw new CRLException("Missing input stream");
+            throw new TCRLException(TString.wrap("Missing input stream"));
         } else {
             try {
                 byte[] var2 = readOneBlock(var1);
                 if(var2 != null) {
-                    X509CRLImpl var3 = (X509CRLImpl)getFromCache(crlCache, var2);
+                    TX509CRLImpl var3 = (TX509CRLImpl)getFromCache(crlCache, var2);
                     if(var3 != null) {
                         return var3;
                     } else {
-                        var3 = new X509CRLImpl(var2);
+                        var3 = new TX509CRLImpl(var2);
                         addToCache(crlCache, var3.getEncodedInternal(), var3);
                         return var3;
                     }
@@ -276,12 +279,12 @@ public class TX509Factory extends TCertificateFactorySpi {
                 throw new CertificateException("No certificate data found");
             } else {
                 try {
-                    PKCS7 var6 = new PKCS7(var3);
-                    X509Certificate[] var7 = var6.getCertificates();
+                    TPKCS7 var6 = new TPKCS7(var3);
+                    TX509Certificate[] var7 = var6.getCertificates();
                     return (Collection)(var7 != null? Arrays.asList(var7):new ArrayList(0));
-                } catch (ParsingException var8) {
+                } catch (TParsingException var8) {
                     while(var3 != null) {
-                        var5.add(new X509CertImpl(var3));
+                        var5.add(new TX509CertImpl(var3));
                         var3 = readOneBlock(var4);
                     }
 
@@ -304,12 +307,12 @@ public class TX509Factory extends TCertificateFactorySpi {
                 throw new CRLException("No CRL data found");
             } else {
                 try {
-                    PKCS7 var6 = new PKCS7(var3);
-                    X509CRL[] var7 = var6.getCRLs();
+                    TPKCS7 var6 = new TPKCS7(var3);
+                    TX509CRL[] var7 = var6.getCRLs();
                     return (Collection)(var7 != null?Arrays.asList(var7):new ArrayList(0));
-                } catch (ParsingException var8) {
+                } catch (TParsingException var8) {
                     while(var3 != null) {
-                        var5.add(new X509CRLImpl(var3));
+                        var5.add(new TX509CRLImpl(var3));
                         var3 = readOneBlock(var4);
                     }
 
@@ -319,7 +322,7 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    private static byte[] readOneBlock(InputStream var0) throws IOException {
+    private static byte[] readOneBlock(TInputStream var0) throws TIOException {
         int var1 = var0.read();
         if(var1 == -1) {
             return null;
@@ -427,7 +430,7 @@ public class TX509Factory extends TCertificateFactorySpi {
         }
     }
 
-    private static int readBERInternal(InputStream var0, ByteArrayOutputStream var1, int var2) throws IOException {
+    private static int readBERInternal(TInputStream var0, ByteArrayOutputStream var1, int var2) throws IOException {
         if(var2 == -1) {
             var2 = var0.read();
             if(var2 == -1) {

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -33,7 +32,11 @@ import java.util.Arrays;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.security.TMessageDigest;
+import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.timestamp.TTimestampToken;
 import org.teavm.classlib.sun.security.util.TDebug;
@@ -109,7 +112,7 @@ public class TSignerInfo implements TDerEncoder {
         }
 
         if(var1.available() != 0) {
-            throw new ParsingException("extra data at the end");
+            throw new TParsingException(TString.wrap("extra data at the end"));
         }
     }
 
@@ -123,37 +126,37 @@ public class TSignerInfo implements TDerEncoder {
         TDerOutputStream var3 = new TDerOutputStream();
         this.issuerName.encode(var3);
         var3.putInteger(this.certificateSerialNumber);
-        var2.write(48, var3);
+        var2.write((byte)48, var3);
         this.digestAlgorithmId.encode(var2);
         if(this.authenticatedAttributes != null) {
-            this.authenticatedAttributes.encode(-96, var2);
+            this.authenticatedAttributes.encode((byte)-96, var2);
         }
 
         this.digestEncryptionAlgorithmId.encode(var2);
         var2.putOctetString(this.encryptedDigest);
         if(this.unauthenticatedAttributes != null) {
-            this.unauthenticatedAttributes.encode(-95, var2);
+            this.unauthenticatedAttributes.encode((byte)-95, var2);
         }
 
         TDerOutputStream var4 = new TDerOutputStream();
-        var4.write(48, var2);
+        var4.write((byte)48, var2);
         var1.write(var4.toByteArray());
     }
 
-    public X509Certificate getCertificate(TPKCS7 var1) throws IOException {
+    public TX509Certificate getCertificate(TPKCS7 var1) throws TIOException {
         return var1.getCertificate(this.certificateSerialNumber, this.issuerName);
     }
 
     public ArrayList<X509Certificate> getCertificateChain(TPKCS7 var1) throws IOException {
-        X509Certificate var2 = var1.getCertificate(this.certificateSerialNumber, this.issuerName);
+        TX509Certificate var2 = var1.getCertificate(this.certificateSerialNumber, this.issuerName);
         if(var2 == null) {
             return null;
         } else {
             ArrayList var3 = new ArrayList();
             var3.add(var2);
-            X509Certificate[] var4 = var1.getCertificates();
+            TX509Certificate[] var4 = var1.getCertificates();
             if(var4 != null && !var2.getSubjectDN().equals(var2.getIssuerDN())) {
-                Principal var5 = var2.getIssuerDN();
+                TPrincipal var5 = var2.getIssuerDN();
                 int var6 = 0;
 
                 boolean var7;
@@ -167,7 +170,7 @@ public class TSignerInfo implements TDerEncoder {
                                 var6 = var4.length;
                             } else {
                                 var5 = var4[var8].getIssuerDN();
-                                X509Certificate var9 = var4[var6];
+                                TX509Certificate var9 = var4[var6];
                                 var4[var6] = var4[var8];
                                 var4[var8] = var9;
                                 ++var6;
@@ -193,7 +196,7 @@ public class TSignerInfo implements TDerEncoder {
                 var2 = var3.getContentBytes();
             }
 
-            String var4 = this.getDigestAlgorithmId().getName();
+            TString var4 = this.getDigestAlgorithmId().getName();
             byte[] var5;
             if(this.authenticatedAttributes == null) {
                 var5 = var2;
@@ -208,7 +211,7 @@ public class TSignerInfo implements TDerEncoder {
                     return null;
                 }
 
-                MessageDigest var8 = MessageDigest.getInstance(var4);
+                TMessageDigest var8 = TMessageDigest.getInstance(var4);
                 byte[] var9 = var8.digest(var2);
                 if(var7.length != var9.length) {
                     return null;

@@ -18,6 +18,7 @@ package org.teavm.classlib.sun.security.util;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -254,7 +255,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
 
         TSimpleDateFormat var5 = new TSimpleDateFormat(var4, TLocale.US);
         var5.setTimeZone(var3);
-        byte[] var6 = var5.format(var1).getBytes(TString.wrap("ISO-8859-1"));
+        byte[] var6 = TString.wrap(var5.format(var1)).getBytes(TString.wrap("ISO-8859-1"));
         this.write(var2);
         this.putLength(var6.length);
         this.write(var6);
