@@ -17,11 +17,7 @@ package org.teavm.classlib.java.security;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
-
-import javax.crypto.Cipher;
 
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.lang.TBoolean;
@@ -30,6 +26,7 @@ import org.teavm.classlib.java.nio.TByteBuffer;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
+import org.teavm.classlib.java.util.TArrays;
 import org.teavm.classlib.java.util.THashMap;
 import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TList;
@@ -97,13 +94,13 @@ public abstract class TSignature extends TSignatureSpi {
     private final static TString RSA_CIPHER = TString.wrap("RSA/ECB/PKCS1Padding");
 
     // all the services we need to lookup for compatibility with TCipher
-    private final static List<TServiceId> rsaIds = Arrays.asList(
+    private final static TList<TServiceId> rsaIds = TArrays.asList(
             new TServiceId[] {
-                    new TServiceId("Signature", "NONEwithRSA"),
-                    new TServiceId("TCipher", "RSA/ECB/PKCS1Padding"),
-                    new TServiceId("TCipher", "RSA/ECB"),
-                    new TServiceId("TCipher", "RSA//PKCS1Padding"),
-                    new TServiceId("TCipher", "RSA"),
+                    new TServiceId(TString.wrap("Signature"), TString.wrap("NONEwithRSA")),
+                    new TServiceId(TString.wrap("TCipher"), TString.wrap("RSA/ECB/PKCS1Padding")),
+                    new TServiceId(TString.wrap("TCipher"), TString.wrap("RSA/ECB")),
+                    new TServiceId(TString.wrap("TCipher"), TString.wrap("RSA//PKCS1Padding")),
+                    new TServiceId(TString.wrap("TCipher"), TString.wrap("RSA")),
             }
     );
 
@@ -545,7 +542,7 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @return the name of the algorithm for this signature object.
      */
-    public final String getAlgorithm() {
+    public final TString getAlgorithm() {
         return this.algorithm;
     }
 
@@ -572,96 +569,25 @@ public abstract class TSignature extends TSignatureSpi {
         return "Signature object: " + getAlgorithm() + initState;
     }
 
-    /**
-     * Sets the specified algorithm parameter to the specified value.
-     * This method supplies a general-purpose mechanism through
-     * which it is possible to set the various parameters of this object.
-     * A parameter may be any settable parameter for the algorithm, such as
-     * a parameter size, or a source of random bits for signature generation
-     * (if appropriate), or an indication of whether or not to perform
-     * a specific but optional computation. A uniform algorithm-specific
-     * naming scheme for each parameter is desirable but left unspecified
-     * at this time.
-     *
-     * @param param the string identifier of the parameter.
-     * @param value the parameter value.
-     *
-     * @exception TInvalidParameterException if {@code param} is an
-     * invalid parameter for this signature algorithm engine,
-     * the parameter is already set
-     * and cannot be set again, a security exception occurs, and so on.
-     *
-     * @see #getParameter
-     *
-     * @deprecated Use
-     * {@link #setParameter(java.security.spec.AlgorithmParameterSpec)
-     * setParameter}.
-     */
+
     @Deprecated
     public final void setParameter(String param, Object value)
             throws TInvalidParameterException {
         engineSetParameter(param, value);
     }
 
-    /**
-     * Initializes this signature engine with the specified parameter set.
-     *
-     * @param params the parameters
-     *
-     * @exception InvalidAlgorithmParameterException if the given parameters
-     * are inappropriate for this signature engine
-     *
-     * @see #getParameters
-     */
     public final void setParameter(TAlgorithmParameterSpec params)
             throws TInvalidAlgorithmParameterException {
         engineSetParameter(params);
     }
 
-    /**
-     * Returns the parameters used with this signature object.
-     *
-     * <p>The returned parameters may be the same that were used to initialize
-     * this signature, or may contain a combination of default and randomly
-     * generated parameter values used by the underlying signature
-     * implementation if this signature requires algorithm parameters but
-     * was not initialized with any.
-     *
-     * @return the parameters used with this signature, or null if this
-     * signature does not use any parameters.
-     *
-     * @see #setParameter(AlgorithmParameterSpec)
-     * @since 1.4
-     */
     public final TAlgorithmParameters getParameters() {
         return engineGetParameters();
     }
 
-    /**
-     * Gets the value of the specified algorithm parameter. This method
-     * supplies a general-purpose mechanism through which it is possible to
-     * get the various parameters of this object. A parameter may be any
-     * settable parameter for the algorithm, such as a parameter size, or
-     * a source of random bits for signature generation (if appropriate),
-     * or an indication of whether or not to perform a specific but optional
-     * computation. A uniform algorithm-specific naming scheme for each
-     * parameter is desirable but left unspecified at this time.
-     *
-     * @param param the string name of the parameter.
-     *
-     * @return the object that represents the parameter value, or null if
-     * there is none.
-     *
-     * @exception TInvalidParameterException if {@code param} is an invalid
-     * parameter for this engine, or another exception occurs while
-     * trying to get this parameter.
-     *
-     * @see #setParameter(String, Object)
-     *
-     * @deprecated
-     */
+
     @Deprecated
-    public final Object getParameter(String param)
+    public final Object getParameter(TString param)
             throws TInvalidParameterException {
         return engineGetParameter(param);
     }
@@ -792,7 +718,7 @@ public abstract class TSignature extends TSignatureSpi {
                 }
                 Exception lastException = null;
                 while ((firstService != null) || serviceIterator.hasNext()) {
-                    Provider.Service s;
+                    TProvider.Service s;
                     if (firstService != null) {
                         s = firstService;
                         firstService = null;
@@ -814,7 +740,7 @@ public abstract class TSignature extends TSignatureSpi {
                     }
                 }
                 TProviderException e = new TProviderException
-                        ("Could not construct SignatureSpi instance");
+                        (TString.wrap("Could not construct SignatureSpi instance"));
                 if (lastException != null) {
                     e.initCause(lastException);
                 }
@@ -831,7 +757,7 @@ public abstract class TSignature extends TSignatureSpi {
                 }
                 Exception lastException = null;
                 while ((firstService != null) || serviceIterator.hasNext()) {
-                    Provider.Service s;
+                    TProvider.Service s;
                     if (firstService != null) {
                         s = firstService;
                         firstService = null;
@@ -872,8 +798,8 @@ public abstract class TSignature extends TSignatureSpi {
                 }
                 String k = (key != null) ? key.getClass().getName() : "(null)";
                 throw new TInvalidKeyException
-                        ("No installed provider supports this key: "
-                                + k, lastException);
+                        (TString.wrap("No installed provider supports this key: "
+                                + k));
             }
         }
 
@@ -1018,7 +944,7 @@ public abstract class TSignature extends TSignatureSpi {
 
         protected void engineInitSign(TPrivateKey privateKey,
                 TSecureRandom random) throws TInvalidKeyException {
-            cipher.init(Cipher.ENCRYPT_MODE, privateKey, random);
+            cipher.init(TCipher.ENCRYPT_MODE, privateKey, random);
             data = null;
         }
 
@@ -1070,7 +996,7 @@ public abstract class TSignature extends TSignatureSpi {
             throw new TInvalidParameterException(TString.wrap("Parameters not supported"));
         }
 
-        protected Object engineGetParameter(String param)
+        protected Object engineGetParameter(TString param)
                 throws TInvalidParameterException {
             throw new TInvalidParameterException(TString.wrap("Parameters not supported"));
         }

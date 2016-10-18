@@ -26,7 +26,6 @@ import java.security.AccessController;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidParameterException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.SecurityPermission;
@@ -43,17 +42,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import sun.security.jca.GetInstance;
-import sun.security.jca.ProviderList;
-import sun.security.jca.Providers;
-import sun.security.util.Debug;
-import sun.security.util.PropertyExpander;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.sun.security.jca.TGetInstance;
+import org.teavm.classlib.sun.security.jca.TProviders;
+import org.teavm.classlib.sun.security.util.TPropertyExpander;
 
 public final class TSecurity {
 
-    /* Are we debugging? -- for developers */
-    private static final Debug sdebug =
-            Debug.getInstance("properties");
 
     /* The java.security properties */
     private static Properties props;
@@ -93,24 +88,12 @@ public final class TSecurity {
                 props.load(is);
                 loadedProps = true;
 
-                if (sdebug != null) {
-                    sdebug.println("reading security properties file: " +
-                            propFile);
-                }
             } catch (IOException e) {
-                if (sdebug != null) {
-                    sdebug.println("unable to load security properties from " +
-                            propFile);
-                    e.printStackTrace();
-                }
             } finally {
                 if (is != null) {
                     try {
                         is.close();
                     } catch (IOException ioe) {
-                        if (sdebug != null) {
-                            sdebug.println("unable to close input stream");
-                        }
                     }
                 }
             }
@@ -128,10 +111,6 @@ public final class TSecurity {
 
             if (overrideAll) {
                 props = new Properties();
-                if (sdebug != null) {
-                    sdebug.println
-                            ("overriding other security properties files!");
-                }
             }
 
             // now load the user-specified file so its values
@@ -141,7 +120,7 @@ public final class TSecurity {
                 try {
                     URL propURL;
 
-                    extraPropFile = PropertyExpander.expand(extraPropFile);
+                    extraPropFile = TPropertyExpander.expand(extraPropFile);
                     propFile = new File(extraPropFile);
                     if (propFile.exists()) {
                         propURL = new URL
@@ -153,29 +132,12 @@ public final class TSecurity {
                     props.load(bis);
                     loadedProps = true;
 
-                    if (sdebug != null) {
-                        sdebug.println("reading security properties file: " +
-                                propURL);
-                        if (overrideAll) {
-                            sdebug.println
-                                    ("overriding other security properties files!");
-                        }
-                    }
                 } catch (Exception e) {
-                    if (sdebug != null) {
-                        sdebug.println
-                                ("unable to load security properties from " +
-                                        extraPropFile);
-                        e.printStackTrace();
-                    }
                 } finally {
                     if (bis != null) {
                         try {
                             bis.close();
                         } catch (IOException ioe) {
-                            if (sdebug != null) {
-                                sdebug.println("unable to close input stream");
-                            }
                         }
                     }
                 }
@@ -184,10 +146,6 @@ public final class TSecurity {
 
         if (!loadedProps) {
             initializeStatic();
-            if (sdebug != null) {
-                sdebug.println("unable to load security properties " +
-                        "-- using defaults");
-            }
         }
 
     }
@@ -229,7 +187,7 @@ public final class TSecurity {
     private static TSecurity.ProviderProperty getProviderProperty(String key) {
         TSecurity.ProviderProperty entry = null;
 
-        List<Provider> providers = Providers.getProviderList().providers();
+        List<TProvider> providers = TProviders.getProviderList().providers();
         for (int i = 0; i < providers.size(); i++) {
 
             String matchKey = null;
@@ -467,8 +425,8 @@ public final class TSecurity {
      * @see #removeProvider
      * @see #addProvider
      */
-    public static Provider getProvider(String name) {
-        return Providers.getProviderList().getProvider(name);
+    public static TProvider getProvider(TString name) {
+        return TProviders.getProviderList().getProvider(name);
     }
 
     /**
@@ -661,7 +619,7 @@ public final class TSecurity {
     }
 
     // Map containing cached Spi Class objects of the specified type
-    private static final Map<String, Class<?>> spiMap =
+    private static final Map<TString, Class<?>> spiMap =
             new ConcurrentHashMap<>();
 
     /**
@@ -669,7 +627,7 @@ public final class TSecurity {
      * (e.g. "MessageDigest"). Works for Spis in the java.security package
      * only.
      */
-    private static Class<?> getSpiClass(String type) {
+    private static Class<?> getSpiClass(TString type) {
         Class<?> clazz = spiMap.get(type);
         if (clazz != null) {
             return clazz;
@@ -691,10 +649,10 @@ public final class TSecurity {
      * The {@code provider} argument can be null, in which case all
      * configured providers will be searched in order of preference.
      */
-    static Object[] getImpl(String algorithm, String type, String provider)
-            throws NoSuchAlgorithmException, NoSuchProviderException {
+    static Object[] getImpl(TString algorithm, TString type, TString provider)
+            throws TNoSuchAlgorithmException, TNoSuchProviderException {
         if (provider == null) {
-            return GetInstance.getInstance
+            return TGetInstance.getInstance
                     (type, getSpiClass(type), algorithm).toArray();
         } else {
             return GetInstance.getInstance
@@ -702,9 +660,9 @@ public final class TSecurity {
         }
     }
 
-    static Object[] getImpl(String algorithm, String type, String provider,
-            Object params) throws NoSuchAlgorithmException,
-            NoSuchProviderException, InvalidAlgorithmParameterException {
+    static Object[] getImpl(TString algorithm, TString type, TString provider,
+            Object params) throws TNoSuchAlgorithmException,
+            TNoSuchProviderException, TInvalidAlgorithmParameterException {
         if (provider == null) {
             return GetInstance.getInstance
                     (type, getSpiClass(type), algorithm, params).toArray();
@@ -721,16 +679,16 @@ public final class TSecurity {
      * of that implementation.
      * The {@code provider} argument cannot be null.
      */
-    static Object[] getImpl(String algorithm, String type, Provider provider)
+    static Object[] getImpl(TString algorithm, TString type, TProvider provider)
             throws NoSuchAlgorithmException {
-        return GetInstance.getInstance
+        return TGetInstance.getInstance
                 (type, getSpiClass(type), algorithm, provider).toArray();
     }
 
-    static Object[] getImpl(String algorithm, String type, Provider provider,
+    static Object[] getImpl(TString algorithm, TString type, TProvider provider,
             Object params) throws NoSuchAlgorithmException,
             InvalidAlgorithmParameterException {
-        return GetInstance.getInstance
+        return TGetInstance.getInstance
                 (type, getSpiClass(type), algorithm, params, provider).toArray();
     }
 

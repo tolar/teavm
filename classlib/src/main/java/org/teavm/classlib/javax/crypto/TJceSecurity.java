@@ -26,7 +26,6 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.security.Provider;
-import java.security.SecureRandom;
 import java.util.Enumeration;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -38,10 +37,11 @@ import java.util.jar.JarFile;
 
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.java.security.TSecureRandom;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
 
 final class TJceSecurity {
-    static final SecureRandom RANDOM = new SecureRandom();
+    static final TSecureRandom RANDOM = new TSecureRandom();
     private static TCryptoPermissions defaultPolicy = null;
     private static TCryptoPermissions exemptPolicy = null;
     private static final Map<TProvider, Object> verificationResults = new IdentityHashMap();

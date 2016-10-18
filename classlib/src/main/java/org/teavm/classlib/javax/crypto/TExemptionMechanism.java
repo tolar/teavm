@@ -17,7 +17,6 @@ package org.teavm.classlib.javax.crypto;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
@@ -72,7 +71,7 @@ public class TExemptionMechanism {
         return this.provider;
     }
 
-    public final boolean isCryptoAllowed(Key var1) throws ExemptionMechanismException {
+    public final boolean isCryptoAllowed(TKey var1) throws ExemptionMechanismException {
         boolean var2 = false;
         if(this.done && var1 != null) {
             var2 = this.keyStored.equals(var1);

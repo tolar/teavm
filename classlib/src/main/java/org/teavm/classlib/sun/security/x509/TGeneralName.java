@@ -15,8 +15,6 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
@@ -34,7 +32,7 @@ public class TGeneralName {
         }
     }
 
-    public TGeneralName(TDerValue var1) throws IOException {
+    public TGeneralName(TDerValue var1) throws TIOException {
         this(var1, false);
     }
 

@@ -21,13 +21,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Spliterator;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountedCompleter;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,11 +46,15 @@ import java.util.function.ToLongBiFunction;
 import java.util.function.ToLongFunction;
 
 import org.teavm.classlib.java.util.TAbstractMap;
+import org.teavm.classlib.java.util.TCollection;
 import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.java.util.TSet;
+import org.teavm.classlib.java.util.function.TBiFunction;
 
 public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
-        implements ConcurrentMap<K,V>, Serializable {
+        implements TConcurrentMap<K,V>, Serializable {
     private static final long serialVersionUID = 7249069246763182397L;
 
     /*
@@ -404,7 +405,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * are special, and contain null keys and values (but are never
      * exported).  Otherwise, keys and vals are never null.
      */
-    static class Node<K,V> implements Map.Entry<K,V> {
+    static class Node<K,V> implements TMap.Entry<K,V> {
         final int hash;
         final K key;
         volatile V val;
@@ -1041,7 +1042,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      *
      * @return the collection view
      */
-    public Collection<V> values() {
+    public TCollection<V> values() {
         TConcurrentHashMap.ValuesView<K,V> vs;
         return (vs = values) != null ? vs : (values = new TConcurrentHashMap.ValuesView<K,V>(this));
     }
@@ -1063,7 +1064,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      *
      * @return the set view
      */
-    public Set<Map.Entry<K,V>> entrySet() {
+    public TSet<TMap.Entry<K,V>> entrySet() {
         TConcurrentHashMap.EntrySetView<K,V> es;
         return (es = entrySet) != null ? es : (entrySet = new TConcurrentHashMap.EntrySetView<K,V>(this));
     }
@@ -1878,7 +1879,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * @return an enumeration of the keys in this table
      * @see #keySet()
      */
-    public Enumeration<K> keys() {
+    public TEnumeration<K> keys() {
         TConcurrentHashMap.Node<K,V>[] t;
         int f = (t = table) == null ? 0 : t.length;
         return new TConcurrentHashMap.KeyIterator<K,V>(t, f, 0, f, this);
@@ -3223,7 +3224,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     }
 
     static final class KeyIterator<K,V> extends TConcurrentHashMap.BaseIterator<K,V>
-            implements Iterator<K>, Enumeration<K> {
+            implements TIterator<K>, TEnumeration<K> {
         KeyIterator(TConcurrentHashMap.Node<K,V>[] tab, int index, int size, int limit,
                 TConcurrentHashMap<K,V> map) {
             super(tab, index, size, limit, map);
@@ -3243,7 +3244,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     }
 
     static final class ValueIterator<K,V> extends TConcurrentHashMap.BaseIterator<K,V>
-            implements Iterator<V>, Enumeration<V> {
+            implements TIterator<V>, TEnumeration<V> {
         ValueIterator(TConcurrentHashMap.Node<K,V>[] tab, int index, int size, int limit,
                 TConcurrentHashMap<K,V> map) {
             super(tab, index, size, limit, map);
@@ -3263,13 +3264,13 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     }
 
     static final class EntryIterator<K,V> extends TConcurrentHashMap.BaseIterator<K,V>
-            implements Iterator<Map.Entry<K,V>> {
+            implements TIterator<TMap.Entry<K,V>> {
         EntryIterator(TConcurrentHashMap.Node<K,V>[] tab, int index, int size, int limit,
                 TConcurrentHashMap<K,V> map) {
             super(tab, index, size, limit, map);
         }
 
-        public final Map.Entry<K,V> next() {
+        public final TMap.Entry<K,V> next() {
             TConcurrentHashMap.Node<K,V> p;
             if ((p = next) == null)
                 throw new NoSuchElementException();
@@ -3284,7 +3285,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     /**
      * Exported Entry for EntryIterator
      */
-    static final class MapEntry<K,V> implements Map.Entry<K,V> {
+    static final class MapEntry<K,V> implements TMap.Entry<K,V> {
         final K key; // non-null
         V val;       // non-null
         final TConcurrentHashMap<K,V> map;
@@ -4008,7 +4009,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * @since 1.8
      */
     public void forEachEntry(long parallelismThreshold,
-            Consumer<? super Map.Entry<K,V>> action) {
+            Consumer<? super TMap.Entry<K,V>> action) {
         if (action == null) throw new NullPointerException();
         new TConcurrentHashMap.ForEachEntryTask<K,V>(null, batchFor(parallelismThreshold), 0, 0, table,
                 action).invoke();
@@ -4054,7 +4055,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * @since 1.8
      */
     public <U> U searchEntries(long parallelismThreshold,
-            Function<Map.Entry<K,V>, ? extends U> searchFunction) {
+            Function<TMap.Entry<K,V>, ? extends U> searchFunction) {
         if (searchFunction == null) throw new NullPointerException();
         return new TConcurrentHashMap.SearchEntriesTask<K,V,U>
                 (null, batchFor(parallelismThreshold), 0, 0, table,
@@ -4071,8 +4072,8 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * @return the result of accumulating all entries
      * @since 1.8
      */
-    public Map.Entry<K,V> reduceEntries(long parallelismThreshold,
-            BiFunction<Map.Entry<K,V>, Map.Entry<K,V>, ? extends Map.Entry<K,V>> reducer) {
+    public TMap.Entry<K,V> reduceEntries(long parallelismThreshold,
+            BiFunction<TMap.Entry<K,V>, TMap.Entry<K,V>, ? extends TMap.Entry<K,V>> reducer) {
         if (reducer == null) throw new NullPointerException();
         return new TConcurrentHashMap.ReduceEntriesTask<K,V>
                 (null, batchFor(parallelismThreshold), 0, 0, table,
@@ -4190,7 +4191,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * Base class for views.
      */
     abstract static class CollectionView<K,V,E>
-            implements Collection<E>, java.io.Serializable {
+            implements TCollection<E>, java.io.Serializable {
         private static final long serialVersionUID = 7249069246763182397L;
         final TConcurrentHashMap<K,V> map;
         CollectionView(TConcurrentHashMap<K,V> map)  { this.map = map; }
@@ -4220,7 +4221,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
          *
          * @return an iterator over the elements in this collection
          */
-        public abstract Iterator<E> iterator();
+        public abstract TIterator<E> iterator();
         public abstract boolean contains(Object o);
         public abstract boolean remove(Object o);
 
@@ -4292,7 +4293,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
         public final String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append('[');
-            Iterator<E> it = iterator();
+            TIterator<E> it = iterator();
             if (it.hasNext()) {
                 for (;;) {
                     Object e = it.next();
@@ -4305,7 +4306,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             return sb.append(']').toString();
         }
 
-        public final boolean containsAll(Collection<?> c) {
+        public final boolean containsAll(TCollection<?> c) {
             if (c != this) {
                 for (Object e : c) {
                     if (e == null || !contains(e))
@@ -4315,10 +4316,10 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             return true;
         }
 
-        public final boolean removeAll(Collection<?> c) {
+        public final boolean removeAll(TCollection<?> c) {
             if (c == null) throw new NullPointerException();
             boolean modified = false;
-            for (Iterator<E> it = iterator(); it.hasNext();) {
+            for (TIterator<E> it = iterator(); it.hasNext();) {
                 if (c.contains(it.next())) {
                     it.remove();
                     modified = true;
@@ -4327,10 +4328,10 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             return modified;
         }
 
-        public final boolean retainAll(Collection<?> c) {
+        public final boolean retainAll(TCollection<?> c) {
             if (c == null) throw new NullPointerException();
             boolean modified = false;
-            for (Iterator<E> it = iterator(); it.hasNext();) {
+            for (TIterator<E> it = iterator(); it.hasNext();) {
                 if (!c.contains(it.next())) {
                     it.remove();
                     modified = true;
@@ -4353,7 +4354,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * @since 1.8
      */
     public static class KeySetView<K,V> extends TConcurrentHashMap.CollectionView<K,V,K>
-            implements Set<K>, java.io.Serializable {
+            implements TSet<K>, java.io.Serializable {
         private static final long serialVersionUID = 7249069246763182397L;
         private final V value;
         KeySetView(TConcurrentHashMap<K,V> map, V value) {  // non-public
@@ -4390,7 +4391,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
         /**
          * @return an iterator over the keys of the backing map
          */
-        public Iterator<K> iterator() {
+        public TIterator<K> iterator() {
             TConcurrentHashMap.Node<K,V>[] t;
             TConcurrentHashMap<K,V> m = map;
             int f = (t = m.table) == null ? 0 : t.length;
@@ -4425,7 +4426,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
          * @throws UnsupportedOperationException if no default mapped value
          * for additions was provided
          */
-        public boolean addAll(Collection<? extends K> c) {
+        public boolean addAll(TCollection<? extends K> c) {
             boolean added = false;
             V v;
             if ((v = value) == null)
@@ -4477,7 +4478,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * directly instantiated. See {@link #values()}.
      */
     static final class ValuesView<K,V> extends TConcurrentHashMap.CollectionView<K,V,V>
-            implements Collection<V>, java.io.Serializable {
+            implements TCollection<V>, java.io.Serializable {
         private static final long serialVersionUID = 2249069246763182397L;
         ValuesView(TConcurrentHashMap<K,V> map) { super(map); }
         public final boolean contains(Object o) {
@@ -4486,7 +4487,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
 
         public final boolean remove(Object o) {
             if (o != null) {
-                for (Iterator<V> it = iterator(); it.hasNext();) {
+                for (TIterator<V> it = iterator(); it.hasNext();) {
                     if (o.equals(it.next())) {
                         it.remove();
                         return true;
@@ -4496,7 +4497,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             return false;
         }
 
-        public final Iterator<V> iterator() {
+        public final TIterator<V> iterator() {
             TConcurrentHashMap<K,V> m = map;
             TConcurrentHashMap.Node<K,V>[] t;
             int f = (t = m.table) == null ? 0 : t.length;
@@ -4506,7 +4507,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
         public final boolean add(V e) {
             throw new UnsupportedOperationException();
         }
-        public final boolean addAll(Collection<? extends V> c) {
+        public final boolean addAll(TCollection<? extends V> c) {
             throw new UnsupportedOperationException();
         }
 
@@ -4536,7 +4537,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * {@link #entrySet()}.
      */
     static final class EntrySetView<K,V> extends TConcurrentHashMap.CollectionView<K,V,TMap.Entry<K,V>>
-            implements Set<TMap.Entry<K,V>>, java.io.Serializable {
+            implements TSet<TMap.Entry<K,V>>, java.io.Serializable {
         private static final long serialVersionUID = 2249069246763182397L;
         EntrySetView(TConcurrentHashMap<K,V> map) { super(map); }
 
@@ -4560,7 +4561,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
         /**
          * @return an iterator over the entries of the backing map
          */
-        public Iterator<Map.Entry<K,V>> iterator() {
+        public TIterator<TMap.Entry<K,V>> iterator() {
             TConcurrentHashMap<K,V> m = map;
             TConcurrentHashMap.Node<K,V>[] t;
             int f = (t = m.table) == null ? 0 : t.length;
@@ -4571,7 +4572,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             return map.putVal(e.getKey(), e.getValue(), false) == null;
         }
 
-        public boolean addAll(Collection<? extends Entry<K,V>> c) {
+        public boolean addAll(TCollection<? extends Entry<K,V>> c) {
             boolean added = false;
             for (Entry<K,V> e : c) {
                 if (add(e))
@@ -4780,15 +4781,15 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     @SuppressWarnings("serial")
     static final class ForEachEntryTask<K,V>
             extends TConcurrentHashMap.BulkTask<K,V,Void> {
-        final Consumer<? super Entry<K,V>> action;
+        final Consumer<? super TMap.Entry<K,V>> action;
         ForEachEntryTask
                 (TConcurrentHashMap.BulkTask<K,V,?> p, int b, int i, int f, TConcurrentHashMap.Node<K,V>[] t,
-                        Consumer<? super Entry<K,V>> action) {
+                        Consumer<? super TMap.Entry<K,V>> action) {
             super(p, b, i, f, t);
             this.action = action;
         }
         public final void compute() {
-            final Consumer<? super Entry<K,V>> action;
+            final Consumer<? super TMap.Entry<K,V>> action;
             if ((action = this.action) != null) {
                 for (int i = baseIndex, f, h; batch > 0 &&
                         (h = ((f = baseLimit) + i) >>> 1) > i;) {
@@ -5055,18 +5056,18 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     @SuppressWarnings("serial")
     static final class SearchEntriesTask<K,V,U>
             extends TConcurrentHashMap.BulkTask<K,V,U> {
-        final Function<Entry<K,V>, ? extends U> searchFunction;
+        final Function<TMap.Entry<K,V>, ? extends U> searchFunction;
         final AtomicReference<U> result;
         SearchEntriesTask
                 (TConcurrentHashMap.BulkTask<K,V,?> p, int b, int i, int f, TConcurrentHashMap.Node<K,V>[] t,
-                        Function<Entry<K,V>, ? extends U> searchFunction,
+                        Function<TMap.Entry<K,V>, ? extends U> searchFunction,
                         AtomicReference<U> result) {
             super(p, b, i, f, t);
             this.searchFunction = searchFunction; this.result = result;
         }
         public final U getRawResult() { return result.get(); }
         public final void compute() {
-            final Function<Entry<K,V>, ? extends U> searchFunction;
+            final Function<TMap.Entry<K,V>, ? extends U> searchFunction;
             final AtomicReference<U> result;
             if ((searchFunction = this.searchFunction) != null &&
                     (result = this.result) != null) {
@@ -5238,20 +5239,20 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
 
     @SuppressWarnings("serial")
     static final class ReduceEntriesTask<K,V>
-            extends TConcurrentHashMap.BulkTask<K,V,Entry<K,V>> {
-        final BiFunction<Map.Entry<K,V>, Map.Entry<K,V>, ? extends Map.Entry<K,V>> reducer;
-        Map.Entry<K,V> result;
+            extends TConcurrentHashMap.BulkTask<K,V,TMap.Entry<K,V>> {
+        final TBiFunction<TMap.Entry<K,V>, TMap.Entry<K,V>, ? extends TMap.Entry<K,V>> reducer;
+        TMap.Entry<K,V> result;
         TConcurrentHashMap.ReduceEntriesTask<K,V> rights, nextRight;
         ReduceEntriesTask
                 (TConcurrentHashMap.BulkTask<K,V,?> p, int b, int i, int f, TConcurrentHashMap.Node<K,V>[] t,
                         TConcurrentHashMap.ReduceEntriesTask<K,V> nextRight,
-                        BiFunction<Entry<K,V>, Map.Entry<K,V>, ? extends Map.Entry<K,V>> reducer) {
+                        TBiFunction<TMap.Entry<K,V>, TMap.Entry<K,V>, ? extends TMap.Entry<K,V>> reducer) {
             super(p, b, i, f, t); this.nextRight = nextRight;
             this.reducer = reducer;
         }
-        public final Map.Entry<K,V> getRawResult() { return result; }
+        public final TMap.Entry<K,V> getRawResult() { return result; }
         public final void compute() {
-            final BiFunction<Map.Entry<K,V>, Map.Entry<K,V>, ? extends Map.Entry<K,V>> reducer;
+            final TBiFunction<TMap.Entry<K,V>, TMap.Entry<K,V>, ? extends TMap.Entry<K,V>> reducer;
             if ((reducer = this.reducer) != null) {
                 for (int i = baseIndex, f, h; batch > 0 &&
                         (h = ((f = baseLimit) + i) >>> 1) > i;) {
@@ -5260,7 +5261,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
                             (this, batch >>>= 1, baseLimit = h, f, tab,
                                     rights, reducer)).fork();
                 }
-                Map.Entry<K,V> r = null;
+                TMap.Entry<K,V> r = null;
                 for (TConcurrentHashMap.Node<K,V> p; (p = advance()) != null; )
                     r = (r == null) ? p : reducer.apply(r, p);
                 result = r;
@@ -5271,7 +5272,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
                             t = (TConcurrentHashMap.ReduceEntriesTask<K,V>)c,
                             s = t.rights;
                     while (s != null) {
-                        Map.Entry<K,V> tr, sr;
+                        TMap.Entry<K,V> tr, sr;
                         if ((sr = s.result) != null)
                             t.result = (((tr = t.result) == null) ? sr :
                                     reducer.apply(tr, sr));
@@ -5801,7 +5802,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     @SuppressWarnings("serial")
     static final class MapReduceEntriesToLongTask<K,V>
             extends TConcurrentHashMap.BulkTask<K,V,Long> {
-        final ToLongFunction<Map.Entry<K,V>> transformer;
+        final ToLongFunction<TMap.Entry<K,V>> transformer;
         final LongBinaryOperator reducer;
         final long basis;
         long result;
@@ -5809,7 +5810,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
         MapReduceEntriesToLongTask
                 (TConcurrentHashMap.BulkTask<K,V,?> p, int b, int i, int f, TConcurrentHashMap.Node<K,V>[] t,
                         TConcurrentHashMap.MapReduceEntriesToLongTask<K,V> nextRight,
-                        ToLongFunction<Map.Entry<K,V>> transformer,
+                        ToLongFunction<TMap.Entry<K,V>> transformer,
                         long basis,
                         LongBinaryOperator reducer) {
             super(p, b, i, f, t); this.nextRight = nextRight;
@@ -5818,7 +5819,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
         }
         public final Long getRawResult() { return result; }
         public final void compute() {
-            final ToLongFunction<Map.Entry<K,V>> transformer;
+            final ToLongFunction<TMap.Entry<K,V>> transformer;
             final LongBinaryOperator reducer;
             if ((transformer = this.transformer) != null &&
                     (reducer = this.reducer) != null) {

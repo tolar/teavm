@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.security.pkcs;
 
-import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Locale;
 
@@ -133,7 +132,7 @@ public class TPKCS9Attribute implements TDerEncoder {
                     case 1:
                     case 2:
                     case 8:
-                        String[] var10 = new String[var5.length];
+                        TString[] var10 = new TString[var5.length];
 
                         for(var8 = 0; var8 < var5.length; ++var8) {
                             var10[var8] = var5[var8].getAsString();
@@ -177,7 +176,7 @@ public class TPKCS9Attribute implements TDerEncoder {
                     case 15:
                         throw new TIOException(TString.wrap("PKCS9 SMIMECapability attribute not supported."));
                     case 16:
-                        this.value = new SigningCertificateInfo(var5[0].toByteArray());
+                        this.value = new TSigningCertificateInfo(var5[0].toByteArray());
                         break;
                     case 17:
                         this.value = var5[0].toByteArray();
@@ -247,14 +246,14 @@ public class TPKCS9Attribute implements TDerEncoder {
                 var2.putOrderedSetOf((byte)49, var8);
                 break;
             case 9:
-                throw new IOException("PKCS9 extended-certificate attribute not supported.");
+                throw new TIOException(TString.wrap("PKCS9 extended-certificate attribute not supported."));
             case 10:
-                throw new IOException("PKCS9 IssuerAndSerialNumberattribute not supported.");
+                throw new TIOException(TString.wrap("PKCS9 IssuerAndSerialNumberattribute not supported."));
             case 11:
             case 12:
-                throw new IOException("PKCS9 RSA DSI attributes11 and 12, not supported.");
+                throw new TIOException(TString.wrap("PKCS9 RSA DSI attributes11 and 12, not supported."));
             case 13:
-                throw new IOException("PKCS9 attribute #13 not supported.");
+                throw new TIOException(TString.wrap("PKCS9 attribute #13 not supported."));
             case 14:
                 var3 = new TDerOutputStream();
                 TCertificateExtensions var4 = (TCertificateExtensions)this.value;
@@ -268,9 +267,9 @@ public class TPKCS9Attribute implements TDerEncoder {
                 var2.write((byte)49, var3.toByteArray());
                 break;
             case 15:
-                throw new IOException("PKCS9 attribute #15 not supported.");
+                throw new TIOException(TString.wrap("PKCS9 attribute #15 not supported."));
             case 16:
-                throw new IOException("PKCS9 SigningCertificate attribute not supported.");
+                throw new TIOException(TString.wrap("PKCS9 SigningCertificate attribute not supported."));
             case 17:
                 var2.write((byte)49, (byte[])((byte[])this.value));
         }
@@ -356,11 +355,11 @@ public class TPKCS9Attribute implements TDerEncoder {
         return -1;
     }
 
-    private void throwSingleValuedException() throws IOException {
-        throw new IOException("Single-value attribute " + this.oid + " (" + this.getName() + ")" + " has multiple values.");
+    private void throwSingleValuedException() throws TIOException {
+        throw new TIOException(TString.wrap("Single-value attribute " + this.oid + " (" + this.getName() + ")" + " has multiple values."));
     }
 
-    private void throwTagException(Byte var1) throws IOException {
+    private void throwTagException(Byte var1) throws TIOException {
         Byte[] var2 = PKCS9_VALUE_TAGS[this.index];
         StringBuffer var3 = new StringBuffer(100);
         var3.append("Value of attribute ");
@@ -378,7 +377,7 @@ public class TPKCS9Attribute implements TDerEncoder {
         }
 
         var3.append(".");
-        throw new IOException(var3.toString());
+        throw new TIOException(TString.wrap(var3.toString()));
     }
 
     static {

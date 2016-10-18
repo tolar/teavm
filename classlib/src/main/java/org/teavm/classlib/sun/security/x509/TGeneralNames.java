@@ -15,12 +15,12 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TDerValue;
 
@@ -28,12 +28,12 @@ import org.teavm.classlib.sun.security.util.TDerValue;
 public class TGeneralNames {
     private final List<TGeneralName> names;
 
-    public TGeneralNames(TDerValue var1) throws IOException {
+    public TGeneralNames(TDerValue var1) throws TIOException {
         this();
         if(var1.tag != 48) {
-            throw new IOException("Invalid encoding for GeneralNames.");
+            throw new TIOException(TString.wrap("Invalid encoding for GeneralNames."));
         } else if(var1.data.available() == 0) {
-            throw new IOException("No data available in passed DER encoded value.");
+            throw new TIOException(TString.wrap("No data available in passed DER encoded value."));
         } else {
             while(var1.data.available() != 0) {
                 TDerValue var2 = var1.data.getDerValue();

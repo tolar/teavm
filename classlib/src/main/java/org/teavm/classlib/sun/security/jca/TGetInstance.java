@@ -75,7 +75,7 @@ public class TGetInstance {
         }
     }
 
-    public static List<TProvider.Service> getServices(TString var0, TString var1) {
+    public static TList<TProvider.Service> getServices(TString var0, TString var1) {
         TProviderList var2 = TProviders.getProviderList();
         return var2.getServices(var0, var1);
     }
