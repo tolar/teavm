@@ -2334,9 +2334,9 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     // See LongAdder version for explanation
     private final void fullAddCount(long x, boolean wasUncontended) {
         int h;
-        if ((h = ThreadLocalRandom.getProbe()) == 0) {
-            ThreadLocalRandom.localInit();      // force initialization
-            h = ThreadLocalRandom.getProbe();
+        if ((h = TThreadLocalRandom.getProbe()) == 0) {
+            TThreadLocalRandom.localInit();      // force initialization
+            h = TThreadLocalRandom.getProbe();
             wasUncontended = true;
         }
         boolean collide = false;                // True if last slot nonempty
@@ -2392,7 +2392,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
                     collide = false;
                     continue;                   // Retry with expanded table
                 }
-                h = ThreadLocalRandom.advanceProbe(h);
+                h = TThreadLocalRandom.advanceProbe(h);
             }
             else if (cellsBusy == 0 && counterCells == as &&
                     U.compareAndSwapInt(this, CELLSBUSY, 0, 1)) {
@@ -3403,7 +3403,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     }
 
     static final class EntrySpliterator<K,V> extends TConcurrentHashMap.Traverser<K,V>
-            implements Spliterator<Map.Entry<K,V>> {
+            implements Spliterator<TMap.Entry<K,V>> {
         final TConcurrentHashMap<K,V> map; // To export MapEntry
         long est;               // size estimate
         EntrySpliterator(TConcurrentHashMap.Node<K,V>[] tab, int size, int index, int limit,
@@ -3413,20 +3413,20 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             this.est = est;
         }
 
-        public Spliterator<Map.Entry<K,V>> trySplit() {
+        public Spliterator<TMap.Entry<K,V>> trySplit() {
             int i, f, h;
             return (h = ((i = baseIndex) + (f = baseLimit)) >>> 1) <= i ? null :
                     new TConcurrentHashMap.EntrySpliterator<K,V>(tab, baseSize, baseLimit = h,
                             f, est >>>= 1, map);
         }
 
-        public void forEachRemaining(Consumer<? super Map.Entry<K,V>> action) {
+        public void forEachRemaining(Consumer<? super TMap.Entry<K,V>> action) {
             if (action == null) throw new NullPointerException();
             for (TConcurrentHashMap.Node<K,V> p; (p = advance()) != null; )
                 action.accept(new TConcurrentHashMap.MapEntry<K,V>(p.key, p.val, map));
         }
 
-        public boolean tryAdvance(Consumer<? super Map.Entry<K,V>> action) {
+        public boolean tryAdvance(Consumer<? super TMap.Entry<K,V>> action) {
             if (action == null) throw new NullPointerException();
             TConcurrentHashMap.Node<K,V> p;
             if ((p = advance()) == null)
@@ -4073,7 +4073,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * @since 1.8
      */
     public TMap.Entry<K,V> reduceEntries(long parallelismThreshold,
-            BiFunction<TMap.Entry<K,V>, TMap.Entry<K,V>, ? extends TMap.Entry<K,V>> reducer) {
+            TBiFunction<TMap.Entry<K,V>, TMap.Entry<K,V>, ? extends TMap.Entry<K,V>> reducer) {
         if (reducer == null) throw new NullPointerException();
         return new TConcurrentHashMap.ReduceEntriesTask<K,V>
                 (null, batchFor(parallelismThreshold), 0, 0, table,
@@ -4148,7 +4148,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
      * @since 1.8
      */
     public long reduceEntriesToLong(long parallelismThreshold,
-            ToLongFunction<Map.Entry<K,V>> transformer,
+            ToLongFunction<TMap.Entry<K,V>> transformer,
             long basis,
             LongBinaryOperator reducer) {
         if (transformer == null || reducer == null)
@@ -4595,9 +4595,9 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
         }
 
         public final boolean equals(Object o) {
-            Set<?> c;
-            return ((o instanceof Set) &&
-                    ((c = (Set<?>)o) == this ||
+            TSet<?> c;
+            return ((o instanceof TSet) &&
+                    ((c = (TSet<?>)o) == this ||
                             (containsAll(c) && c.containsAll(this))));
         }
 
@@ -4609,7 +4609,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             return new TConcurrentHashMap.EntrySpliterator<K,V>(t, f, 0, f, n < 0L ? 0L : n, m);
         }
 
-        public void forEach(Consumer<? super Map.Entry<K,V>> action) {
+        public void forEach(Consumer<? super TMap.Entry<K,V>> action) {
             if (action == null) throw new NullPointerException();
             TConcurrentHashMap.Node<K,V>[] t;
             if ((t = map.table) != null) {
@@ -4901,7 +4901,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
     @SuppressWarnings("serial")
     static final class ForEachTransformedEntryTask<K,V,U>
             extends TConcurrentHashMap.BulkTask<K,V,Void> {
-        final Function<Map.Entry<K,V>, ? extends U> transformer;
+        final Function<TMap.Entry<K,V>, ? extends U> transformer;
         final Consumer<? super U> action;
         ForEachTransformedEntryTask
                 (TConcurrentHashMap.BulkTask<K,V,?> p, int b, int i, int f, TConcurrentHashMap.Node<K,V>[] t,
@@ -4910,7 +4910,7 @@ public class TConcurrentHashMap<K,V> extends TAbstractMap<K,V>
             this.transformer = transformer; this.action = action;
         }
         public final void compute() {
-            final Function<Map.Entry<K,V>, ? extends U> transformer;
+            final Function<TMap.Entry<K,V>, ? extends U> transformer;
             final Consumer<? super U> action;
             if ((transformer = this.transformer) != null &&
                     (action = this.action) != null) {

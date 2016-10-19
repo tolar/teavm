@@ -19,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
 import java.util.Iterator;
-import java.util.List;
 
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TObject;
@@ -27,6 +26,7 @@ import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.java.security.TNoSuchProviderException;
 import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TList;
 
 public class TGetInstance {
@@ -43,7 +43,7 @@ public class TGetInstance {
         }
     }
 
-    public static TProvider.Service getService(TString var0, TString var1, TString var2) throws NoSuchAlgorithmException,
+    public static TProvider.Service getService(TString var0, TString var1, TString var2) throws TNoSuchAlgorithmException,
             NoSuchProviderException {
         if(var2 != null && var2.length() != 0) {
             TProvider var3 = TProviders.getProviderList().getProvider(var2);
@@ -52,7 +52,7 @@ public class TGetInstance {
             } else {
                 TProvider.Service var4 = var3.getService(var0, var1);
                 if(var4 == null) {
-                    throw new NoSuchAlgorithmException("no such algorithm: " + var1 + " for provider " + var2);
+                    throw new TNoSuchAlgorithmException(TString.wrap("no such algorithm: " + var1 + " for provider " + var2));
                 } else {
                     return var4;
                 }
@@ -124,10 +124,10 @@ public class TGetInstance {
         }
     }
 
-    public static TGetInstance.Instance getInstance(TString var0, Class<?> var1, TString var2, Object var3) throws NoSuchAlgorithmException {
-        List var4 = getServices(var0, var2);
+    public static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, TString var2, TObject var3) throws TNoSuchAlgorithmException {
+        TList var4 = getServices(var0, var2);
         TNoSuchAlgorithmException var5 = null;
-        Iterator var6 = var4.iterator();
+        TIterator var6 = var4.iterator();
 
         while(var6.hasNext()) {
             TProvider.Service var7 = (TProvider.Service)var6.next();
@@ -142,7 +142,7 @@ public class TGetInstance {
         if(var5 != null) {
             throw var5;
         } else {
-            throw new NoSuchAlgorithmException(var2 + " " + var0 + " not available");
+            throw new TNoSuchAlgorithmException(TString.wrap(var2 + " " + var0 + " not available"));
         }
     }
 
@@ -151,7 +151,7 @@ public class TGetInstance {
         return getInstance(getService(var0, var2, var3), var1);
     }
 
-    public static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, String var2, Object var3, String var4) throws TNoSuchAlgorithmException, TNoSuchProviderException {
+    public static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, String var2, TObject var3, TString var4) throws TNoSuchAlgorithmException, TNoSuchProviderException {
         return getInstance(getService(var0, var2, var4), var1, var3);
     }
 
@@ -169,7 +169,7 @@ public class TGetInstance {
         return new TGetInstance.Instance(var0.getProvider(), var2);
     }
 
-    public static TGetInstance.Instance getInstance(TProvider.Service var0, Class<?> var1, Object var2) throws TNoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(TProvider.Service var0, TClass<?> var1, Object var2) throws TNoSuchAlgorithmException {
         Object var3 = var0.newInstance(var2);
         checkSuperClass(var0, var3.getClass(), var1);
         return new TGetInstance.Instance(var0.getProvider(), var3);

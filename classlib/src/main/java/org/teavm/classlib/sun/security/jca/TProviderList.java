@@ -26,16 +26,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import sun.security.jca.ServiceId;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.java.util.TAbstractList;
+import org.teavm.classlib.java.util.TArrayList;
+import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TList;
 
 public final class TProviderList {
     private static final TProviderConfig[] PC0 = new TProviderConfig[0];
     private static final Provider[] P0 = new Provider[0];
     static final TProviderList EMPTY;
-    private static final Provider EMPTY_PROVIDER;
+    private static final TProvider EMPTY_PROVIDER;
     private final TProviderConfig[] configs;
     private volatile boolean allLoaded;
-    private final List<Provider> userList;
+    private final List<TProvider> userList;
 
     static TProviderList fromSecurityProperties() {
         return (TProviderList) AccessController.doPrivileged(new PrivilegedAction() {
@@ -49,7 +54,7 @@ public final class TProviderList {
         return insertAt(var0, var1, -1);
     }
 
-    public static TProviderList insertAt(TProviderList var0, Provider var1, int var2) {
+    public static TProviderList insertAt(TProviderList var0, TProvider var1, int var2) {
         if(var0.getProvider(var1.getName()) != null) {
             return var0;
         } else {
@@ -100,7 +105,7 @@ public final class TProviderList {
                 return TProviderList.this.configs.length;
             }
 
-            public Provider get(int var1) {
+            public TProvider get(int var1) {
                 return TProviderList.this.getProvider(var1);
             }
         };
@@ -114,7 +119,7 @@ public final class TProviderList {
                 return TProviderList.this.configs.length;
             }
 
-            public Provider get(int var1) {
+            public TProvider get(int var1) {
                 return TProviderList.this.getProvider(var1);
             }
         };
@@ -184,28 +189,28 @@ public final class TProviderList {
         return this.configs.length;
     }
 
-    Provider getProvider(int var1) {
-        Provider var2 = this.configs[var1].getProvider();
+    TProvider getProvider(int var1) {
+        TProvider var2 = this.configs[var1].getProvider();
         return var2 != null?var2:EMPTY_PROVIDER;
     }
 
-    public List<Provider> providers() {
+    public List<TProvider> providers() {
         return this.userList;
     }
 
-    private TProviderConfig getProviderConfig(String var1) {
+    private TProviderConfig getProviderConfig(TString var1) {
         int var2 = this.getIndex(var1);
         return var2 != -1?this.configs[var2]:null;
     }
 
-    public Provider getProvider(String var1) {
+    public TProvider getProvider(TString var1) {
         TProviderConfig var2 = this.getProviderConfig(var1);
         return var2 == null?null:var2.getProvider();
     }
 
-    public int getIndex(String var1) {
+    public int getIndex(TString var1) {
         for(int var2 = 0; var2 < this.configs.length; ++var2) {
-            Provider var3 = this.getProvider(var2);
+            TProvider var3 = this.getProvider(var2);
             if(var3.getName().equals(var1)) {
                 return var2;
             }
@@ -222,7 +227,7 @@ public final class TProviderList {
             int var1 = 0;
 
             for(int var2 = 0; var2 < this.configs.length; ++var2) {
-                Provider var3 = this.configs[var2].getProvider();
+                TProvider var3 = this.configs[var2].getProvider();
                 if(var3 != null) {
                     ++var1;
                 }
@@ -263,10 +268,10 @@ public final class TProviderList {
         return Arrays.asList(this.configs).toString();
     }
 
-    public Provider.Service getService(String var1, String var2) {
+    public TProvider.Service getService(TString var1, TString var2) {
         for(int var3 = 0; var3 < this.configs.length; ++var3) {
-            Provider var4 = this.getProvider(var3);
-            Provider.Service var5 = var4.getService(var1, var2);
+            TProvider var4 = this.getProvider(var3);
+            TProvider.Service var5 = var4.getService(var1, var2);
             if(var5 != null) {
                 return var5;
             }
@@ -275,65 +280,65 @@ public final class TProviderList {
         return null;
     }
 
-    public List<Provider.Service> getServices(String var1, String var2) {
+    public TList<TProvider.Service> getServices(TString var1, TString var2) {
         return new TProviderList.ServiceList(var1, var2);
     }
 
     /** @deprecated */
     @Deprecated
-    public List<Provider.Service> getServices(String var1, List<String> var2) {
-        ArrayList var3 = new ArrayList();
-        Iterator var4 = var2.iterator();
+    public TList<Provider.Service> getServices(TString var1, TList<TString> var2) {
+        TArrayList var3 = new TArrayList();
+        TIterator var4 = var2.iterator();
 
         while(var4.hasNext()) {
-            String var5 = (String)var4.next();
-            var3.add(new ServiceId(var1, var5));
+            TString var5 = (TString)var4.next();
+            var3.add(new TServiceId(var1, var5));
         }
 
         return this.getServices(var3);
     }
 
-    public List<Provider.Service> getServices(List<ServiceId> var1) {
+    public TList<TProvider.Service> getServices(List<TServiceId> var1) {
         return new TProviderList.ServiceList(var1);
     }
 
     static {
         EMPTY = new TProviderList(PC0, true);
-//        EMPTY_PROVIDER = new TProvider("##Empty##", 1.0D, var4) {
-//            private static final long serialVersionUID = 1151354171352296389L;
-//
-//            public Service getService(String var1, String var2) {
-//                return null;
-//            }
-//        };
+        EMPTY_PROVIDER = new TProvider("##Empty##", 1.0D, var4) {
+            private static final long serialVersionUID = 1151354171352296389L;
+
+            public Service getService(String var1, String var2) {
+                return null;
+            }
+        };
     }
 
-    private final class ServiceList extends AbstractList<Provider.Service> {
-        private final String type;
-        private final String algorithm;
-        private final List<ServiceId> ids;
-        private Provider.Service firstService;
-        private List<Provider.Service> services;
+    private final class ServiceList extends TAbstractList<TProvider.Service> {
+        private final TString type;
+        private final TString algorithm;
+        private final List<TServiceId> ids;
+        private TProvider.Service firstService;
+        private TList<TProvider.Service> services;
         private int providerIndex;
 
-        ServiceList(String var2, String var3) {
+        ServiceList(TString var2, TString var3) {
             this.type = var2;
             this.algorithm = var3;
             this.ids = null;
         }
 
-        ServiceList(List<ServiceId> var1) {
+        ServiceList(List<TServiceId> var1) {
             this.type = null;
             this.algorithm = null;
             this.ids = var2;
         }
 
-        private void addService(Provider.Service var1) {
+        private void addService(TProvider.Service var1) {
             if(this.firstService == null) {
                 this.firstService = var1;
             } else {
                 if(this.services == null) {
-                    this.services = new ArrayList(4);
+                    this.services = new TArrayList(4);
                     this.services.add(this.firstService);
                 }
 
@@ -342,19 +347,19 @@ public final class TProviderList {
 
         }
 
-        private Provider.Service tryGet(int var1) {
+        private TProvider.Service tryGet(int var1) {
             while(var1 != 0 || this.firstService == null) {
                 if(this.services != null && this.services.size() > var1) {
-                    return (Provider.Service)this.services.get(var1);
+                    return (TProvider.Service)this.services.get(var1);
                 }
 
                 if(this.providerIndex >= TProviderList.this.configs.length) {
                     return null;
                 }
 
-                Provider var2 = TProviderList.this.getProvider(this.providerIndex++);
+                TProvider var2 = TProviderList.this.getProvider(this.providerIndex++);
                 if(this.type != null) {
-                    Provider.Service var6 = var2.getService(this.type, this.algorithm);
+                    TProvider.Service var6 = var2.getService(this.type, this.algorithm);
                     if(var6 != null) {
                         this.addService(var6);
                     }
@@ -362,8 +367,8 @@ public final class TProviderList {
                     Iterator var3 = this.ids.iterator();
 
                     while(var3.hasNext()) {
-                        ServiceId var4 = (ServiceId)var3.next();
-                        Provider.Service var5 = var2.getService(var4.type, var4.algorithm);
+                        TServiceId var4 = (TServiceId)var3.next();
+                        TProvider.Service var5 = var2.getService(var4.type, var4.algorithm);
                         if(var5 != null) {
                             this.addService(var5);
                         }
@@ -374,8 +379,8 @@ public final class TProviderList {
             return this.firstService;
         }
 
-        public Provider.Service get(int var1) {
-            Provider.Service var2 = this.tryGet(var1);
+        public TProvider.Service get(int var1) {
+            TProvider.Service var2 = this.tryGet(var1);
             if(var2 == null) {
                 throw new IndexOutOfBoundsException();
             } else {
@@ -402,16 +407,16 @@ public final class TProviderList {
             return this.tryGet(0) == null;
         }
 
-        public Iterator<Provider.Service> iterator() {
-            return new Iterator() {
+        public TIterator<TProvider.Service> iterator() {
+            return new TIterator() {
                 int index;
 
                 public boolean hasNext() {
                     return TProviderList.ServiceList.this.tryGet(this.index) != null;
                 }
 
-                public Provider.Service next() {
-                    Provider.Service var1 = TProviderList.ServiceList.this.tryGet(this.index);
+                public TProvider.Service next() {
+                    TProvider.Service var1 = TProviderList.ServiceList.this.tryGet(this.index);
                     if(var1 == null) {
                         throw new NoSuchElementException();
                     } else {

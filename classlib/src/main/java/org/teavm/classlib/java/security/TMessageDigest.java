@@ -25,15 +25,14 @@ import java.security.Provider;
 import java.security.Security;
 
 import org.teavm.classlib.java.lang.TString;
-
-import sun.security.util.Debug;
+import org.teavm.classlib.sun.security.util.TDebug;
 
 public abstract class TMessageDigest extends TMessageDigestSpi {
 
-    private static final Debug pdebug =
-            Debug.getInstance("provider", "Provider");
+    private static final TDebug pdebug =
+            TDebug.getInstance("provider", "Provider");
     private static final boolean skipDebug =
-            Debug.isOn("engine=") && !Debug.isOn("messagedigest");
+            TDebug.isOn("engine=") && !TDebug.isOn("messagedigest");
 
     private TString algorithm;
 
@@ -86,11 +85,11 @@ public abstract class TMessageDigest extends TMessageDigestSpi {
      * @see Provider
      */
     public static TMessageDigest getInstance(TString algorithm)
-            throws NoSuchAlgorithmException {
+            throws TNoSuchAlgorithmException {
         try {
             TMessageDigest md;
-            Object[] objs = TSecurity.getImpl(algorithm, "TMessageDigest",
-                    (String)null);
+            Object[] objs = TSecurity.getImpl(algorithm, TString.wrap("TMessageDigest"),
+                    (TString)null);
             if (objs[0] instanceof TMessageDigest) {
                 md = (TMessageDigest)objs[0];
             } else {
@@ -105,8 +104,8 @@ public abstract class TMessageDigest extends TMessageDigestSpi {
 
             return md;
 
-        } catch(NoSuchProviderException e) {
-            throw new NoSuchAlgorithmException(algorithm + " not found");
+        } catch(TNoSuchProviderException e) {
+            throw new TNoSuchAlgorithmException(TString.wrap(algorithm + " not found"));
         }
     }
 
@@ -144,13 +143,13 @@ public abstract class TMessageDigest extends TMessageDigestSpi {
      *
      * @see Provider
      */
-    public static TMessageDigest getInstance(String algorithm, String provider)
+    public static TMessageDigest getInstance(TString algorithm, TString provider)
             throws NoSuchAlgorithmException, NoSuchProviderException
     {
         if (provider == null || provider.length() == 0)
             throw new IllegalArgumentException("missing provider");
-        Object[] objs = TSecurity.getImpl(algorithm, "MessageDigest", provider);
-        if (objs[0] instanceof java.security.MessageDigest) {
+        Object[] objs = TSecurity.getImpl(algorithm, TString.wrap("MessageDigest"), provider);
+        if (objs[0] instanceof TMessageDigest) {
             TMessageDigest md = (TMessageDigest)objs[0];
             md.provider = (Provider)objs[1];
             return md;
@@ -197,7 +196,7 @@ public abstract class TMessageDigest extends TMessageDigestSpi {
     {
         if (provider == null)
             throw new IllegalArgumentException("missing provider");
-        Object[] objs = TSecurity.getImpl(algorithm,"TMessageDigest", provider);
+        Object[] objs = TSecurity.getImpl(algorithm,TString.wrap("TMessageDigest"), provider);
         if (objs[0] instanceof TMessageDigest) {
             TMessageDigest md = (TMessageDigest)objs[0];
             md.provider = (Provider)objs[1];

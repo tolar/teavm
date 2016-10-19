@@ -24,11 +24,12 @@ import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.ProviderException;
 
-import sun.security.util.Debug;
-import sun.security.util.PropertyExpander;
+import org.teavm.classlib.java.security.TProvider;
+import org.teavm.classlib.sun.security.util.TDebug;
+import org.teavm.classlib.sun.security.util.TPropertyExpander;
 
 final class TProviderConfig {
-    private static final Debug debug = Debug.getInstance("jca", "ProviderConfig");
+    private static final TDebug debug = TDebug.getInstance("jca", "ProviderConfig");
     private static final String P11_SOL_NAME = "sun.security.pkcs11.SunPKCS11";
     private static final String P11_SOL_ARG = "${java.home}/lib/security/sunpkcs11-solaris.cfg";
     private static final int MAX_LOAD_TRIES = 30;
@@ -36,7 +37,7 @@ final class TProviderConfig {
     private final String className;
     private final String argument;
     private int tries;
-    private volatile Provider provider;
+    private volatile TProvider provider;
     private boolean isLoading;
 
     TProviderConfig(String var1, String var2) {
@@ -52,7 +53,7 @@ final class TProviderConfig {
         this(var1, "");
     }
 
-    TProviderConfig(Provider var1) {
+    TProviderConfig(TProvider var1) {
         this.className = var1.getClass().getName();
         this.argument = "";
         this.provider = var1;
@@ -106,8 +107,8 @@ final class TProviderConfig {
         return this.hasArgument()?this.className + "(\'" + this.argument + "\')":this.className;
     }
 
-    synchronized Provider getProvider() {
-        Provider var1 = this.provider;
+    synchronized TProvider getProvider() {
+        TProvider var1 = this.provider;
         if(var1 != null) {
             return var1;
         } else if(!this.shouldLoad()) {
@@ -133,8 +134,8 @@ final class TProviderConfig {
         }
     }
 
-    private Provider doLoadProvider() {
-        return (Provider)AccessController.doPrivileged(new PrivilegedAction() {
+    private TProvider doLoadProvider() {
+        return (TProvider)AccessController.doPrivileged(new PrivilegedAction() {
             public Provider run() {
                 if(TProviderConfig.debug != null) {
                     TProviderConfig.debug.println("Loading provider: " + TProviderConfig.this);
@@ -203,7 +204,7 @@ final class TProviderConfig {
         return !var0.contains("${")?var0:(String)AccessController.doPrivileged(new PrivilegedAction() {
             public String run() {
                 try {
-                    return PropertyExpander.expand(var0);
+                    return TPropertyExpander.expand(var0);
                 } catch (GeneralSecurityException var2) {
                     throw new ProviderException(var2);
                 }

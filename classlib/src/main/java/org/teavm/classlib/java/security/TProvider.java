@@ -139,15 +139,15 @@ public abstract class TProvider extends TProperties {
             legacyMap.put(new TProvider.ServiceKey(type, TString.wrap(stdAlg), true), s);
             s.addAlias(aliasAlg);
         } else {
-            String[] typeAndAlg = getTypeAndAlgorithm(name);
+            TString[] typeAndAlg = getTypeAndAlgorithm(name);
             if (typeAndAlg == null) {
                 return;
             }
             int i = typeAndAlg[1].indexOf(' ');
             if (i == -1) {
                 // e.g. put("MessageDigest.SHA-1", "sun.security.provider.SHA");
-                String type = getEngineName(TString.wrap(typeAndAlg[0])).toString();
-                String stdAlg = typeAndAlg[1].intern();
+                TString type = getEngineName(TString.wrap((typeAndAlg[0]).toString()));
+                TString stdAlg = typeAndAlg[1].intern();
                 String className = value;
                 TProvider.ServiceKey key = new TProvider.ServiceKey(TString.wrap(type), TString.wrap(stdAlg), true);
                 TProvider.Service s = legacyMap.get(key);

@@ -25,7 +25,6 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidParameterException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.SecurityPermission;
@@ -40,10 +39,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TClassNotFoundException;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.java.util.TMap;
+import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
+import org.teavm.classlib.sun.security.jca.TProviderList;
 import org.teavm.classlib.sun.security.jca.TProviders;
 import org.teavm.classlib.sun.security.util.TPropertyExpander;
 
@@ -56,7 +60,7 @@ public final class TSecurity {
     // An element in the cache
     private static class ProviderProperty {
         String className;
-        Provider provider;
+        TProvider provider;
     }
 
     static {
@@ -191,13 +195,13 @@ public final class TSecurity {
         for (int i = 0; i < providers.size(); i++) {
 
             String matchKey = null;
-            Provider prov = providers.get(i);
+            TProvider prov = providers.get(i);
             String prop = prov.getProperty(key);
 
             if (prop == null) {
                 // Is there a match if we do a case-insensitive property name
                 // comparison? Let's try ...
-                for (Enumeration<Object> e = prov.keys();
+                for (TEnumeration<Object> e = prov.keys();
                      e.hasMoreElements() && prop == null; ) {
                     matchKey = (String)e.nextElement();
                     if (key.equalsIgnoreCase(matchKey)) {
@@ -314,16 +318,16 @@ public final class TSecurity {
      * @see #removeProvider
      * @see java.security.SecurityPermission
      */
-    public static synchronized int insertProviderAt(Provider provider,
+    public static synchronized int insertProviderAt(TProvider provider,
             int position) {
-        String providerName = provider.getName();
+        TString providerName = provider.getName();
         checkInsertProvider(providerName);
-        ProviderList list = Providers.getFullProviderList();
-        ProviderList newList = ProviderList.insertAt(list, provider, position - 1);
+        TProviderList list = TProviders.getFullProviderList();
+        TProviderList newList = TProviderList.insertAt(list, provider, position - 1);
         if (list == newList) {
             return -1;
         }
-        Providers.setProviderList(newList);
+        TProviders.setProviderList(newList);
         return newList.getIndex(providerName) + 1;
     }
 
@@ -354,7 +358,7 @@ public final class TSecurity {
      * @see #removeProvider
      * @see java.security.SecurityPermission
      */
-    public static int addProvider(Provider provider) {
+    public static int addProvider(TProvider provider) {
         /*
          * We can't assign a position here because the statically
          * registered providers may not have been installed yet.
@@ -398,9 +402,9 @@ public final class TSecurity {
      */
     public static synchronized void removeProvider(String name) {
         check("removeProvider." + name);
-        ProviderList list = Providers.getFullProviderList();
-        ProviderList newList = ProviderList.remove(list, name);
-        Providers.setProviderList(newList);
+        TProviderList list = TProviders.getFullProviderList();
+        TProviderList newList = TProviderList.remove(list, name);
+        TProviders.setProviderList(newList);
     }
 
     /**
@@ -410,7 +414,7 @@ public final class TSecurity {
      * @return an array of all the installed providers.
      */
     public static Provider[] getProviders() {
-        return Providers.getFullProviderList().toArray();
+        return TProviders.getFullProviderList().toArray();
     }
 
     /**
@@ -429,66 +433,6 @@ public final class TSecurity {
         return TProviders.getProviderList().getProvider(name);
     }
 
-    /**
-     * Returns an array containing all installed providers that satisfy the
-     * specified selection criterion, or null if no such providers have been
-     * installed. The returned providers are ordered
-     * according to their
-     * {@linkplain #insertProviderAt(java.security.Provider, int) preference order}.
-     *
-     * <p> A cryptographic service is always associated with a particular
-     * algorithm or type. For example, a digital signature service is
-     * always associated with a particular algorithm (e.g., DSA),
-     * and a CertificateFactory service is always associated with
-     * a particular certificate type (e.g., X.509).
-     *
-     * <p>The selection criterion must be specified in one of the following two
-     * formats:
-     * <ul>
-     * <li> <i>{@literal <crypto_service>.<algorithm_or_type>}</i>
-     * <p> The cryptographic service name must not contain any dots.
-     * <p> A
-     * provider satisfies the specified selection criterion iff the provider
-     * implements the
-     * specified algorithm or type for the specified cryptographic service.
-     * <p> For example, "CertificateFactory.X.509"
-     * would be satisfied by any provider that supplied
-     * a CertificateFactory implementation for X.509 certificates.
-     * <li> <i>{@literal <crypto_service>.<algorithm_or_type>
-     * <attribute_name>:<attribute_value>}</i>
-     * <p> The cryptographic service name must not contain any dots. There
-     * must be one or more space characters between the
-     * <i>{@literal <algorithm_or_type>}</i> and the
-     * <i>{@literal <attribute_name>}</i>.
-     *  <p> A provider satisfies this selection criterion iff the
-     * provider implements the specified algorithm or type for the specified
-     * cryptographic service and its implementation meets the
-     * constraint expressed by the specified attribute name/value pair.
-     * <p> For example, "Signature.SHA1withDSA KeySize:1024" would be
-     * satisfied by any provider that implemented
-     * the SHA1withDSA signature algorithm with a keysize of 1024 (or larger).
-     *
-     * </ul>
-     *
-     * <p> See the <a href=
-     * "{@docRoot}/../technotes/guides/security/StandardNames.html">
-     * Java Cryptography Architecture Standard Algorithm Name Documentation</a>
-     * for information about standard cryptographic service names, standard
-     * algorithm names and standard attribute names.
-     *
-     * @param filter the criterion for selecting
-     * providers. The filter is case-insensitive.
-     *
-     * @return all the installed providers that satisfy the selection
-     * criterion, or null if no such providers have been installed.
-     *
-     * @throws InvalidParameterException
-     *         if the filter is not in the required format
-     * @throws NullPointerException if filter is null
-     *
-     * @see #getProviders(java.util.Map)
-     * @since 1.3
-     */
     public static Provider[] getProviders(String filter) {
         String key = null;
         String value = null;
@@ -508,58 +452,6 @@ public final class TSecurity {
         return (getProviders(hashtableFilter));
     }
 
-    /**
-     * Returns an array containing all installed providers that satisfy the
-     * specified* selection criteria, or null if no such providers have been
-     * installed. The returned providers are ordered
-     * according to their
-     * {@linkplain #insertProviderAt(java.security.Provider, int)
-     * preference order}.
-     *
-     * <p>The selection criteria are represented by a map.
-     * Each map entry represents a selection criterion.
-     * A provider is selected iff it satisfies all selection
-     * criteria. The key for any entry in such a map must be in one of the
-     * following two formats:
-     * <ul>
-     * <li> <i>{@literal <crypto_service>.<algorithm_or_type>}</i>
-     * <p> The cryptographic service name must not contain any dots.
-     * <p> The value associated with the key must be an empty string.
-     * <p> A provider
-     * satisfies this selection criterion iff the provider implements the
-     * specified algorithm or type for the specified cryptographic service.
-     * <li>  <i>{@literal <crypto_service>}.
-     * {@literal <algorithm_or_type> <attribute_name>}</i>
-     * <p> The cryptographic service name must not contain any dots. There
-     * must be one or more space characters between the
-     * <i>{@literal <algorithm_or_type>}</i>
-     * and the <i>{@literal <attribute_name>}</i>.
-     * <p> The value associated with the key must be a non-empty string.
-     * A provider satisfies this selection criterion iff the
-     * provider implements the specified algorithm or type for the specified
-     * cryptographic service and its implementation meets the
-     * constraint expressed by the specified attribute name/value pair.
-     * </ul>
-     *
-     * <p> See the <a href=
-     * "../../../technotes/guides/security/StandardNames.html">
-     * Java Cryptography Architecture Standard Algorithm Name Documentation</a>
-     * for information about standard cryptographic service names, standard
-     * algorithm names and standard attribute names.
-     *
-     * @param filter the criteria for selecting
-     * providers. The filter is case-insensitive.
-     *
-     * @return all the installed providers that satisfy the selection
-     * criteria, or null if no such providers have been installed.
-     *
-     * @throws InvalidParameterException
-     *         if the filter is not in the required format
-     * @throws NullPointerException if filter is null
-     *
-     * @see #getProviders(java.lang.String)
-     * @since 1.3
-     */
     public static Provider[] getProviders(Map<String,String> filter) {
         // Get all installed providers first.
         // Then only return those providers who satisfy the selection criteria.
@@ -619,24 +511,24 @@ public final class TSecurity {
     }
 
     // Map containing cached Spi Class objects of the specified type
-    private static final Map<TString, Class<?>> spiMap =
-            new ConcurrentHashMap<>();
+    private static final TMap<TString, TClass<?>> spiMap =
+            new TConcurrentHashMap<TString, TClass<?>>();
 
     /**
      * Return the Class object for the given engine type
      * (e.g. "MessageDigest"). Works for Spis in the java.security package
      * only.
      */
-    private static Class<?> getSpiClass(TString type) {
-        Class<?> clazz = spiMap.get(type);
+    private static TClass<?> getSpiClass(TString type) {
+        TClass<?> clazz = spiMap.get(type);
         if (clazz != null) {
             return clazz;
         }
         try {
-            clazz = Class.forName("java.security." + type + "Spi");
+            clazz = TClass.forName(TString.wrap("java.security." + type + "Spi"));
             spiMap.put(type, clazz);
             return clazz;
-        } catch (ClassNotFoundException e) {
+        } catch (TClassNotFoundException e) {
             throw new AssertionError("Spi class not found", e);
         }
     }
@@ -655,7 +547,7 @@ public final class TSecurity {
             return TGetInstance.getInstance
                     (type, getSpiClass(type), algorithm).toArray();
         } else {
-            return GetInstance.getInstance
+            return TGetInstance.getInstance
                     (type, getSpiClass(type), algorithm, provider).toArray();
         }
     }
@@ -664,10 +556,10 @@ public final class TSecurity {
             Object params) throws TNoSuchAlgorithmException,
             TNoSuchProviderException, TInvalidAlgorithmParameterException {
         if (provider == null) {
-            return GetInstance.getInstance
+            return TGetInstance.getInstance
                     (type, getSpiClass(type), algorithm, params).toArray();
         } else {
-            return GetInstance.getInstance
+            return TGetInstance.getInstance
                     (type, getSpiClass(type), algorithm, params, provider).toArray();
         }
     }
@@ -680,13 +572,13 @@ public final class TSecurity {
      * The {@code provider} argument cannot be null.
      */
     static Object[] getImpl(TString algorithm, TString type, TProvider provider)
-            throws NoSuchAlgorithmException {
+            throws TNoSuchAlgorithmException {
         return TGetInstance.getInstance
                 (type, getSpiClass(type), algorithm, provider).toArray();
     }
 
     static Object[] getImpl(TString algorithm, TString type, TProvider provider,
-            Object params) throws NoSuchAlgorithmException,
+            Object params) throws TNoSuchAlgorithmException,
             InvalidAlgorithmParameterException {
         return TGetInstance.getInstance
                 (type, getSpiClass(type), algorithm, params, provider).toArray();
@@ -816,7 +708,7 @@ public final class TSecurity {
         }
     }
 
-    private static void checkInsertProvider(String name) {
+    private static void checkInsertProvider(TString name) {
         SecurityManager security = System.getSecurityManager();
         if (security != null) {
             try {

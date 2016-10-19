@@ -129,7 +129,7 @@ public abstract class TSignature extends TSignatureSpi {
                     TGetInstance.Instance instance =
                             TGetInstance.getInstance(s, TSignatureSpi.class);
                     return getInstance(instance, algorithm);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (TNoSuchAlgorithmException e) {
                     failure = e;
                 }
             }
@@ -258,7 +258,7 @@ public abstract class TSignature extends TSignatureSpi {
     // return an implementation for NONEwithRSA, which is a special case
     // because of the TCipher.RSA/ECB/PKCS1Padding compatibility wrapper
     private static TSignature getInstanceRSA(TProvider p)
-            throws NoSuchAlgorithmException {
+            throws TNoSuchAlgorithmException {
         // try Signature first
         TProvider.Service s = p.getService(TString.wrap("Signature"), RSA_SIGNATURE);
         if (s != null) {
@@ -272,8 +272,8 @@ public abstract class TSignature extends TSignatureSpi {
         } catch (TGeneralSecurityException e) {
             // throw Signature style exception message to avoid confusion,
             // but append TCipher exception as cause
-            throw new NoSuchAlgorithmException("no such algorithm: "
-                    + RSA_SIGNATURE + " for provider " + p.getName(), e);
+            throw new TNoSuchAlgorithmException(TString.wrap("no such algorithm: "
+                    + RSA_SIGNATURE + " for provider " + p.getName()), e);
         }
     }
 
@@ -282,7 +282,7 @@ public abstract class TSignature extends TSignatureSpi {
      *
      * @return the provider of this signature object
      */
-    public final Provider getProvider() {
+    public final TProvider getProvider() {
         chooseFirstProvider();
         return this.provider;
     }
@@ -391,60 +391,14 @@ public abstract class TSignature extends TSignatureSpi {
 
     }
 
-    /**
-     * Returns the signature bytes of all the data updated.
-     * The format of the signature depends on the underlying
-     * signature scheme.
-     *
-     * <p>A call to this method resets this signature object to the state
-     * it was in when previously initialized for signing via a
-     * call to {@code initSign(PrivateKey)}. That is, the object is
-     * reset and available to generate another signature from the same
-     * signer, if desired, via new calls to {@code update} and
-     * {@code sign}.
-     *
-     * @return the signature bytes of the signing operation's result.
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly or if this signature algorithm is unable to
-     * process the input data provided.
-     */
     public final byte[] sign() throws TSignatureException {
         if (state == SIGN) {
             return engineSign();
         }
-        throw new TSignatureException("object not initialized for " +
-                "signing");
+        throw new TSignatureException(TString.wrap("object not initialized for " +
+                "signing"));
     }
 
-    /**
-     * Finishes the signature operation and stores the resulting signature
-     * bytes in the provided buffer {@code outbuf}, starting at
-     * {@code offset}.
-     * The format of the signature depends on the underlying
-     * signature scheme.
-     *
-     * <p>This signature object is reset to its initial state (the state it
-     * was in after a call to one of the {@code initSign} methods) and
-     * can be reused to generate further signatures with the same private key.
-     *
-     * @param outbuf buffer for the signature result.
-     *
-     * @param offset offset into {@code outbuf} where the signature is
-     * stored.
-     *
-     * @param len number of bytes within {@code outbuf} allotted for the
-     * signature.
-     *
-     * @return the number of bytes placed into {@code outbuf}.
-     *
-     * @exception SignatureException if this signature object is not
-     * initialized properly, if this signature algorithm is unable to
-     * process the input data provided, or if {@code len} is less
-     * than the actual signature length.
-     *
-     * @since 1.2
-     */
     public final int sign(byte[] outbuf, int offset, int len)
             throws TSignatureException {
         if (outbuf == null) {

@@ -18,7 +18,7 @@ package org.teavm.classlib.java.security;
 import java.nio.ByteBuffer;
 import java.security.DigestException;
 
-import sun.security.jca.JCAUtil;
+import org.teavm.classlib.sun.security.jca.TJCAUtil;
 
 public abstract class TMessageDigestSpi {
 
@@ -87,7 +87,7 @@ public abstract class TMessageDigestSpi {
             input.position(lim);
         } else {
             int len = input.remaining();
-            int n = JCAUtil.getTempArraySize(len);
+            int n = TJCAUtil.getTempArraySize(len);
             if ((tempArray == null) || (n > tempArray.length)) {
                 tempArray = new byte[n];
             }
