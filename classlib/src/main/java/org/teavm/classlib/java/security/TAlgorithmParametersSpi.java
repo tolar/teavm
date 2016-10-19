@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 
+import org.teavm.classlib.java.io.TIOException;
+
 public abstract class TAlgorithmParametersSpi {
 
     /**
@@ -45,7 +47,7 @@ public abstract class TAlgorithmParametersSpi {
      * @exception IOException on decoding errors
      */
     protected abstract void engineInit(byte[] params)
-            throws IOException;
+            throws TIOException;
 
     /**
      * Imports the parameters from {@code params} and
@@ -97,7 +99,7 @@ public abstract class TAlgorithmParametersSpi {
      *
      * @exception IOException on encoding errors.
      */
-    protected abstract byte[] engineGetEncoded() throws IOException;
+    protected abstract byte[] engineGetEncoded() throws TIOException;
 
     /**
      * Returns the parameters encoded in the specified format.

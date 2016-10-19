@@ -399,7 +399,7 @@ public abstract class TMessageDigest extends TMessageDigestSpi {
      *
      * @return the name of the algorithm
      */
-    public final String getAlgorithm() {
+    public final TString getAlgorithm() {
         return this.algorithm;
     }
 

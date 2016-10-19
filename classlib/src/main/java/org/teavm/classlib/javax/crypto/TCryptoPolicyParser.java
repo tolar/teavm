@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Vector;
 
 import org.teavm.classlib.java.io.TBufferedReader;
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TReader;
 import org.teavm.classlib.java.io.TStreamTokenizer;
 import org.teavm.classlib.java.lang.TClass;
@@ -38,7 +39,7 @@ final class TCryptoPolicyParser {
     TCryptoPolicyParser() {
     }
 
-    void read(TReader var1) throws TCryptoPolicyParser.ParsingException, IOException {
+    void read(TReader var1) throws TCryptoPolicyParser.ParsingException, TIOException {
         if(!(var1 instanceof TBufferedReader)) {
             var1 = new TBufferedReader((TReader)var1);
         }

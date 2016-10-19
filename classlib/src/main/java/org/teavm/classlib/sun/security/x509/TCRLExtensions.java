@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.security.x509;
 
-import java.lang.reflect.InvocationTargetException;
 import java.security.cert.CRLException;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TString;
-import org.teavm.classlib.java.lang.reflect.TConstructor;
 import org.teavm.classlib.java.security.cert.TCRLException;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -37,7 +35,7 @@ import org.teavm.classlib.sun.security.util.TDerValue;
 public class TCRLExtensions {
     private Map<String, TExtension> map = Collections.synchronizedMap(new TreeMap());
     private boolean unsupportedCritExt = false;
-    private static final Class[] PARAMS = new Class[]{Boolean.TYPE, Object.class };
+    //private static final TClass[] PARAMS = new TClass[]{TBoolean.TYPE, TClass.getClass(PlatformClass.class. TObject) };
 
     public TCRLExtensions() {
     }
@@ -79,15 +77,15 @@ public class TCRLExtensions {
                     throw new CRLException("Duplicate extensions not allowed");
                 }
             } else {
-                TConstructor var3 = var2.getConstructor(PARAMS);
-                Object[] var4 = new Object[]{Boolean.valueOf(var1.isCritical()), var1.getExtensionValue()};
-                TCertAttrSet var5 = (TCertAttrSet)var3.newInstance(var4);
-                if(this.map.put(var5.getName(), (TExtension)var5) != null) {
-                    throw new CRLException("Duplicate extensions not allowed");
-                }
+//                TConstructor var3 = var2.getConstructor(PARAMS);
+//                Object[] var4 = new Object[]{Boolean.valueOf(var1.isCritical()), var1.getExtensionValue()};
+//                TCertAttrSet var5 = (TCertAttrSet)var3.newInstance(var4);
+//                if(this.map.put(var5.getName(), (TExtension)var5) != null) {
+//                    throw new CRLException("Duplicate extensions not allowed");
+//                }
             }
-        } catch (InvocationTargetException var6) {
-            throw new TCRLException(TString.wrap(var6.getTargetException().getMessage()));
+//        } catch (InvocationTargetException var6) {
+//            throw new TCRLException(TString.wrap(var6.getTargetException().getMessage()));
         } catch (Exception var7) {
             throw new TCRLException(TString.wrap(var7.toString()));
         }

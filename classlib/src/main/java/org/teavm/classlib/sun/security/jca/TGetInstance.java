@@ -151,7 +151,7 @@ public class TGetInstance {
         return getInstance(getService(var0, var2, var3), var1);
     }
 
-    public static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, String var2, TObject var3, TString var4) throws TNoSuchAlgorithmException, TNoSuchProviderException {
+    public static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, TString var2, TObject var3, TString var4) throws TNoSuchAlgorithmException, TNoSuchProviderException {
         return getInstance(getService(var0, var2, var4), var1, var3);
     }
 
@@ -169,7 +169,7 @@ public class TGetInstance {
         return new TGetInstance.Instance(var0.getProvider(), var2);
     }
 
-    public static TGetInstance.Instance getInstance(TProvider.Service var0, TClass<?> var1, Object var2) throws TNoSuchAlgorithmException {
+    public static TGetInstance.Instance getInstance(TProvider.Service var0, TClass<?> var1, TObject var2) throws TNoSuchAlgorithmException {
         Object var3 = var0.newInstance(var2);
         checkSuperClass(var0, var3.getClass(), var1);
         return new TGetInstance.Instance(var0.getProvider(), var3);

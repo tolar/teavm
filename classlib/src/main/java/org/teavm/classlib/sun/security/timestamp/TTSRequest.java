@@ -15,11 +15,12 @@
  */
 package org.teavm.classlib.sun.security.timestamp;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.security.TMessageDigest;
 import org.teavm.classlib.java.security.cert.TX509Extension;
 import org.teavm.classlib.sun.security.util.TDerOutputStream;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
@@ -37,7 +38,7 @@ public class TTSRequest {
     private boolean returnCertificate = false;
     private TX509Extension[] extensions = null;
 
-    public TTSRequest(TString var1, byte[] var2, MessageDigest var3) throws NoSuchAlgorithmException {
+    public TTSRequest(TString var1, byte[] var2, TMessageDigest var3) throws NoSuchAlgorithmException {
         this.policyId = var1;
         this.hashAlgorithmId = TAlgorithmId.get(var3.getAlgorithm());
         this.hashValue = var3.digest(var2);

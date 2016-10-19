@@ -69,7 +69,7 @@ public abstract class TX509CRLEntry implements TX509Extension {
             for (int i = 1; i < entryData.length; i++)
                 retval += entryData[i] * i;
 
-        } catch (CRLException ce) {
+        } catch (TCRLException ce) {
             return(retval);
         }
         return(retval);

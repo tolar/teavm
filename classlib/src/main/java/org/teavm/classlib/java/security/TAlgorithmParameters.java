@@ -16,7 +16,6 @@
 package org.teavm.classlib.java.security;
 
 import java.io.IOException;
-import java.security.AlgorithmParametersSpi;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
@@ -24,6 +23,7 @@ import java.security.Security;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 
+import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 
 public class TAlgorithmParameters {
@@ -102,7 +102,7 @@ public class TAlgorithmParameters {
             return new TAlgorithmParameters((TAlgorithmParametersSpi)objs[0],
                     (TProvider)objs[1],
                     algorithm);
-        } catch(NoSuchProviderException e) {
+        } catch(TNoSuchProviderException e) {
             throw new NoSuchAlgorithmException(algorithm + " not found");
         }
     }
@@ -144,16 +144,16 @@ public class TAlgorithmParameters {
      *
      * @see Provider
      */
-    public static java.security.AlgorithmParameters getInstance(String algorithm,
-            String provider)
+    public static TAlgorithmParameters getInstance(TString algorithm,
+            TString provider)
             throws NoSuchAlgorithmException, NoSuchProviderException
     {
         if (provider == null || provider.length() == 0)
             throw new IllegalArgumentException("missing provider");
-        Object[] objs = Security.getImpl(algorithm, "AlgorithmParameters",
+        Object[] objs = TSecurity.getImpl(algorithm, TString.wrap("AlgorithmParameters"),
                 provider);
-        return new java.security.AlgorithmParameters((AlgorithmParametersSpi)objs[0],
-                (Provider)objs[1],
+        return new TAlgorithmParameters((TAlgorithmParametersSpi)objs[0],
+                (TProvider)objs[1],
                 algorithm);
     }
 
@@ -189,16 +189,16 @@ public class TAlgorithmParameters {
      *
      * @since 1.4
      */
-    public static java.security.AlgorithmParameters getInstance(String algorithm,
-            Provider provider)
+    public static TAlgorithmParameters getInstance(TString algorithm,
+            TProvider provider)
             throws NoSuchAlgorithmException
     {
         if (provider == null)
             throw new IllegalArgumentException("missing provider");
-        Object[] objs = Security.getImpl(algorithm, "AlgorithmParameters",
+        Object[] objs = TSecurity.getImpl(algorithm, TString.wrap("TAlgorithmParameters"),
                 provider);
-        return new java.security.AlgorithmParameters((AlgorithmParametersSpi)objs[0],
-                (Provider)objs[1],
+        return new TAlgorithmParameters((TAlgorithmParametersSpi)objs[0],
+                (TProvider)objs[1],
                 algorithm);
     }
 
@@ -207,7 +207,7 @@ public class TAlgorithmParameters {
      *
      * @return the provider of this parameter object
      */
-    public final Provider getProvider() {
+    public final TProvider getProvider() {
         return this.provider;
     }
 
@@ -241,9 +241,9 @@ public class TAlgorithmParameters {
      * @exception IOException on decoding errors, or if this parameter object
      * has already been initialized.
      */
-    public final void init(byte[] params) throws IOException {
+    public final void init(byte[] params) throws TIOException {
         if (this.initialized)
-            throw new IOException("already initialized");
+            throw new TIOException(TString.wrap("already initialized"));
         paramSpi.engineInit(params);
         this.initialized = true;
     }
@@ -308,10 +308,10 @@ public class TAlgorithmParameters {
      * @exception IOException on encoding errors, or if this parameter object
      * has not been initialized.
      */
-    public final byte[] getEncoded() throws IOException
+    public final byte[] getEncoded() throws TIOException
     {
         if (this.initialized == false) {
-            throw new IOException("not initialized");
+            throw new TIOException(TString.wrap("not initialized"));
         }
         return paramSpi.engineGetEncoded();
     }

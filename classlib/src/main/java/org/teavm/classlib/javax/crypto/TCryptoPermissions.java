@@ -15,19 +15,19 @@
  */
 package org.teavm.classlib.javax.crypto;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamField;
 import java.io.Serializable;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.teavm.classlib.java.io.TBufferedReader;
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TInputStream;
+import org.teavm.classlib.java.io.TInputStreamReader;
+import org.teavm.classlib.java.lang.TClassNotFoundException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPermission;
 import org.teavm.classlib.java.security.TPermissionCollection;
@@ -42,9 +42,9 @@ final class TCryptoPermissions extends TPermissionCollection implements Serializ
     TCryptoPermissions() {
     }
 
-    void load(InputStream var1) throws IOException, TCryptoPolicyParser.ParsingException {
+    void load(TInputStream var1) throws TIOException, TCryptoPolicyParser.ParsingException {
         TCryptoPolicyParser var2 = new TCryptoPolicyParser();
-        var2.read(new BufferedReader(new InputStreamReader(var1, "UTF-8")));
+        var2.read(new TBufferedReader(new TInputStreamReader(var1, TString.wrap("UTF-8"))));
         TCryptoPermission[] var3 = var2.getPermissions();
 
         for(int var4 = 0; var4 < var3.length; ++var4) {
@@ -98,7 +98,7 @@ final class TCryptoPermissions extends TPermissionCollection implements Serializ
                 var4 = ((TCryptoPermission)var3.elements().nextElement()).getMaxKeySize();
             }
 
-            Enumeration var5 = this.perms.keys();
+            TEnumeration var5 = this.perms.keys();
 
             while(true) {
                 TCryptoPermission[] var9;
@@ -110,7 +110,7 @@ final class TCryptoPermissions extends TPermissionCollection implements Serializ
                         }
 
                         var4 = ((TCryptoPermission)var12.elements().nextElement()).getMaxKeySize();
-                        Enumeration var13 = var1.perms.keys();
+                        TEnumeration var13 = var1.perms.keys();
 
                         while(true) {
                             String var14;
@@ -156,12 +156,12 @@ final class TCryptoPermissions extends TPermissionCollection implements Serializ
 
     private TCryptoPermission[] getMinimum(TPermissionCollection var1, TPermissionCollection var2) {
         Vector var3 = new Vector(2);
-        Enumeration var4 = var1.elements();
+        TEnumeration var4 = var1.elements();
 
         while(true) {
             while(var4.hasMoreElements()) {
                 TCryptoPermission var5 = (TCryptoPermission)var4.nextElement();
-                Enumeration var6 = var2.elements();
+                TEnumeration var6 = var2.elements();
 
                 while(var6.hasMoreElements()) {
                     TCryptoPermission var7 = (TCryptoPermission)var6.nextElement();
@@ -184,7 +184,7 @@ final class TCryptoPermissions extends TPermissionCollection implements Serializ
 
     private TCryptoPermission[] getMinimum(int var1, TPermissionCollection var2) {
         Vector var3 = new Vector(1);
-        Enumeration var4 = var2.elements();
+        TEnumeration var4 = var2.elements();
 
         while(var4.hasMoreElements()) {
             TCryptoPermission var5 = (TCryptoPermission)var4.nextElement();
@@ -224,13 +224,13 @@ final class TCryptoPermissions extends TPermissionCollection implements Serializ
         return var3;
     }
 
-    private void readObject(ObjectInputStream var1) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream var1) throws TIOException, TClassNotFoundException {
         ObjectInputStream.GetField var2 = var1.readFields();
         Hashtable var3 = (Hashtable)((Hashtable)var2.get("perms", (Object)null));
         if(var3 != null) {
-            this.perms = new ConcurrentHashMap(var3);
+            this.perms = new TConcurrentHashMap(var3);
         } else {
-            this.perms = new ConcurrentHashMap();
+            this.perms = new TConcurrentHashMap();
         }
 
     }

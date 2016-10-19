@@ -42,6 +42,7 @@ import java.util.Set;
 
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TClassNotFoundException;
+import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.java.util.TMap;
@@ -553,7 +554,7 @@ public final class TSecurity {
     }
 
     static Object[] getImpl(TString algorithm, TString type, TString provider,
-            Object params) throws TNoSuchAlgorithmException,
+            TObject params) throws TNoSuchAlgorithmException,
             TNoSuchProviderException, TInvalidAlgorithmParameterException {
         if (provider == null) {
             return TGetInstance.getInstance
@@ -578,7 +579,7 @@ public final class TSecurity {
     }
 
     static Object[] getImpl(TString algorithm, TString type, TProvider provider,
-            Object params) throws TNoSuchAlgorithmException,
+            TObject params) throws TNoSuchAlgorithmException,
             InvalidAlgorithmParameterException {
         return TGetInstance.getInstance
                 (type, getSpiClass(type), algorithm, params, provider).toArray();

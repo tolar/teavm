@@ -23,8 +23,6 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +31,8 @@ import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TArrayList;
 import org.teavm.classlib.java.util.TCollections;
 import org.teavm.classlib.java.util.THashMap;
+import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TLinkedHashMap;
 import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.java.util.TProperties;
@@ -93,10 +93,10 @@ public abstract class TProvider extends TProperties {
 
     // Map<ServiceKey,Service>
     // used for services added via legacy methods, init on demand
-    private transient Map<TProvider.ServiceKey,TProvider.Service> legacyMap;
+    private transient TMap<TProvider.ServiceKey,TProvider.Service> legacyMap;
 
     // Map<String,String>
-    private transient Map<String,String> legacyStrings;
+    private transient TMap<TString,TString> legacyStrings;
 
     // Set<Service>
     // Unmodifiable set of all services. Initialized on demand.
@@ -106,37 +106,37 @@ public abstract class TProvider extends TProperties {
     private final static String ALIAS_PREFIX_LOWER = "alg.alias.";
     private final static int ALIAS_LENGTH = ALIAS_PREFIX.length();
 
-    private TString[] getTypeAndAlgorithm(String key) {
-        int i = key.indexOf(".");
+    private TString[] getTypeAndAlgorithm(TString key) {
+        int i = key.indexOf(TString.wrap("."));
         if (i < 1) {
             return null;
         }
-        String type = key.substring(0, i);
-        String alg = key.substring(i + 1);
-        return new TString[] {TString.wrap(type), TString.wrap(alg)};
+        TString type = key.substring(0, i);
+        TString alg = key.substring(i + 1);
+        return new TString[] {type, alg};
     }
 
-    private void parseLegacyPut(String name, String value) {
-        if (name.toLowerCase(ENGLISH).startsWith(ALIAS_PREFIX_LOWER)) {
+    private void parseLegacyPut(TString name, TString value) {
+        if (name.toLowerCase(ENGLISH).startsWith(TString.wrap(ALIAS_PREFIX_LOWER))) {
             // e.g. put("Alg.Alias.MessageDigest.SHA", "SHA-1");
             // aliasKey ~ MessageDigest.SHA
-            String stdAlg = value;
-            String aliasKey = name.substring(ALIAS_LENGTH);
+            TString stdAlg = value;
+            TString aliasKey = name.substring(ALIAS_LENGTH);
             TString[] typeAndAlg = getTypeAndAlgorithm(aliasKey);
             if (typeAndAlg == null) {
                 return;
             }
-            TString type = getEngineName(TString.wrap(typeAndAlg[0]));
+            TString type = getEngineName(TString.wrap(typeAndAlg[0].toString()));
             TString aliasAlg = typeAndAlg[1].intern();
-            TProvider.ServiceKey key = new TProvider.ServiceKey(type, TString.wrap(stdAlg), true);
+            TProvider.ServiceKey key = new TProvider.ServiceKey(type, stdAlg, true);
             TProvider.Service s = legacyMap.get(key);
             if (s == null) {
                 s = new TProvider.Service(this);
                 s.type = type;
-                s.algorithm = TString.wrap(stdAlg);
+                s.algorithm = stdAlg;
                 legacyMap.put(key, s);
             }
-            legacyMap.put(new TProvider.ServiceKey(type, TString.wrap(stdAlg), true), s);
+            legacyMap.put(new TProvider.ServiceKey(type, stdAlg, true), s);
             s.addAlias(aliasAlg);
         } else {
             TString[] typeAndAlg = getTypeAndAlgorithm(name);
@@ -148,34 +148,34 @@ public abstract class TProvider extends TProperties {
                 // e.g. put("MessageDigest.SHA-1", "sun.security.provider.SHA");
                 TString type = getEngineName(TString.wrap((typeAndAlg[0]).toString()));
                 TString stdAlg = typeAndAlg[1].intern();
-                String className = value;
-                TProvider.ServiceKey key = new TProvider.ServiceKey(TString.wrap(type), TString.wrap(stdAlg), true);
+                TString className = value;
+                TProvider.ServiceKey key = new TProvider.ServiceKey(TString.wrap(type.toString()), TString.wrap(stdAlg.toString()), true);
                 TProvider.Service s = legacyMap.get(key);
                 if (s == null) {
                     s = new TProvider.Service(this);
-                    s.type = TString.wrap(type);
-                    s.algorithm = TString.wrap(stdAlg);
+                    s.type = TString.wrap(type.toString());
+                    s.algorithm = TString.wrap(stdAlg.toString());
                     legacyMap.put(key, s);
                 }
-                s.className = TString.wrap(className);
+                s.className = className;
             } else { // attribute
                 // e.g. put("MessageDigest.SHA-1 ImplementedIn", "Software");
-                String attributeValue = value;
-                String type = getEngineName(TString.wrap(typeAndAlg[0])).toString();
-                String attributeString = typeAndAlg[1];
-                String stdAlg = attributeString.substring(0, i).intern();
-                String attributeName = attributeString.substring(i + 1);
+                TString attributeValue = value;
+                String type = getEngineName(TString.wrap(typeAndAlg[0].toString())).toString();
+                TString attributeString = typeAndAlg[1];
+                TString stdAlg = attributeString.substring(0, i).intern();
+                TString attributeName = attributeString.substring(i + 1);
                 // kill additional spaces
-                while (attributeName.startsWith(" ")) {
+                while (attributeName.startsWith(TString.wrap(" "))) {
                     attributeName = attributeName.substring(1);
                 }
                 attributeName = attributeName.intern();
-                TProvider.ServiceKey key = new TProvider.ServiceKey(TString.wrap(type), TString.wrap(stdAlg), true);
+                TProvider.ServiceKey key = new TProvider.ServiceKey(TString.wrap(type), TString.wrap(stdAlg.toString()), true);
                 TProvider.Service s = legacyMap.get(key);
                 if (s == null) {
                     s = new TProvider.Service(this);
                     s.type = TString.wrap(type);
-                    s.algorithm = TString.wrap(stdAlg);
+                    s.algorithm = TString.wrap(stdAlg.toString());
                     legacyMap.put(key, s);
                 }
                 s.addAttribute(attributeName, attributeValue);
@@ -278,19 +278,19 @@ public abstract class TProvider extends TProperties {
         }
         serviceSet = null;
         if (legacyMap == null) {
-            legacyMap = new LinkedHashMap<TProvider.ServiceKey,TProvider.Service>();
+            legacyMap = new TLinkedHashMap<ServiceKey,Service>();
         } else {
             legacyMap.clear();
         }
-        for (Map.Entry<String,String> entry : legacyStrings.entrySet()) {
+        for (TMap.Entry<TString,TString> entry : legacyStrings.entrySet()) {
             parseLegacyPut(entry.getKey(), entry.getValue());
         }
         removeInvalidServices(legacyMap);
         legacyChanged = false;
     }
 
-    private void removeInvalidServices(Map<TProvider.ServiceKey,TProvider.Service> map) {
-        for (Iterator<Map.Entry<TProvider.ServiceKey, TProvider.Service>> t =
+    private void removeInvalidServices(TMap<TProvider.ServiceKey,TProvider.Service> map) {
+        for (TIterator<TMap.Entry<ServiceKey, Service>> t =
              map.entrySet().iterator(); t.hasNext(); ) {
             TProvider.Service s = t.next().getValue();
             if (s.isValid() == false) {
@@ -400,7 +400,7 @@ public abstract class TProvider extends TProperties {
          */
         public Service(TProvider provider, String type, String algorithm,
                 String className, List<TString> aliases,
-                Map<String,String> attributes) {
+                TMap<String,String> attributes) {
             if ((provider == null) || (type == null) ||
                     (algorithm == null) || (className == null)) {
                 throw new NullPointerException();
@@ -417,8 +417,8 @@ public abstract class TProvider extends TProperties {
             if (attributes == null) {
                 this.attributes = TCollections.<TProvider.UString,TString>emptyMap();
             } else {
-                this.attributes = new HashMap<TProvider.UString,String>();
-                for (Map.Entry<String,String> entry : attributes.entrySet()) {
+                this.attributes = new THashMap<TProvider.UString,TString>();
+                for (TMap.Entry<String,String> entry : attributes.entrySet()) {
                     this.attributes.put(new TProvider.UString(entry.getKey()), entry.getValue());
                 }
             }

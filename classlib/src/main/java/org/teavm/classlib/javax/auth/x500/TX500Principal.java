@@ -133,14 +133,10 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      */
     public TX500Principal(TString name, TMap<TString, TString> keywordMap) {
         if (name == null) {
-            throw new NullPointerException
-                    (sun.security.util.ResourcesMgr.getString
-                            ("provided.null.name"));
+            throw new NullPointerException("provided.null.name");
         }
         if (keywordMap == null) {
-            throw new NullPointerException
-                    (sun.security.util.ResourcesMgr.getString
-                            ("provided.null.keyword.map"));
+            throw new NullPointerException("provided.null.keyword.map");
         }
 
         try {
@@ -369,9 +365,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      */
     public String getName(String format, Map<String, String> oidMap) {
         if (oidMap == null) {
-            throw new NullPointerException
-                    (sun.security.util.ResourcesMgr.getString
-                            ("provided.null.OID.map"));
+            throw new NullPointerException("provided.null.OID.map");
         }
         if (format != null) {
             if (format.equalsIgnoreCase(RFC1779)) {

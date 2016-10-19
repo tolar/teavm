@@ -183,7 +183,7 @@ public class TAlgorithmId implements TDerEncoder {
         String var1 = this.algid.toString();
 
         try {
-            this.algParams = TAlgorithmParameters.getInstance(var1);
+            this.algParams = TAlgorithmParameters.getInstance(TString.wrap(var1));
         } catch (NoSuchAlgorithmException var3) {
             this.algParams = null;
             return;
