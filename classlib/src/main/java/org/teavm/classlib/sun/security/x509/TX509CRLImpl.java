@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRLEntry;
@@ -29,7 +27,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -39,6 +36,7 @@ import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.java.security.TNoSuchProviderException;
 import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.TPrivateKey;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.TSignature;
@@ -365,20 +363,20 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
         var0.verify(var1, var2);
     }
 
-    public void sign(PrivateKey var1, String var2) throws CRLException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
-        this.sign(var1, var2, (String)null);
+    public void sign(TPrivateKey var1, TString var2) throws CRLException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
+        this.sign(var1, var2, (TString)null);
     }
 
-    public void sign(PrivateKey var1, String var2, String var3) throws CRLException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
+    public void sign(TPrivateKey var1, TString var2, TString var3) throws CRLException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
         try {
             if(this.readOnly) {
                 throw new CRLException("cannot over-write existing CRL");
             } else {
-                Signature var4 = null;
+                TSignature var4 = null;
                 if(var3 != null && var3.length() != 0) {
-                    var4 = Signature.getInstance(var2, var3);
+                    var4 = TSignature.getInstance(var2, var3);
                 } else {
-                    var4 = Signature.getInstance(var2);
+                    var4 = TSignature.getInstance(var2);
                 }
 
                 var4.initSign(var1);

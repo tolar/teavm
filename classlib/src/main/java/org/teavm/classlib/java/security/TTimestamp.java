@@ -16,13 +16,12 @@
 package org.teavm.classlib.java.security;
 
 import java.io.ObjectInputStream;
-import java.util.List;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TSerializable;
 import org.teavm.classlib.java.security.cert.TCertPath;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.java.util.TList;
 
 public final class TTimestamp implements TSerializable {
 
@@ -126,7 +125,7 @@ public final class TTimestamp implements TSerializable {
         StringBuffer sb = new StringBuffer();
         sb.append("(");
         sb.append("timestamp: " + timestamp);
-        List<? extends TCertificate> certs = signerCertPath.getCertificates();
+        TList<? extends TCertificate> certs = signerCertPath.getCertificates();
         if (!certs.isEmpty()) {
             sb.append("TSA: " + certs.get(0));
         } else {

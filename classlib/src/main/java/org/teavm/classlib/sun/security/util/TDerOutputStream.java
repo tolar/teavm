@@ -18,7 +18,6 @@ package org.teavm.classlib.sun.security.util;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
@@ -120,7 +119,7 @@ public class TDerOutputStream extends TByteArrayOutputStream implements TDerEnco
 
     }
 
-    public void putBitString(byte[] var1) throws IOException {
+    public void putBitString(byte[] var1) throws TIOException {
         this.write(3);
         this.putLength(var1.length + 1);
         this.write(0);

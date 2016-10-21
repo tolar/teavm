@@ -21,11 +21,7 @@ import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Principal;
-import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
@@ -42,9 +38,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.io.TBufferedInputStream;
 import org.teavm.classlib.java.io.TBufferedReader;
 import org.teavm.classlib.java.io.TIOException;
@@ -57,6 +51,7 @@ import org.teavm.classlib.java.security.TInvalidKeyException;
 import org.teavm.classlib.java.security.TNoSuchAlgorithmException;
 import org.teavm.classlib.java.security.TNoSuchProviderException;
 import org.teavm.classlib.java.security.TPrincipal;
+import org.teavm.classlib.java.security.TPrivateKey;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.TSignature;
@@ -287,24 +282,24 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         }
     }
 
-    public static void verify(TX509Certificate var0, TPublicKey var1, TProvider var2) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public static void verify(TX509Certificate var0, TPublicKey var1, TProvider var2) throws TCertificateException, TNoSuchAlgorithmException, TInvalidKeyException, TSignatureException {
         var0.verify(var1, var2);
     }
 
-    public void sign(PrivateKey var1, String var2) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
-        this.sign(var1, var2, (String)null);
+    public void sign(TPrivateKey var1, TString var2) throws TCertificateException, NoSuchAlgorithmException, InvalidKeyException, TNoSuchProviderException, TSignatureException {
+        this.sign(var1, var2, (TString)null);
     }
 
-    public void sign(PrivateKey var1, String var2, String var3) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
+    public void sign(TPrivateKey var1, TString var2, TString var3) throws TCertificateException, NoSuchAlgorithmException, InvalidKeyException, TNoSuchProviderException, TSignatureException {
         try {
             if(this.readOnly) {
-                throw new CertificateEncodingException("cannot over-write existing certificate");
+                throw new TCertificateEncodingException(TString.wrap("cannot over-write existing certificate"));
             } else {
-                Signature var4 = null;
+                TSignature var4 = null;
                 if(var3 != null && var3.length() != 0) {
-                    var4 = Signature.getInstance(var2, var3);
+                    var4 = TSignature.getInstance(var2, var3);
                 } else {
-                    var4 = Signature.getInstance(var2);
+                    var4 = TSignature.getInstance(var2);
                 }
 
                 var4.initSign(var1);
@@ -321,8 +316,8 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
                 this.signedCert = var5.toByteArray();
                 this.readOnly = true;
             }
-        } catch (IOException var8) {
-            throw new CertificateEncodingException(var8.toString());
+        } catch (TIOException var8) {
+            throw new TCertificateEncodingException(var8);
         }
     }
 
@@ -662,7 +657,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         TAuthorityKeyIdentifierExtension var1 = this.getAuthorityKeyIdentifierExtension();
         if(var1 != null) {
             try {
-                return (TKeyIdentifier)var1.get("key_id");
+                return (TKeyIdentifier)var1.get(TString.wrap("key_id"));
             } catch (TIOException var3) {
                 ;
             }
@@ -935,7 +930,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         }
     }
 
-    public synchronized List<String> getExtendedKeyUsage() throws CertificateParsingException {
+    public synchronized List<String> getExtendedKeyUsage() throws TCertificateParsingException {
         if(this.readOnly && this.extKeyUsage != null) {
             return this.extKeyUsage;
         } else {
@@ -949,7 +944,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         }
     }
 
-    public static List<String> getExtendedKeyUsage(TX509Certificate var0) throws CertificateParsingException {
+    public static List<String> getExtendedKeyUsage(TX509Certificate var0) throws TCertificateParsingException {
         try {
             byte[] var1 = var0.getExtensionValue(TString.wrap("2.5.29.37"));
             if(var1 == null) {
@@ -960,8 +955,8 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
                 TExtendedKeyUsageExtension var4 = new TExtendedKeyUsageExtension(Boolean.FALSE, var3);
                 return Collections.unmodifiableList(var4.getExtendedKeyUsage());
             }
-        } catch (IOException var5) {
-            throw new CertificateParsingException(var5);
+        } catch (TIOException var5) {
+            throw new TCertificateParsingException(var5);
         }
     }
 

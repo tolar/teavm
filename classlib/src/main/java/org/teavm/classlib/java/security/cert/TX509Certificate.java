@@ -27,7 +27,6 @@ import java.security.cert.CertificateParsingException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TInvalidKeyException;
@@ -445,7 +444,7 @@ public abstract class TX509Certificate extends TCertificate
      * @throws CertificateParsingException if the extension cannot be decoded
      * @since 1.4
      */
-    public List<String> getExtendedKeyUsage() throws CertificateParsingException {
+    public List<String> getExtendedKeyUsage() throws TCertificateParsingException {
         return TX509CertImpl.getExtendedKeyUsage(this);
     }
 

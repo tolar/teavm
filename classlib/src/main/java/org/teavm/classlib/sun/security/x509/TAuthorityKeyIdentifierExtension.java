@@ -17,7 +17,6 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
@@ -163,21 +162,21 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("key_id")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("key_id"))) {
             if(!(var2 instanceof TKeyIdentifier)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type KeyIdentifier."));
             }
 
             this.id = (TKeyIdentifier)var2;
-        } else if(var1.equalsIgnoreCase("auth_name")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("auth_name"))) {
             if(!(var2 instanceof TGeneralNames)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type GeneralNames."));
             }
 
             this.names = (TGeneralNames)var2;
         } else {
-            if(!var1.equalsIgnoreCase("serial_number")) {
+            if(!var1.equalsIgnoreCase(TString.wrap("serial_number"))) {
                 throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier."));
             }
 
@@ -191,25 +190,25 @@ public class TAuthorityKeyIdentifierExtension extends TExtension implements TCer
         this.encodeThis();
     }
 
-    public Object get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("key_id")) {
+    public Object get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("key_id"))) {
             return this.id;
-        } else if(var1.equalsIgnoreCase("auth_name")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("auth_name"))) {
             return this.names;
-        } else if(var1.equalsIgnoreCase("serial_number")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("serial_number"))) {
             return this.serialNum;
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("key_id")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("key_id"))) {
             this.id = null;
-        } else if(var1.equalsIgnoreCase("auth_name")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("auth_name"))) {
             this.names = null;
         } else {
-            if(!var1.equalsIgnoreCase("serial_number")) {
+            if(!var1.equalsIgnoreCase(TString.wrap("serial_number"))) {
                 throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:AuthorityKeyIdentifier."));
             }
 

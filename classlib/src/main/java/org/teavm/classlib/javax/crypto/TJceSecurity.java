@@ -28,16 +28,16 @@ import java.security.ProtectionDomain;
 import java.security.Provider;
 import java.util.Enumeration;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
+import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TProvider;
 import org.teavm.classlib.java.security.TSecureRandom;
+import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
 
 final class TJceSecurity {
@@ -66,7 +66,7 @@ final class TJceSecurity {
         }
     }
 
-    static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2, Provider var3) throws NoSuchAlgorithmException {
+    static TGetInstance.Instance getInstance(TString var0, TClass<?> var1, TString var2, TProvider var3) throws NoSuchAlgorithmException {
         TProvider.Service var4 = TGetInstance.getService(var0, var2, var3);
         Exception var5 = getVerificationResult(var3);
         if(var5 != null) {
@@ -77,10 +77,10 @@ final class TJceSecurity {
         }
     }
 
-    static TGetInstance.Instance getInstance(String var0, Class<?> var1, String var2) throws NoSuchAlgorithmException {
-        List var3 = TGetInstance.getServices(var0, var2);
+    static TGetInstance.Instance getInstance(TString var0, Class<?> var1, TString var2) throws NoSuchAlgorithmException {
+        TList var3 = TGetInstance.getServices(var0, var2);
         NoSuchAlgorithmException var4 = null;
-        Iterator var5 = var3.iterator();
+        TIterator var5 = var3.iterator();
 
         while(true) {
             Provider.Service var6;

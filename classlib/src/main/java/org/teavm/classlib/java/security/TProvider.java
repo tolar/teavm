@@ -16,7 +16,6 @@
 package org.teavm.classlib.java.security;
 
 import static java.util.Locale.ENGLISH;
-
 import java.lang.ref.Reference;
 import java.security.InvalidParameterException;
 import java.security.Key;
@@ -26,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TArrayList;
 import org.teavm.classlib.java.util.TCollections;
@@ -399,7 +397,7 @@ public abstract class TProvider extends TProperties {
          * className is null
          */
         public Service(TProvider provider, String type, String algorithm,
-                String className, List<TString> aliases,
+                String className, TList<TString> aliases,
                 TMap<String,String> attributes) {
             if ((provider == null) || (type == null) ||
                     (algorithm == null) || (className == null)) {

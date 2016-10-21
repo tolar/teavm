@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
@@ -75,13 +74,13 @@ public class TExtendedKeyUsageExtension extends TExtension implements TCertAttrS
         this.encodeThis();
     }
 
-    public TExtendedKeyUsageExtension(Boolean var1, Object var2) throws IOException {
+    public TExtendedKeyUsageExtension(Boolean var1, Object var2) throws TIOException {
         this.extensionId = TPKIXExtensions.ExtendedKeyUsage_Id;
         this.critical = var1.booleanValue();
         this.extensionValue = (byte[])((byte[])var2);
         TDerValue var3 = new TDerValue(this.extensionValue);
         if(var3.tag != 48) {
-            throw new IOException("Invalid encoding for ExtendedKeyUsageExtension.");
+            throw new TIOException(TString.wrap("Invalid encoding for ExtendedKeyUsageExtension."));
         } else {
             this.keyUsages = new Vector();
 
