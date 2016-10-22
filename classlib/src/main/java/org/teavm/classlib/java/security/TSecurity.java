@@ -39,7 +39,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TClassNotFoundException;
 import org.teavm.classlib.java.lang.TObject;
@@ -926,7 +925,7 @@ public final class TSecurity {
     /**
      * Returns a Set of Strings containing the names of all available
      * algorithms or types for the specified Java cryptographic service
-     * (e.g., Signature, MessageDigest, Cipher, Mac, KeyStore). Returns
+     * (e.g., Signature, MessageDigest, Cipher, Mac, TKeyStore). Returns
      * an empty Set if there is no provider that supports the
      * specified service or if serviceName is null. For a complete list
      * of Java cryptographic services, please see the
@@ -935,7 +934,7 @@ public final class TSecurity {
      * Note: the returned set is immutable.
      *
      * @param serviceName the name of the Java cryptographic
-     * service (e.g., Signature, MessageDigest, Cipher, Mac, KeyStore).
+     * service (e.g., Signature, MessageDigest, Cipher, Mac, TKeyStore).
      * Note: this parameter is case-insensitive.
      *
      * @return a Set of Strings containing the names of all available

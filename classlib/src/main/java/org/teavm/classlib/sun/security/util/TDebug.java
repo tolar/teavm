@@ -18,7 +18,6 @@ package org.teavm.classlib.sun.security.util;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.teavm.classlib.java.math.TBigInteger;
 
 public class TDebug {
@@ -47,7 +46,7 @@ public class TDebug {
         System.err.println("provider      security provider debugging");
         System.err.println("pkcs11        PKCS11 session manager debugging");
         System.err.println("pkcs11keystore");
-        System.err.println("              PKCS11 KeyStore debugging");
+        System.err.println("              PKCS11 TKeyStore debugging");
         System.err.println("sunpkcs11     SunPKCS11 provider debugging");
         System.err.println("scl           permissions SecureClassLoader assigns");
         System.err.println("ts            timestamping");
@@ -74,7 +73,7 @@ public class TDebug {
         System.err.println("              only dump output for the specified list");
         System.err.println("              of JCA engines. Supported values:");
         System.err.println("              TCipher, KeyAgreement, KeyGenerator,");
-        System.err.println("              KeyPairGenerator, KeyStore, Mac,");
+        System.err.println("              KeyPairGenerator, TKeyStore, Mac,");
         System.err.println("              MessageDigest, SecureRandom, Signature.");
         System.err.println();
         System.err.println("Note: Separate multiple options with a comma");

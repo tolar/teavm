@@ -16,7 +16,6 @@
 package org.teavm.classlib.sun.security.validator;
 
 import java.io.IOException;
-import java.security.PublicKey;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
 import java.security.cert.TrustAnchor;
@@ -28,10 +27,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.x500.X500Principal;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TAlgorithmConstraints;
 import org.teavm.classlib.java.security.TGeneralSecurityException;
+import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TCollection;
@@ -39,14 +38,8 @@ import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
-import sun.security.provider.certpath.AlgorithmChecker;
-import sun.security.provider.certpath.UntrustedChecker;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
-import sun.security.validator.ValidatorException;
-import sun.security.x509.NetscapeCertTypeExtension;
-import sun.security.x509.X509CertImpl;
+import org.teavm.classlib.sun.security.util.TObjectIdentifier;
+import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
 /**
  * Created by vasek on 21. 10. 2016.
@@ -57,20 +50,20 @@ public final class TSimpleValidator extends TValidator {
     static final String OID_KEY_USAGE = "2.5.29.15";
     static final String OID_EXTENDED_KEY_USAGE = "2.5.29.37";
     static final String OID_EKU_ANY_USAGE = "2.5.29.37.0";
-    static final ObjectIdentifier OBJID_NETSCAPE_CERT_TYPE;
+    static final TObjectIdentifier OBJID_NETSCAPE_CERT_TYPE;
     private static final String NSCT_SSL_CA = "ssl_ca";
     private static final String NSCT_CODE_SIGNING_CA = "object_signing_ca";
     private final Map<TX500Principal, List<TX509Certificate>> trustedX500Principals;
     private final TCollection<TX509Certificate> trustedCerts;
 
-    TSimpleValidator(String var1, TCollection<TX509Certificate> var2) {
-        super("Simple", var1);
+    TSimpleValidator(TString var1, TCollection<TX509Certificate> var2) {
+        super(TString.wrap("Simple"), var1);
         this.trustedCerts = var2;
         this.trustedX500Principals = new HashMap();
 
         TX509Certificate var4;
         Object var6;
-        for(TIterator var3 = var2.iterator(); var3.hasNext(); ((List)var6).add(var4)) {
+        for(TIterator var3 = var2.iterator(); var3.hasNext(); ((TList)var6).add(var4)) {
             var4 = (TX509Certificate)var3.next();
             TX500Principal var5 = var4.getSubjectX500Principal();
             var6 = (TList)this.trustedX500Principals.get(var5);
@@ -101,7 +94,7 @@ public final class TSimpleValidator extends TValidator {
             try {
                 var6.check(var7);
             } catch (CertPathValidatorException var18) {
-                throw new TValidatorException("Untrusted certificate: " + var7.getSubjectX500Principal(), ValidatorException.T_UNTRUSTED_CERT, var7, var18);
+                throw new TValidatorException(TString.wrap("Untrusted certificate: " + var7.getSubjectX500Principal()), ValidatorException.T_UNTRUSTED_CERT, var7, var18);
             }
 
             TrustAnchor var8 = new TrustAnchor(var7, (byte[])null);
@@ -196,18 +189,18 @@ public final class TSimpleValidator extends TValidator {
 
     }
 
-    static boolean getNetscapeCertTypeBit(X509Certificate var0, String var1) {
+    static boolean getNetscapeCertTypeBit(TX509Certificate var0, String var1) {
         try {
             NetscapeCertTypeExtension var2;
-            if(var0 instanceof X509CertImpl) {
-                X509CertImpl var3 = (X509CertImpl)var0;
+            if(var0 instanceof TX509CertImpl) {
+                TX509CertImpl var3 = (TX509CertImpl)var0;
                 ObjectIdentifier var4 = OBJID_NETSCAPE_CERT_TYPE;
                 var2 = (NetscapeCertTypeExtension)var3.getExtension(var4);
                 if(var2 == null) {
                     return true;
                 }
             } else {
-                byte[] var7 = var0.getExtensionValue("2.16.840.1.113730.1.1");
+                byte[] var7 = var0.getExtensionValue(TString.wrap("2.16.840.1.113730.1.1"));
                 if(var7 == null) {
                     return true;
                 }
@@ -256,41 +249,41 @@ public final class TSimpleValidator extends TValidator {
         }
     }
 
-    private X509Certificate[] buildTrustedChain(X509Certificate[] var1) throws CertificateException {
+    private TX509Certificate[] buildTrustedChain(TX509Certificate[] var1) throws CertificateException {
         ArrayList var2 = new ArrayList(var1.length);
 
         for(int var3 = 0; var3 < var1.length; ++var3) {
-            X509Certificate var4 = var1[var3];
-            X509Certificate var5 = this.getTrustedCertificate(var4);
+            TX509Certificate var4 = var1[var3];
+            TX509Certificate var5 = this.getTrustedCertificate(var4);
             if(var5 != null) {
                 var2.add(var5);
-                return (X509Certificate[])var2.toArray(CHAIN0);
+                return (TX509Certificate[])var2.toArray(CHAIN0);
             }
 
             var2.add(var4);
         }
 
-        X509Certificate var8 = var1[var1.length - 1];
-        X500Principal var9 = var8.getSubjectX500Principal();
-        X500Principal var10 = var8.getIssuerX500Principal();
+        TX509Certificate var8 = var1[var1.length - 1];
+        TX500Principal var9 = var8.getSubjectX500Principal();
+        TX500Principal var10 = var8.getIssuerX500Principal();
         List var6 = (List)this.trustedX500Principals.get(var10);
         if(var6 != null) {
-            X509Certificate var7 = (X509Certificate)var6.iterator().next();
+            TX509Certificate var7 = (TX509Certificate)var6.iterator().next();
             var2.add(var7);
-            return (X509Certificate[])var2.toArray(CHAIN0);
+            return (TX509Certificate[])var2.toArray(CHAIN0);
         } else {
             throw new ValidatorException(ValidatorException.T_NO_TRUST_ANCHOR);
         }
     }
 
-    private X509Certificate getTrustedCertificate(X509Certificate var1) {
-        X500Principal var2 = var1.getSubjectX500Principal();
+    private TX509Certificate getTrustedCertificate(TX509Certificate var1) {
+        TX500Principal var2 = var1.getSubjectX500Principal();
         List var3 = (List)this.trustedX500Principals.get(var2);
         if(var3 == null) {
             return null;
         } else {
-            X500Principal var4 = var1.getIssuerX500Principal();
-            PublicKey var5 = var1.getPublicKey();
+            TX500Principal var4 = var1.getIssuerX500Principal();
+            TPublicKey var5 = var1.getPublicKey();
             Iterator var6 = var3.iterator();
 
             X509Certificate var7;

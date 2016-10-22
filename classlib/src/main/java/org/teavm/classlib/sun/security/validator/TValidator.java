@@ -15,8 +15,11 @@
  */
 package org.teavm.classlib.sun.security.validator;
 
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TAlgorithmConstraints;
+import org.teavm.classlib.java.security.TKeyStore;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TPKIXBuilderParameters;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TCollection;
 import org.teavm.classlib.java.util.TDate;
@@ -36,35 +39,35 @@ public abstract class TValidator {
     public static final String VAR_TSA_SERVER = "tsa server";
     public static final String VAR_PLUGIN_CODE_SIGNING = "plugin code signing";
     final TEndEntityChecker endEntityChecker;
-    final String variant;
+    final TString variant;
     /** @deprecated */
     @Deprecated
     volatile TDate validationDate;
 
-    TValidator(String var1, String var2) {
+    TValidator(TString var1, TString var2) {
         this.variant = var2;
         this.endEntityChecker = TEndEntityChecker.getInstance(var1, var2);
     }
 
-    public static sun.security.validator.Validator getInstance(String var0, String var1, TKeyStore var2) {
-        return getInstance(var0, var1, (TCollection) KeyStores.getTrustedCerts(var2));
+    public static TValidator getInstance(String var0, String var1, TKeyStore var2) {
+        return getInstance(var0, var1, (TCollection) TKeyStores.getTrustedCerts(var2));
     }
 
-    public static sun.security.validator.Validator getInstance(String var0, String var1, Collection<X509Certificate> var2) {
+    public static TValidator getInstance(String var0, String var1, TCollection<TX509Certificate> var2) {
         if(var0.equals("Simple")) {
             return new TSimpleValidator(var1, var2);
         } else if(var0.equals("PKIX")) {
-            return new PKIXValidator(var1, var2);
+            return new TPKIXValidator(var1, var2);
         } else {
             throw new IllegalArgumentException("Unknown validator type: " + var0);
         }
     }
 
-    public static sun.security.validator.Validator getInstance(String var0, String var1, PKIXBuilderParameters var2) {
+    public static TValidator getInstance(String var0, String var1, TPKIXBuilderParameters var2) {
         if(!var0.equals("PKIX")) {
-            throw new IllegalArgumentException("getInstance(PKIXBuilderParameters) can only be used with PKIX validator");
+            throw new IllegalArgumentException("getInstance(TPKIXBuilderParameters) can only be used with PKIX validator");
         } else {
-            return new PKIXValidator(var1, var2);
+            return new TPKIXValidator(var1, var2);
         }
     }
 
@@ -80,7 +83,7 @@ public abstract class TValidator {
         return this.validate(var1, var2, (TAlgorithmConstraints)null, var3);
     }
 
-    public final TX509Certificate[] validate(TX509Certificate[] var1, TCollection<TX509Certificate> var2, TAlgorithmConstraints var3, Object var4) throws CertificateException {
+    public final TX509Certificate[] validate(TX509Certificate[] var1, TCollection<TX509Certificate> var2, TAlgorithmConstraints var3, Object var4) throws TCertificateException {
         var1 = this.engineValidate(var1, var2, var3, var4);
         if(var1.length > 1) {
             this.endEntityChecker.check(var1[0], var4);

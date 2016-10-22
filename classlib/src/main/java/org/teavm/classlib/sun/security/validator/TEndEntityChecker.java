@@ -15,7 +15,6 @@
  */
 package org.teavm.classlib.sun.security.validator;
 
-import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,15 +47,15 @@ class TEndEntityChecker {
             .asList(new String[]{"DHE_DSS", "DHE_RSA", "ECDHE_ECDSA", "ECDHE_RSA", "RSA_EXPORT", "UNKNOWN"});
     private static final Collection<String> KU_SERVER_ENCRYPTION = Arrays.asList(new String[]{"RSA"});
     private static final Collection<String> KU_SERVER_KEY_AGREEMENT = Arrays.asList(new String[]{"DH_DSS", "DH_RSA", "ECDH_ECDSA", "ECDH_RSA"});
-    private final String variant;
-    private final String type;
+    private final TString variant;
+    private final TString type;
 
-    private TEndEntityChecker(String var1, String var2) {
+    private TEndEntityChecker(TString var1, TString var2) {
         this.type = var1;
         this.variant = var2;
     }
 
-    static TEndEntityChecker getInstance(String var0, String var1) {
+    static TEndEntityChecker getInstance(TString var0, TString var1) {
         return new TEndEntityChecker(var0, var1);
     }
 
@@ -74,7 +73,7 @@ class TEndEntityChecker {
                 this.checkCodeSigning(var1);
             } else {
                 if(!this.variant.equals("tsa server")) {
-                    throw new CertificateException("Unknown variant: " + this.variant);
+                    throw new TCertificateException(TString.wrap("Unknown variant: " + this.variant));
                 }
 
                 this.checkTSAServer(var1);
@@ -159,7 +158,7 @@ class TEndEntityChecker {
         }
     }
 
-    private void checkCodeSigning(TX509Certificate var1) throws CertificateException {
+    private void checkCodeSigning(TX509Certificate var1) throws TCertificateException {
         Set var2 = this.getCriticalExtensions(var1);
         if(!this.checkKeyUsage(var1, 0)) {
             throw new TValidatorException(TString.wrap("KeyUsage does not allow digital signatures"), TValidatorException.T_EE_EXTENSIONS, var1);
@@ -185,7 +184,7 @@ class TEndEntityChecker {
         if(!this.checkKeyUsage(var1, 0)) {
             throw new TValidatorException(TString.wrap("KeyUsage does not allow digital signatures"), TValidatorException.T_EE_EXTENSIONS, var1);
         } else if(var1.getExtendedKeyUsage() == null) {
-            throw new TValidatorException(TString.wrap("Certificate does not contain an extended key usage extension required for a TSA server"), ValidatorException.T_EE_EXTENSIONS, var1);
+            throw new TValidatorException(TString.wrap("Certificate does not contain an extended key usage extension required for a TSA server"), TValidatorException.T_EE_EXTENSIONS, var1);
         } else if(!this.checkEKU(var1, var2, "1.3.6.1.5.5.7.3.8")) {
             throw new TValidatorException(TString.wrap("Extended key usage does not permit use for TSA server"), TValidatorException.T_EE_EXTENSIONS, var1);
         } else {

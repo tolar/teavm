@@ -228,7 +228,7 @@ public abstract class TProvider extends TProperties {
         addEngine("AlgorithmParameters",                false, null);
         addEngine("KeyFactory",                         false, null);
         addEngine("KeyPairGenerator",                   false, null);
-        addEngine("KeyStore",                           false, null);
+        addEngine("TKeyStore",                           false, null);
         addEngine("MessageDigest",                      false, null);
         addEngine("SecureRandom",                       false, null);
         addEngine("Signature",                          true,  null);
