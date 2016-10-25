@@ -40,7 +40,7 @@ class TDecomposedCharSet extends TJointSet {
     private int[] decomposedChar;
 
     /**
-     * Length of useful part of decomposedChar decomposedCharLength <=
+     * TLength of useful part of decomposedChar decomposedCharLength <=
      * decomposedChar.length
      */
     private int decomposedCharLength;
@@ -122,7 +122,7 @@ class TDecomposedCharSet extends TJointSet {
                     decCurCodePoint = TLexer.getDecomposition(curChar);
 
                     /*
-                     * Length of such decomposition is 1 or 2. See UnicodeData
+                     * TLength of such decomposition is 1 or 2. See UnicodeData
                      * file http://www.unicode.org/Public/4.0-Update
                      * /UnicodeData-4.0.0.txt
                      */

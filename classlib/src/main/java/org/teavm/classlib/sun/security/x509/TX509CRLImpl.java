@@ -720,7 +720,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
                 this.sigAlgId = TAlgorithmId.parse(var2[1]);
                 this.signature = var2[2].getBitString();
                 if(var2[1].data.available() != 0) {
-                    throw new TCRLException(TString.wrap("AlgorithmId field overrun"));
+                    throw new TCRLException(TString.wrap("TAlgorithmId field overrun"));
                 } else if(var2[2].data.available() != 0) {
                     throw new TCRLException(TString.wrap("Signature field overrun"));
                 } else {

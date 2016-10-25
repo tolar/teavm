@@ -15,10 +15,10 @@
  */
 package org.teavm.classlib.java.security;
 
-import java.security.AlgorithmParameters;
 import java.security.CryptoPrimitive;
 import java.security.Key;
 import java.util.Set;
+import org.teavm.classlib.java.lang.TString;
 
 /**
  * Created by vasek on 21. 10. 2016.
@@ -41,7 +41,7 @@ public interface TAlgorithmConstraints {
      *     or empty
      */
     public boolean permits(Set<CryptoPrimitive> primitives,
-            String algorithm, AlgorithmParameters parameters);
+            TString algorithm, TAlgorithmParameters parameters);
 
     /**
      * Determines whether a key is granted permission for the specified
@@ -77,6 +77,6 @@ public interface TAlgorithmConstraints {
      *     or empty, or the key is null
      */
     public boolean permits(Set<CryptoPrimitive> primitives,
-            String algorithm, Key key, AlgorithmParameters parameters);
+            TString algorithm, TKey key, TAlgorithmParameters parameters);
 
 }

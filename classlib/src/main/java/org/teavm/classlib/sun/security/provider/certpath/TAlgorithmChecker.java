@@ -16,8 +16,6 @@
 package org.teavm.classlib.sun.security.provider.certpath;
 
 import java.math.BigInteger;
-import java.security.AlgorithmConstraints;
-import java.security.AlgorithmParameters;
 import java.security.CryptoPrimitive;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -25,13 +23,11 @@ import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidatorException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.PKIXCertPathChecker;
 import java.security.cert.PKIXReason;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
@@ -39,34 +35,39 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
-import sun.security.provider.certpath.PKIX;
-import sun.security.util.DisabledAlgorithmConstraints;
-import sun.security.x509.AlgorithmId;
-import sun.security.x509.X509CRLImpl;
-import sun.security.x509.X509CertImpl;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.TAlgorithmConstraints;
+import org.teavm.classlib.java.security.TAlgorithmParameters;
+import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.security.cert.TCertificate;
+import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.util.TDisabledAlgorithmConstraints;
+import org.teavm.classlib.sun.security.x509.TAlgorithmId;
+import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
 /**
  * Created by vasek on 22. 10. 2016.
  */
 public final class TAlgorithmChecker extends PKIXCertPathChecker {
-    private final AlgorithmConstraints constraints;
-    private final PublicKey trustedPubKey;
-    private PublicKey prevPubKey;
+    private final TAlgorithmConstraints constraints;
+    private final TPublicKey trustedPubKey;
+    private TPublicKey prevPubKey;
     private static final Set<CryptoPrimitive> SIGNATURE_PRIMITIVE_SET;
     private static final Set<CryptoPrimitive> KU_PRIMITIVE_SET;
-    private static final DisabledAlgorithmConstraints certPathDefaultConstraints;
+    private static final TDisabledAlgorithmConstraints certPathDefaultConstraints;
 
     public TAlgorithmChecker(TrustAnchor var1) {
         this(var1, certPathDefaultConstraints);
     }
 
-    public TAlgorithmChecker(AlgorithmConstraints var1) {
+    public TAlgorithmChecker(TAlgorithmConstraints var1) {
         this.prevPubKey = null;
         this.trustedPubKey = null;
         this.constraints = var1;
     }
 
-    public TAlgorithmChecker(TrustAnchor var1, AlgorithmConstraints var2) {
+    public TAlgorithmChecker(TrustAnchor var1, TAlgorithmConstraints var2) {
         if(var1 == null) {
             throw new IllegalArgumentException("The trust anchor cannot be null");
         } else {
@@ -102,27 +103,27 @@ public final class TAlgorithmChecker extends PKIXCertPathChecker {
         return null;
     }
 
-    public void check(Certificate var1, Collection<String> var2) throws CertPathValidatorException {
-        if(var1 instanceof X509Certificate && this.constraints != null) {
-            X509CertImpl var3 = null;
+    public void check(TCertificate var1, Collection<String> var2) throws CertPathValidatorException {
+        if(var1 instanceof TX509Certificate && this.constraints != null) {
+            TX509CertImpl var3 = null;
 
             try {
-                var3 = X509CertImpl.toImpl((X509Certificate)var1);
-            } catch (CertificateException var16) {
+                var3 = TX509CertImpl.toImpl((TX509Certificate)var1);
+            } catch (TCertificateException var16) {
                 throw new CertPathValidatorException(var16);
             }
 
-            PublicKey var4 = var3.getPublicKey();
-            String var5 = var3.getSigAlgName();
-            AlgorithmId var6 = null;
+            TPublicKey var4 = var3.getPublicKey();
+            TString var5 = var3.getSigAlgName();
+            TAlgorithmId var6 = null;
 
             try {
-                var6 = (AlgorithmId)var3.get("x509.algorithm");
+                var6 = (TAlgorithmId)var3.get(TString.wrap("x509.algorithm"));
             } catch (CertificateException var15) {
                 throw new CertPathValidatorException(var15);
             }
 
-            AlgorithmParameters var7 = var6.getParameters();
+            TAlgorithmParameters var7 = var6.getParameters();
             if(!this.constraints.permits(SIGNATURE_PRIMITIVE_SET, var5, var7)) {
                 throw new CertPathValidatorException("Algorithm constraints check failed: " + var5, (Throwable)null, (CertPath)null, -1, CertPathValidatorException.BasicReason.ALGORITHM_CONSTRAINED);
             } else {
@@ -215,13 +216,13 @@ public final class TAlgorithmChecker extends PKIXCertPathChecker {
             throw new CertPathValidatorException(var4);
         }
 
-        AlgorithmId var3 = var2.getSigAlgId();
+        TAlgorithmId var3 = var2.getSigAlgId();
         check(var0, var3);
     }
 
-    static void check(PublicKey var0, AlgorithmId var1) throws CertPathValidatorException {
-        String var2 = var1.getName();
-        AlgorithmParameters var3 = var1.getParameters();
+    static void check(PublicKey var0, TAlgorithmId var1) throws CertPathValidatorException {
+        TString var2 = var1.getName();
+        TAlgorithmParameters var3 = var1.getParameters();
         if(!certPathDefaultConstraints.permits(SIGNATURE_PRIMITIVE_SET, var2, var0, var3)) {
             throw new CertPathValidatorException("algorithm check failed: " + var2 + " is disabled", (Throwable)null, (CertPath)null, -1, CertPathValidatorException.BasicReason.ALGORITHM_CONSTRAINED);
         }

@@ -22,7 +22,6 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 
@@ -95,7 +94,7 @@ public class TAlgorithmParameters {
      * @see Provider
      */
     public static TAlgorithmParameters getInstance(TString algorithm)
-            throws NoSuchAlgorithmException {
+            throws TNoSuchAlgorithmException {
         try {
             Object[] objs = TSecurity.getImpl(algorithm, TString.wrap("TAlgorithmParameters"),
                     (TString)null);
@@ -103,7 +102,7 @@ public class TAlgorithmParameters {
                     (TProvider)objs[1],
                     algorithm);
         } catch(TNoSuchProviderException e) {
-            throw new NoSuchAlgorithmException(algorithm + " not found");
+            throw new TNoSuchAlgorithmException(TString.wrap(algorithm + " not found"));
         }
     }
 

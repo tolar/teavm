@@ -87,7 +87,7 @@ public class TPushbackInputStream extends TFilterInputStream {
             throw new TArrayIndexOutOfBoundsException(TString.wrap("Offset out of bounds: " + offset));
         }
         if (length < 0 || length > buffer.length - offset) {
-            throw new TArrayIndexOutOfBoundsException(TString.wrap("Length out of bounds: " + length));
+            throw new TArrayIndexOutOfBoundsException(TString.wrap("TLength out of bounds: " + length));
         }
 
         int copiedBytes = 0;
@@ -147,7 +147,7 @@ public class TPushbackInputStream extends TFilterInputStream {
             throw new TArrayIndexOutOfBoundsException(TString.wrap("Offset out of bounds: " + offset));
         }
         if (length < 0 || length > buffer.length - offset) {
-            throw new TArrayIndexOutOfBoundsException(TString.wrap("Length out of bounds: " + length));
+            throw new TArrayIndexOutOfBoundsException(TString.wrap("TLength out of bounds: " + length));
         }
         if (buf == null) {
             throw new TIOException(TString.wrap("Stream is closed"));

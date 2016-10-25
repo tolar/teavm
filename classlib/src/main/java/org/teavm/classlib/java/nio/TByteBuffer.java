@@ -82,7 +82,7 @@ public abstract class TByteBuffer extends TBuffer implements TComparable<TByteBu
             throw new TBufferUnderflowException();
         }
         if (length < 0) {
-            throw new IndexOutOfBoundsException("Length " + length + " must be non-negative");
+            throw new IndexOutOfBoundsException("TLength " + length + " must be non-negative");
         }
         int pos = position + start;
         for (int i = 0; i < length; ++i) {
@@ -118,7 +118,7 @@ public abstract class TByteBuffer extends TBuffer implements TComparable<TByteBu
                     + "of array of size " + src.length);
         }
         if (length < 0) {
-            throw new IndexOutOfBoundsException("Length " + length + " must be non-negative");
+            throw new IndexOutOfBoundsException("TLength " + length + " must be non-negative");
         }
         int pos = position + start;
         for (int i = 0; i < length; ++i) {

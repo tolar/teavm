@@ -59,7 +59,7 @@ public class TCertificateAlgorithmId implements TCertAttrSet<String> {
 
     public void set(TString var1, Object var2) throws TIOException {
         if(!(var2 instanceof TAlgorithmId)) {
-            throw new TIOException(TString.wrap("Attribute must be of type AlgorithmId."));
+            throw new TIOException(TString.wrap("Attribute must be of type TAlgorithmId."));
         } else if(var1.equalsIgnoreCase(TString.wrap("algorithm"))) {
             this.algId = (TAlgorithmId)var2;
         } else {

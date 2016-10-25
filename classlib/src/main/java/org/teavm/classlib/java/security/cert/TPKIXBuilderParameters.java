@@ -144,7 +144,7 @@ public class TPKIXBuilderParameters extends PKIXParameters {
         StringBuffer sb = new StringBuffer();
         sb.append("[\n");
         sb.append(super.toString());
-        sb.append("  Maximum Path Length: " + maxPathLength + "\n");
+        sb.append("  Maximum Path TLength: " + maxPathLength + "\n");
         sb.append("]\n");
         return sb.toString();
     }

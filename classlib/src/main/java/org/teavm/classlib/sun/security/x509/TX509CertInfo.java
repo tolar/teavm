@@ -602,7 +602,7 @@ public class TX509CertInfo implements TCertAttrSet<String> {
 
     private void setAlgorithmId(Object var1) throws TCertificateException {
         if(!(var1 instanceof TCertificateAlgorithmId)) {
-            throw new TCertificateException(TString.wrap("AlgorithmId class type invalid."));
+            throw new TCertificateException(TString.wrap("TAlgorithmId class type invalid."));
         } else {
             this.algId = (TCertificateAlgorithmId)var1;
         }

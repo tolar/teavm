@@ -413,7 +413,7 @@ public final class TSecurity {
      *
      * @return an array of all the installed providers.
      */
-    public static Provider[] getProviders() {
+    public static TProvider[] getProviders() {
         return TProviders.getFullProviderList().toArray();
     }
 

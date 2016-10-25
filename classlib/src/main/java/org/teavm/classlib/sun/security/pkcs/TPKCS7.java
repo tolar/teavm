@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
-
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TByteArrayOutputStream;
 import org.teavm.classlib.java.io.TDataInputStream;
@@ -231,7 +230,7 @@ public class TPKCS7  {
                 this.digestAlgorithmIds[var5] = TAlgorithmId.parse(var36);
             }
         } catch (TIOException var34) {
-            TParsingException var6 = new TParsingException(TString.wrap("Error parsing digest AlgorithmId IDs: " + var34.getMessage()));
+            TParsingException var6 = new TParsingException(TString.wrap("Error parsing digest TAlgorithmId IDs: " + var34.getMessage()));
             var6.initCause(var34);
             throw var6;
         }
@@ -350,7 +349,7 @@ public class TPKCS7  {
                 this.digestAlgorithmIds[var5] = TAlgorithmId.parse(var6);
             }
         } catch (TIOException var21) {
-            throw new TParsingException(TString.wrap("Error parsing digest AlgorithmId IDs"));
+            throw new TParsingException(TString.wrap("Error parsing digest TAlgorithmId IDs"));
         }
 
         this.contentInfo = new TContentInfo(var2, true);

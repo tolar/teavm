@@ -95,18 +95,18 @@ public class TProperties extends THashtable<Object, Object> {
         return hexChars;
     }
 
-    public String getProperty(String name) {
+    public TString getProperty(TString name) {
         Object result = super.get(name);
-        String property = result instanceof String ? (String) result : null;
+        TString property = result instanceof String ? (TString) result : null;
         if (property == null && defaults != null) {
             property = defaults.getProperty(name);
         }
         return property;
     }
 
-    public String getProperty(String name, String defaultValue) {
+    public TString getProperty(TString name, TString defaultValue) {
         Object result = super.get(name);
-        String property = result instanceof String ? (String) result : null;
+        TString property = result instanceof String ? (TString) result : null;
         if (property == null && defaults != null) {
             property = defaults.getProperty(name);
         }

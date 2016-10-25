@@ -34,7 +34,7 @@ class THangulDecomposedCharSet extends TJointSet {
     private String decomposedCharUTF16 = null;
 
     /**
-     * Length of useful part of decomposedChar decomposedCharLength <=
+     * TLength of useful part of decomposedChar decomposedCharLength <=
      * decomposedChar.length
      */
     private int decomposedCharLength;
