@@ -34,12 +34,12 @@ public class TPKIXBuilderParameters extends PKIXParameters {
     /**
      * Creates an instance of {@code TPKIXBuilderParameters} with
      * the specified {@code Set} of most-trusted CAs.
-     * Each element of the set is a {@link TrustAnchor TrustAnchor}.
+     * Each element of the set is a {@link TrustAnchor TTrustAnchor}.
      *
      * <p>Note that the {@code Set} is copied to protect against
      * subsequent modifications.
      *
-     * @param trustAnchors a {@code Set} of {@code TrustAnchor}s
+     * @param trustAnchors a {@code Set} of {@code TTrustAnchor}s
      * @param targetConstraints a {@code CertSelector} specifying the
      * constraints on the target certificate
      * @throws InvalidAlgorithmParameterException if {@code trustAnchors}
@@ -48,7 +48,7 @@ public class TPKIXBuilderParameters extends PKIXParameters {
      * {@code null}
      * @throws ClassCastException if any of the elements of
      * {@code trustAnchors} are not of type
-     * {@code java.security.cert.TrustAnchor}
+     * {@code java.security.cert.TTrustAnchor}
      */
     public TPKIXBuilderParameters(Set<TrustAnchor> trustAnchors, CertSelector
             targetConstraints) throws InvalidAlgorithmParameterException

@@ -41,6 +41,7 @@ import org.teavm.classlib.java.security.TAlgorithmParameters;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TTrustAnchor;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.sun.security.util.TDisabledAlgorithmConstraints;
 import org.teavm.classlib.sun.security.x509.TAlgorithmId;
@@ -67,7 +68,7 @@ public final class TAlgorithmChecker extends PKIXCertPathChecker {
         this.constraints = var1;
     }
 
-    public TAlgorithmChecker(TrustAnchor var1, TAlgorithmConstraints var2) {
+    public TAlgorithmChecker(TTrustAnchor var1, TAlgorithmConstraints var2) {
         if(var1 == null) {
             throw new IllegalArgumentException("The trust anchor cannot be null");
         } else {
@@ -163,7 +164,7 @@ public final class TAlgorithmChecker extends PKIXCertPathChecker {
                                 throw new CertPathValidatorException("Algorithm constraints check failed: " + var5, (Throwable)null, (CertPath)null, -1, CertPathValidatorException.BasicReason.ALGORITHM_CONSTRAINED);
                             }
 
-                            if(PKIX.isDSAPublicKeyWithoutParams(var4)) {
+                            if(TPKIX.isDSAPublicKeyWithoutParams(var4)) {
                                 if(!(this.prevPubKey instanceof DSAPublicKey)) {
                                     throw new CertPathValidatorException("Input key is not of a appropriate type for inheriting parameters");
                                 }

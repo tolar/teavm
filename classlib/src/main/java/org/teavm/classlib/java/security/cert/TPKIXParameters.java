@@ -55,18 +55,18 @@ public class TPKIXParameters implements TCertPathParameters {
     /**
      * Creates an instance of {@code TPKIXParameters} with the specified
      * {@code Set} of most-trusted CAs. Each element of the
-     * set is a {@link TrustAnchor TrustAnchor}.
+     * set is a {@link TrustAnchor TTrustAnchor}.
      * <p>
      * Note that the {@code Set} is copied to protect against
      * subsequent modifications.
      *
-     * @param trustAnchors a {@code Set} of {@code TrustAnchor}s
+     * @param trustAnchors a {@code Set} of {@code TTrustAnchor}s
      * @throws InvalidAlgorithmParameterException if the specified
      * {@code Set} is empty {@code (trustAnchors.isEmpty() == true)}
      * @throws NullPointerException if the specified {@code Set} is
      * {@code null}
      * @throws ClassCastException if any of the elements in the {@code Set}
-     * are not of type {@code java.security.cert.TrustAnchor}
+     * are not of type {@code java.security.cert.TTrustAnchor}
      */
     public TPKIXParameters(Set<TrustAnchor> trustAnchors)
             throws InvalidAlgorithmParameterException
@@ -118,7 +118,7 @@ public class TPKIXParameters implements TCertPathParameters {
      * Returns an immutable {@code Set} of the most-trusted
      * CAs.
      *
-     * @return an immutable {@code Set} of {@code TrustAnchor}s
+     * @return an immutable {@code Set} of {@code TTrustAnchor}s
      * (never {@code null})
      *
      * @see #setTrustAnchors
@@ -133,13 +133,13 @@ public class TPKIXParameters implements TCertPathParameters {
      * Note that the {@code Set} is copied to protect against
      * subsequent modifications.
      *
-     * @param trustAnchors a {@code Set} of {@code TrustAnchor}s
+     * @param trustAnchors a {@code Set} of {@code TTrustAnchor}s
      * @throws InvalidAlgorithmParameterException if the specified
      * {@code Set} is empty {@code (trustAnchors.isEmpty() == true)}
      * @throws NullPointerException if the specified {@code Set} is
      * {@code null}
      * @throws ClassCastException if any of the elements in the set
-     * are not of type {@code java.security.cert.TrustAnchor}
+     * are not of type {@code java.security.cert.TTrustAnchor}
      *
      * @see #getTrustAnchors
      */
@@ -157,7 +157,7 @@ public class TPKIXParameters implements TCertPathParameters {
         for (Iterator<TrustAnchor> i = trustAnchors.iterator(); i.hasNext(); ) {
             if (!(i.next() instanceof TrustAnchor)) {
                 throw new ClassCastException("all elements of set must be "
-                        + "of type java.security.cert.TrustAnchor");
+                        + "of type java.security.cert.TTrustAnchor");
             }
         }
         this.unmodTrustAnchors = Collections.unmodifiableSet

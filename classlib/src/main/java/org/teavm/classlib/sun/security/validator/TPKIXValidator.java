@@ -261,7 +261,7 @@ public final class TPKIXValidator extends TValidator {
         var2.toArray(var3);
         X509Certificate var4 = var1.getTrustedCert();
         if(var4 == null) {
-            throw new ValidatorException("TrustAnchor must be specified as certificate");
+            throw new ValidatorException("TTrustAnchor must be specified as certificate");
         } else {
             var3[var3.length - 1] = var4;
             return var3;

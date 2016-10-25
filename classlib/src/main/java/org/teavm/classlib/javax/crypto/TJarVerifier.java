@@ -16,7 +16,6 @@
 package org.teavm.classlib.javax.crypto;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -49,22 +48,26 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarException;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import org.teavm.classlib.java.io.TByteArrayInputStream;
+import org.teavm.classlib.java.security.cert.TCertificateFactory;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
+import org.teavm.classlib.sun.security.validator.TValidator;
 
 final class TJarVerifier {
     private static final String PLUGIN_IMPL_NAME = "sun.plugin.net.protocol.jar.CachedJarURLConnection";
     private static TX509Certificate frameworkCertificate;
-    private static Validator providerValidator;
-    private static Validator exemptValidator;
+    private static TValidator providerValidator;
+    private static TValidator exemptValidator;
     private Vector<TX509Certificate> verifiedSignerCache = null;
     private URL jarURL;
-    private Validator validator;
+    private TValidator validator;
     private boolean savePerms;
-    private CryptoPermissions appPerms = null;
 
-    private static X509Certificate parseCertificate(String var0, CertificateFactory var1) throws Exception {
-        ByteArrayInputStream var2 = new ByteArrayInputStream(var0.getBytes("UTF8"));
-        return (X509Certificate)var1.generateCertificate(var2);
+    private TCryptoPermissions appPerms = null;
+
+    private static TX509Certificate parseCertificate(String var0, TCertificateFactory var1) throws Exception {
+        TByteArrayInputStream var2 = new TByteArrayInputStream(var0.getBytes("UTF8"));
+        return (TX509Certificate)var1.generateCertificate(var2);
     }
 
     TJarVerifier(URL var1, boolean var2) {
@@ -84,7 +87,7 @@ final class TJarVerifier {
                 throw new JarException("Cannot verify " + this.jarURL.toString());
             } catch (CertificateException var8) {
                 throw new JarException("Cannot verify " + this.jarURL.toString());
-            } catch (CryptoPolicyParser.ParsingException var9) {
+            } catch (TCryptoPolicyParser.ParsingException var9) {
                 throw new JarException("Cannot parse " + this.jarURL.toString());
             } finally {
                 if(this.verifiedSignerCache != null) {
@@ -115,12 +118,12 @@ final class TJarVerifier {
         }
     }
 
-    CryptoPermissions getPermissions() {
+    TCryptoPermissions getPermissions() {
         return this.appPerms;
     }
 
     private void verifyJars(URL var1, Vector<String> var2) throws NoSuchProviderException, CertificateException, IOException,
-            CryptoPolicyParser.ParsingException {
+            TCryptoPolicyParser.ParsingException {
         String var3 = var1.toString();
         if(var2 == null || !var2.contains(var3)) {
             String var4 = this.verifySingleJar(var1);
@@ -141,7 +144,7 @@ final class TJarVerifier {
     }
 
     private void verifyManifestClassPathJars(URL var1, String var2, Vector<String> var3) throws NoSuchProviderException, CertificateException, IOException,
-            CryptoPolicyParser.ParsingException {
+            TCryptoPolicyParser.ParsingException {
         String[] var4 = parseAttrClasspath(var2);
 
         try {
@@ -158,14 +161,14 @@ final class TJarVerifier {
     }
 
     private String verifySingleJar(URL var1) throws NoSuchProviderException, CertificateException, IOException,
-            CryptoPolicyParser.ParsingException {
+            TCryptoPolicyParser.ParsingException {
         final URL var2 = var1.getProtocol().equalsIgnoreCase("jar")?var1:new URL("jar:" + var1.toString() + "!/");
-        javax.crypto.JarVerifier.JarHolder var3 = null;
+        TJarVerifier.JarHolder var3 = null;
 
         try {
             try {
-                var3 = (javax.crypto.JarVerifier.JarHolder) AccessController.doPrivileged(new PrivilegedExceptionAction() {
-                    public javax.crypto.JarVerifier.JarHolder run() throws Exception {
+                var3 = (TJarVerifier.JarHolder) AccessController.doPrivileged(new PrivilegedExceptionAction() {
+                    public TJarVerifier.JarHolder run() throws Exception {
                         boolean var1 = false;
                         JarURLConnection var2x = (JarURLConnection)var2.openConnection();
                         if(var2x.getClass().getName().equals("sun.plugin.net.protocol.jar.CachedJarURLConnection")) {
@@ -174,7 +177,7 @@ final class TJarVerifier {
 
                         var2x.setUseCaches(var1);
                         JarFile var3 = var2x.getJarFile();
-                        return var3 != null?new javax.crypto.JarVerifier.JarHolder(var3, var1):null;
+                        return var3 != null?new TJarVerifier.JarHolder(var3, var1):null;
                     }
                 });
             } catch (PrivilegedActionException var21) {
@@ -427,11 +430,11 @@ final class TJarVerifier {
             AccessController.doPrivileged(new PrivilegedExceptionAction() {
                 public Void run() throws Exception {
                     CertificateFactory var1 = CertificateFactory.getInstance("X.509");
-                    javax.crypto.JarVerifier.frameworkCertificate = javax.crypto.JarVerifier.parseCertificate("-----BEGIN CERTIFICATE-----\nMIICoTCCAl+gAwIBAgICAzkwCwYHKoZIzjgEAwUAMIGQMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExEjAQBgNVBAcTCVBhbG8gQWx0bzEdMBsGA1UEChMUU3VuIE1pY3Jvc3lzdGVtcyBJbmMxIzAhBgNVBAsTGkphdmEgU29mdHdhcmUgQ29kZSBTaWduaW5nMRwwGgYDVQQDExNKQ0UgQ29kZSBTaWduaW5nIENBMB4XDTExMDQxMTA2MDA0M1oXDTE2MDQxNDA2MDA0M1owYTEdMBsGA1UEChMUU3VuIE1pY3Jvc3lzdGVtcyBJbmMxIzAhBgNVBAsTGkphdmEgU29mdHdhcmUgQ29kZSBTaWduaW5nMRswGQYDVQQDExJPcmFjbGUgQ29ycG9yYXRpb24wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALR6pnmTTdvYtjj0EH7nQTa52aHuWTsxIgX+sVzy5MyYcGZJk23QI623tCNLk1MgPf0ntUKe/HZjuvdrBIfgBcu2C+Htw0PwmQyjHQToAMUt5CfWpGLmBh0LVblnOb9mcOp/Ety4myc9V8c3LSVXpgvNgIUhu8Vv3IEM966NKtmLAgMBAAGjgY4wgYswEQYJYIZIAYb4QgEBBAQDAgQQMA4GA1UdDwEB/wQEAwIF4DAdBgNVHQ4EFgQU5YHrhAD3Wo9gQZEycFmm7NAgzUUwHwYDVR0jBBgwFoAUZeL0hsnTTvCRTliiavXYeFqawaYwJgYDVR0RBB8wHYEbYnJhZGZvcmQud2V0bW9yZUBvcmFjbGUuY29tMAsGByqGSM44BAMFAAMvADAsAhRVoQglrJDMgxGzsGFS7oHMbzLioQIUSps7E1B/RSMh6ooea/mGwKX4iVc=\n-----END CERTIFICATE-----", var1);
-                    X509Certificate[] var2 = new X509Certificate[]{javax.crypto.JarVerifier.parseCertificate("-----BEGIN CERTIFICATE-----\nMIIDwDCCA36gAwIBAgIBEDALBgcqhkjOOAQDBQAwgZAxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTESMBAGA1UEBxMJUGFsbyBBbHRvMR0wGwYDVQQKExRTdW4gTWljcm9zeXN0ZW1zIEluYzEjMCEGA1UECxMaSmF2YSBTb2Z0d2FyZSBDb2RlIFNpZ25pbmcxHDAaBgNVBAMTE0pDRSBDb2RlIFNpZ25pbmcgQ0EwHhcNMDEwNDI1MDcwMDAwWhcNMjAwNDI1MDcwMDAwWjCBkDELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRIwEAYDVQQHEwlQYWxvIEFsdG8xHTAbBgNVBAoTFFN1biBNaWNyb3N5c3RlbXMgSW5jMSMwIQYDVQQLExpKYXZhIFNvZnR3YXJlIENvZGUgU2lnbmluZzEcMBoGA1UEAxMTSkNFIENvZGUgU2lnbmluZyBDQTCCAbcwggEsBgcqhkjOOAQBMIIBHwKBgQDrrzcEHspRHmldsPKP9rVJH8akmQXXKb90t2r1Gdge5Bv4CgGamP9wq+JKVoZsU7P84ciBjDHwxPOwi+ZwBuz3aWjbg0xyKYkpNhdcO0oHoCACKkaXUR1wyAgYC84Mbpt29wXj5/vTYXnhYJokjQaVgzxRIOEwzzhXgqYacg3O0wIVAIQlReG6ualiq3noWzC4iWsb/3t1AoGBAKvJdHt07+5CtWpTTTvdkAZyaJEPC6Qpdi5VO9WuTWVcfio6BKZnptBxqqXXt+LBcg2k0aoeklRMIAAJorAJQRkzALLDXK5C+LGLynyW2BB/N0Rbqsx4yNdydjdrQJmoVWb6qAMei0oRAmnLTLglBhygd9LJrNI96QoQ+nZwt/vcA4GEAAKBgC0JmFysuJzHmX7uIBkqNJD516urrt1rcpUNZvjvJ49Esu0oRMf+r7CmJ28AZ0WCWweoVlY70ilRYV5pOdcudHcSzxlK9S3Iy3JhxE5v+kdDPxS7+rwYZijC2WaLei0vwmCSSxT+WD4hf2hivmxISfmgS16FnRkQ+RVFURtx1PcLo2YwZDARBglghkgBhvhCAQEEBAMCAAcwDwYDVR0TAQH/BAUwAwEB/zAfBgNVHSMEGDAWgBRl4vSGydNO8JFOWKJq9dh4WprBpjAdBgNVHQ4EFgQUZeL0hsnTTvCRTliiavXYeFqawaYwCwYHKoZIzjgEAwUAAy8AMCwCFCr3zzyXXfl4tgjXQbTZDUVM5LScAhRFzXVpDiH6HdazKbLp9zMdM/38SQ==\n-----END CERTIFICATE-----", var1), javax.crypto.JarVerifier.parseCertificate("-----BEGIN CERTIFICATE-----\nMIIDUTCCAw2gAwIBAgIEQCFoETALBgcqhkjOOAQDBQAwYDELMAkGA1UEBhMCVVMxGDAWBgNVBAoTD0lCTSBDb3Jwb3JhdGlvbjEZMBcGA1UECxMQSUJNIENvZGUgU2lnbmluZzEcMBoGA1UEAxMTSkNFIENvZGUgU2lnbmluZyBDQTAeFw0wNDAyMDQyMTQ1NTNaFw0yMDA1MjYyMDQ1NTNaMGAxCzAJBgNVBAYTAlVTMRgwFgYDVQQKEw9JQk0gQ29ycG9yYXRpb24xGTAXBgNVBAsTEElCTSBDb2RlIFNpZ25pbmcxHDAaBgNVBAMTE0pDRSBDb2RlIFNpZ25pbmcgQ0EwggG4MIIBLAYHKoZIzjgEATCCAR8CgYEA/X9TgR11EilS30qcLuzk5/YRt1I870QAwx4/gLZRJmlFXUAiUftZPY1Y+r/F9bow9subVWzXgTuAHTRv8mZgt2uZUKWkn5/oBHsQIsJPu6nX/rfGG/g7V+fGqKYVDwT7g/bTxR7DAjVUE1oWkTL2dfOuK2HXKu/yIgMZndFIAccCFQCXYFCPFSMLzLKSuYKi64QL8Fgc9QKBgQD34aCF1ps93su8q1w2uFe5eZSvu/o66oL5V0wLPQeCZ1FZV4661FlP5nEHEIGAtEkWcSPoTCgWE7fPCTKMyKbhPBZ6i1R8jSjgo64eK7OmdZFuo38L+iE1YvH7YnoBJDvMpPG+qFGQiaiD3+Fa5Z8GkotmXoB7VSVkAUw7/s9JKgOBhQACgYEA6msAx98QO7l0NafhbWaCTfdbVnHCJkUncj1REGL/s9wQyftRE9Sti6glbl3JeNJbJ9MTQUcUBnzLgjhexgthoEyDLZTMjC6EkDqPQgppUtN0JnekFH0qcUGIiXemLWKaoViYbWzPzqjqut3ooRBEjIRCwbgfK7S8s110YICNQlSjUzBRMB0GA1UdDgQWBBR+PU1NzBBZuvmuQj3lyVdaUgt+hzAfBgNVHSMEGDAWgBR+PU1NzBBZuvmuQj3lyVdaUgt+hzAPBgNVHRMBAf8EBTADAQH/MAsGByqGSM44BAMFAAMxADAuAhUAi5ncRzk0NqFYt4yWsnlcVBPt+zsCFQCM9M0mv0t9iodsOOHJhqUrW1QjAA==\n-----END CERTIFICATE-----", var1), javax.crypto.JarVerifier.frameworkCertificate};
-                    javax.crypto.JarVerifier.providerValidator = Validator.getInstance("Simple", "jce signing", Arrays.asList(var2));
-                    javax.crypto.JarVerifier.exemptValidator = javax.crypto.JarVerifier.providerValidator;
-                    javax.crypto.JarVerifier.testSignatures(var2[0], var1);
+                    TJarVerifier.frameworkCertificate = TJarVerifier.parseCertificate("-----BEGIN CERTIFICATE-----\nMIICoTCCAl+gAwIBAgICAzkwCwYHKoZIzjgEAwUAMIGQMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExEjAQBgNVBAcTCVBhbG8gQWx0bzEdMBsGA1UEChMUU3VuIE1pY3Jvc3lzdGVtcyBJbmMxIzAhBgNVBAsTGkphdmEgU29mdHdhcmUgQ29kZSBTaWduaW5nMRwwGgYDVQQDExNKQ0UgQ29kZSBTaWduaW5nIENBMB4XDTExMDQxMTA2MDA0M1oXDTE2MDQxNDA2MDA0M1owYTEdMBsGA1UEChMUU3VuIE1pY3Jvc3lzdGVtcyBJbmMxIzAhBgNVBAsTGkphdmEgU29mdHdhcmUgQ29kZSBTaWduaW5nMRswGQYDVQQDExJPcmFjbGUgQ29ycG9yYXRpb24wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALR6pnmTTdvYtjj0EH7nQTa52aHuWTsxIgX+sVzy5MyYcGZJk23QI623tCNLk1MgPf0ntUKe/HZjuvdrBIfgBcu2C+Htw0PwmQyjHQToAMUt5CfWpGLmBh0LVblnOb9mcOp/Ety4myc9V8c3LSVXpgvNgIUhu8Vv3IEM966NKtmLAgMBAAGjgY4wgYswEQYJYIZIAYb4QgEBBAQDAgQQMA4GA1UdDwEB/wQEAwIF4DAdBgNVHQ4EFgQU5YHrhAD3Wo9gQZEycFmm7NAgzUUwHwYDVR0jBBgwFoAUZeL0hsnTTvCRTliiavXYeFqawaYwJgYDVR0RBB8wHYEbYnJhZGZvcmQud2V0bW9yZUBvcmFjbGUuY29tMAsGByqGSM44BAMFAAMvADAsAhRVoQglrJDMgxGzsGFS7oHMbzLioQIUSps7E1B/RSMh6ooea/mGwKX4iVc=\n-----END CERTIFICATE-----", var1);
+                    TX509Certificate[] var2 = new TX509Certificate[]{TJarVerifier.parseCertificate("-----BEGIN CERTIFICATE-----\nMIIDwDCCA36gAwIBAgIBEDALBgcqhkjOOAQDBQAwgZAxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTESMBAGA1UEBxMJUGFsbyBBbHRvMR0wGwYDVQQKExRTdW4gTWljcm9zeXN0ZW1zIEluYzEjMCEGA1UECxMaSmF2YSBTb2Z0d2FyZSBDb2RlIFNpZ25pbmcxHDAaBgNVBAMTE0pDRSBDb2RlIFNpZ25pbmcgQ0EwHhcNMDEwNDI1MDcwMDAwWhcNMjAwNDI1MDcwMDAwWjCBkDELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRIwEAYDVQQHEwlQYWxvIEFsdG8xHTAbBgNVBAoTFFN1biBNaWNyb3N5c3RlbXMgSW5jMSMwIQYDVQQLExpKYXZhIFNvZnR3YXJlIENvZGUgU2lnbmluZzEcMBoGA1UEAxMTSkNFIENvZGUgU2lnbmluZyBDQTCCAbcwggEsBgcqhkjOOAQBMIIBHwKBgQDrrzcEHspRHmldsPKP9rVJH8akmQXXKb90t2r1Gdge5Bv4CgGamP9wq+JKVoZsU7P84ciBjDHwxPOwi+ZwBuz3aWjbg0xyKYkpNhdcO0oHoCACKkaXUR1wyAgYC84Mbpt29wXj5/vTYXnhYJokjQaVgzxRIOEwzzhXgqYacg3O0wIVAIQlReG6ualiq3noWzC4iWsb/3t1AoGBAKvJdHt07+5CtWpTTTvdkAZyaJEPC6Qpdi5VO9WuTWVcfio6BKZnptBxqqXXt+LBcg2k0aoeklRMIAAJorAJQRkzALLDXK5C+LGLynyW2BB/N0Rbqsx4yNdydjdrQJmoVWb6qAMei0oRAmnLTLglBhygd9LJrNI96QoQ+nZwt/vcA4GEAAKBgC0JmFysuJzHmX7uIBkqNJD516urrt1rcpUNZvjvJ49Esu0oRMf+r7CmJ28AZ0WCWweoVlY70ilRYV5pOdcudHcSzxlK9S3Iy3JhxE5v+kdDPxS7+rwYZijC2WaLei0vwmCSSxT+WD4hf2hivmxISfmgS16FnRkQ+RVFURtx1PcLo2YwZDARBglghkgBhvhCAQEEBAMCAAcwDwYDVR0TAQH/BAUwAwEB/zAfBgNVHSMEGDAWgBRl4vSGydNO8JFOWKJq9dh4WprBpjAdBgNVHQ4EFgQUZeL0hsnTTvCRTliiavXYeFqawaYwCwYHKoZIzjgEAwUAAy8AMCwCFCr3zzyXXfl4tgjXQbTZDUVM5LScAhRFzXVpDiH6HdazKbLp9zMdM/38SQ==\n-----END CERTIFICATE-----", var1), TJarVerifier.parseCertificate("-----BEGIN CERTIFICATE-----\nMIIDUTCCAw2gAwIBAgIEQCFoETALBgcqhkjOOAQDBQAwYDELMAkGA1UEBhMCVVMxGDAWBgNVBAoTD0lCTSBDb3Jwb3JhdGlvbjEZMBcGA1UECxMQSUJNIENvZGUgU2lnbmluZzEcMBoGA1UEAxMTSkNFIENvZGUgU2lnbmluZyBDQTAeFw0wNDAyMDQyMTQ1NTNaFw0yMDA1MjYyMDQ1NTNaMGAxCzAJBgNVBAYTAlVTMRgwFgYDVQQKEw9JQk0gQ29ycG9yYXRpb24xGTAXBgNVBAsTEElCTSBDb2RlIFNpZ25pbmcxHDAaBgNVBAMTE0pDRSBDb2RlIFNpZ25pbmcgQ0EwggG4MIIBLAYHKoZIzjgEATCCAR8CgYEA/X9TgR11EilS30qcLuzk5/YRt1I870QAwx4/gLZRJmlFXUAiUftZPY1Y+r/F9bow9subVWzXgTuAHTRv8mZgt2uZUKWkn5/oBHsQIsJPu6nX/rfGG/g7V+fGqKYVDwT7g/bTxR7DAjVUE1oWkTL2dfOuK2HXKu/yIgMZndFIAccCFQCXYFCPFSMLzLKSuYKi64QL8Fgc9QKBgQD34aCF1ps93su8q1w2uFe5eZSvu/o66oL5V0wLPQeCZ1FZV4661FlP5nEHEIGAtEkWcSPoTCgWE7fPCTKMyKbhPBZ6i1R8jSjgo64eK7OmdZFuo38L+iE1YvH7YnoBJDvMpPG+qFGQiaiD3+Fa5Z8GkotmXoB7VSVkAUw7/s9JKgOBhQACgYEA6msAx98QO7l0NafhbWaCTfdbVnHCJkUncj1REGL/s9wQyftRE9Sti6glbl3JeNJbJ9MTQUcUBnzLgjhexgthoEyDLZTMjC6EkDqPQgppUtN0JnekFH0qcUGIiXemLWKaoViYbWzPzqjqut3ooRBEjIRCwbgfK7S8s110YICNQlSjUzBRMB0GA1UdDgQWBBR+PU1NzBBZuvmuQj3lyVdaUgt+hzAfBgNVHSMEGDAWgBR+PU1NzBBZuvmuQj3lyVdaUgt+hzAPBgNVHRMBAf8EBTADAQH/MAsGByqGSM44BAMFAAMxADAuAhUAi5ncRzk0NqFYt4yWsnlcVBPt+zsCFQCM9M0mv0t9iodsOOHJhqUrW1QjAA==\n-----END CERTIFICATE-----", var1), TJarVerifier.frameworkCertificate};
+                    TJarVerifier.providerValidator = TValidator.getInstance("Simple", "jce signing", Arrays.asList(var2));
+                    TJarVerifier.exemptValidator = TJarVerifier.providerValidator;
+                    TJarVerifier.testSignatures(var2[0], var1);
                     return null;
                 }
             });

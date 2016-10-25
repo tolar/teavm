@@ -17,7 +17,6 @@ package org.teavm.classlib.javax.auth.x500;
 
 import java.io.IOException;
 import java.util.Map;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.lang.TString;
@@ -94,43 +93,6 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
         this(name, TCollections.<TString, TString>emptyMap());
     }
 
-    /**
-     * Creates an {@code X500Principal} from a string representation of
-     * an X.500 distinguished name (ex:
-     * "CN=Duke, OU=JavaSoft, O=Sun Microsystems, C=US").
-     * The distinguished name must be specified using the grammar defined in
-     * RFC 1779 or RFC 2253 (either format is acceptable).
-     *
-     * <p> This constructor recognizes the attribute type keywords specified
-     * in {@link #TX500Principal(String)} and also recognizes additional
-     * keywords that have entries in the {@code keywordMap} parameter.
-     * Keyword entries in the keywordMap take precedence over the default
-     * keywords recognized by {@code X500Principal(String)}. Keywords
-     * MUST be specified in all upper-case, otherwise they will be ignored.
-     * Improperly specified keywords are ignored; however if a keyword in the
-     * name maps to an improperly specified Object Identifier (OID), an
-     * {@code IllegalArgumentException} is thrown. It is permissible to
-     * have 2 different keywords that map to the same OID.
-     *
-     * <p>This implementation enforces a more restrictive OID syntax than
-     * defined in RFC 1779 and 2253. It uses the more correct syntax defined in
-     * <a href="http://www.ietf.org/rfc/rfc4512.txt">RFC 4512</a>, which
-     * specifies that OIDs contain at least 2 digits:
-     *
-     * <p>{@code numericoid = number 1*( DOT number ) }
-     *
-     * @param name an X.500 distinguished name in RFC 1779 or RFC 2253 format
-     * @param keywordMap an attribute type keyword map, where each key is a
-     *   keyword String that maps to a corresponding object identifier in String
-     *   form (a sequence of nonnegative integers separated by periods). The map
-     *   may be empty but never {@code null}.
-     * @exception NullPointerException if {@code name} or
-     *   {@code keywordMap} is {@code null}
-     * @exception IllegalArgumentException if the {@code name} is
-     *   improperly specified or a keyword in the {@code name} maps to an
-     *   OID that is not in the correct form
-     * @since 1.6
-     */
     public TX500Principal(TString name, TMap<TString, TString> keywordMap) {
         if (name == null) {
             throw new NullPointerException("provided.null.name");
@@ -251,7 +213,7 @@ public final class TX500Principal implements TPrincipal, java.io.Serializable {
      * @return the distinguished name of this {@code X500Principal}
      */
     public String getName() {
-        return getName(javax.security.auth.x500.X500Principal.RFC2253);
+        return getName(TX500Principal.RFC2253);
     }
 
     /**
