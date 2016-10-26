@@ -83,7 +83,7 @@ class TPKIX {
         private void checkParams(TPKIXBuilderParameters var1) throws InvalidAlgorithmParameterException {
             CertSelector var2 = this.targetCertConstraints();
             if(!(var2 instanceof X509CertSelector)) {
-                throw new InvalidAlgorithmParameterException("the targetCertConstraints parameter must be an X509CertSelector");
+                throw new InvalidAlgorithmParameterException("the targetCertConstraints parameter must be an TX509CertSelector");
             } else {
                 this.params = var1;
                 this.targetSubject = getTargetSubject(this.certStores(), (X509CertSelector)this.targetCertConstraints());

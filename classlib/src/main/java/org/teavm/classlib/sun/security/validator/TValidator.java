@@ -49,11 +49,11 @@ public abstract class TValidator {
         this.endEntityChecker = TEndEntityChecker.getInstance(var1, var2);
     }
 
-    public static TValidator getInstance(String var0, String var1, TKeyStore var2) {
+    public static TValidator getInstance(TString var0, TString var1, TKeyStore var2) {
         return getInstance(var0, var1, (TCollection) TKeyStores.getTrustedCerts(var2));
     }
 
-    public static TValidator getInstance(String var0, String var1, TCollection<TX509Certificate> var2) {
+    public static TValidator getInstance(TString var0, TString var1, TCollection<TX509Certificate> var2) {
         if(var0.equals("Simple")) {
             return new TSimpleValidator(var1, var2);
         } else if(var0.equals("PKIX")) {
@@ -63,7 +63,7 @@ public abstract class TValidator {
         }
     }
 
-    public static TValidator getInstance(String var0, String var1, TPKIXBuilderParameters var2) {
+    public static TValidator getInstance(TString var0, TString var1, TPKIXBuilderParameters var2) {
         if(!var0.equals("PKIX")) {
             throw new IllegalArgumentException("getInstance(TPKIXBuilderParameters) can only be used with PKIX validator");
         } else {

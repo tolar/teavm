@@ -20,14 +20,13 @@ import java.security.InvalidParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.CertSelector;
-import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
 import java.util.Set;
 
 /**
  * Created by vasek on 22. 10. 2016.
  */
-public class TPKIXBuilderParameters extends PKIXParameters {
+public class TPKIXBuilderParameters extends TPKIXParameters {
 
     private int maxPathLength = 5;
 
@@ -40,7 +39,7 @@ public class TPKIXBuilderParameters extends PKIXParameters {
      * subsequent modifications.
      *
      * @param trustAnchors a {@code Set} of {@code TTrustAnchor}s
-     * @param targetConstraints a {@code CertSelector} specifying the
+     * @param targetConstraints a {@code TCertSelector} specifying the
      * constraints on the target certificate
      * @throws InvalidAlgorithmParameterException if {@code trustAnchors}
      * is empty {@code (trustAnchors.isEmpty() == true)}
@@ -66,7 +65,7 @@ public class TPKIXBuilderParameters extends PKIXParameters {
      *
      * @param keystore a {@code KeyStore} from which the set of
      * most-trusted CAs will be populated
-     * @param targetConstraints a {@code CertSelector} specifying the
+     * @param targetConstraints a {@code TCertSelector} specifying the
      * constraints on the target certificate
      * @throws KeyStoreException if {@code keystore} has not been
      * initialized

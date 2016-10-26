@@ -571,13 +571,13 @@ public class TPKIXParameters implements TCertPathParameters {
 
     /**
      * Returns the required constraints on the target certificate.
-     * The constraints are returned as an instance of {@code CertSelector}.
+     * The constraints are returned as an instance of {@code TCertSelector}.
      * If {@code null}, no constraints are defined.
      *
-     * <p>Note that the {@code CertSelector} returned is cloned
+     * <p>Note that the {@code TCertSelector} returned is cloned
      * to protect against subsequent modifications.
      *
-     * @return a {@code CertSelector} specifying the constraints
+     * @return a {@code TCertSelector} specifying the constraints
      * on the target certificate (or {@code null})
      * @see #setTargetCertConstraints
      */
@@ -592,13 +592,13 @@ public class TPKIXParameters implements TCertPathParameters {
     /**
      * Sets the required constraints on the target certificate.
      * The constraints are specified as an instance of
-     * {@code CertSelector}. If {@code null}, no constraints are
+     * {@code TCertSelector}. If {@code null}, no constraints are
      * defined.
      *
-     * <p>Note that the {@code CertSelector} specified is cloned
+     * <p>Note that the {@code TCertSelector} specified is cloned
      * to protect against subsequent modifications.
      *
-     * @param selector a {@code CertSelector} specifying the constraints
+     * @param selector a {@code TCertSelector} specifying the constraints
      * on the target certificate (or {@code null})
      * @see #getTargetCertConstraints
      */

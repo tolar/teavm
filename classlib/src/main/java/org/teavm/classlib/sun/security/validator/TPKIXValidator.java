@@ -50,8 +50,12 @@ import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.actions.TGetBooleanAction;
 import org.teavm.classlib.java.security.cert.TPKIXBuilderParameters;
+import org.teavm.classlib.java.security.cert.TTrustAnchor;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TCollection;
+import org.teavm.classlib.java.util.THashSet;
+import org.teavm.classlib.java.util.TIterator;
+import org.teavm.classlib.java.util.TSet;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 
 /**
@@ -60,28 +64,28 @@ import org.teavm.classlib.javax.auth.x500.TX500Principal;
 public final class TPKIXValidator extends TValidator {
     private static final boolean checkTLSRevocation = ((Boolean) AccessController.doPrivileged(new TGetBooleanAction(TString.wrap("com.sun.net.ssl.checkRevocation")))).booleanValue();
     private static final boolean TRY_VALIDATOR = true;
-    private final Set<TX509Certificate> trustedCerts;
+    private final TSet<TX509Certificate> trustedCerts;
     private final TPKIXBuilderParameters parameterTemplate;
     private int certPathLength = -1;
     private final Map<TX500Principal, List<TPublicKey>> trustedSubjects;
     private final CertificateFactory factory;
     private final boolean plugin;
 
-    TPKIXValidator(TString var1, Collection<TX509Certificate> var2) {
+    TPKIXValidator(TString var1, TCollection<TX509Certificate> var2) {
         super(TString.wrap("PKIX"), var1);
         if(var2 instanceof Set) {
-            this.trustedCerts = (Set)var2;
+            this.trustedCerts = (TSet)var2;
         } else {
-            this.trustedCerts = new HashSet(var2);
+            this.trustedCerts = new THashSet(var2);
         }
 
         HashSet var3 = new HashSet();
-        Iterator var4 = var2.iterator();
+        TIterator var4 = var2.iterator();
 
-        X509Certificate var5;
+        TX509Certificate var5;
         while(var4.hasNext()) {
-            var5 = (X509Certificate)var4.next();
-            var3.add(new TrustAnchor(var5, (byte[])null));
+            var5 = (TX509Certificate)var4.next();
+            var3.add(new TTrustAnchor(var5, (byte[])null));
         }
 
         try {
@@ -95,13 +99,13 @@ public final class TPKIXValidator extends TValidator {
 
         Object var7;
         for(var4 = var2.iterator(); var4.hasNext(); ((List)var7).add(var5.getPublicKey())) {
-            var5 = (X509Certificate)var4.next();
-            X500Principal var6 = var5.getSubjectX500Principal();
+            var5 = (TX509Certificate)var4.next();
+            TX500Principal var6 = var5.getSubjectX500Principal();
             if(this.trustedSubjects.containsKey(var6)) {
                 var7 = (List)this.trustedSubjects.get(var6);
             } else {
                 var7 = new ArrayList();
-                this.trustedSubjects.put(var6, var7);
+                this.trustedSubjects.put(var6, (List<TPublicKey>) var7);
             }
         }
 
@@ -114,10 +118,10 @@ public final class TPKIXValidator extends TValidator {
         this.plugin = var1.equals("plugin code signing");
     }
 
-    TPKIXValidator(TString var1, PKIXBuilderParameters var2) {
+    TPKIXValidator(TString var1, TPKIXBuilderParameters var2) {
         super(TString.wrap("PKIX"), var1);
-        this.trustedCerts = new HashSet();
-        Iterator var3 = var2.getTrustAnchors().iterator();
+        this.trustedCerts = new THashSet();
+        TIterator var3 = var2.getTrustAnchors().iterator();
 
         while(var3.hasNext()) {
             TrustAnchor var4 = (TrustAnchor)var3.next();
@@ -131,10 +135,10 @@ public final class TPKIXValidator extends TValidator {
         this.trustedSubjects = new HashMap();
 
         Object var6;
-        X509Certificate var8;
+        TX509Certificate var8;
         for(var3 = this.trustedCerts.iterator(); var3.hasNext(); ((List)var6).add(var8.getPublicKey())) {
-            var8 = (X509Certificate)var3.next();
-            X500Principal var9 = var8.getSubjectX500Principal();
+            var8 = (TX509Certificate)var3.next();
+            TX500Principal var9 = var8.getSubjectX500Principal();
             if(this.trustedSubjects.containsKey(var9)) {
                 var6 = (List)this.trustedSubjects.get(var9);
             } else {
