@@ -19,7 +19,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.Security;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -40,7 +39,7 @@ public final class TProviderList {
     private static final TProvider EMPTY_PROVIDER;
     private final TProviderConfig[] configs;
     private volatile boolean allLoaded;
-    private final List<TProvider> userList;
+    private final TList<TProvider> userList;
 
     static TProviderList fromSecurityProperties() {
         return (TProviderList) AccessController.doPrivileged(new PrivilegedAction() {
@@ -100,7 +99,7 @@ public final class TProviderList {
     }
 
     private TProviderList(TProviderConfig[] var1, boolean var2) {
-        this.userList = new AbstractList() {
+        this.userList = new TAbstractList() {
             public int size() {
                 return TProviderList.this.configs.length;
             }
@@ -114,7 +113,7 @@ public final class TProviderList {
     }
 
     private TProviderList() {
-        this.userList = new AbstractList() {
+        this.userList = new TAbstractList() {
             public int size() {
                 return TProviderList.this.configs.length;
             }
@@ -194,7 +193,7 @@ public final class TProviderList {
         return var2 != null?var2:EMPTY_PROVIDER;
     }
 
-    public List<TProvider> providers() {
+    public TList<TProvider> providers() {
         return this.userList;
     }
 
@@ -260,8 +259,8 @@ public final class TProviderList {
         }
     }
 
-    public Provider[] toArray() {
-        return (Provider[])this.providers().toArray(P0);
+    public TProvider[] toArray() {
+        return (TProvider[])this.providers().toArray(P0);
     }
 
     public String toString() {

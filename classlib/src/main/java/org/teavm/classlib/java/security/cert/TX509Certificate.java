@@ -27,6 +27,7 @@ import java.security.cert.CertificateParsingException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
 import org.teavm.classlib.java.security.TInvalidKeyException;
@@ -100,7 +101,7 @@ public abstract class TX509Certificate extends TCertificate
      * @see #checkValidity()
      */
     public abstract void checkValidity(TDate date)
-            throws CertificateExpiredException, CertificateNotYetValidException;
+            throws TCertificateExpiredException, TCertificateNotYetValidException;
 
     /**
      * Gets the {@code version} (version number) value from the

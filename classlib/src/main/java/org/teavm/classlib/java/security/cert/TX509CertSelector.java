@@ -17,14 +17,6 @@ package org.teavm.classlib.java.security.cert;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.PublicKey;
-import java.security.cert.CertPathHelperImpl;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.Extension;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,75 +27,77 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import javax.security.auth.x500.X500Principal;
-import sun.misc.HexDumpEncoder;
-import sun.security.util.Debug;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
-import sun.security.x509.AlgorithmId;
-import sun.security.x509.CertificatePoliciesExtension;
-import sun.security.x509.CertificatePolicyId;
-import sun.security.x509.CertificatePolicySet;
-import sun.security.x509.DNSName;
-import sun.security.x509.EDIPartyName;
-import sun.security.x509.ExtendedKeyUsageExtension;
-import sun.security.x509.GeneralName;
-import sun.security.x509.GeneralNameInterface;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.GeneralSubtree;
-import sun.security.x509.GeneralSubtrees;
-import sun.security.x509.IPAddressName;
-import sun.security.x509.NameConstraintsExtension;
-import sun.security.x509.OIDName;
-import sun.security.x509.OtherName;
-import sun.security.x509.PolicyInformation;
-import sun.security.x509.PrivateKeyUsageExtension;
-import sun.security.x509.RFC822Name;
-import sun.security.x509.SubjectAlternativeNameExtension;
-import sun.security.x509.URIName;
-import sun.security.x509.X400Address;
-import sun.security.x509.X500Name;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509Key;
+
+import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.TPublicKey;
+import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.javax.auth.x500.TX500Principal;
+import org.teavm.classlib.sun.misc.THexDumpEncoder;
+import org.teavm.classlib.sun.security.cert.TCertificatePolicySet;
+import org.teavm.classlib.sun.security.util.TDerInputStream;
+import org.teavm.classlib.sun.security.util.TDerValue;
+import org.teavm.classlib.sun.security.util.TObjectIdentifier;
+import org.teavm.classlib.sun.security.x509.TAlgorithmId;
+import org.teavm.classlib.sun.security.x509.TCertificatePoliciesExtension;
+import org.teavm.classlib.sun.security.x509.TCertificatePolicyId;
+import org.teavm.classlib.sun.security.x509.TDNSName;
+import org.teavm.classlib.sun.security.x509.TEDIPartyName;
+import org.teavm.classlib.sun.security.x509.TExtendedKeyUsageExtension;
+import org.teavm.classlib.sun.security.x509.TGeneralName;
+import org.teavm.classlib.sun.security.x509.TGeneralNameInterface;
+import org.teavm.classlib.sun.security.x509.TGeneralNames;
+import org.teavm.classlib.sun.security.x509.TGeneralSubtree;
+import org.teavm.classlib.sun.security.x509.TGeneralSubtrees;
+import org.teavm.classlib.sun.security.x509.TIPAddressName;
+import org.teavm.classlib.sun.security.x509.TNameConstraintsExtension;
+import org.teavm.classlib.sun.security.x509.TOIDName;
+import org.teavm.classlib.sun.security.x509.TOtherName;
+import org.teavm.classlib.sun.security.x509.TPolicyInformation;
+import org.teavm.classlib.sun.security.x509.TPrivateKeyUsageExtension;
+import org.teavm.classlib.sun.security.x509.TRFC822Name;
+import org.teavm.classlib.sun.security.x509.TSubjectAlternativeNameExtension;
+import org.teavm.classlib.sun.security.x509.TURIName;
+import org.teavm.classlib.sun.security.x509.TX400Address;
+import org.teavm.classlib.sun.security.x509.TX500Name;
+import org.teavm.classlib.sun.security.x509.TX509CertImpl;
+import org.teavm.classlib.sun.security.x509.TX509Key;
 
 /**
  * Created by vasek on 26. 10. 2016.
  */
 public class TX509CertSelector implements TCertSelector {
 
-    private static final Debug debug = Debug.getInstance("certpath");
-
-    private final static ObjectIdentifier ANY_EXTENDED_KEY_USAGE =
-            ObjectIdentifier.newInternal(new int[] {2, 5, 29, 37, 0});
+    private final static TObjectIdentifier ANY_EXTENDED_KEY_USAGE =
+            TObjectIdentifier.newInternal(new int[] {2, 5, 29, 37, 0});
 
     static {
-        CertPathHelperImpl.initialize();
+        TCertPathHelperImpl.initialize();
     }
 
     private BigInteger serialNumber;
-    private X500Principal issuer;
-    private X500Principal subject;
+    private TX500Principal issuer;
+    private TX500Principal subject;
     private byte[] subjectKeyID;
     private byte[] authorityKeyID;
-    private Date certificateValid;
-    private Date privateKeyValid;
-    private ObjectIdentifier subjectPublicKeyAlgID;
-    private PublicKey subjectPublicKey;
+    private TDate certificateValid;
+    private TDate privateKeyValid;
+    private TObjectIdentifier subjectPublicKeyAlgID;
+    private TPublicKey subjectPublicKey;
     private byte[] subjectPublicKeyBytes;
     private boolean[] keyUsage;
-    private Set<String> keyPurposeSet;
-    private Set<ObjectIdentifier> keyPurposeOIDSet;
+    private Set<TString> keyPurposeSet;
+    private Set<TObjectIdentifier> keyPurposeOIDSet;
     private Set<List<?>> subjectAlternativeNames;
-    private Set<GeneralNameInterface> subjectAlternativeGeneralNames;
-    private CertificatePolicySet policy;
+    private Set<TGeneralNameInterface> subjectAlternativeGeneralNames;
+    private TCertificatePolicySet policy;
     private Set<String> policySet;
     private Set<List<?>> pathToNames;
-    private Set<GeneralNameInterface> pathToGeneralNames;
-    private NameConstraintsExtension nc;
+    private Set<TGeneralNameInterface> pathToGeneralNames;
+    private TNameConstraintsExtension nc;
     private byte[] ncBytes;
     private int basicConstraints = -1;
-    private X509Certificate x509Cert;
+    private TX509Certificate x509Cert;
     private boolean matchAllSubjectAltNames = true;
 
     private static final Boolean FALSE = Boolean.FALSE;
@@ -114,14 +108,14 @@ public class TX509CertSelector implements TCertSelector {
     private static final int CERT_POLICIES_ID = 3;
     private static final int EXTENDED_KEY_USAGE_ID = 4;
     private static final int NUM_OF_EXTENSIONS = 5;
-    private static final String[] EXTENSION_OIDS = new String[NUM_OF_EXTENSIONS];
+    private static final TString[] EXTENSION_OIDS = new TString[NUM_OF_EXTENSIONS];
 
     static {
-        EXTENSION_OIDS[PRIVATE_KEY_USAGE_ID]  = "2.5.29.16";
-        EXTENSION_OIDS[SUBJECT_ALT_NAME_ID]   = "2.5.29.17";
-        EXTENSION_OIDS[NAME_CONSTRAINTS_ID]   = "2.5.29.30";
-        EXTENSION_OIDS[CERT_POLICIES_ID]      = "2.5.29.32";
-        EXTENSION_OIDS[EXTENDED_KEY_USAGE_ID] = "2.5.29.37";
+        EXTENSION_OIDS[PRIVATE_KEY_USAGE_ID]  = TString.wrap("2.5.29.16");
+        EXTENSION_OIDS[SUBJECT_ALT_NAME_ID]   = TString.wrap("2.5.29.17");
+        EXTENSION_OIDS[NAME_CONSTRAINTS_ID]   = TString.wrap("2.5.29.30");
+        EXTENSION_OIDS[CERT_POLICIES_ID]      = TString.wrap("2.5.29.32");
+        EXTENSION_OIDS[EXTENDED_KEY_USAGE_ID] = TString.wrap("2.5.29.37");
     };
 
     /* Constants representing the GeneralName types */
@@ -158,7 +152,7 @@ public class TX509CertSelector implements TCertSelector {
      * {@code null})
      * @see #getCertificate
      */
-    public void setCertificate(X509Certificate cert) {
+    public void setCertificate(TX509Certificate cert) {
         x509Cert = cert;
     }
 
@@ -182,16 +176,16 @@ public class TX509CertSelector implements TCertSelector {
      * {@code X509Certificate}. If {@code null}, any issuer
      * distinguished name will do.
      *
-     * @param issuer a distinguished name as X500Principal
+     * @param issuer a distinguished name as TX500Principal
      *                 (or {@code null})
      * @since 1.5
      */
-    public void setIssuer(X500Principal issuer) {
+    public void setIssuer(TX500Principal issuer) {
         this.issuer = issuer;
     }
 
     /**
-     * <strong>Denigrated</strong>, use {@linkplain #setIssuer(X500Principal)}
+     * <strong>Denigrated</strong>, use {@linkplain #setIssuer(TX500Principal)}
      * or {@linkplain #setIssuer(byte[])} instead. This method should not be
      * relied on as it can fail to match some certificates because of a loss of
      * encoding information in the
@@ -210,11 +204,11 @@ public class TX509CertSelector implements TCertSelector {
      *                 (or {@code null})
      * @throws IOException if a parsing error occurs (incorrect form for DN)
      */
-    public void setIssuer(String issuerDN) throws IOException {
+    public void setIssuer(TString issuerDN) throws IOException {
         if (issuerDN == null) {
             issuer = null;
         } else {
-            issuer = new X500Name(issuerDN).asX500Principal();
+            issuer = new TX500Name(issuerDN).asX500Principal();
         }
     }
 
@@ -262,7 +256,7 @@ public class TX509CertSelector implements TCertSelector {
      */
     public void setIssuer(byte[] issuerDN) throws IOException {
         try {
-            issuer = (issuerDN == null ? null : new X500Principal(issuerDN));
+            issuer = (issuerDN == null ? null : new TX500Principal(issuerDN));
         } catch (IllegalArgumentException e) {
             throw new IOException("Invalid name", e);
         }
@@ -274,16 +268,16 @@ public class TX509CertSelector implements TCertSelector {
      * {@code X509Certificate}. If {@code null}, any subject
      * distinguished name will do.
      *
-     * @param subject a distinguished name as X500Principal
+     * @param subject a distinguished name as TX500Principal
      *                  (or {@code null})
      * @since 1.5
      */
-    public void setSubject(X500Principal subject) {
+    public void setSubject(TX500Principal subject) {
         this.subject = subject;
     }
 
     /**
-     * <strong>Denigrated</strong>, use {@linkplain #setSubject(X500Principal)}
+     * <strong>Denigrated</strong>, use {@linkplain #setSubject(TX500Principal)}
      * or {@linkplain #setSubject(byte[])} instead. This method should not be
      * relied on as it can fail to match some certificates because of a loss of
      * encoding information in the RFC 2253 String form of some distinguished
@@ -301,32 +295,17 @@ public class TX509CertSelector implements TCertSelector {
      *                  (or {@code null})
      * @throws IOException if a parsing error occurs (incorrect form for DN)
      */
-    public void setSubject(String subjectDN) throws IOException {
+    public void setSubject(TString subjectDN) throws IOException {
         if (subjectDN == null) {
             subject = null;
         } else {
-            subject = new X500Name(subjectDN).asX500Principal();
+            subject = new TX500Name(subjectDN).asX500Principal();
         }
     }
 
-    /**
-     * Sets the subject criterion. The specified distinguished name
-     * must match the subject distinguished name in the
-     * {@code X509Certificate}. If {@code null}, any subject
-     * distinguished name will do.
-     * <p>
-     * If {@code subjectDN} is not {@code null}, it should contain a
-     * single DER encoded distinguished name, as defined in X.501. For the ASN.1
-     * notation for this structure, see
-     * {@link #setIssuer(byte [] issuerDN) setIssuer(byte [] issuerDN)}.
-     *
-     * @param subjectDN a byte array containing the distinguished name in
-     *                  ASN.1 DER format (or {@code null})
-     * @throws IOException if an encoding error occurs (incorrect form for DN)
-     */
     public void setSubject(byte[] subjectDN) throws IOException {
         try {
-            subject = (subjectDN == null ? null : new X500Principal(subjectDN));
+            subject = (subjectDN == null ? null : new TX500Principal(subjectDN));
         } catch (IllegalArgumentException e) {
             throw new IOException("Invalid name", e);
         }
@@ -449,7 +428,7 @@ public class TX509CertSelector implements TCertSelector {
         if (certValid == null) {
             certificateValid = null;
         } else {
-            certificateValid = (Date)certValid.clone();
+            certificateValid = (TDate)certValid.clone();
         }
     }
 
@@ -470,7 +449,7 @@ public class TX509CertSelector implements TCertSelector {
         if (privateKeyValid == null) {
             this.privateKeyValid = null;
         } else {
-            this.privateKeyValid = (Date)privateKeyValid.clone();
+            this.privateKeyValid = (TDate)privateKeyValid.clone();
         }
     }
 
@@ -489,11 +468,11 @@ public class TX509CertSelector implements TCertSelector {
      *
      * @see #getSubjectPublicKeyAlgID
      */
-    public void setSubjectPublicKeyAlgID(String oid) throws IOException {
+    public void setSubjectPublicKeyAlgID(TString oid) throws IOException {
         if (oid == null) {
             subjectPublicKeyAlgID = null;
         } else {
-            subjectPublicKeyAlgID = new ObjectIdentifier(oid);
+            subjectPublicKeyAlgID = new TObjectIdentifier(oid);
         }
     }
 
@@ -505,7 +484,7 @@ public class TX509CertSelector implements TCertSelector {
      * @param key the subject public key to check for (or {@code null})
      * @see #getSubjectPublicKey
      */
-    public void setSubjectPublicKey(PublicKey key) {
+    public void setSubjectPublicKey(TPublicKey key) {
         if (key == null) {
             subjectPublicKey = null;
             subjectPublicKeyBytes = null;
@@ -554,25 +533,10 @@ public class TX509CertSelector implements TCertSelector {
             subjectPublicKeyBytes = null;
         } else {
             subjectPublicKeyBytes = key.clone();
-            subjectPublicKey = X509Key.parse(new DerValue(subjectPublicKeyBytes));
+            subjectPublicKey = TX509Key.parse(new TDerValue(subjectPublicKeyBytes));
         }
     }
 
-    /**
-     * Sets the keyUsage criterion. The {@code X509Certificate}
-     * must allow the specified keyUsage values. If {@code null}, no
-     * keyUsage check will be done. Note that an {@code X509Certificate}
-     * that has no keyUsage extension implicitly allows all keyUsage values.
-     * <p>
-     * Note that the boolean array supplied here is cloned to protect against
-     * subsequent modifications.
-     *
-     * @param keyUsage a boolean array in the same format as the boolean
-     *                 array returned by
-     * {@link X509Certificate#getKeyUsage() X509Certificate.getKeyUsage()}.
-     *                 Or {@code null}.
-     * @see #getKeyUsage
-     */
     public void setKeyUsage(boolean[] keyUsage) {
         if (keyUsage == null) {
             this.keyUsage = null;
@@ -600,16 +564,16 @@ public class TX509CertSelector implements TCertSelector {
      * being greater than 39.
      * @see #getExtendedKeyUsage
      */
-    public void setExtendedKeyUsage(Set<String> keyPurposeSet) throws IOException {
+    public void setExtendedKeyUsage(Set<TString> keyPurposeSet) throws IOException {
         if ((keyPurposeSet == null) || keyPurposeSet.isEmpty()) {
             this.keyPurposeSet = null;
             keyPurposeOIDSet = null;
         } else {
             this.keyPurposeSet =
-                    Collections.unmodifiableSet(new HashSet<String>(keyPurposeSet));
-            keyPurposeOIDSet = new HashSet<ObjectIdentifier>();
-            for (String s : this.keyPurposeSet) {
-                keyPurposeOIDSet.add(new ObjectIdentifier(s));
+                    Collections.unmodifiableSet(new HashSet<TString>(keyPurposeSet));
+            keyPurposeOIDSet = new HashSet<TObjectIdentifier>();
+            for (TString s : this.keyPurposeSet) {
+                keyPurposeOIDSet.add(new TObjectIdentifier(s));
             }
         }
     }
@@ -634,53 +598,6 @@ public class TX509CertSelector implements TCertSelector {
         this.matchAllSubjectAltNames = matchAllNames;
     }
 
-    /**
-     * Sets the subjectAlternativeNames criterion. The
-     * {@code X509Certificate} must contain all or at least one of the
-     * specified subjectAlternativeNames, depending on the value of
-     * the matchAllNames flag (see {@link #setMatchAllSubjectAltNames
-     * setMatchAllSubjectAltNames}).
-     * <p>
-     * This method allows the caller to specify, with a single method call,
-     * the complete set of subject alternative names for the
-     * subjectAlternativeNames criterion. The specified value replaces
-     * the previous value for the subjectAlternativeNames criterion.
-     * <p>
-     * The {@code names} parameter (if not {@code null}) is a
-     * {@code Collection} with one
-     * entry for each name to be included in the subject alternative name
-     * criterion. Each entry is a {@code List} whose first entry is an
-     * {@code Integer} (the name type, 0-8) and whose second
-     * entry is a {@code String} or a byte array (the name, in
-     * string or ASN.1 DER encoded form, respectively).
-     * There can be multiple names of the same type. If {@code null}
-     * is supplied as the value for this argument, no
-     * subjectAlternativeNames check will be performed.
-     * <p>
-     * Each subject alternative name in the {@code Collection}
-     * may be specified either as a {@code String} or as an ASN.1 encoded
-     * byte array. For more details about the formats used, see
-     * {@link #addSubjectAlternativeName(int type, String name)
-     * addSubjectAlternativeName(int type, String name)} and
-     * {@link #addSubjectAlternativeName(int type, byte [] name)
-     * addSubjectAlternativeName(int type, byte [] name)}.
-     * <p>
-     * <strong>Note:</strong> for distinguished names, specify the byte
-     * array form instead of the String form. See the note in
-     * {@link #addSubjectAlternativeName(int, String)} for more information.
-     * <p>
-     * Note that the {@code names} parameter can contain duplicate
-     * names (same name and name type), but they may be removed from the
-     * {@code Collection} of names returned by the
-     * {@link #getSubjectAlternativeNames getSubjectAlternativeNames} method.
-     * <p>
-     * Note that a deep copy is performed on the {@code Collection} to
-     * protect against subsequent modifications.
-     *
-     * @param names a {@code Collection} of names (or {@code null})
-     * @throws IOException if a parsing error occurs
-     * @see #getSubjectAlternativeNames
-     */
     public void setSubjectAlternativeNames(Collection<List<?>> names)
             throws IOException {
         if (names == null) {
@@ -699,44 +616,6 @@ public class TX509CertSelector implements TCertSelector {
         }
     }
 
-    /**
-     * Adds a name to the subjectAlternativeNames criterion. The
-     * {@code X509Certificate} must contain all or at least one
-     * of the specified subjectAlternativeNames, depending on the value of
-     * the matchAllNames flag (see {@link #setMatchAllSubjectAltNames
-     * setMatchAllSubjectAltNames}).
-     * <p>
-     * This method allows the caller to add a name to the set of subject
-     * alternative names.
-     * The specified name is added to any previous value for the
-     * subjectAlternativeNames criterion. If the specified name is a
-     * duplicate, it may be ignored.
-     * <p>
-     * The name is provided in string format.
-     * <a href="http://www.ietf.org/rfc/rfc822.txt">RFC 822</a>, DNS, and URI
-     * names use the well-established string formats for those types (subject to
-     * the restrictions included in RFC 3280). IPv4 address names are
-     * supplied using dotted quad notation. OID address names are represented
-     * as a series of nonnegative integers separated by periods. And
-     * directory names (distinguished names) are supplied in RFC 2253 format.
-     * No standard string format is defined for otherNames, X.400 names,
-     * EDI party names, IPv6 address names, or any other type of names. They
-     * should be specified using the
-     * {@link #addSubjectAlternativeName(int type, byte [] name)
-     * addSubjectAlternativeName(int type, byte [] name)}
-     * method.
-     * <p>
-     * <strong>Note:</strong> for distinguished names, use
-     * {@linkplain #addSubjectAlternativeName(int, byte[])} instead.
-     * This method should not be relied on as it can fail to match some
-     * certificates because of a loss of encoding information in the RFC 2253
-     * String form of some distinguished names.
-     *
-     * @param type the name type (0-8, as specified in
-     *             RFC 3280, section 4.2.1.7)
-     * @param name the name in string form (not {@code null})
-     * @throws IOException if a parsing error occurs
-     */
     public void addSubjectAlternativeName(int type, String name)
             throws IOException {
         addSubjectAlternativeNameInternal(type, name);
@@ -800,12 +679,12 @@ public class TX509CertSelector implements TCertSelector {
     private void addSubjectAlternativeNameInternal(int type, Object name)
             throws IOException {
         // First, ensure that the name parses
-        GeneralNameInterface tempName = makeGeneralNameInterface(type, name);
+        TGeneralNameInterface tempName = makeGeneralNameInterface(type, name);
         if (subjectAlternativeNames == null) {
             subjectAlternativeNames = new HashSet<List<?>>();
         }
         if (subjectAlternativeGeneralNames == null) {
-            subjectAlternativeGeneralNames = new HashSet<GeneralNameInterface>();
+            subjectAlternativeGeneralNames = new HashSet<TGeneralNameInterface>();
         }
         List<Object> list = new ArrayList<Object>(2);
         list.add(Integer.valueOf(type));
@@ -831,8 +710,8 @@ public class TX509CertSelector implements TCertSelector {
      * @return a Set of {@code GeneralNameInterface}s
      * @throws IOException if a parsing error occurs
      */
-    private static Set<GeneralNameInterface> parseNames(Collection<List<?>> names) throws IOException {
-        Set<GeneralNameInterface> genNames = new HashSet<GeneralNameInterface>();
+    private static Set<TGeneralNameInterface> parseNames(Collection<List<?>> names) throws IOException {
+        Set<TGeneralNameInterface> genNames = new HashSet<TGeneralNameInterface>();
         for (List<?> nameList : names) {
             if (nameList.size() != 2) {
                 throw new IOException("name list size not 2");
@@ -881,94 +760,70 @@ public class TX509CertSelector implements TCertSelector {
      * @return a GeneralNameInterface name
      * @throws IOException if a parsing error occurs
      */
-    static GeneralNameInterface makeGeneralNameInterface(int type, Object name)
+    static TGeneralNameInterface makeGeneralNameInterface(int type, Object name)
             throws IOException {
-        GeneralNameInterface result;
-        if (debug != null) {
-            debug.println("TX509CertSelector.makeGeneralNameInterface("
-                    + type + ")...");
-        }
+        TGeneralNameInterface result;
 
         if (name instanceof String) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.makeGeneralNameInterface() "
-                        + "name is String: " + name);
-            }
             switch (type) {
                 case NAME_RFC822:
-                    result = new RFC822Name((String)name);
+                    result = new TRFC822Name((TString)name);
                     break;
                 case NAME_DNS:
-                    result = new DNSName((String)name);
+                    result = new TDNSName((TString)name);
                     break;
                 case NAME_DIRECTORY:
-                    result = new X500Name((String)name);
+                    result = new TX500Name((TString)name);
                     break;
                 case NAME_URI:
-                    result = new URIName((String)name);
+                    result = new TURIName((TString)name);
                     break;
                 case NAME_IP:
-                    result = new IPAddressName((String)name);
+                    result = new TIPAddressName((TString)name);
                     break;
                 case NAME_OID:
-                    result = new OIDName((String)name);
+                    result = new TOIDName((TString)name);
                     break;
                 default:
                     throw new IOException("unable to parse String names of type "
                             + type);
             }
-            if (debug != null) {
-                debug.println("TX509CertSelector.makeGeneralNameInterface() "
-                        + "result: " + result.toString());
-            }
         } else if (name instanceof byte[]) {
-            DerValue val = new DerValue((byte[]) name);
-            if (debug != null) {
-                debug.println
-                        ("TX509CertSelector.makeGeneralNameInterface() is byte[]");
-            }
+            TDerValue val = new TDerValue((byte[]) name);
 
             switch (type) {
                 case NAME_ANY:
-                    result = new OtherName(val);
+                    result = new TOtherName(val);
                     break;
                 case NAME_RFC822:
-                    result = new RFC822Name(val);
+                    result = new TRFC822Name(val);
                     break;
                 case NAME_DNS:
-                    result = new DNSName(val);
+                    result = new TDNSName(val);
                     break;
                 case NAME_X400:
-                    result = new X400Address(val);
+                    result = new TX400Address(val);
                     break;
                 case NAME_DIRECTORY:
-                    result = new X500Name(val);
+                    result = new TX500Name(val);
                     break;
                 case NAME_EDI:
-                    result = new EDIPartyName(val);
+                    result = new TEDIPartyName(val);
                     break;
                 case NAME_URI:
-                    result = new URIName(val);
+                    result = new TURIName(val);
                     break;
                 case NAME_IP:
-                    result = new IPAddressName(val);
+                    result = new TIPAddressName(val);
                     break;
                 case NAME_OID:
-                    result = new OIDName(val);
+                    result = new TOIDName(val);
                     break;
                 default:
                     throw new IOException("unable to parse byte array names of "
                             + "type " + type);
             }
-            if (debug != null) {
-                debug.println("TX509CertSelector.makeGeneralNameInterface() result: "
-                        + result.toString());
-            }
         } else {
-            if (debug != null) {
-                debug.println("TX509CertSelector.makeGeneralName() input name "
-                        + "not String or byte array");
-            }
             throw new IOException("name not String or byte array");
         }
         return result;
@@ -1029,7 +884,7 @@ public class TX509CertSelector implements TCertSelector {
             nc = null;
         } else {
             ncBytes = bytes.clone();
-            nc = new NameConstraintsExtension(FALSE, bytes);
+            nc = new TNameConstraintsExtension(FALSE, bytes);
         }
     }
 
@@ -1084,74 +939,23 @@ public class TX509CertSelector implements TCertSelector {
             // Snapshot set and parse it
             Set<String> tempSet = Collections.unmodifiableSet
                     (new HashSet<String>(certPolicySet));
-            /* Convert to Vector of ObjectIdentifiers */
+            /* Convert to Vector of TObjectIdentifiers */
             Iterator<String> i = tempSet.iterator();
-            Vector<CertificatePolicyId> polIdVector = new Vector<CertificatePolicyId>();
+            Vector<TCertificatePolicyId> polIdVector = new Vector<TCertificatePolicyId>();
             while (i.hasNext()) {
                 Object o = i.next();
                 if (!(o instanceof String)) {
                     throw new IOException("non String in certPolicySet");
                 }
-                polIdVector.add(new CertificatePolicyId(new ObjectIdentifier(
-                        (String)o)));
+                polIdVector.add(new TCertificatePolicyId(new TObjectIdentifier(
+                        (TString)o)));
             }
             // If everything went OK, make the changes
             policySet = tempSet;
-            policy = new CertificatePolicySet(polIdVector);
+            policy = new TCertificatePolicySet(polIdVector);
         }
     }
 
-    /**
-     * Sets the pathToNames criterion. The {@code X509Certificate} must
-     * not include name constraints that would prohibit building a
-     * path to the specified names.
-     * <p>
-     * This method allows the caller to specify, with a single method call,
-     * the complete set of names which the {@code X509Certificates}'s
-     * name constraints must permit. The specified value replaces
-     * the previous value for the pathToNames criterion.
-     * <p>
-     * This constraint is useful when building a certification path forward
-     * (from the target toward the trust anchor. If a partial path has been
-     * built, any candidate certificate must not include name constraints that
-     * would prohibit building a path to any of the names in the partial path.
-     * <p>
-     * The {@code names} parameter (if not {@code null}) is a
-     * {@code Collection} with one
-     * entry for each name to be included in the pathToNames
-     * criterion. Each entry is a {@code List} whose first entry is an
-     * {@code Integer} (the name type, 0-8) and whose second
-     * entry is a {@code String} or a byte array (the name, in
-     * string or ASN.1 DER encoded form, respectively).
-     * There can be multiple names of the same type. If {@code null}
-     * is supplied as the value for this argument, no
-     * pathToNames check will be performed.
-     * <p>
-     * Each name in the {@code Collection}
-     * may be specified either as a {@code String} or as an ASN.1 encoded
-     * byte array. For more details about the formats used, see
-     * {@link #addPathToName(int type, String name)
-     * addPathToName(int type, String name)} and
-     * {@link #addPathToName(int type, byte [] name)
-     * addPathToName(int type, byte [] name)}.
-     * <p>
-     * <strong>Note:</strong> for distinguished names, specify the byte
-     * array form instead of the String form. See the note in
-     * {@link #addPathToName(int, String)} for more information.
-     * <p>
-     * Note that the {@code names} parameter can contain duplicate
-     * names (same name and name type), but they may be removed from the
-     * {@code Collection} of names returned by the
-     * {@link #getPathToNames getPathToNames} method.
-     * <p>
-     * Note that a deep copy is performed on the {@code Collection} to
-     * protect against subsequent modifications.
-     *
-     * @param names a {@code Collection} with one entry per name
-     *              (or {@code null})
-     * @throws IOException if a parsing error occurs
-     * @see #getPathToNames
-     */
     public void setPathToNames(Collection<List<?>> names) throws IOException {
         if ((names == null) || names.isEmpty()) {
             pathToNames = null;
@@ -1165,75 +969,17 @@ public class TX509CertSelector implements TCertSelector {
     }
 
     // called from CertPathHelper
-    void setPathToNamesInternal(Set<GeneralNameInterface> names) {
+    void setPathToNamesInternal(Set<TGeneralNameInterface> names) {
         // set names to non-null dummy value
         // this breaks getPathToNames()
         pathToNames = Collections.<List<?>>emptySet();
         pathToGeneralNames = names;
     }
 
-    /**
-     * Adds a name to the pathToNames criterion. The {@code X509Certificate}
-     * must not include name constraints that would prohibit building a
-     * path to the specified name.
-     * <p>
-     * This method allows the caller to add a name to the set of names which
-     * the {@code X509Certificates}'s name constraints must permit.
-     * The specified name is added to any previous value for the
-     * pathToNames criterion.  If the name is a duplicate, it may be ignored.
-     * <p>
-     * The name is provided in string format. RFC 822, DNS, and URI names
-     * use the well-established string formats for those types (subject to
-     * the restrictions included in RFC 3280). IPv4 address names are
-     * supplied using dotted quad notation. OID address names are represented
-     * as a series of nonnegative integers separated by periods. And
-     * directory names (distinguished names) are supplied in RFC 2253 format.
-     * No standard string format is defined for otherNames, X.400 names,
-     * EDI party names, IPv6 address names, or any other type of names. They
-     * should be specified using the
-     * {@link #addPathToName(int type, byte [] name)
-     * addPathToName(int type, byte [] name)} method.
-     * <p>
-     * <strong>Note:</strong> for distinguished names, use
-     * {@linkplain #addPathToName(int, byte[])} instead.
-     * This method should not be relied on as it can fail to match some
-     * certificates because of a loss of encoding information in the RFC 2253
-     * String form of some distinguished names.
-     *
-     * @param type the name type (0-8, as specified in
-     *             RFC 3280, section 4.2.1.7)
-     * @param name the name in string form
-     * @throws IOException if a parsing error occurs
-     */
     public void addPathToName(int type, String name) throws IOException {
         addPathToNameInternal(type, name);
     }
 
-    /**
-     * Adds a name to the pathToNames criterion. The {@code X509Certificate}
-     * must not include name constraints that would prohibit building a
-     * path to the specified name.
-     * <p>
-     * This method allows the caller to add a name to the set of names which
-     * the {@code X509Certificates}'s name constraints must permit.
-     * The specified name is added to any previous value for the
-     * pathToNames criterion. If the name is a duplicate, it may be ignored.
-     * <p>
-     * The name is provided as a byte array. This byte array should contain
-     * the DER encoded name, as it would appear in the GeneralName structure
-     * defined in RFC 3280 and X.509. The ASN.1 definition of this structure
-     * appears in the documentation for
-     * {@link #addSubjectAlternativeName(int type, byte [] name)
-     * addSubjectAlternativeName(int type, byte [] name)}.
-     * <p>
-     * Note that the byte array supplied here is cloned to protect against
-     * subsequent modifications.
-     *
-     * @param type the name type (0-8, as specified in
-     *             RFC 3280, section 4.2.1.7)
-     * @param name a byte array containing the name in ASN.1 DER encoded form
-     * @throws IOException if a parsing error occurs
-     */
     public void addPathToName(int type, byte [] name) throws IOException {
         // clone because byte arrays are modifiable
         addPathToNameInternal(type, name.clone());
@@ -1252,10 +998,10 @@ public class TX509CertSelector implements TCertSelector {
     private void addPathToNameInternal(int type, Object name)
             throws IOException {
         // First, ensure that the name parses
-        GeneralNameInterface tempName = makeGeneralNameInterface(type, name);
+        TGeneralNameInterface tempName = makeGeneralNameInterface(type, name);
         if (pathToGeneralNames == null) {
             pathToNames = new HashSet<List<?>>();
-            pathToGeneralNames = new HashSet<GeneralNameInterface>();
+            pathToGeneralNames = new HashSet<TGeneralNameInterface>();
         }
         List<Object> list = new ArrayList<Object>(2);
         list.add(Integer.valueOf(type));
@@ -1273,7 +1019,7 @@ public class TX509CertSelector implements TCertSelector {
      * @return the {@code X509Certificate} to match (or {@code null})
      * @see #setCertificate
      */
-    public X509Certificate getCertificate() {
+    public TX509Certificate getCertificate() {
         return x509Cert;
     }
 
@@ -1301,7 +1047,7 @@ public class TX509CertSelector implements TCertSelector {
      *         (or {@code null})
      * @since 1.5
      */
-    public X500Principal getIssuer() {
+    public TX500Principal getIssuer() {
         return issuer;
     }
 
@@ -1327,25 +1073,6 @@ public class TX509CertSelector implements TCertSelector {
         return (issuer == null ? null : issuer.getName());
     }
 
-    /**
-     * Returns the issuer criterion as a byte array. This distinguished name
-     * must match the issuer distinguished name in the
-     * {@code X509Certificate}. If {@code null}, the issuer criterion
-     * is disabled and any issuer distinguished name will do.
-     * <p>
-     * If the value returned is not {@code null}, it is a byte
-     * array containing a single DER encoded distinguished name, as defined in
-     * X.501. The ASN.1 notation for this structure is supplied in the
-     * documentation for
-     * {@link #setIssuer(byte [] issuerDN) setIssuer(byte [] issuerDN)}.
-     * <p>
-     * Note that the byte array returned is cloned to protect against
-     * subsequent modifications.
-     *
-     * @return a byte array containing the required issuer distinguished name
-     *         in ASN.1 DER format (or {@code null})
-     * @throws IOException if an encoding error occurs
-     */
     public byte[] getIssuerAsBytes() throws IOException {
         return (issuer == null ? null: issuer.getEncoded());
     }
@@ -1360,7 +1087,7 @@ public class TX509CertSelector implements TCertSelector {
      *         (or {@code null})
      * @since 1.5
      */
-    public X500Principal getSubject() {
+    public TX500Principal getSubject() {
         return subject;
     }
 
@@ -1386,25 +1113,6 @@ public class TX509CertSelector implements TCertSelector {
         return (subject == null ? null : subject.getName());
     }
 
-    /**
-     * Returns the subject criterion as a byte array. This distinguished name
-     * must match the subject distinguished name in the
-     * {@code X509Certificate}. If {@code null}, the subject criterion
-     * is disabled and any subject distinguished name will do.
-     * <p>
-     * If the value returned is not {@code null}, it is a byte
-     * array containing a single DER encoded distinguished name, as defined in
-     * X.501. The ASN.1 notation for this structure is supplied in the
-     * documentation for
-     * {@link #setSubject(byte [] subjectDN) setSubject(byte [] subjectDN)}.
-     * <p>
-     * Note that the byte array returned is cloned to protect against
-     * subsequent modifications.
-     *
-     * @return a byte array containing the required subject distinguished name
-     *         in ASN.1 DER format (or {@code null})
-     * @throws IOException if an encoding error occurs
-     */
     public byte[] getSubjectAsBytes() throws IOException {
         return (subject == null ? null : subject.getEncoded());
     }
@@ -1511,24 +1219,10 @@ public class TX509CertSelector implements TCertSelector {
      * @return the subject public key to check for (or {@code null})
      * @see #setSubjectPublicKey
      */
-    public PublicKey getSubjectPublicKey() {
+    public TPublicKey getSubjectPublicKey() {
         return subjectPublicKey;
     }
 
-    /**
-     * Returns the keyUsage criterion. The {@code X509Certificate}
-     * must allow the specified keyUsage values. If null, no keyUsage
-     * check will be done.
-     * <p>
-     * Note that the boolean array returned is cloned to protect against
-     * subsequent modifications.
-     *
-     * @return a boolean array in the same format as the boolean
-     *                 array returned by
-     * {@link X509Certificate#getKeyUsage() X509Certificate.getKeyUsage()}.
-     *                 Or {@code null}.
-     * @see #setKeyUsage
-     */
     public boolean[] getKeyUsage() {
         if (keyUsage == null) {
             return null;
@@ -1548,7 +1242,7 @@ public class TX509CertSelector implements TCertSelector {
      * format (or {@code null})
      * @see #setExtendedKeyUsage
      */
-    public Set<String> getExtendedKeyUsage() {
+    public Set<TString> getExtendedKeyUsage() {
         return keyPurposeSet;
     }
 
@@ -1572,39 +1266,6 @@ public class TX509CertSelector implements TCertSelector {
         return matchAllSubjectAltNames;
     }
 
-    /**
-     * Returns a copy of the subjectAlternativeNames criterion.
-     * The {@code X509Certificate} must contain all or at least one
-     * of the specified subjectAlternativeNames, depending on the value
-     * of the matchAllNames flag (see {@link #getMatchAllSubjectAltNames
-     * getMatchAllSubjectAltNames}). If the value returned is
-     * {@code null}, no subjectAlternativeNames check will be performed.
-     * <p>
-     * If the value returned is not {@code null}, it is a
-     * {@code Collection} with
-     * one entry for each name to be included in the subject alternative name
-     * criterion. Each entry is a {@code List} whose first entry is an
-     * {@code Integer} (the name type, 0-8) and whose second
-     * entry is a {@code String} or a byte array (the name, in
-     * string or ASN.1 DER encoded form, respectively).
-     * There can be multiple names of the same type.  Note that the
-     * {@code Collection} returned may contain duplicate names (same name
-     * and name type).
-     * <p>
-     * Each subject alternative name in the {@code Collection}
-     * may be specified either as a {@code String} or as an ASN.1 encoded
-     * byte array. For more details about the formats used, see
-     * {@link #addSubjectAlternativeName(int type, String name)
-     * addSubjectAlternativeName(int type, String name)} and
-     * {@link #addSubjectAlternativeName(int type, byte [] name)
-     * addSubjectAlternativeName(int type, byte [] name)}.
-     * <p>
-     * Note that a deep copy is performed on the {@code Collection} to
-     * protect against subsequent modifications.
-     *
-     * @return a {@code Collection} of names (or {@code null})
-     * @see #setSubjectAlternativeNames
-     */
     public Collection<List<?>> getSubjectAlternativeNames() {
         if (subjectAlternativeNames == null) {
             return null;
@@ -1682,10 +1343,6 @@ public class TX509CertSelector implements TCertSelector {
             Object nameObject = nameList.get(1);
             if (!(nameObject instanceof byte[]) &&
                     !(nameObject instanceof String)) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.cloneAndCheckNames() "
-                            + "name not byte array");
-                }
                 throw new IOException("name not byte array or String");
             }
             if (nameObject instanceof byte[]) {
@@ -1695,26 +1352,6 @@ public class TX509CertSelector implements TCertSelector {
         return namesCopy;
     }
 
-    /**
-     * Returns the name constraints criterion. The {@code X509Certificate}
-     * must have subject and subject alternative names that
-     * meet the specified name constraints.
-     * <p>
-     * The name constraints are returned as a byte array. This byte array
-     * contains the DER encoded form of the name constraints, as they
-     * would appear in the NameConstraints structure defined in RFC 3280
-     * and X.509. The ASN.1 notation for this structure is supplied in the
-     * documentation for
-     * {@link #setNameConstraints(byte [] bytes) setNameConstraints(byte [] bytes)}.
-     * <p>
-     * Note that the byte array returned is cloned to protect against
-     * subsequent modifications.
-     *
-     * @return a byte array containing the ASN.1 DER encoding of
-     *         a NameConstraints extension used for checking name constraints.
-     *         {@code null} if no name constraints check will be performed.
-     * @see #setNameConstraints
-     */
     public byte[] getNameConstraints() {
         if (ncBytes == null) {
             return null;
@@ -1753,37 +1390,6 @@ public class TX509CertSelector implements TCertSelector {
         return policySet;
     }
 
-    /**
-     * Returns a copy of the pathToNames criterion. The
-     * {@code X509Certificate} must not include name constraints that would
-     * prohibit building a path to the specified names. If the value
-     * returned is {@code null}, no pathToNames check will be performed.
-     * <p>
-     * If the value returned is not {@code null}, it is a
-     * {@code Collection} with one
-     * entry for each name to be included in the pathToNames
-     * criterion. Each entry is a {@code List} whose first entry is an
-     * {@code Integer} (the name type, 0-8) and whose second
-     * entry is a {@code String} or a byte array (the name, in
-     * string or ASN.1 DER encoded form, respectively).
-     * There can be multiple names of the same type. Note that the
-     * {@code Collection} returned may contain duplicate names (same
-     * name and name type).
-     * <p>
-     * Each name in the {@code Collection}
-     * may be specified either as a {@code String} or as an ASN.1 encoded
-     * byte array. For more details about the formats used, see
-     * {@link #addPathToName(int type, String name)
-     * addPathToName(int type, String name)} and
-     * {@link #addPathToName(int type, byte [] name)
-     * addPathToName(int type, byte [] name)}.
-     * <p>
-     * Note that a deep copy is performed on the {@code Collection} to
-     * protect against subsequent modifications.
-     *
-     * @return a {@code Collection} of names (or {@code null})
-     * @see #setPathToNames
-     */
     public Collection<List<?>> getPathToNames() {
         if (pathToNames == null) {
             return null;
@@ -1824,12 +1430,12 @@ public class TX509CertSelector implements TCertSelector {
             }
         }
         if (subjectKeyID != null) {
-            HexDumpEncoder enc = new HexDumpEncoder();
+            THexDumpEncoder enc = new THexDumpEncoder();
             sb.append("  Subject Key Identifier: " +
                     enc.encodeBuffer(subjectKeyID) + "\n");
         }
         if (authorityKeyID != null) {
-            HexDumpEncoder enc = new HexDumpEncoder();
+            THexDumpEncoder enc = new THexDumpEncoder();
             sb.append("  Authority Key Identifier: " +
                     enc.encodeBuffer(authorityKeyID) + "\n");
         }
@@ -1861,7 +1467,7 @@ public class TX509CertSelector implements TCertSelector {
         }
         if (pathToGeneralNames != null) {
             sb.append("  Path to names:\n");
-            Iterator<GeneralNameInterface> i = pathToGeneralNames.iterator();
+            Iterator<TGeneralNameInterface> i = pathToGeneralNames.iterator();
             while (i.hasNext()) {
                 sb.append("    " + i.next() + "\n");
             }
@@ -1931,10 +1537,10 @@ public class TX509CertSelector implements TCertSelector {
      * object with the extension encoding retrieved from the passed in
      * {@code X509Certificate}.
      */
-    private static Extension getExtensionObject(X509Certificate cert, int extId)
+    private static TExtension getExtensionObject(TX509Certificate cert, int extId)
             throws IOException {
-        if (cert instanceof X509CertImpl) {
-            X509CertImpl impl = (X509CertImpl)cert;
+        if (cert instanceof TX509CertImpl) {
+            TX509CertImpl impl = (TX509CertImpl)cert;
             switch (extId) {
                 case PRIVATE_KEY_USAGE_ID:
                     return impl.getPrivateKeyUsageExtension();
@@ -1954,23 +1560,23 @@ public class TX509CertSelector implements TCertSelector {
         if (rawExtVal == null) {
             return null;
         }
-        DerInputStream in = new DerInputStream(rawExtVal);
+        TDerInputStream in = new TDerInputStream(rawExtVal);
         byte[] encoded = in.getOctetString();
         switch (extId) {
             case PRIVATE_KEY_USAGE_ID:
                 try {
-                    return new PrivateKeyUsageExtension(FALSE, encoded);
-                } catch (CertificateException ex) {
+                    return new TPrivateKeyUsageExtension(FALSE, encoded);
+                } catch (TCertificateException ex) {
                     throw new IOException(ex.getMessage());
                 }
             case SUBJECT_ALT_NAME_ID:
-                return new SubjectAlternativeNameExtension(FALSE, encoded);
+                return new TSubjectAlternativeNameExtension(FALSE, encoded);
             case NAME_CONSTRAINTS_ID:
-                return new NameConstraintsExtension(FALSE, encoded);
+                return new TNameConstraintsExtension(FALSE, encoded);
             case CERT_POLICIES_ID:
-                return new CertificatePoliciesExtension(FALSE, encoded);
+                return new TCertificatePoliciesExtension(FALSE, encoded);
             case EXTENDED_KEY_USAGE_ID:
-                return new ExtendedKeyUsageExtension(FALSE, encoded);
+                return new TExtendedKeyUsageExtension(FALSE, encoded);
             default:
                 return null;
         }
@@ -1983,26 +1589,15 @@ public class TX509CertSelector implements TCertSelector {
      * @return {@code true} if the {@code Certificate} should be
      *         selected, {@code false} otherwise
      */
-    public boolean match(Certificate cert) {
-        if (!(cert instanceof X509Certificate)) {
+    public boolean match(TCertificate cert) {
+        if (!(cert instanceof TX509Certificate)) {
             return false;
         }
-        X509Certificate xcert = (X509Certificate)cert;
-
-        if (debug != null) {
-            debug.println("TX509CertSelector.match(SN: "
-                    + (xcert.getSerialNumber()).toString(16) + "\n  Issuer: "
-                    + xcert.getIssuerDN() + "\n  Subject: " + xcert.getSubjectDN()
-                    + ")");
-        }
+        TX509Certificate xcert = (TX509Certificate)cert;
 
         /* match on X509Certificate */
         if (x509Cert != null) {
             if (!x509Cert.equals(xcert)) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "certs don't match");
-                }
                 return false;
             }
         }
@@ -2010,10 +1605,6 @@ public class TX509CertSelector implements TCertSelector {
         /* match on serial number */
         if (serialNumber != null) {
             if (!serialNumber.equals(xcert.getSerialNumber())) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "serial numbers don't match");
-                }
                 return false;
             }
         }
@@ -2021,10 +1612,6 @@ public class TX509CertSelector implements TCertSelector {
         /* match on issuer name */
         if (issuer != null) {
             if (!issuer.equals(xcert.getIssuerX500Principal())) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "issuer DNs don't match");
-                }
                 return false;
             }
         }
@@ -2032,10 +1619,6 @@ public class TX509CertSelector implements TCertSelector {
         /* match on subject name */
         if (subject != null) {
             if (!subject.equals(xcert.getSubjectX500Principal())) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "subject DNs don't match");
-                }
                 return false;
             }
         }
@@ -2044,11 +1627,7 @@ public class TX509CertSelector implements TCertSelector {
         if (certificateValid != null) {
             try {
                 xcert.checkValidity(certificateValid);
-            } catch (CertificateException e) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "certificate not within validity period");
-                }
+            } catch (TCertificateException e) {
                 return false;
             }
         }
@@ -2057,10 +1636,6 @@ public class TX509CertSelector implements TCertSelector {
         if (subjectPublicKeyBytes != null) {
             byte[] certKey = xcert.getPublicKey().getEncoded();
             if (!Arrays.equals(subjectPublicKeyBytes, certKey)) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "subject public keys don't match");
-                }
                 return false;
             }
         }
@@ -2077,173 +1652,96 @@ public class TX509CertSelector implements TCertSelector {
                 && matchPathToNames(xcert)
                 && matchNameConstraints(xcert);
 
-        if (result && (debug != null)) {
-            debug.println("TX509CertSelector.match returning: true");
-        }
         return result;
     }
 
     /* match on subject key identifier extension value */
-    private boolean matchSubjectKeyID(X509Certificate xcert) {
+    private boolean matchSubjectKeyID(TX509Certificate xcert) {
         if (subjectKeyID == null) {
             return true;
         }
         try {
-            byte[] extVal = xcert.getExtensionValue("2.5.29.14");
+            byte[] extVal = xcert.getExtensionValue(TString.wrap("2.5.29.14"));
             if (extVal == null) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "no subject key ID extension");
-                }
                 return false;
             }
-            DerInputStream in = new DerInputStream(extVal);
+            TDerInputStream in = new TDerInputStream(extVal);
             byte[] certSubjectKeyID = in.getOctetString();
             if (certSubjectKeyID == null ||
                     !Arrays.equals(subjectKeyID, certSubjectKeyID)) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "subject key IDs don't match");
-                }
                 return false;
             }
-        } catch (IOException ex) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: "
-                        + "exception in subject key ID check");
-            }
+        } catch (TIOException ex) {
             return false;
         }
         return true;
     }
 
     /* match on authority key identifier extension value */
-    private boolean matchAuthorityKeyID(X509Certificate xcert) {
+    private boolean matchAuthorityKeyID(TX509Certificate xcert) {
         if (authorityKeyID == null) {
             return true;
         }
         try {
-            byte[] extVal = xcert.getExtensionValue("2.5.29.35");
+            byte[] extVal = xcert.getExtensionValue(TString.wrap("2.5.29.35"));
             if (extVal == null) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "no authority key ID extension");
-                }
                 return false;
             }
-            DerInputStream in = new DerInputStream(extVal);
+            TDerInputStream in = new TDerInputStream(extVal);
             byte[] certAuthKeyID = in.getOctetString();
             if (certAuthKeyID == null ||
                     !Arrays.equals(authorityKeyID, certAuthKeyID)) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "authority key IDs don't match");
-                }
                 return false;
             }
-        } catch (IOException ex) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: "
-                        + "exception in authority key ID check");
-            }
+        } catch (TIOException ex) {
             return false;
         }
         return true;
     }
 
     /* match on private key usage range */
-    private boolean matchPrivateKeyValid(X509Certificate xcert) {
+    private boolean matchPrivateKeyValid(TX509Certificate xcert) {
         if (privateKeyValid == null) {
             return true;
         }
-        PrivateKeyUsageExtension ext = null;
+        TPrivateKeyUsageExtension ext = null;
         try {
-            ext = (PrivateKeyUsageExtension)
+            ext = (TPrivateKeyUsageExtension)
                     getExtensionObject(xcert, PRIVATE_KEY_USAGE_ID);
             if (ext != null) {
                 ext.valid(privateKeyValid);
             }
-        } catch (CertificateExpiredException e1) {
-            if (debug != null) {
-                String time = "n/a";
-                try {
-                    Date notAfter = ext.get(PrivateKeyUsageExtension.NOT_AFTER);
-                    time = notAfter.toString();
-                } catch (CertificateException ex) {
-                    // not able to retrieve notAfter value
-                }
-                debug.println("TX509CertSelector.match: private key usage not "
-                        + "within validity date; ext.NOT_After: "
-                        + time + "; TX509CertSelector: "
-                        + this.toString());
-                e1.printStackTrace();
-            }
+        } catch (TCertificateExpiredException e1) {
             return false;
-        } catch (CertificateNotYetValidException e2) {
-            if (debug != null) {
-                String time = "n/a";
-                try {
-                    Date notBefore = ext.get(PrivateKeyUsageExtension.NOT_BEFORE);
-                    time = notBefore.toString();
-                } catch (CertificateException ex) {
-                    // not able to retrieve notBefore value
-                }
-                debug.println("TX509CertSelector.match: private key usage not "
-                        + "within validity date; ext.NOT_BEFORE: "
-                        + time + "; TX509CertSelector: "
-                        + this.toString());
-                e2.printStackTrace();
-            }
+        } catch (TCertificateNotYetValidException e2) {
             return false;
         } catch (IOException e4) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: IOException in "
-                        + "private key usage check; TX509CertSelector: "
-                        + this.toString());
-                e4.printStackTrace();
-            }
             return false;
         }
         return true;
     }
 
     /* match on subject public key algorithm OID */
-    private boolean matchSubjectPublicKeyAlgID(X509Certificate xcert) {
+    private boolean matchSubjectPublicKeyAlgID(TX509Certificate xcert) {
         if (subjectPublicKeyAlgID == null) {
             return true;
         }
         try {
             byte[] encodedKey = xcert.getPublicKey().getEncoded();
-            DerValue val = new DerValue(encodedKey);
-            if (val.tag != DerValue.tag_Sequence) {
-                throw new IOException("invalid key format");
-            }
+            TDerValue val = new TDerValue(encodedKey);
 
-            AlgorithmId algID = AlgorithmId.parse(val.data.getDerValue());
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: subjectPublicKeyAlgID = "
-                        + subjectPublicKeyAlgID + ", xcert subjectPublicKeyAlgID = "
-                        + algID.getOID());
-            }
+            TAlgorithmId algID = TAlgorithmId.parse(val.data.getDerValue());
             if (!subjectPublicKeyAlgID.equals((Object)algID.getOID())) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "subject public key alg IDs don't match");
-                }
                 return false;
             }
-        } catch (IOException e5) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: IOException in subject "
-                        + "public key algorithm OID check");
-            }
+        } catch (TIOException e5) {
             return false;
         }
         return true;
     }
 
     /* match on key usage extension value */
-    private boolean matchKeyUsage(X509Certificate xcert) {
+    private boolean matchKeyUsage(TX509Certificate xcert) {
         if (keyUsage == null) {
             return true;
         }
@@ -2252,10 +1750,6 @@ public class TX509CertSelector implements TCertSelector {
             for (int keyBit = 0; keyBit < keyUsage.length; keyBit++) {
                 if (keyUsage[keyBit] &&
                         ((keyBit >= certKeyUsage.length) || !certKeyUsage[keyBit])) {
-                    if (debug != null) {
-                        debug.println("TX509CertSelector.match: "
-                                + "key usage bits don't match");
-                    }
                     return false;
                 }
             }
@@ -2264,128 +1758,97 @@ public class TX509CertSelector implements TCertSelector {
     }
 
     /* match on extended key usage purpose OIDs */
-    private boolean matchExtendedKeyUsage(X509Certificate xcert) {
+    private boolean matchExtendedKeyUsage(TX509Certificate xcert) {
         if ((keyPurposeSet == null) || keyPurposeSet.isEmpty()) {
             return true;
         }
         try {
-            ExtendedKeyUsageExtension ext =
-                    (ExtendedKeyUsageExtension)getExtensionObject(xcert,
+            TExtendedKeyUsageExtension ext =
+                    (TExtendedKeyUsageExtension)getExtensionObject(xcert,
                             EXTENDED_KEY_USAGE_ID);
             if (ext != null) {
-                Vector<ObjectIdentifier> certKeyPurposeVector =
-                        ext.get(ExtendedKeyUsageExtension.USAGES);
+                Vector<TObjectIdentifier> certKeyPurposeVector =
+                        ext.get(TString.wrap(TExtendedKeyUsageExtension.USAGES));
                 if (!certKeyPurposeVector.contains(ANY_EXTENDED_KEY_USAGE)
                         && !certKeyPurposeVector.containsAll(keyPurposeOIDSet)) {
-                    if (debug != null) {
-                        debug.println("TX509CertSelector.match: cert failed "
-                                + "extendedKeyUsage criterion");
-                    }
                     return false;
                 }
             }
         } catch (IOException ex) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: "
-                        + "IOException in extended key usage check");
-            }
             return false;
         }
         return true;
     }
 
     /* match on subject alternative name extension names */
-    private boolean matchSubjectAlternativeNames(X509Certificate xcert) {
+    private boolean matchSubjectAlternativeNames(TX509Certificate xcert) {
         if ((subjectAlternativeNames == null) || subjectAlternativeNames.isEmpty()) {
             return true;
         }
         try {
-            SubjectAlternativeNameExtension sanExt =
-                    (SubjectAlternativeNameExtension) getExtensionObject(xcert,
+            TSubjectAlternativeNameExtension sanExt =
+                    (TSubjectAlternativeNameExtension) getExtensionObject(xcert,
                             SUBJECT_ALT_NAME_ID);
             if (sanExt == null) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "no subject alternative name extension");
-                }
                 return false;
             }
-            GeneralNames certNames =
-                    sanExt.get(SubjectAlternativeNameExtension.SUBJECT_NAME);
-            Iterator<GeneralNameInterface> i =
+            TGeneralNames certNames =
+                    sanExt.get(TSubjectAlternativeNameExtension.SUBJECT_NAME);
+            Iterator<TGeneralNameInterface> i =
                     subjectAlternativeGeneralNames.iterator();
             while (i.hasNext()) {
-                GeneralNameInterface matchName = i.next();
+                TGeneralNameInterface matchName = i.next();
                 boolean found = false;
-                for (Iterator<GeneralName> t = certNames.iterator();
+                for (Iterator<TGeneralName> t = certNames.iterator();
                      t.hasNext() && !found; ) {
-                    GeneralNameInterface certName = (t.next()).getName();
+                    TGeneralNameInterface certName = (t.next()).getName();
                     found = certName.equals(matchName);
                 }
                 if (!found && (matchAllSubjectAltNames || !i.hasNext())) {
-                    if (debug != null) {
-                        debug.println("TX509CertSelector.match: subject alternative "
-                                + "name " + matchName + " not found");
-                    }
                     return false;
                 } else if (found && !matchAllSubjectAltNames) {
                     break;
                 }
             }
         } catch (IOException ex) {
-            if (debug != null)
-                debug.println("TX509CertSelector.match: IOException in subject "
-                        + "alternative name check");
             return false;
         }
         return true;
     }
 
     /* match on name constraints */
-    private boolean matchNameConstraints(X509Certificate xcert) {
+    private boolean matchNameConstraints(TX509Certificate xcert) {
         if (nc == null) {
             return true;
         }
         try {
             if (!nc.verify(xcert)) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "name constraints not satisfied");
-                }
                 return false;
             }
         } catch (IOException e) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: "
-                        + "IOException in name constraints check");
-            }
             return false;
         }
         return true;
     }
 
     /* match on policy OIDs */
-    private boolean matchPolicy(X509Certificate xcert) {
+    private boolean matchPolicy(TX509Certificate xcert) {
         if (policy == null) {
             return true;
         }
         try {
-            CertificatePoliciesExtension ext = (CertificatePoliciesExtension)
+            TCertificatePoliciesExtension ext = (TCertificatePoliciesExtension)
                     getExtensionObject(xcert, CERT_POLICIES_ID);
             if (ext == null) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: "
-                            + "no certificate policy extension");
-                }
                 return false;
             }
-            List<PolicyInformation> policies = ext.get(CertificatePoliciesExtension.POLICIES);
+            List<TPolicyInformation> policies = ext.get(TCertificatePoliciesExtension.POLICIES);
             /*
              * Convert the Vector of PolicyInformation to a Vector
              * of CertificatePolicyIds for easier comparison.
              */
-            List<CertificatePolicyId> policyIDs = new ArrayList<CertificatePolicyId>(policies.size());
-            for (PolicyInformation info : policies) {
+            List<TCertificatePolicyId> policyIDs = new ArrayList<TCertificatePolicyId>(policies.size());
+            for (TPolicyInformation info : policies) {
                 policyIDs.add(info.getPolicyIdentifier());
             }
             if (policy != null) {
@@ -2397,62 +1860,42 @@ public class TX509CertSelector implements TCertSelector {
                  */
                 if (policy.getCertPolicyIds().isEmpty()) {
                     if (policyIDs.isEmpty()) {
-                        if (debug != null) {
-                            debug.println("TX509CertSelector.match: "
-                                    + "cert failed policyAny criterion");
-                        }
                         return false;
                     }
                 } else {
-                    for (CertificatePolicyId id : policy.getCertPolicyIds()) {
+                    for (TCertificatePolicyId id : policy.getCertPolicyIds()) {
                         if (policyIDs.contains(id)) {
                             foundOne = true;
                             break;
                         }
                     }
                     if (!foundOne) {
-                        if (debug != null) {
-                            debug.println("TX509CertSelector.match: "
-                                    + "cert failed policyAny criterion");
-                        }
                         return false;
                     }
                 }
             }
         } catch (IOException ex) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: "
-                        + "IOException in certificate policy ID check");
-            }
             return false;
         }
         return true;
     }
 
     /* match on pathToNames */
-    private boolean matchPathToNames(X509Certificate xcert) {
+    private boolean matchPathToNames(TX509Certificate xcert) {
         if (pathToGeneralNames == null) {
             return true;
         }
         try {
-            NameConstraintsExtension ext = (NameConstraintsExtension)
+            TNameConstraintsExtension ext = (TNameConstraintsExtension)
                     getExtensionObject(xcert, NAME_CONSTRAINTS_ID);
             if (ext == null) {
                 return true;
             }
-            if ((debug != null) && Debug.isOn("certpath")) {
-                debug.println("TX509CertSelector.match pathToNames:\n");
-                Iterator<GeneralNameInterface> i =
-                        pathToGeneralNames.iterator();
-                while (i.hasNext()) {
-                    debug.println("    " + i.next() + "\n");
-                }
-            }
 
-            GeneralSubtrees permitted =
-                    ext.get(NameConstraintsExtension.PERMITTED_SUBTREES);
-            GeneralSubtrees excluded =
-                    ext.get(NameConstraintsExtension.EXCLUDED_SUBTREES);
+            TGeneralSubtrees permitted =
+                    ext.get(TString.wrap(TNameConstraintsExtension.PERMITTED_SUBTREES));
+            TGeneralSubtrees excluded =
+                    ext.get(TString.wrap(TNameConstraintsExtension.EXCLUDED_SUBTREES));
             if (excluded != null) {
                 if (matchExcluded(excluded) == false) {
                     return false;
@@ -2464,37 +1907,27 @@ public class TX509CertSelector implements TCertSelector {
                 }
             }
         } catch (IOException ex) {
-            if (debug != null) {
-                debug.println("TX509CertSelector.match: "
-                        + "IOException in name constraints check");
-            }
             return false;
         }
         return true;
     }
 
-    private boolean matchExcluded(GeneralSubtrees excluded) {
+    private boolean matchExcluded(TGeneralSubtrees excluded) {
         /*
          * Enumerate through excluded and compare each entry
          * to all pathToNames. If any pathToName is within any of the
          * subtrees listed in excluded, return false.
          */
-        for (Iterator<GeneralSubtree> t = excluded.iterator(); t.hasNext(); ) {
-            GeneralSubtree tree = t.next();
-            GeneralNameInterface excludedName = tree.getName().getName();
-            Iterator<GeneralNameInterface> i = pathToGeneralNames.iterator();
+        for (Iterator<TGeneralSubtree> t = excluded.iterator(); t.hasNext(); ) {
+            TGeneralSubtree tree = t.next();
+            TGeneralNameInterface excludedName = tree.getName().getName();
+            Iterator<TGeneralNameInterface> i = pathToGeneralNames.iterator();
             while (i.hasNext()) {
-                GeneralNameInterface pathToName = i.next();
+                TGeneralNameInterface pathToName = i.next();
                 if (excludedName.getType() == pathToName.getType()) {
                     switch (pathToName.constrains(excludedName)) {
-                        case GeneralNameInterface.NAME_WIDENS:
-                        case GeneralNameInterface.NAME_MATCH:
-                            if (debug != null) {
-                                debug.println("TX509CertSelector.match: name constraints "
-                                        + "inhibit path to specified name");
-                                debug.println("TX509CertSelector.match: excluded name: " +
-                                        pathToName);
-                            }
+                        case TGeneralNameInterface.NAME_WIDENS:
+                        case TGeneralNameInterface.NAME_MATCH:
                             return false;
                         default:
                     }
@@ -2504,29 +1937,29 @@ public class TX509CertSelector implements TCertSelector {
         return true;
     }
 
-    private boolean matchPermitted(GeneralSubtrees permitted) {
+    private boolean matchPermitted(TGeneralSubtrees permitted) {
         /*
          * Enumerate through pathToNames, checking that each pathToName
          * is in at least one of the subtrees listed in permitted.
          * If not, return false. However, if no subtrees of a given type
          * are listed, all names of that type are permitted.
          */
-        Iterator<GeneralNameInterface> i = pathToGeneralNames.iterator();
+        Iterator<TGeneralNameInterface> i = pathToGeneralNames.iterator();
         while (i.hasNext()) {
-            GeneralNameInterface pathToName = i.next();
-            Iterator<GeneralSubtree> t = permitted.iterator();
+            TGeneralNameInterface pathToName = i.next();
+            Iterator<TGeneralSubtree> t = permitted.iterator();
             boolean permittedNameFound = false;
             boolean nameTypeFound = false;
             String names = "";
             while (t.hasNext() && !permittedNameFound) {
-                GeneralSubtree tree = t.next();
-                GeneralNameInterface permittedName = tree.getName().getName();
+                TGeneralSubtree tree = t.next();
+                TGeneralNameInterface permittedName = tree.getName().getName();
                 if (permittedName.getType() == pathToName.getType()) {
                     nameTypeFound = true;
                     names = names + "  " + permittedName;
                     switch (pathToName.constrains(permittedName)) {
-                        case GeneralNameInterface.NAME_WIDENS:
-                        case GeneralNameInterface.NAME_MATCH:
+                        case TGeneralNameInterface.NAME_WIDENS:
+                        case TGeneralNameInterface.NAME_MATCH:
                             permittedNameFound = true;
                             break;
                         default:
@@ -2534,11 +1967,6 @@ public class TX509CertSelector implements TCertSelector {
                 }
             }
             if (!permittedNameFound && nameTypeFound) {
-                if (debug != null)
-                    debug.println("TX509CertSelector.match: " +
-                            "name constraints inhibit path to specified name; " +
-                            "permitted names of type " + pathToName.getType() +
-                            ": " + names);
                 return false;
             }
         }
@@ -2546,26 +1974,17 @@ public class TX509CertSelector implements TCertSelector {
     }
 
     /* match on basic constraints */
-    private boolean matchBasicConstraints(X509Certificate xcert) {
+    private boolean matchBasicConstraints(TX509Certificate xcert) {
         if (basicConstraints == -1) {
             return true;
         }
         int maxPathLen = xcert.getBasicConstraints();
         if (basicConstraints == -2) {
             if (maxPathLen != -1) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: not an EE cert");
-                }
                 return false;
             }
         } else {
             if (maxPathLen < basicConstraints) {
-                if (debug != null) {
-                    debug.println("TX509CertSelector.match: cert's maxPathLen " +
-                            "is less than the min maxPathLen set by " +
-                            "basicConstraints. " +
-                            "(" + maxPathLen + " < " + basicConstraints + ")");
-                }
                 return false;
             }
         }
@@ -2589,7 +2008,7 @@ public class TX509CertSelector implements TCertSelector {
      */
     public Object clone() {
         try {
-            java.security.cert.X509CertSelector copy = (java.security.cert.X509CertSelector)super.clone();
+            TX509CertSelector copy = (TX509CertSelector)super.clone();
             // Must clone these because addPathToName et al. modify them
             if (subjectAlternativeNames != null) {
                 copy.subjectAlternativeNames =

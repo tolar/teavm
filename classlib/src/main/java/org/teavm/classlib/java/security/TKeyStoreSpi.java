@@ -29,11 +29,14 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Enumeration;
+
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.teavm.classlib.java.security.cert.TCertificate;
 
 /**
  * Created by vasek on 22. 10. 2016.
@@ -74,7 +77,7 @@ public abstract class TKeyStoreSpi {
      * and the root certificate authority last), or null if the given alias
      * does not exist or does not contain a certificate chain
      */
-    public abstract Certificate[] engineGetCertificateChain(String alias);
+    public abstract TCertificate[] engineGetCertificateChain(String alias);
 
     /**
      * Returns the certificate associated with the given alias.
@@ -459,10 +462,10 @@ public abstract class TKeyStoreSpi {
 
                 Key key = engineGetKey(alias, password);
                 if (key instanceof PrivateKey) {
-                    Certificate[] chain = engineGetCertificateChain(alias);
-                    return new KeyStore.PrivateKeyEntry((PrivateKey)key, chain);
+                    TCertificate[] chain = engineGetCertificateChain(alias);
+                    return new TKeyStore.PrivateKeyEntry((TPrivateKey)key, chain);
                 } else if (key instanceof SecretKey) {
-                    return new KeyStore.SecretKeyEntry((SecretKey)key);
+                    return new TKeyStore.SecretKeyEntry((TSecretKey)key);
                 }
             }
         }

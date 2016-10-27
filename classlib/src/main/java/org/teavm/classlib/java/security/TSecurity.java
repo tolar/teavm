@@ -34,16 +34,17 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TClassNotFoundException;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
+import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.java.util.TMap;
 import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
 import org.teavm.classlib.sun.security.jca.TGetInstance;
@@ -59,7 +60,7 @@ public final class TSecurity {
 
     // An element in the cache
     private static class ProviderProperty {
-        String className;
+        TString className;
         TProvider provider;
     }
 
@@ -188,22 +189,22 @@ public final class TSecurity {
      * provider-preference order, as specificed in the security
      * properties file.
      */
-    private static TSecurity.ProviderProperty getProviderProperty(String key) {
+    private static TSecurity.ProviderProperty getProviderProperty(TString key) {
         TSecurity.ProviderProperty entry = null;
 
-        List<TProvider> providers = TProviders.getProviderList().providers();
+        TList<TProvider> providers = TProviders.getProviderList().providers();
         for (int i = 0; i < providers.size(); i++) {
 
-            String matchKey = null;
+            TString matchKey = null;
             TProvider prov = providers.get(i);
-            String prop = prov.getProperty(key);
+            TString prop = prov.getProperty(key);
 
             if (prop == null) {
                 // Is there a match if we do a case-insensitive property name
                 // comparison? Let's try ...
                 for (TEnumeration<Object> e = prov.keys();
                      e.hasMoreElements() && prop == null; ) {
-                    matchKey = (String)e.nextElement();
+                    matchKey = (TString)e.nextElement();
                     if (key.equalsIgnoreCase(matchKey)) {
                         prop = prov.getProperty(matchKey);
                         break;
@@ -267,10 +268,10 @@ public final class TSecurity {
      * classes (introduced in the J2SE version 1.2 platform) instead.
      */
     @Deprecated
-    public static String getAlgorithmProperty(String algName,
+    public static TString getAlgorithmProperty(String algName,
             String propName) {
-        TSecurity.ProviderProperty entry = getProviderProperty("Alg." + propName
-                + "." + algName);
+        TSecurity.ProviderProperty entry = getProviderProperty(TString.wrap("Alg." + propName
+                + "." + algName));
         if (entry != null) {
             return entry.className;
         } else {

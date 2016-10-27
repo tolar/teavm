@@ -17,16 +17,17 @@ package org.teavm.classlib.sun.security.x509;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateParsingException;
 import java.util.Date;
 import java.util.Objects;
 
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TCertificateExpiredException;
+import org.teavm.classlib.java.security.cert.TCertificateNotYetValidException;
+import org.teavm.classlib.java.security.cert.TCertificateParsingException;
 import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -75,7 +76,7 @@ public class TPrivateKeyUsageExtension extends TExtension implements TCertAttrSe
         this.encodeThis();
     }
 
-    public TPrivateKeyUsageExtension(Boolean var1, Object var2) throws CertificateException, IOException {
+    public TPrivateKeyUsageExtension(Boolean var1, Object var2) throws TCertificateException, IOException {
         this.extensionId = TPKIXExtensions.PrivateKeyUsage_Id;
         this.critical = var1.booleanValue();
         this.extensionValue = (byte[])((byte[])var2);
@@ -86,7 +87,7 @@ public class TPrivateKeyUsageExtension extends TExtension implements TCertAttrSe
             TDerValue var6 = var4[var5];
             if(var6.isContextSpecific((byte) 0) && !var6.isConstructed()) {
                 if(this.notBefore != null) {
-                    throw new CertificateParsingException("Duplicate notBefore in PrivateKeyUsage.");
+                    throw new TCertificateParsingException(TString.wrap("Duplicate notBefore in PrivateKeyUsage."));
                 }
 
                 var6.resetTag((byte) 24);
@@ -98,7 +99,7 @@ public class TPrivateKeyUsageExtension extends TExtension implements TCertAttrSe
                 }
 
                 if(this.notAfter != null) {
-                    throw new CertificateParsingException("Duplicate notAfter in PrivateKeyUsage.");
+                    throw new TCertificateParsingException(TString.wrap("Duplicate notAfter in PrivateKeyUsage."));
                 }
 
                 var6.resetTag((byte) 24);
@@ -118,12 +119,12 @@ public class TPrivateKeyUsageExtension extends TExtension implements TCertAttrSe
         this.valid(var1);
     }
 
-    public void valid(TDate var1) throws CertificateNotYetValidException, CertificateExpiredException {
+    public void valid(TDate var1) throws TCertificateNotYetValidException, TCertificateExpiredException {
         Objects.requireNonNull(var1);
         if(this.notBefore != null && this.notBefore.after(var1)) {
-            throw new CertificateNotYetValidException("NotBefore: " + this.notBefore.toString());
+            throw new TCertificateNotYetValidException(TString.wrap("NotBefore: " + this.notBefore.toString()));
         } else if(this.notAfter != null && this.notAfter.before(var1)) {
-            throw new CertificateExpiredException("NotAfter: " + this.notAfter.toString());
+            throw new TCertificateExpiredException(TString.wrap("NotAfter: " + this.notAfter.toString()));
         }
     }
 

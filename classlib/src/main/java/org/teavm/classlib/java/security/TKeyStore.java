@@ -36,7 +36,6 @@ import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,13 +43,16 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.crypto.SecretKey;
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
+
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificate;
+import org.teavm.classlib.java.security.cert.TX509Certificate;
 
 /**
  * Created by vasek on 22. 10. 2016.
@@ -69,7 +71,7 @@ public class TKeyStore {
     private static final String KEYSTORE_TYPE = "keystore.type";
 
     // The keystore type
-    private String type;
+    private TString type;
 
     // The provider
     private TProvider provider;
@@ -331,10 +333,10 @@ public class TKeyStore {
      *
      * @since 1.5
      */
-    public static final class PrivateKeyEntry implements java.security.KeyStore.Entry {
+    public static final class PrivateKeyEntry implements TKeyStore.Entry {
 
-        private final PrivateKey privKey;
-        private final Certificate[] chain;
+        private final TPrivateKey privKey;
+        private final TCertificate[] chain;
         private final Set<Attribute> attributes;
 
         /**
@@ -361,7 +363,7 @@ public class TKeyStore {
          *      does not match the algorithm of the {@code PublicKey}
          *      in the end entity {@code Certificate} (at index 0)
          */
-        public PrivateKeyEntry(PrivateKey privateKey, Certificate[] chain) {
+        public PrivateKeyEntry(TPrivateKey privateKey, TCertificate[] chain) {
             this(privateKey, chain, Collections.<Attribute>emptySet());
         }
 
@@ -391,7 +393,7 @@ public class TKeyStore {
          *
          * @since 1.8
          */
-        public PrivateKeyEntry(PrivateKey privateKey, Certificate[] chain,
+        public PrivateKeyEntry(TPrivateKey privateKey, TCertificate[] chain,
                 Set<Attribute> attributes) {
 
             if (privateKey == null || chain == null || attributes == null) {
@@ -402,7 +404,7 @@ public class TKeyStore {
                         ("invalid zero-length input chain");
             }
 
-            Certificate[] clonedChain = chain.clone();
+            TCertificate[] clonedChain = chain.clone();
             String certType = clonedChain[0].getType();
             for (int i = 1; i < clonedChain.length; i++) {
                 if (!certType.equals(clonedChain[i].getType())) {
@@ -420,10 +422,10 @@ public class TKeyStore {
             }
             this.privKey = privateKey;
 
-            if (clonedChain[0] instanceof X509Certificate &&
-                    !(clonedChain instanceof X509Certificate[])) {
+            if (clonedChain[0] instanceof TX509Certificate &&
+                    !(clonedChain instanceof TX509Certificate[])) {
 
-                this.chain = new X509Certificate[clonedChain.length];
+                this.chain = new TX509Certificate[clonedChain.length];
                 System.arraycopy(clonedChain, 0,
                         this.chain, 0, clonedChain.length);
             } else {
@@ -439,7 +441,7 @@ public class TKeyStore {
          *
          * @return the {@code PrivateKey} from this entry
          */
-        public PrivateKey getPrivateKey() {
+        public TPrivateKey getPrivateKey() {
             return privKey;
         }
 
@@ -677,7 +679,7 @@ public class TKeyStore {
      * @param provider the provider.
      * @param type the keystore type.
      */
-    protected TKeyStore(TKeyStoreSpi keyStoreSpi, TProvider provider, String type)
+    protected TKeyStore(TKeyStoreSpi keyStoreSpi, TProvider provider, TString type)
     {
         this.keyStoreSpi = keyStoreSpi;
         this.provider = provider;
@@ -717,9 +719,9 @@ public class TKeyStore {
         try {
             Object[] objs = TSecurity.getImpl(type, TString.wrap("TKeyStore"), (TString)null);
             return new TKeyStore((TKeyStoreSpi)objs[0], (TProvider)objs[1], type);
-        } catch (NoSuchAlgorithmException nsae) {
+        } catch (TNoSuchAlgorithmException nsae) {
             throw new KeyStoreException(type + " not found", nsae);
-        } catch (NoSuchProviderException nspe) {
+        } catch (TNoSuchProviderException nspe) {
             throw new KeyStoreException(type + " not found", nspe);
         }
     }
@@ -757,15 +759,15 @@ public class TKeyStore {
      *
      * @see Provider
      */
-    public static TKeyStore getInstance(String type, String provider)
+    public static TKeyStore getInstance(TString type, TString provider)
             throws KeyStoreException, NoSuchProviderException
     {
         if (provider == null || provider.length() == 0)
             throw new IllegalArgumentException("missing provider");
         try {
-            Object[] objs = TSecurity.getImpl(type, "TKeyStore", provider);
+            Object[] objs = TSecurity.getImpl(type, TString.wrap("TKeyStore"), provider);
             return new TKeyStore((TKeyStoreSpi)objs[0], (TProvider)objs[1], type);
-        } catch (NoSuchAlgorithmException nsae) {
+        } catch (TNoSuchAlgorithmException nsae) {
             throw new KeyStoreException(type + " not found", nsae);
         }
     }
@@ -798,15 +800,15 @@ public class TKeyStore {
      *
      * @since 1.4
      */
-    public static java.security.KeyStore getInstance(String type, Provider provider)
+    public static TKeyStore getInstance(TString type, TProvider provider)
             throws KeyStoreException
     {
         if (provider == null)
             throw new IllegalArgumentException("missing provider");
         try {
-            Object[] objs = TSecurity.getImpl(type, "TKeyStore", provider);
+            Object[] objs = TSecurity.getImpl(type, TString.wrap("TKeyStore"), provider);
             return new TKeyStore((TKeyStoreSpi)objs[0], (TProvider)objs[1], type);
-        } catch (NoSuchAlgorithmException nsae) {
+        } catch (TNoSuchAlgorithmException nsae) {
             throw new KeyStoreException(type + " not found", nsae);
         }
     }
@@ -858,7 +860,7 @@ public class TKeyStore {
      *
      * @return the type of this keystore.
      */
-    public final String getType()
+    public final TString getType()
     {
         return this.type;
     }

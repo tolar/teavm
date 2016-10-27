@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 vasek.
+ *  Copyright 2016 vtolar.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,26 +15,24 @@
  */
 package org.teavm.classlib.java.security.cert;
 
+import java.security.cert.CRL;
 
-/**
- * Created by vasek on 26. 10. 2016.
- */
-public interface TCertSelector extends Cloneable {
+public interface TCRLSelector extends Cloneable {
 
     /**
-     * Decides whether a {@code Certificate} should be selected.
+     * Decides whether a {@code CRL} should be selected.
      *
-     * @param   cert    the {@code Certificate} to be checked
-     * @return  {@code true} if the {@code Certificate}
-     * should be selected, {@code false} otherwise
+     * @param   crl     the {@code CRL} to be checked
+     * @return  {@code true} if the {@code CRL} should be selected,
+     * {@code false} otherwise
      */
-    boolean match(TCertificate cert);
+    boolean match(CRL crl);
 
     /**
-     * Makes a copy of this {@code TCertSelector}. Changes to the
+     * Makes a copy of this {@code CRLSelector}. Changes to the
      * copy will not affect the original and vice versa.
      *
-     * @return a copy of this {@code TCertSelector}
+     * @return a copy of this {@code CRLSelector}
      */
     Object clone();
 }

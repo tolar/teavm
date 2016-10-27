@@ -18,6 +18,7 @@ package org.teavm.classlib.sun.security.x509;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
@@ -28,8 +29,8 @@ import org.teavm.classlib.sun.security.util.TDerValue;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 
 public class TCRLNumberExtension extends TExtension implements TCertAttrSet<String> {
-    public static final String NAME = "CRLNumber";
-    public static final String NUMBER = "value";
+    public static final TString NAME = TString.wrap("CRLNumber");
+    public static final TString NUMBER = TString.wrap("value");
     private static final String LABEL = "CRL Number";
     private TBigInteger crlNumber;
     private String extensionName;
