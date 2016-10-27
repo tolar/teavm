@@ -22,7 +22,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Arrays;
-
 import org.teavm.classlib.java.io.TByteArrayInputStream;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TInputStream;
@@ -91,7 +90,7 @@ public class TX509Key implements TPublicKey {
         }
     }
 
-    protected void parseKeyBits() throws IOException, InvalidKeyException {
+    protected void parseKeyBits() throws TIOException, TInvalidKeyException {
         this.encode();
     }
 
@@ -101,7 +100,7 @@ public class TX509Key implements TPublicKey {
         TX509EncodedKeySpec var3 = new TX509EncodedKeySpec(var2.toByteArray());
 
         try {
-            TKeyFactory var18 = TKeyFactory.getInstance(var0.getName());
+            TKeyFactory var18 = TKeyFactory.getInstance(TString.wrap(var0.getName()));
             return var18.generatePublic(var3);
         } catch (NoSuchAlgorithmException var15) {
             String var4 = "";
@@ -218,7 +217,7 @@ public class TX509Key implements TPublicKey {
                     throw new InvalidKeyException("excess key data");
                 }
             }
-        } catch (IOException var4) {
+        } catch (TIOException var4) {
             throw new InvalidKeyException("IOException: " + var4.getMessage());
         }
     }

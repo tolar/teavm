@@ -149,7 +149,7 @@ class TEndEntityChecker {
         if(!this.checkEKU(var1, var3, "1.3.6.1.5.5.7.3.1") && !this.checkEKU(var1, var3, "1.3.6.1.4.1.311.10.3.3") && !this.checkEKU(var1, var3, "2.16.840.1.113730.4.1")) {
             throw new TValidatorException(TString.wrap("Extended key usage does not permit use for TLS server authentication"), TValidatorException.T_EE_EXTENSIONS, var1);
         } else if(!TSimpleValidator.getNetscapeCertTypeBit(var1, "ssl_server")) {
-            throw new TValidatorException(TString.wrap("Netscape cert type does not permit use for SSL server"), ValidatorException.T_EE_EXTENSIONS, var1);
+            throw new TValidatorException(TString.wrap("Netscape cert type does not permit use for SSL server"), TValidatorException.T_EE_EXTENSIONS, var1);
         } else {
             var3.remove("2.5.29.15");
             var3.remove("2.5.29.37");

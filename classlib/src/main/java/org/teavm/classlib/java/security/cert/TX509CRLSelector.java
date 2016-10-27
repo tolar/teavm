@@ -17,30 +17,28 @@ package org.teavm.classlib.java.security.cert;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CRLSelector;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-
 import javax.security.auth.x500.X500Principal;
-
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TDate;
+import org.teavm.classlib.java.util.THashSet;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
 import org.teavm.classlib.sun.security.x509.TCRLNumberExtension;
 import org.teavm.classlib.sun.security.x509.TX500Name;
 
-public class TX509CRLSelector implements CRLSelector {
+public class TX509CRLSelector implements TCRLSelector {
 
     static {
         TCertPathHelperImpl.initialize();
     }
 
     private HashSet<Object> issuerNames;
-    private HashSet<TX500Principal> issuerX500Principals;
+    private THashSet<TX500Principal> issuerX500Principals;
     private BigInteger minCRL;
     private BigInteger maxCRL;
     private Date dateAndTime;
@@ -86,7 +84,7 @@ public class TX509CRLSelector implements CRLSelector {
             issuerX500Principals = null;
         } else {
             // clone
-            issuerX500Principals = new HashSet<TX500Principal>(issuers);
+            issuerX500Principals = new THashSet<TX500Principal>(issuers);
             issuerNames = new HashSet<Object>();
             for (TX500Principal p : issuerX500Principals) {
                 issuerNames.add(p.getEncoded());
@@ -119,30 +117,10 @@ public class TX509CRLSelector implements CRLSelector {
      * @param issuer the issuer as X500Principal
      * @since 1.5
      */
-    public void addIssuer(X500Principal issuer) {
+    public void addIssuer(TX500Principal issuer) {
         addIssuerNameInternal(issuer.getEncoded(), issuer);
     }
 
-    /**
-     * <strong>Denigrated</strong>, use
-     * {@linkplain #addIssuer(X500Principal)} or
-     * {@linkplain #addIssuerName(byte[])} instead. This method should not be
-     * relied on as it can fail to match some CRLs because of a loss of
-     * encoding information in the RFC 2253 String form of some distinguished
-     * names.
-     * <p>
-     * Adds a name to the issuerNames criterion. The issuer distinguished
-     * name in the {@code X509CRL} must match at least one of the specified
-     * distinguished names.
-     * <p>
-     * This method allows the caller to add a name to the set of issuer names
-     * which {@code X509CRLs} may contain. The specified name is added to
-     * any previous value for the issuerNames criterion.
-     * If the specified name is a duplicate, it may be ignored.
-     *
-     * @param name the name in RFC 2253 form
-     * @throws IOException if a parsing error occurs
-     */
     public void addIssuerName(TString name) throws IOException {
         addIssuerNameInternal(name, new TX500Name(name).asX500Principal());
     }
@@ -173,7 +151,7 @@ public class TX509CRLSelector implements CRLSelector {
      */
     public void addIssuerName(byte[] name) throws IOException {
         // clone because byte arrays are modifiable
-        addIssuerNameInternal(name.clone(), new X500Name(name).asX500Principal());
+        addIssuerNameInternal(name.clone(), new TX500Name(name).asX500Principal());
     }
 
     /**
@@ -191,7 +169,7 @@ public class TX509CRLSelector implements CRLSelector {
             issuerNames = new HashSet<Object>();
         }
         if (issuerX500Principals == null) {
-            issuerX500Principals = new HashSet<X500Principal>();
+            issuerX500Principals = new THashSet<TX500Principal>();
         }
         issuerNames.add(name);
         issuerX500Principals.add(principal);

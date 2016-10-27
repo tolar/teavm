@@ -21,7 +21,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
-
 import org.teavm.classlib.java.io.TBufferedReader;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TReader;
@@ -77,9 +76,9 @@ final class TCryptoPolicyParser {
 
     }
 
-    private TCryptoPolicyParser.GrantEntry parseGrantEntry(Hashtable<String, Vector<String>> var1) throws TCryptoPolicyParser.ParsingException, IOException {
+    private TCryptoPolicyParser.GrantEntry parseGrantEntry(Hashtable<TString, Vector<TString>> var1) throws TCryptoPolicyParser.ParsingException, TIOException {
         TCryptoPolicyParser.GrantEntry var2 = new TCryptoPolicyParser.GrantEntry();
-        this.match("grant");
+        this.match(TString.wrap("grant"));
         this.match("{");
 
         while(!this.peek("}")) {
@@ -267,14 +266,14 @@ final class TCryptoPolicyParser {
         }
     }
 
-    private TString match(String var1) throws TCryptoPolicyParser.ParsingException, IOException {
+    private TString match(TString var1) throws TCryptoPolicyParser.ParsingException, IOException {
         TString var2 = null;
         switch(this.lookahead) {
             case -3:
                 if(var1.equalsIgnoreCase(this.st.sval)) {
                     this.lookahead = this.st.nextToken();
                 } else {
-                    if(!var1.equalsIgnoreCase("permission type")) {
+                    if(!var1.equalsIgnoreCase(TString.wrap("permission type"))) {
                         throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, this.st.sval);
                     }
 

@@ -43,13 +43,11 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.crypto.SecretKey;
 import javax.security.auth.DestroyFailedException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
-
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
@@ -299,8 +297,8 @@ public class TKeyStore {
          *
          * @since 1.8
          */
-        public default Set<java.security.KeyStore.Entry.Attribute> getAttributes() {
-            return Collections.<java.security.KeyStore.Entry.Attribute>emptySet();
+        public default Set<TKeyStore.Entry.Attribute> getAttributes() {
+            return Collections.<TKeyStore.Entry.Attribute>emptySet();
         }
 
         /**
@@ -456,7 +454,7 @@ public class TKeyStore {
          *      the runtime type of the returned array is
          *      {@code X509Certificate[]}.
          */
-        public Certificate[] getCertificateChain() {
+        public TCertificate[] getCertificateChain() {
             return chain.clone();
         }
 
@@ -470,7 +468,7 @@ public class TKeyStore {
          *      the runtime type of the returned certificate is
          *      {@code X509Certificate}.
          */
-        public Certificate getCertificate() {
+        public TCertificate getCertificate() {
             return chain[0];
         }
 
@@ -495,7 +493,7 @@ public class TKeyStore {
             StringBuilder sb = new StringBuilder();
             sb.append("Private key entry and certificate chain with "
                     + chain.length + " elements:\r\n");
-            for (Certificate cert : chain) {
+            for (TCertificate cert : chain) {
                 sb.append(cert);
                 sb.append("\r\n");
             }
@@ -1633,8 +1631,8 @@ public class TKeyStore {
 
         private static final class FileBuilder extends TKeyStore.Builder {
 
-            private final String type;
-            private final Provider provider;
+            private final TString type;
+            private final TProvider provider;
             private final File file;
             private TKeyStore.ProtectionParameter protection;
             private TKeyStore.ProtectionParameter keyProtection;
@@ -1644,7 +1642,7 @@ public class TKeyStore {
 
             private Throwable oldException;
 
-            FileBuilder(String type, Provider provider, File file,
+            FileBuilder(TString type, TProvider provider, File file,
                     TKeyStore.ProtectionParameter protection,
                     AccessControlContext context) {
                 this.type = type;
@@ -1749,33 +1747,6 @@ public class TKeyStore {
             }
         }
 
-        /**
-         * Returns a new Builder object.
-         *
-         * <p>Each call to the {@link #getKeyStore} method on the returned
-         * builder will return a new TKeyStore object of type {@code type}.
-         * Its {@link TKeyStore#load(TKeyStore.LoadStoreParameter) load()}
-         * method is invoked using a
-         * {@code LoadStoreParameter} that encapsulates
-         * {@code protection}.
-         *
-         * <p>The TKeyStore is instantiated from {@code provider} if
-         * non-null. Otherwise, all installed providers are searched.
-         *
-         * <p>Calls to {@link #getProtectionParameter getProtectionParameter()}
-         * will return {@code protection}.
-         *
-         * <p><em>Note</em> that the {@link #getKeyStore} method is executed
-         * within the {@link AccessControlContext} of the code invoking this
-         * method.
-         *
-         * @return a new Builder object
-         * @param type the type of TKeyStore to be constructed
-         * @param provider the provider from which the TKeyStore is to
-         *   be instantiated (or null)
-         * @param protection the ProtectionParameter securing the Keystore
-         * @throws NullPointerException if type or protection is null
-         */
         public static TKeyStore.Builder newInstance(final String type,
                 final Provider provider, final TKeyStore.ProtectionParameter protection) {
             if ((type == null) || (protection == null)) {

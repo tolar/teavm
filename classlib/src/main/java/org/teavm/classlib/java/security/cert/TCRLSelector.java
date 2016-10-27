@@ -15,8 +15,6 @@
  */
 package org.teavm.classlib.java.security.cert;
 
-import java.security.cert.CRL;
-
 public interface TCRLSelector extends Cloneable {
 
     /**
@@ -26,7 +24,7 @@ public interface TCRLSelector extends Cloneable {
      * @return  {@code true} if the {@code CRL} should be selected,
      * {@code false} otherwise
      */
-    boolean match(CRL crl);
+    boolean match(TCRL crl);
 
     /**
      * Makes a copy of this {@code CRLSelector}. Changes to the

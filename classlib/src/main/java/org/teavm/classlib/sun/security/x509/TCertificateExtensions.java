@@ -20,6 +20,7 @@ import java.util.Map;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.cert.TCertificateException;
 import org.teavm.classlib.java.util.TCollection;
@@ -58,7 +59,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
 
     }
 
-    private void parseExtension(TExtension var1) throws IOException {
+    private void parseExtension(TExtension var1) throws TIOException {
         try {
             TClass var2 = TOIDMap.getClass(var1.getExtensionId());
             if(var2 == null) {
@@ -67,7 +68,7 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
                 }
 
                 if(this.map.put(TString.wrap(var1.getExtensionId().toString()), var1) != null) {
-                    throw new IOException("Duplicate extensions not allowed");
+                    throw new TIOException(TString.wrap("Duplicate extensions not allowed"));
                 }
             } else {
 //                Constructor var9 = var2.getConstructor(PARAMS);
@@ -91,10 +92,10 @@ public class TCertificateExtensions implements TCertAttrSet<TExtension> {
 //            } else {
 //                throw new IOException(var3);
 //            }
-        } catch (IOException var7) {
+        } catch (TIOException var7) {
             throw var7;
-        } catch (Exception var8) {
-            throw new IOException(var8);
+        } catch (TException var8) {
+            throw new TIOException(var8);
         }
     }
 
