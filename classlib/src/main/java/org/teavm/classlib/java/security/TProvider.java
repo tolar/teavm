@@ -416,7 +416,7 @@ public abstract class TProvider extends TProperties {
                 this.attributes = TCollections.<TProvider.UString,TString>emptyMap();
             } else {
                 this.attributes = new THashMap<TProvider.UString,TString>();
-                for (TMap.Entry<String,String> entry : attributes.entrySet()) {
+                for (TMap.Entry<TString,TString> entry : attributes.entrySet()) {
                     this.attributes.put(new TProvider.UString(entry.getKey()), entry.getValue());
                 }
             }

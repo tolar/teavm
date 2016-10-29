@@ -15,8 +15,6 @@
  */
 package org.teavm.classlib.javax.crypto;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -28,6 +26,7 @@ import org.teavm.classlib.java.io.TStreamTokenizer;
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.reflect.TConstructor;
+import org.teavm.classlib.java.security.TGeneralSecurityException;
 import org.teavm.classlib.java.security.spec.TAlgorithmParameterSpec;
 
 final class TCryptoPolicyParser {
@@ -63,9 +62,9 @@ final class TCryptoPolicyParser {
         this.st.parseNumbers();
         Object var2 = null;
 
-        for(this.lookahead = this.st.nextToken(); this.lookahead != -1; this.match(";")) {
-            if(!this.peek("grant")) {
-                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), "expected grant statement");
+        for(this.lookahead = this.st.nextToken(); this.lookahead != -1; this.match(TString.wrap(";"))) {
+            if(!this.peek(TString.wrap("grant"))) {
+                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), TString.wrap("expected grant statement"));
             }
 
             TCryptoPolicyParser.GrantEntry var3 = this.parseGrantEntry((Hashtable)var2);
@@ -79,79 +78,79 @@ final class TCryptoPolicyParser {
     private TCryptoPolicyParser.GrantEntry parseGrantEntry(Hashtable<TString, Vector<TString>> var1) throws TCryptoPolicyParser.ParsingException, TIOException {
         TCryptoPolicyParser.GrantEntry var2 = new TCryptoPolicyParser.GrantEntry();
         this.match(TString.wrap("grant"));
-        this.match("{");
+        this.match(TString.wrap("{"));
 
-        while(!this.peek("}")) {
-            if(!this.peek("Permission")) {
-                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), "expected permission entry");
+        while(!this.peek(TString.wrap("}"))) {
+            if(!this.peek(TString.wrap("Permission"))) {
+                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), TString.wrap("expected permission entry"));
             }
 
             TCryptoPolicyParser.CryptoPermissionEntry var3 = this.parsePermissionEntry(var1);
             var2.add(var3);
-            this.match(";");
+            this.match(TString.wrap(";"));
         }
 
-        this.match("}");
+        this.match(TString.wrap("}"));
         return var2;
     }
 
-    private TCryptoPolicyParser.CryptoPermissionEntry parsePermissionEntry(Hashtable<TString, Vector<TString>> var1) throws TCryptoPolicyParser.ParsingException, IOException {
+    private TCryptoPolicyParser.CryptoPermissionEntry parsePermissionEntry(Hashtable<TString, Vector<TString>> var1) throws TCryptoPolicyParser.ParsingException, TIOException {
         TCryptoPolicyParser.CryptoPermissionEntry var2 = new TCryptoPolicyParser.CryptoPermissionEntry();
-        this.match("Permission");
-        var2.cryptoPermission = this.match("permission type");
+        this.match(TString.wrap("Permission"));
+        var2.cryptoPermission = this.match(TString.wrap("permission type"));
         if(var2.cryptoPermission.equals("javax.crypto.CryptoAllPermission")) {
             var2.alg = TString.wrap("CryptoAllPermission");
             var2.maxKeySize = 2147483647;
             return var2;
         } else {
-            if(this.peek("\"")) {
-                var2.alg = this.match("quoted string").toUpperCase(Locale.ENGLISH);
+            if(this.peek(TString.wrap("\""))) {
+                var2.alg = this.match(TString.wrap("quoted string")).toUpperCase(Locale.ENGLISH);
             } else {
-                if(!this.peek("*")) {
-                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), "Missing the algorithm name");
+                if(!this.peek(TString.wrap("*"))) {
+                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), TString.wrap("Missing the algorithm name"));
                 }
 
-                this.match("*");
+                this.match(TString.wrap("*"));
                 var2.alg = TString.wrap("*");
             }
 
-            this.peekAndMatch(",");
-            if(this.peek("\"")) {
-                var2.exemptionMechanism = this.match("quoted string").toUpperCase(Locale.ENGLISH);
+            this.peekAndMatch(TString.wrap(","));
+            if(this.peek(TString.wrap("\""))) {
+                var2.exemptionMechanism = this.match(TString.wrap("quoted string")).toUpperCase(Locale.ENGLISH);
             }
 
-            this.peekAndMatch(",");
+            this.peekAndMatch(TString.wrap(","));
             if(!this.isConsistent(var2.alg, var2.exemptionMechanism, var1)) {
-                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), "Inconsistent policy");
+                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), TString.wrap("Inconsistent policy"));
             } else {
-                if(this.peek("number")) {
+                if(this.peek(TString.wrap("number"))) {
                     var2.maxKeySize = this.match();
-                } else if(this.peek("*")) {
-                    this.match("*");
+                } else if(this.peek(TString.wrap("*"))) {
+                    this.match(TString.wrap("*"));
                     var2.maxKeySize = 2147483647;
                 } else {
-                    if(!this.peek(";")) {
-                        throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), "Missing the maximum allowable key size");
+                    if(!this.peek(TString.wrap(";"))) {
+                        throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), TString.wrap("Missing the maximum allowable key size"));
                     }
 
                     var2.maxKeySize = 2147483647;
                 }
 
-                this.peekAndMatch(",");
-                if(this.peek("\"")) {
-                    TString var3 = this.match("quoted string");
+                this.peekAndMatch(TString.wrap(","));
+                if(this.peek(TString.wrap("\""))) {
+                    TString var3 = this.match(TString.wrap("quoted string"));
                     Vector var4 = new Vector(1);
 
-                    while(this.peek(",")) {
-                        this.match(",");
-                        if(this.peek("number")) {
+                    while(this.peek(TString.wrap(","))) {
+                        this.match(TString.wrap(","));
+                        if(this.peek(TString.wrap("number"))) {
                             var4.addElement(new Integer(this.match()));
                         } else {
-                            if(!this.peek("*")) {
-                                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), "Expecting an integer");
+                            if(!this.peek(TString.wrap("*"))) {
+                                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), TString.wrap("Expecting an integer"));
                             }
 
-                            this.match("*");
+                            this.match(TString.wrap("*"));
                             var4.addElement(new Integer(2147483647));
                         }
                     }
@@ -182,11 +181,11 @@ final class TCryptoPolicyParser {
             var2 = (TAlgorithmParameterSpec)var7.newInstance((Object[])var1);
             return var2;
         } catch (Exception var6) {
-            throw new TCryptoPolicyParser.ParsingException("Cannot call the constructor of " + var0 + var6);
+            throw new TCryptoPolicyParser.ParsingException(TString.wrap("Cannot call the constructor of " + var0 + var6));
         }
     }
 
-    private boolean peekAndMatch(String var1) throws TCryptoPolicyParser.ParsingException, IOException {
+    private boolean peekAndMatch(TString var1) throws TCryptoPolicyParser.ParsingException, TIOException {
         if(this.peek(var1)) {
             this.match(var1);
             return true;
@@ -195,7 +194,7 @@ final class TCryptoPolicyParser {
         }
     }
 
-    private boolean peek(String var1) {
+    private boolean peek(TString var1) {
         boolean var2 = false;
         switch(this.lookahead) {
             case -3:
@@ -204,7 +203,7 @@ final class TCryptoPolicyParser {
                 }
                 break;
             case -2:
-                if(var1.equalsIgnoreCase("number")) {
+                if(var1.equalsIgnoreCase(TString.wrap("number"))) {
                     var2 = true;
                 }
                 break;
@@ -242,15 +241,15 @@ final class TCryptoPolicyParser {
         return var2;
     }
 
-    private int match() throws TCryptoPolicyParser.ParsingException, IOException {
+    private int match() throws TCryptoPolicyParser.ParsingException, TIOException {
         int var1 = -1;
         int var2 = this.st.lineno();
-        String var3 = null;
+        TString var3 = null;
         switch(this.lookahead) {
             case -2:
                 var1 = (int)this.st.nval;
                 if(var1 < 0) {
-                    var3 = String.valueOf(this.st.nval);
+                    var3 = TString.valueOf(this.st.nval);
                 }
 
                 this.lookahead = this.st.nextToken();
@@ -260,13 +259,13 @@ final class TCryptoPolicyParser {
         }
 
         if(var1 <= 0) {
-            throw new TCryptoPolicyParser.ParsingException(var2, "a non-negative number", var3);
+            throw new TCryptoPolicyParser.ParsingException(var2, TString.wrap("a non-negative number"), var3);
         } else {
             return var1;
         }
     }
 
-    private TString match(TString var1) throws TCryptoPolicyParser.ParsingException, IOException {
+    private TString match(TString var1) throws TCryptoPolicyParser.ParsingException, TIOException {
         TString var2 = null;
         switch(this.lookahead) {
             case -3:
@@ -282,15 +281,15 @@ final class TCryptoPolicyParser {
                 }
                 break;
             case -2:
-                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, "number " + String.valueOf(this.st.nval));
+                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, TString.wrap("number " + String.valueOf(this.st.nval)));
             case -1:
-                throw new TCryptoPolicyParser.ParsingException("expected " + var1 + ", read end of file");
+                throw new TCryptoPolicyParser.ParsingException(TString.wrap("expected " + var1 + ", read end of file"));
             case 34:
-                if(var1.equalsIgnoreCase("quoted string")) {
+                if(var1.equalsIgnoreCase(TString.wrap("quoted string"))) {
                     var2 = this.st.sval;
                     this.lookahead = this.st.nextToken();
                 } else {
-                    if(!var1.equalsIgnoreCase("permission type")) {
+                    if(!var1.equalsIgnoreCase(TString.wrap("permission type"))) {
                         throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, this.st.sval);
                     }
 
@@ -300,41 +299,41 @@ final class TCryptoPolicyParser {
                 break;
             case 42:
                 if(!var1.equals("*")) {
-                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, "*");
+                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, TString.wrap("*"));
                 }
 
                 this.lookahead = this.st.nextToken();
                 break;
             case 44:
                 if(!var1.equals(",")) {
-                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, ",");
+                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, TString.wrap(","));
                 }
 
                 this.lookahead = this.st.nextToken();
                 break;
             case 59:
                 if(!var1.equals(";")) {
-                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, ";");
+                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, TString.wrap(";"));
                 }
 
                 this.lookahead = this.st.nextToken();
                 break;
             case 123:
                 if(!var1.equals("{")) {
-                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, "{");
+                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, TString.wrap("{"));
                 }
 
                 this.lookahead = this.st.nextToken();
                 break;
             case 125:
                 if(!var1.equals("}")) {
-                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, "}");
+                    throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, TString.wrap("}"));
                 }
 
                 this.lookahead = this.st.nextToken();
                 break;
             default:
-                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, new String(new char[]{(char)this.lookahead}));
+                throw new TCryptoPolicyParser.ParsingException(this.st.lineno(), var1, new TString(new char[]{(char)this.lookahead}));
         }
 
         return var2;
@@ -392,19 +391,19 @@ final class TCryptoPolicyParser {
         }
     }
 
-    static final class ParsingException extends GeneralSecurityException {
+    static final class ParsingException extends TGeneralSecurityException {
         private static final long serialVersionUID = 7147241245566588374L;
 
-        ParsingException(String var1) {
+        ParsingException(TString var1) {
             super(var1);
         }
 
-        ParsingException(int var1, String var2) {
-            super("line " + var1 + ": " + var2);
+        ParsingException(int var1, TString var2) {
+            super(TString.wrap("line " + var1 + ": " + var2));
         }
 
-        ParsingException(int var1, String var2, String var3) {
-            super("line " + var1 + ": expected \'" + var2 + "\', found \'" + var3 + "\'");
+        ParsingException(int var1, TString var2, TString var3) {
+            super(TString.wrap("line " + var1 + ": expected \'" + var2 + "\', found \'" + var3 + "\'"));
         }
     }
 

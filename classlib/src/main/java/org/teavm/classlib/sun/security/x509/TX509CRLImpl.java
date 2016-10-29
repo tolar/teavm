@@ -393,7 +393,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
                 this.signedCRL = var5.toByteArray();
                 this.readOnly = true;
             }
-        } catch (IOException var7) {
+        } catch (TIOException var7) {
             throw new CRLException("Error while encoding data: " + var7.getMessage());
         }
     }
@@ -568,7 +568,7 @@ public class TX509CRLImpl extends TX509CRL implements TDerEncoder {
     public TKeyIdentifier getAuthKeyId() throws IOException {
         TAuthorityKeyIdentifierExtension var1 = this.getAuthKeyIdExtension();
         if(var1 != null) {
-            TKeyIdentifier var2 = (TKeyIdentifier)var1.get("key_id");
+            TKeyIdentifier var2 = (TKeyIdentifier)var1.get(TString.wrap("key_id"));
             return var2;
         } else {
             return null;

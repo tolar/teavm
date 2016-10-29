@@ -148,14 +148,14 @@ public class TPolicyConstraintsExtension extends TExtension implements TCertAttr
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
+    public void set(TString var1, Object var2) throws TIOException {
         if(!(var2 instanceof Integer)) {
             throw new TIOException(TString.wrap("Attribute value should be of type Integer."));
         } else {
-            if(var1.equalsIgnoreCase("require")) {
+            if(var1.equalsIgnoreCase(TString.wrap("require"))) {
                 this.require = ((Integer)var2).intValue();
             } else {
-                if(!var1.equalsIgnoreCase("inhibit")) {
+                if(!var1.equalsIgnoreCase(TString.wrap("inhibit"))) {
                     throw new TIOException(TString.wrap("Attribute name [" + var1 + "]" + " not recognized by " + "CertAttrSet:PolicyConstraints."));
                 }
 
@@ -166,21 +166,21 @@ public class TPolicyConstraintsExtension extends TExtension implements TCertAttr
         }
     }
 
-    public Integer get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("require")) {
+    public Integer get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("require"))) {
             return new Integer(this.require);
-        } else if(var1.equalsIgnoreCase("inhibit")) {
+        } else if(var1.equalsIgnoreCase(TString.wrap("inhibit"))) {
             return new Integer(this.inhibit);
         } else {
             throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:PolicyConstraints."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("require")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("require"))) {
             this.require = -1;
         } else {
-            if(!var1.equalsIgnoreCase("inhibit")) {
+            if(!var1.equalsIgnoreCase(TString.wrap("inhibit"))) {
                 throw new TIOException(TString.wrap("Attribute name not recognized by CertAttrSet:PolicyConstraints."));
             }
 

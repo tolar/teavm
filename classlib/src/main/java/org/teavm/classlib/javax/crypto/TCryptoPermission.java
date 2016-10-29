@@ -16,7 +16,6 @@
 package org.teavm.classlib.javax.crypto;
 
 import javax.crypto.spec.PBEParameterSpec;
-
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.security.TPermission;
 import org.teavm.classlib.java.security.TPermissionCollection;
@@ -161,8 +160,8 @@ class TCryptoPermission extends TPermission {
         if(this.algParamSpec != null) {
             if(this.algParamSpec instanceof TRC2ParameterSpec) {
                 var1.append(" , effective " + ((TRC2ParameterSpec)this.algParamSpec).getEffectiveKeyBits());
-            } else if(this.algParamSpec instanceof TRC2ParameterSpec) {
-                var1.append(" , rounds " + ((TRC2ParameterSpec)this.algParamSpec).getRounds());
+            } else if(this.algParamSpec instanceof TRC5ParameterSpec) {
+                var1.append(" , rounds " + ((TRC5ParameterSpec)this.algParamSpec).getRounds());
             }
         }
 

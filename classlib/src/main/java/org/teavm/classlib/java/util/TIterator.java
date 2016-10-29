@@ -15,12 +15,14 @@
  */
 package org.teavm.classlib.java.util;
 
+import java.util.Iterator;
+
 /**
  *
  * @author Alexey Andreev
  * @param <E>
  */
-public interface TIterator<E> {
+public interface TIterator<E> extends Iterator {
     boolean hasNext();
 
     E next();

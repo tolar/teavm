@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.util.TEnumeration;
@@ -112,8 +111,8 @@ public class TCertificatePoliciesExtension extends TExtension implements TCertAt
         var1.write(var2.toByteArray());
     }
 
-    public void set(String var1, Object var2) throws TIOException {
-        if(var1.equalsIgnoreCase("policies")) {
+    public void set(TString var1, Object var2) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("policies"))) {
             if(!(var2 instanceof List)) {
                 throw new TIOException(TString.wrap("Attribute value should be of type List."));
             } else {
@@ -125,16 +124,16 @@ public class TCertificatePoliciesExtension extends TExtension implements TCertAt
         }
     }
 
-    public List<TPolicyInformation> get(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("policies")) {
+    public List<TPolicyInformation> get(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("policies"))) {
             return this.certPolicies;
         } else {
             throw new TIOException(TString.wrap("Attribute name [" + var1 + "] not recognized by " + "CertAttrSet:CertificatePoliciesExtension."));
         }
     }
 
-    public void delete(String var1) throws TIOException {
-        if(var1.equalsIgnoreCase("policies")) {
+    public void delete(TString var1) throws TIOException {
+        if(var1.equalsIgnoreCase(TString.wrap("policies"))) {
             this.certPolicies = null;
             this.encodeThis();
         } else {

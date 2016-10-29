@@ -230,7 +230,7 @@ public class TX509Key implements TPublicKey {
 //        var1.write(this.getEncoded());
 //    }
 //
-//    private void readObject(ObjectInputStream var1) throws IOException {
+//    private void readObject(TObjectInputStream var1) throws IOException {
 //        try {
 //            this.decode((TInputStream)var1);
 //        } catch (InvalidKeyException var3) {

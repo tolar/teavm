@@ -25,7 +25,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
-import java.security.Provider;
 import java.util.Enumeration;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -83,13 +82,13 @@ final class TJceSecurity {
         TIterator var5 = var3.iterator();
 
         while(true) {
-            Provider.Service var6;
+            TProvider.Service var6;
             do {
                 if(!var5.hasNext()) {
                     throw new NoSuchAlgorithmException("Algorithm " + var2 + " not available", var4);
                 }
 
-                var6 = (Provider.Service)var5.next();
+                var6 = (TProvider.Service)var5.next();
             } while(!canUseProvider(var6.getProvider()));
 
             try {

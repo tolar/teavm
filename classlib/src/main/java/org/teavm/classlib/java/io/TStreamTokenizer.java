@@ -15,9 +15,7 @@
  */
 package org.teavm.classlib.java.io;
 
-import java.io.IOException;
 import java.util.Arrays;
-
 import org.teavm.classlib.java.lang.TString;
 
 public class TStreamTokenizer {
@@ -129,7 +127,7 @@ public class TStreamTokenizer {
         return LINENO;
     }
 
-    public int nextToken() throws IOException {
+    public int nextToken() throws TIOException {
         if (pushedBack) {
             pushedBack = false;
             return ttype;
@@ -358,7 +356,7 @@ public class TStreamTokenizer {
         return ttype = c;
     }
 
-    private int read() throws IOException {
+    private int read() throws TIOException {
         if (reader != null)
             return reader.read();
         else if (input != null)
