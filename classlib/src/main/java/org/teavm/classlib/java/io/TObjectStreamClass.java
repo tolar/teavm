@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamConstants;
 import java.io.ObjectStreamException;
-import java.io.ObjectStreamField;
 import java.io.Serializable;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -49,11 +48,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import sun.misc.Unsafe;
-import sun.reflect.CallerSensitive;
-import sun.reflect.Reflection;
-import sun.reflect.ReflectionFactory;
-import sun.reflect.misc.ReflectUtil;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.sun.reflect.TReflection;
+import org.teavm.classlib.sun.reflect.TReflectionFactory;
+import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
 
 /**
  * Created by vasek on 29. 10. 2016.
@@ -61,15 +60,15 @@ import sun.reflect.misc.ReflectUtil;
 public class TObjectStreamClass implements Serializable {
 
     /** serialPersistentFields value indicating no serializable fields */
-    public static final ObjectStreamField[] NO_FIELDS =
-            new ObjectStreamField[0];
+    public static final TObjectStreamField[] NO_FIELDS =
+            new TObjectStreamField[0];
 
     private static final long serialVersionUID = -6120832682080437368L;
-    private static final ObjectStreamField[] serialPersistentFields =
+    private static final TObjectStreamField[] serialPersistentFields =
             NO_FIELDS;
 
     /** reflection factory for obtaining serialization constructors */
-    private static final ReflectionFactory reflFactory =
+    private static final TReflectionFactory reflFactory =
             AccessController.doPrivileged(
                     new ReflectionFactory.GetReflectionFactoryAction());
 
@@ -91,7 +90,7 @@ public class TObjectStreamClass implements Serializable {
     }
 
     /** class associated with this descriptor (if any) */
-    private Class<?> cl;
+    private TClass<?> cl;
     /** name of class represented by this descriptor */
     private String name;
     /** serialVersionUID of represented class (null if not computed yet) */
@@ -253,16 +252,15 @@ public class TObjectStreamClass implements Serializable {
      *
      * @return  the <code>Class</code> instance that this descriptor represents
      */
-    @CallerSensitive
     public Class<?> forClass() {
         if (cl == null) {
             return null;
         }
         requireInitialized();
         if (System.getSecurityManager() != null) {
-            Class<?> caller = Reflection.getCallerClass();
-            if (ReflectUtil.needsPackageAccessCheck(caller.getClassLoader(), cl.getClassLoader())) {
-                ReflectUtil.checkPackageAccess(cl);
+            TClass<?> caller = TReflection.getCallerClass();
+            if (TReflectUtil.needsPackageAccessCheck(caller.getClassLoader(), cl.getClassLoader())) {
+                TReflectUtil.checkPackageAccess(cl);
             }
         }
         return cl;
@@ -276,7 +274,7 @@ public class TObjectStreamClass implements Serializable {
      *          fields.
      * @since 1.2
      */
-    public ObjectStreamField[] getFields() {
+    public TObjectStreamField[] getFields() {
         return getFields(true);
     }
 
@@ -287,7 +285,7 @@ public class TObjectStreamClass implements Serializable {
      * @return  The TObjectStreamField object of the named field or null if
      *          there is no such named field.
      */
-    public ObjectStreamField getField(String name) {
+    public TObjectStreamField getField(String name) {
         return getField(name, null);
     }
 
@@ -668,7 +666,7 @@ public class TObjectStreamClass implements Serializable {
      * used as input to the ObjectInputStream.resolveClass() and
      * TObjectStreamClass.initNonProxy() methods.
      */
-    void readNonProxy(TObjectInputStream in)
+    void readNonProxy(TObjectOutputStream in)
             throws IOException, ClassNotFoundException
     {
         name = in.readUTF();
@@ -701,14 +699,14 @@ public class TObjectStreamClass implements Serializable {
                     "enum descriptor has non-zero field count: " + numFields);
         }
         fields = (numFields > 0) ?
-                new ObjectStreamField[numFields] : NO_FIELDS;
+                new TObjectStreamField[numFields] : NO_FIELDS;
         for (int i = 0; i < numFields; i++) {
             char tcode = (char) in.readByte();
             String fname = in.readUTF();
             String signature = ((tcode == 'L') || (tcode == '[')) ?
                     in.readTypeString() : new String(new char[] { tcode });
             try {
-                fields[i] = new ObjectStreamField(fname, signature, false);
+                fields[i] = new TObjectStreamField(fname, signature, false);
             } catch (RuntimeException e) {
                 throw (IOException) new InvalidClassException(name,
                         "invalid descriptor for field " + fname).initCause(e);
@@ -720,7 +718,7 @@ public class TObjectStreamClass implements Serializable {
     /**
      * Writes non-proxy class descriptor information to given output stream.
      */
-    void writeNonProxy(ObjectOutputStream out) throws IOException {
+    void writeNonProxy(TObjectOutputStream out) throws IOException {
         out.writeUTF(name);
         out.writeLong(getSerialVersionUID());
 
@@ -744,7 +742,7 @@ public class TObjectStreamClass implements Serializable {
 
         out.writeShort(fields.length);
         for (int i = 0; i < fields.length; i++) {
-            ObjectStreamField f = fields[i];
+            TObjectStreamField f = fields[i];
             out.writeByte(f.getTypeCode());
             out.writeUTF(f.getName());
             if (!f.isPrimitive()) {
@@ -834,7 +832,7 @@ public class TObjectStreamClass implements Serializable {
      * descriptor's field array is returned, otherwise the array itself is
      * returned.
      */
-    ObjectStreamField[] getFields(boolean copy) {
+    TObjectStreamField[] getFields(boolean copy) {
         return copy ? fields.clone() : fields;
     }
 
@@ -844,9 +842,9 @@ public class TObjectStreamClass implements Serializable {
      * non-primitive types, and any other non-null type matches assignable
      * types only.  Returns matching field, or null if no match found.
      */
-    ObjectStreamField getField(String name, Class<?> type) {
+    TObjectStreamField getField(String name, Class<?> type) {
         for (int i = 0; i < fields.length; i++) {
-            ObjectStreamField f = fields[i];
+            TObjectStreamField f = fields[i];
             if (f.getName().equals(name)) {
                 if (type == null ||
                         (type == Object.class && !f.isPrimitive()))
@@ -1582,10 +1580,10 @@ public class TObjectStreamClass implements Serializable {
      * Field objects.  Throws InvalidClassException if the (explicitly
      * declared) serializable fields are invalid.
      */
-    private static ObjectStreamField[] getSerialFields(Class<?> cl)
+    private static TObjectStreamField[] getSerialFields(Class<?> cl)
             throws InvalidClassException
     {
-        ObjectStreamField[] fields;
+        TObjectStreamField[] fields;
         if (Serializable.class.isAssignableFrom(cl) &&
                 !Externalizable.class.isAssignableFrom(cl) &&
                 !Proxy.isProxyClass(cl) &&
@@ -1612,16 +1610,16 @@ public class TObjectStreamClass implements Serializable {
      * InvalidClassException if the declared serializable fields are
      * invalid--e.g., if multiple fields share the same name.
      */
-    private static ObjectStreamField[] getDeclaredSerialFields(Class<?> cl)
+    private static TObjectStreamField[] getDeclaredSerialFields(Class<?> cl)
             throws InvalidClassException
     {
-        ObjectStreamField[] serialPersistentFields = null;
+        TObjectStreamField[] serialPersistentFields = null;
         try {
             Field f = cl.getDeclaredField("serialPersistentFields");
             int mask = Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL;
             if ((f.getModifiers() & mask) == mask) {
                 f.setAccessible(true);
-                serialPersistentFields = (ObjectStreamField[]) f.get(null);
+                serialPersistentFields = (TObjectStreamField[]) f.get(null);
             }
         } catch (Exception ex) {
         }
@@ -1631,12 +1629,12 @@ public class TObjectStreamClass implements Serializable {
             return NO_FIELDS;
         }
 
-        ObjectStreamField[] boundFields =
-                new ObjectStreamField[serialPersistentFields.length];
+        TObjectStreamField[] boundFields =
+                new TObjectStreamField[serialPersistentFields.length];
         Set<String> fieldNames = new HashSet<>(serialPersistentFields.length);
 
         for (int i = 0; i < serialPersistentFields.length; i++) {
-            ObjectStreamField spf = serialPersistentFields[i];
+            TObjectStreamField spf = serialPersistentFields[i];
 
             String fname = spf.getName();
             if (fieldNames.contains(fname)) {
@@ -1651,12 +1649,12 @@ public class TObjectStreamClass implements Serializable {
                         ((f.getModifiers() & Modifier.STATIC) == 0))
                 {
                     boundFields[i] =
-                            new ObjectStreamField(f, spf.isUnshared(), true);
+                            new TObjectStreamField(f, spf.isUnshared(), true);
                 }
             } catch (NoSuchFieldException ex) {
             }
             if (boundFields[i] == null) {
-                boundFields[i] = new ObjectStreamField(
+                boundFields[i] = new TObjectStreamField(
                         fname, spf.getType(), spf.isUnshared());
             }
         }
@@ -1669,19 +1667,19 @@ public class TObjectStreamClass implements Serializable {
      * contains a Field object for the field it represents.  If no default
      * serializable fields exist, NO_FIELDS is returned.
      */
-    private static ObjectStreamField[] getDefaultSerialFields(Class<?> cl) {
+    private static TObjectStreamField[] getDefaultSerialFields(Class<?> cl) {
         Field[] clFields = cl.getDeclaredFields();
-        ArrayList<ObjectStreamField> list = new ArrayList<>();
+        ArrayList<TObjectStreamField> list = new ArrayList<>();
         int mask = Modifier.STATIC | Modifier.TRANSIENT;
 
         for (int i = 0; i < clFields.length; i++) {
             if ((clFields[i].getModifiers() & mask) == 0) {
-                list.add(new ObjectStreamField(clFields[i], false, true));
+                list.add(new TObjectStreamField(clFields[i], false, true));
             }
         }
         int size = list.size();
         return (size == 0) ? NO_FIELDS :
-                list.toArray(new ObjectStreamField[size]);
+                list.toArray(new TObjectStreamField[size]);
     }
 
     /**
@@ -1704,7 +1702,7 @@ public class TObjectStreamClass implements Serializable {
     /**
      * Computes the default serial version UID value for the given class.
      */
-    private static long computeDefaultSUID(Class<?> cl) {
+    private static long computeDefaultSUID(TClass<?> cl) {
         if (!Serializable.class.isAssignableFrom(cl) || Proxy.isProxyClass(cl))
         {
             return 0L;
@@ -1897,7 +1895,7 @@ public class TObjectStreamClass implements Serializable {
         private static final Unsafe unsafe = Unsafe.getUnsafe();
 
         /** fields to operate on */
-        private final ObjectStreamField[] fields;
+        private final TObjectStreamField[] fields;
         /** number of primitive fields */
         private final int numPrimFields;
         /** unsafe field keys for reading fields - may contain dupes */
@@ -1918,7 +1916,7 @@ public class TObjectStreamClass implements Serializable {
          * treated as filler, for which get operations return default values
          * and set operations discard given values.
          */
-        FieldReflector(ObjectStreamField[] fields) {
+        FieldReflector(TObjectStreamField[] fields) {
             this.fields = fields;
             int nfields = fields.length;
             readKeys = new long[nfields];
@@ -1930,7 +1928,7 @@ public class TObjectStreamClass implements Serializable {
 
 
             for (int i = 0; i < nfields; i++) {
-                ObjectStreamField f = fields[i];
+                TObjectStreamField f = fields[i];
                 Field rf = f.getField();
                 long key = (rf != null) ?
                         unsafe.objectFieldOffset(rf) : Unsafe.INVALID_FIELD_OFFSET;
@@ -1954,7 +1952,7 @@ public class TObjectStreamClass implements Serializable {
          * contained by ObjectStreamFields in the list reflect their bindings
          * to locally defined serializable fields.
          */
-        ObjectStreamField[] getFields() {
+        TObjectStreamField[] getFields() {
             return fields;
         }
 
@@ -1976,7 +1974,7 @@ public class TObjectStreamClass implements Serializable {
                 int off = offsets[i];
                 switch (typeCodes[i]) {
                     case 'Z':
-                        Bits.putBoolean(buf, off, unsafe.getBoolean(obj, key));
+                        TBits.putBoolean(buf, off, unsafe.getBoolean(obj, key));
                         break;
 
                     case 'B':
@@ -1984,27 +1982,27 @@ public class TObjectStreamClass implements Serializable {
                         break;
 
                     case 'C':
-                        Bits.putChar(buf, off, unsafe.getChar(obj, key));
+                        TBits.putChar(buf, off, unsafe.getChar(obj, key));
                         break;
 
                     case 'S':
-                        Bits.putShort(buf, off, unsafe.getShort(obj, key));
+                        TBits.putShort(buf, off, unsafe.getShort(obj, key));
                         break;
 
                     case 'I':
-                        Bits.putInt(buf, off, unsafe.getInt(obj, key));
+                        TBits.putInt(buf, off, unsafe.getInt(obj, key));
                         break;
 
                     case 'F':
-                        Bits.putFloat(buf, off, unsafe.getFloat(obj, key));
+                        TBits.putFloat(buf, off, unsafe.getFloat(obj, key));
                         break;
 
                     case 'J':
-                        Bits.putLong(buf, off, unsafe.getLong(obj, key));
+                        TBits.putLong(buf, off, unsafe.getLong(obj, key));
                         break;
 
                     case 'D':
-                        Bits.putDouble(buf, off, unsafe.getDouble(obj, key));
+                        TBits.putDouble(buf, off, unsafe.getDouble(obj, key));
                         break;
 
                     default:
@@ -2030,7 +2028,7 @@ public class TObjectStreamClass implements Serializable {
                 int off = offsets[i];
                 switch (typeCodes[i]) {
                     case 'Z':
-                        unsafe.putBoolean(obj, key, Bits.getBoolean(buf, off));
+                        unsafe.putBoolean(obj, key, TBits.getBoolean(buf, off));
                         break;
 
                     case 'B':
@@ -2038,27 +2036,27 @@ public class TObjectStreamClass implements Serializable {
                         break;
 
                     case 'C':
-                        unsafe.putChar(obj, key, Bits.getChar(buf, off));
+                        unsafe.putChar(obj, key, TBits.getChar(buf, off));
                         break;
 
                     case 'S':
-                        unsafe.putShort(obj, key, Bits.getShort(buf, off));
+                        unsafe.putShort(obj, key, TBits.getShort(buf, off));
                         break;
 
                     case 'I':
-                        unsafe.putInt(obj, key, Bits.getInt(buf, off));
+                        unsafe.putInt(obj, key, TBits.getInt(buf, off));
                         break;
 
                     case 'F':
-                        unsafe.putFloat(obj, key, Bits.getFloat(buf, off));
+                        unsafe.putFloat(obj, key, TBits.getFloat(buf, off));
                         break;
 
                     case 'J':
-                        unsafe.putLong(obj, key, Bits.getLong(buf, off));
+                        unsafe.putLong(obj, key, TBits.getLong(buf, off));
                         break;
 
                     case 'D':
-                        unsafe.putDouble(obj, key, Bits.getDouble(buf, off));
+                        unsafe.putDouble(obj, key, TBits.getDouble(buf, off));
                         break;
 
                     default:
@@ -2144,7 +2142,7 @@ public class TObjectStreamClass implements Serializable {
      * discard given values).  Throws InvalidClassException if unresolvable
      * type conflicts exist between the two sets of fields.
      */
-    private static TObjectStreamClass.FieldReflector getReflector(ObjectStreamField[] fields,
+    private static TObjectStreamClass.FieldReflector getReflector(TObjectStreamField[] fields,
             TObjectStreamClass localDesc)
             throws InvalidClassException
     {
@@ -2214,14 +2212,14 @@ public class TObjectStreamClass implements Serializable {
         private final int hash;
         private final boolean nullClass;
 
-        FieldReflectorKey(Class<?> cl, ObjectStreamField[] fields,
+        FieldReflectorKey(Class<?> cl, TObjectStreamField[] fields,
                 ReferenceQueue<Class<?>> queue)
         {
             super(cl, queue);
             nullClass = (cl == null);
             StringBuilder sbuf = new StringBuilder();
             for (int i = 0; i < fields.length; i++) {
-                ObjectStreamField f = fields[i];
+                TObjectStreamField f = fields[i];
                 sbuf.append(f.getName()).append(f.getSignature());
             }
             sigs = sbuf.toString();
@@ -2261,11 +2259,11 @@ public class TObjectStreamClass implements Serializable {
      * ObjectStreamFields.  Throws InvalidClassException if unresolvable type
      * conflicts exist between the two sets of fields.
      */
-    private static ObjectStreamField[] matchFields(ObjectStreamField[] fields,
+    private static TObjectStreamField[] matchFields(TObjectStreamField[] fields,
             TObjectStreamClass localDesc)
             throws InvalidClassException
     {
-        ObjectStreamField[] localFields = (localDesc != null) ?
+        TObjectStreamField[] localFields = (localDesc != null) ?
                 localDesc.fields : NO_FIELDS;
 
         /*
@@ -2279,11 +2277,11 @@ public class TObjectStreamClass implements Serializable {
          * localFields cannot be returned directly.
          */
 
-        ObjectStreamField[] matches = new ObjectStreamField[fields.length];
+        TObjectStreamField[] matches = new TObjectStreamField[fields.length];
         for (int i = 0; i < fields.length; i++) {
-            ObjectStreamField f = fields[i], m = null;
+            TObjectStreamField f = fields[i], m = null;
             for (int j = 0; j < localFields.length; j++) {
-                ObjectStreamField lf = localFields[j];
+                TObjectStreamField lf = localFields[j];
                 if (f.getName().equals(lf.getName())) {
                     if ((f.isPrimitive() || lf.isPrimitive()) &&
                             f.getTypeCode() != lf.getTypeCode())
@@ -2292,16 +2290,16 @@ public class TObjectStreamClass implements Serializable {
                                 "incompatible types for field " + f.getName());
                     }
                     if (lf.getField() != null) {
-                        m = new ObjectStreamField(
+                        m = new TObjectStreamField(
                                 lf.getField(), lf.isUnshared(), false);
                     } else {
-                        m = new ObjectStreamField(
+                        m = new TObjectStreamField(
                                 lf.getName(), lf.getSignature(), lf.isUnshared());
                     }
                 }
             }
             if (m == null) {
-                m = new ObjectStreamField(
+                m = new TObjectStreamField(
                         f.getName(), f.getSignature(), false);
             }
             m.setOffset(f.getOffset());

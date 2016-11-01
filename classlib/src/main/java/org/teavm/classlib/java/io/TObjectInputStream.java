@@ -15,52 +15,16 @@
  */
 package org.teavm.classlib.java.io;
 
-import static java.io.ObjectStreamClass.processQueue;
-import java.io.Bits;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.io.InvalidObjectException;
-import java.io.NotActiveException;
-import java.io.ObjectInput;
-import java.io.ObjectInputValidation;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-import java.io.ObjectStreamConstants;
-import java.io.ObjectStreamException;
-import java.io.ObjectStreamField;
-import java.io.OptionalDataException;
-import java.io.OutputStream;
-import java.io.SerialCallbackContext;
-import java.io.StreamCorruptedException;
-import java.io.UTFDataFormatException;
-import java.io.WriteAbortedException;
-import java.lang.ref.ReferenceQueue;
-import java.lang.reflect.Array;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import sun.misc.ObjectStreamClassValidator;
-import sun.misc.SharedSecrets;
-import sun.reflect.misc.ReflectUtil;
+import org.teavm.classlib.java.lang.ref.TReferenceQueue;
+import org.teavm.classlib.java.util.THashMap;
+import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
+import org.teavm.classlib.java.util.concurrent.TConcurrentMap;
 
 /**
  * Created by vasek on 29. 10. 2016.
  */
 public class TObjectInputStream
-        extends TInputStream implements ObjectInput, ObjectStreamConstants
+        extends TInputStream implements TObjectInput, TObjectStreamConstants
 {
     /** handle value representing null */
     private static final int NULL_HANDLE = -1;
@@ -69,8 +33,8 @@ public class TObjectInputStream
     private static final Object unsharedMarker = new Object();
 
     /** table mapping primitive type names to corresponding class objects */
-    private static final HashMap<String, Class<?>> primClasses
-            = new HashMap<>(8, 1.0F);
+    private static final THashMap<String, Class<?>> primClasses
+            = new THashMap<>(8, 1.0F);
     static {
         primClasses.put("boolean", boolean.class);
         primClasses.put("byte", byte.class);
@@ -85,25 +49,25 @@ public class TObjectInputStream
 
     private static class Caches {
         /** cache of subclass security audit results */
-        static final ConcurrentMap<ObjectStreamClass.WeakClassKey,Boolean> subclassAudits =
-                new ConcurrentHashMap<>();
+        static final TConcurrentMap<TObjectStreamClass.WeakClassKey,Boolean> subclassAudits =
+                new TConcurrentHashMap<>();
 
         /** queue for WeakReferences to audited subclasses */
-        static final ReferenceQueue<Class<?>> subclassAuditsQueue =
-                new ReferenceQueue<>();
+        static final TReferenceQueue<Class<?>> subclassAuditsQueue =
+                new TReferenceQueue<>();
     }
 
     /** filter stream for handling block data conversion */
-    private final java.io.ObjectInputStream.BlockDataInputStream bin;
+    private final TObjectOutputStream.BlockDataInputStream bin;
     /** validation callback list */
-    private final java.io.ObjectInputStream.ValidationList vlist;
+    private final TObjectOutputStream.ValidationList vlist;
     /** recursion depth */
     private int depth;
     /** whether stream is closed */
     private boolean closed;
 
     /** wire handle -> obj/exception map */
-    private final java.io.ObjectInputStream.HandleTable handles;
+    private final TObjectOutputStream.HandleTable handles;
     /** scratch field for passing handle values up/down call stack */
     private int passHandle = NULL_HANDLE;
     /** flag set when at end of field value block with no TC_ENDBLOCKDATA */
@@ -125,7 +89,7 @@ public class TObjectInputStream
     private SerialCallbackContext curContext;
 
     /**
-     * Creates an TObjectInputStream that reads from the specified InputStream.
+     * Creates an ObjectInputStream that reads from the specified InputStream.
      * A serialization stream header is read from the stream and verified.
      * This constructor will block until the corresponding ObjectOutputStream
      * has written and flushed the header.
@@ -133,7 +97,7 @@ public class TObjectInputStream
      * <p>If a security manager is installed, this constructor will check for
      * the "enableSubclassImplementation" SerializablePermission when invoked
      * directly or indirectly by the constructor of a subclass which overrides
-     * the TObjectInputStream.readFields or TObjectInputStream.readUnshared
+     * the ObjectInputStream.readFields or ObjectInputStream.readUnshared
      * methods.
      *
      * @param   in input stream to read from
@@ -142,15 +106,15 @@ public class TObjectInputStream
      * @throws  SecurityException if untrusted subclass illegally overrides
      *          security-sensitive methods
      * @throws  NullPointerException if <code>in</code> is <code>null</code>
-     * @see     java.io.ObjectInputStream#ObjectInputStream()
-     * @see     java.io.ObjectInputStream#readFields()
+     * @see     TObjectOutputStream#ObjectInputStream()
+     * @see     TObjectOutputStream#readFields()
      * @see     ObjectOutputStream#ObjectOutputStream(OutputStream)
      */
     public TObjectInputStream(InputStream in) throws IOException {
         verifySubclass();
-        bin = new java.io.ObjectInputStream.BlockDataInputStream(in);
-        handles = new java.io.ObjectInputStream.HandleTable(10);
-        vlist = new java.io.ObjectInputStream.ValidationList();
+        bin = new TObjectOutputStream.BlockDataInputStream(in);
+        handles = new TObjectOutputStream.HandleTable(10);
+        vlist = new TObjectOutputStream.ValidationList();
         enableOverride = false;
         readStreamHeader();
         bin.setBlockDataMode(true);
@@ -158,8 +122,8 @@ public class TObjectInputStream
 
     /**
      * Provide a way for subclasses that are completely reimplementing
-     * TObjectInputStream to not have to allocate private data just used by this
-     * implementation of TObjectInputStream.
+     * ObjectInputStream to not have to allocate private data just used by this
+     * implementation of ObjectInputStream.
      *
      * <p>If there is a security manager installed, this method first calls the
      * security manager's <code>checkPermission</code> method with the
@@ -185,7 +149,7 @@ public class TObjectInputStream
     }
 
     /**
-     * Read an object from the TObjectInputStream.  The class of the object, the
+     * Read an object from the ObjectInputStream.  The class of the object, the
      * signature of the class, and the values of the non-transient and
      * non-static fields of the class and all of its supertypes are read.
      * Default deserializing for a class can be overriden using the writeObject
@@ -255,7 +219,7 @@ public class TObjectInputStream
      *          instead of objects.
      * @throws  IOException if I/O errors occurred while reading from the
      *          underlying stream
-     * @see #TObjectInputStream()
+     * @see #TObjectOutputStream()
      * @see #readObject()
      * @since 1.2
      */
@@ -266,7 +230,7 @@ public class TObjectInputStream
     }
 
     /**
-     * Reads an "unshared" object from the TObjectInputStream.  This method is
+     * Reads an "unshared" object from the ObjectInputStream.  This method is
      * identical to readObject, except that it prevents subsequent calls to
      * readObject and readUnshared from returning additional references to the
      * deserialized instance obtained via this call.  Specifically:
@@ -290,10 +254,10 @@ public class TObjectInputStream
      * and the invocation of that method returns an array, then readUnshared
      * returns a shallow clone of that array; this guarantees that the returned
      * array object is unique and cannot be obtained a second time from an
-     * invocation of readObject or readUnshared on the TObjectInputStream,
+     * invocation of readObject or readUnshared on the ObjectInputStream,
      * even if the underlying data stream has been manipulated.
      *
-     * <p>TObjectInputStream subclasses which override this method can only be
+     * <p>ObjectInputStream subclasses which override this method can only be
      * constructed in security contexts possessing the
      * "enableSubclassImplementation" SerializablePermission; any attempt to
      * instantiate such a subclass without this permission will cause a
@@ -383,7 +347,7 @@ public class TObjectInputStream
      *          objects.
      * @since 1.2
      */
-    public java.io.ObjectInputStream.GetField readFields()
+    public TObjectOutputStream.GetField readFields()
             throws IOException, ClassNotFoundException
     {
         SerialCallbackContext ctx = curContext;
@@ -393,7 +357,7 @@ public class TObjectInputStream
         Object curObj = ctx.getObj();
         ObjectStreamClass curDesc = ctx.getDesc();
         bin.setBlockDataMode(false);
-        java.io.ObjectInputStream.GetFieldImpl getField = new java.io.ObjectInputStream.GetFieldImpl(curDesc);
+        TObjectOutputStream.GetFieldImpl getField = new TObjectOutputStream.GetFieldImpl(curDesc);
         getField.readFields();
         bin.setBlockDataMode(true);
         if (!curDesc.hasWriteObjectData()) {
@@ -448,7 +412,7 @@ public class TObjectInputStream
      * and an {@link InvalidClassException} is thrown.
      *
      * <p>The default implementation of this method in
-     * <code>TObjectInputStream</code> returns the result of calling
+     * <code>ObjectInputStream</code> returns the result of calling
      * <pre>
      *     Class.forName(desc.getName(), false, loader)
      * </pre>
@@ -460,15 +424,15 @@ public class TObjectInputStream
      * executing frame; otherwise, <code>loader</code> is
      * <code>null</code>. If this call results in a
      * <code>ClassNotFoundException</code> and the name of the passed
-     * <code>TObjectStreamClass</code> instance is the Java language keyword
+     * <code>ObjectStreamClass</code> instance is the Java language keyword
      * for a primitive type or void, then the <code>Class</code> object
      * representing that primitive type or void will be returned
-     * (e.g., an <code>TObjectStreamClass</code> with the name
+     * (e.g., an <code>ObjectStreamClass</code> with the name
      * <code>"int"</code> will be resolved to <code>Integer.TYPE</code>).
      * Otherwise, the <code>ClassNotFoundException</code> will be thrown to
      * the caller of this method.
      *
-     * @param   desc an instance of class <code>TObjectStreamClass</code>
+     * @param   desc an instance of class <code>ObjectStreamClass</code>
      * @return  a <code>Class</code> object corresponding to <code>desc</code>
      * @throws  IOException any of the usual Input/Output exceptions.
      * @throws  ClassNotFoundException if class of a serialized object cannot
@@ -502,13 +466,13 @@ public class TObjectInputStream
      *
      * <p>The corresponding method in <code>ObjectOutputStream</code> is
      * <code>annotateProxyClass</code>.  For a given subclass of
-     * <code>TObjectInputStream</code> that overrides this method, the
+     * <code>ObjectInputStream</code> that overrides this method, the
      * <code>annotateProxyClass</code> method in the corresponding subclass of
      * <code>ObjectOutputStream</code> must write any data or objects read by
      * this method.
      *
      * <p>The default implementation of this method in
-     * <code>TObjectInputStream</code> returns the result of calling
+     * <code>ObjectInputStream</code> returns the result of calling
      * <code>Proxy.getProxyClass</code> with the list of <code>Class</code>
      * objects for the interfaces that are named in the <code>interfaces</code>
      * parameter.  The <code>Class</code> object for each interface name
@@ -575,7 +539,7 @@ public class TObjectInputStream
     }
 
     /**
-     * This method will allow trusted subclasses of TObjectInputStream to
+     * This method will allow trusted subclasses of ObjectInputStream to
      * substitute one object for another during deserialization. Replacing
      * objects is disabled until enableResolveObject is called. The
      * enableResolveObject method checks that the stream requesting to resolve
@@ -665,8 +629,8 @@ public class TObjectInputStream
 
     /**
      * Read a class descriptor from the serialization stream.  This method is
-     * called when the TObjectInputStream expects a class descriptor as the next
-     * item in the serialization stream.  Subclasses of TObjectInputStream may
+     * called when the ObjectInputStream expects a class descriptor as the next
+     * item in the serialization stream.  Subclasses of ObjectInputStream may
      * override this method to read in class descriptors that have been written
      * in non-standard formats (by subclasses of ObjectOutputStream which have
      * overridden the <code>writeClassDescriptor</code> method).  By default,
@@ -935,7 +899,7 @@ public class TObjectInputStream
     public static abstract class GetField {
 
         /**
-         * Get the TObjectStreamClass that describes the fields in the stream.
+         * Get the ObjectStreamClass that describes the fields in the stream.
          *
          * @return  the descriptor class that describes the serializable fields
          */
@@ -1090,19 +1054,19 @@ public class TObjectInputStream
      */
     private void verifySubclass() {
         Class<?> cl = getClass();
-        if (cl == java.io.ObjectInputStream.class) {
+        if (cl == TObjectOutputStream.class) {
             return;
         }
         SecurityManager sm = System.getSecurityManager();
         if (sm == null) {
             return;
         }
-        processQueue(java.io.ObjectInputStream.Caches.subclassAuditsQueue, java.io.ObjectInputStream.Caches.subclassAudits);
-        ObjectStreamClass.WeakClassKey key = new ObjectStreamClass.WeakClassKey(cl, java.io.ObjectInputStream.Caches.subclassAuditsQueue);
-        Boolean result = java.io.ObjectInputStream.Caches.subclassAudits.get(key);
+        processQueue(TObjectOutputStream.Caches.subclassAuditsQueue, TObjectOutputStream.Caches.subclassAudits);
+        ObjectStreamClass.WeakClassKey key = new ObjectStreamClass.WeakClassKey(cl, TObjectOutputStream.Caches.subclassAuditsQueue);
+        Boolean result = TObjectOutputStream.Caches.subclassAudits.get(key);
         if (result == null) {
             result = Boolean.valueOf(auditSubclass(cl));
-            java.io.ObjectInputStream.Caches.subclassAudits.putIfAbsent(key, result);
+            TObjectOutputStream.Caches.subclassAudits.putIfAbsent(key, result);
         }
         if (result.booleanValue()) {
             return;
@@ -1120,7 +1084,7 @@ public class TObjectInputStream
                 new PrivilegedAction<Boolean>() {
                     public Boolean run() {
                         for (Class<?> cl = subcl;
-                             cl != java.io.ObjectInputStream.class;
+                             cl != TObjectOutputStream.class;
                              cl = cl.getSuperclass())
                         {
                             try {
@@ -1261,7 +1225,7 @@ public class TObjectInputStream
 
     /**
      * Reads string without allowing it to be replaced in stream.  Called from
-     * within TObjectStreamClass.read().
+     * within ObjectStreamClass.read().
      */
     String readTypeString() throws IOException {
         int oldHandle = passHandle;
@@ -1360,34 +1324,29 @@ public class TObjectInputStream
             throws IOException
     {
         byte tc = bin.peekByte();
-        ObjectStreamClass descriptor;
         switch (tc) {
             case TC_NULL:
-                descriptor = (ObjectStreamClass) readNull();
-                break;
+                return (ObjectStreamClass) readNull();
+
             case TC_REFERENCE:
-                descriptor = (ObjectStreamClass) readHandle(unshared);
-                break;
+                return (ObjectStreamClass) readHandle(unshared);
+
             case TC_PROXYCLASSDESC:
-                descriptor = readProxyDesc(unshared);
-                break;
+                return readProxyDesc(unshared);
+
             case TC_CLASSDESC:
-                descriptor = readNonProxyDesc(unshared);
-                break;
+                return readNonProxyDesc(unshared);
+
             default:
                 throw new StreamCorruptedException(
                         String.format("invalid type code: %02X", tc));
         }
-        if (descriptor != null) {
-            validateDescriptor(descriptor);
-        }
-        return descriptor;
     }
 
     private boolean isCustomSubclass() {
-        // Return true if this class is a custom subclass of TObjectInputStream
+        // Return true if this class is a custom subclass of ObjectInputStream
         return getClass().getClassLoader()
-                != java.io.ObjectInputStream.class.getClassLoader();
+                != TObjectOutputStream.class.getClassLoader();
     }
 
     /**
@@ -1620,7 +1579,7 @@ public class TObjectInputStream
 
     /**
      * Reads and returns "ordinary" (i.e., not a String, Class,
-     * TObjectStreamClass, array, or enum constant) object, or null if object's
+     * ObjectStreamClass, array, or enum constant) object, or null if object's
      * class is unresolvable (in which case a ClassNotFoundException will be
      * associated with object's handle).  Sets passHandle to object's assigned
      * handle.
@@ -1751,8 +1710,6 @@ public class TObjectInputStream
                 if (obj == null || handles.lookupException(passHandle) != null) {
                     defaultReadFields(null, slotDesc); // skip field values
                 } else if (slotDesc.hasReadObjectMethod()) {
-                    ThreadDeath t = null;
-                    boolean reset = false;
                     SerialCallbackContext oldContext = curContext;
                     if (oldContext != null)
                         oldContext.check();
@@ -1771,19 +1728,10 @@ public class TObjectInputStream
                          */
                         handles.markException(passHandle, ex);
                     } finally {
-                        do {
-                            try {
-                                curContext.setUsed();
-                                if (oldContext!= null)
-                                    oldContext.check();
-                                curContext = oldContext;
-                                reset = true;
-                            } catch (ThreadDeath x) {
-                                t = x;  // defer until reset is true
-                            }
-                        } while (!reset);
-                        if (t != null)
-                            throw t;
+                        curContext.setUsed();
+                        if (oldContext!= null)
+                            oldContext.check();
+                        curContext = oldContext;
                     }
 
                     /*
@@ -1940,7 +1888,7 @@ public class TObjectInputStream
     /**
      * Default GetField implementation.
      */
-    private class GetFieldImpl extends java.io.ObjectInputStream.GetField {
+    private class GetFieldImpl extends TObjectOutputStream.GetField {
 
         /** class descriptor describing serializable fields */
         private final ObjectStreamClass desc;
@@ -2070,10 +2018,10 @@ public class TObjectInputStream
         private static class Callback {
             final ObjectInputValidation obj;
             final int priority;
-            java.io.ObjectInputStream.ValidationList.Callback next;
+            TObjectOutputStream.ValidationList.Callback next;
             final AccessControlContext acc;
 
-            Callback(ObjectInputValidation obj, int priority, java.io.ObjectInputStream.ValidationList.Callback next,
+            Callback(ObjectInputValidation obj, int priority, TObjectOutputStream.ValidationList.Callback next,
                     AccessControlContext acc)
             {
                 this.obj = obj;
@@ -2084,7 +2032,7 @@ public class TObjectInputStream
         }
 
         /** linked list of callbacks */
-        private java.io.ObjectInputStream.ValidationList.Callback list;
+        private TObjectOutputStream.ValidationList.Callback list;
 
         /**
          * Creates new (empty) ValidationList.
@@ -2103,16 +2051,16 @@ public class TObjectInputStream
                 throw new InvalidObjectException("null callback");
             }
 
-            java.io.ObjectInputStream.ValidationList.Callback prev = null, cur = list;
+            TObjectOutputStream.ValidationList.Callback prev = null, cur = list;
             while (cur != null && priority < cur.priority) {
                 prev = cur;
                 cur = cur.next;
             }
             AccessControlContext acc = AccessController.getContext();
             if (prev != null) {
-                prev.next = new java.io.ObjectInputStream.ValidationList.Callback(obj, priority, cur, acc);
+                prev.next = new TObjectOutputStream.ValidationList.Callback(obj, priority, cur, acc);
             } else {
-                list = new java.io.ObjectInputStream.ValidationList.Callback(obj, priority, list, acc);
+                list = new TObjectOutputStream.ValidationList.Callback(obj, priority, list, acc);
             }
         }
 
@@ -2271,7 +2219,7 @@ public class TObjectInputStream
         private int unread = 0;
 
         /** underlying stream (wrapped in peekable filter stream) */
-        private final java.io.ObjectInputStream.PeekInputStream in;
+        private final TObjectOutputStream.PeekInputStream in;
         /** loopback stream (for data reads that span data blocks) */
         private final DataInputStream din;
 
@@ -2280,7 +2228,7 @@ public class TObjectInputStream
          * Block data mode is turned off by default.
          */
         BlockDataInputStream(InputStream in) {
-            this.in = new java.io.ObjectInputStream.PeekInputStream(in);
+            this.in = new TObjectOutputStream.PeekInputStream(in);
             din = new DataInputStream(this);
         }
 
@@ -3128,7 +3076,7 @@ public class TObjectInputStream
         /** array mapping handle -> object/exception (depending on status) */
         Object[] entries;
         /** array mapping handle -> list of dependent handles (if any) */
-        java.io.ObjectInputStream.HandleTable.HandleList[] deps;
+        TObjectOutputStream.HandleTable.HandleList[] deps;
         /** lowest unresolved dependency */
         int lowDep = -1;
         /** number of handles in table */
@@ -3140,7 +3088,7 @@ public class TObjectInputStream
         HandleTable(int initialCapacity) {
             status = new byte[initialCapacity];
             entries = new Object[initialCapacity];
-            deps = new java.io.ObjectInputStream.HandleTable.HandleList[initialCapacity];
+            deps = new TObjectOutputStream.HandleTable.HandleList[initialCapacity];
         }
 
         /**
@@ -3185,7 +3133,7 @@ public class TObjectInputStream
                         case STATUS_UNKNOWN:
                             // add to dependency list of target
                             if (deps[target] == null) {
-                                deps[target] = new java.io.ObjectInputStream.HandleTable.HandleList();
+                                deps[target] = new TObjectOutputStream.HandleTable.HandleList();
                             }
                             deps[target].add(dependent);
 
@@ -3221,7 +3169,7 @@ public class TObjectInputStream
                     entries[handle] = ex;
 
                     // propagate exception to dependents
-                    java.io.ObjectInputStream.HandleTable.HandleList dlist = deps[handle];
+                    TObjectOutputStream.HandleTable.HandleList dlist = deps[handle];
                     if (dlist != null) {
                         int ndeps = dlist.size();
                         for (int i = 0; i < ndeps; i++) {
@@ -3345,7 +3293,7 @@ public class TObjectInputStream
 
             byte[] newStatus = new byte[newCapacity];
             Object[] newEntries = new Object[newCapacity];
-            java.io.ObjectInputStream.HandleTable.HandleList[] newDeps = new java.io.ObjectInputStream.HandleTable.HandleList[newCapacity];
+            TObjectOutputStream.HandleTable.HandleList[] newDeps = new TObjectOutputStream.HandleTable.HandleList[newCapacity];
 
             System.arraycopy(status, 0, newStatus, 0, size);
             System.arraycopy(entries, 0, newEntries, 0, size);
@@ -3415,21 +3363,5 @@ public class TObjectInputStream
         }
     }
 
-    private void validateDescriptor(ObjectStreamClass descriptor) {
-        ObjectStreamClassValidator validating = validator;
-        if (validating != null) {
-            validating.validateDescriptor(descriptor);
-        }
-    }
-
-    // controlled access to ObjectStreamClassValidator
-    private volatile ObjectStreamClassValidator validator;
-
-    private static void setValidator(java.io.ObjectInputStream ois, ObjectStreamClassValidator validator) {
-        ois.validator = validator;
-    }
-    static {
-        SharedSecrets.setJavaObjectInputStreamAccess(java.io.ObjectInputStream::setValidator);
-    }
 }
 

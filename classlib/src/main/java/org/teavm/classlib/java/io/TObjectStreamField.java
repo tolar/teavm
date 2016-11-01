@@ -17,9 +17,10 @@ package org.teavm.classlib.java.io;
 
 import java.io.ObjectStreamClass;
 import java.lang.reflect.Field;
-import sun.reflect.CallerSensitive;
-import sun.reflect.Reflection;
-import sun.reflect.misc.ReflectUtil;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.sun.reflect.TReflection;
+import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
 
 public class TObjectStreamField
         implements Comparable<Object>
@@ -30,7 +31,7 @@ public class TObjectStreamField
     /** canonical JVM signature of field type */
     private final String signature;
     /** field type (Object.class if unknown non-primitive type) */
-    private final Class<?> type;
+    private final TClass<?> type;
     /** whether or not to (de)serialize field values as unshared */
     private final boolean unshared;
     /** corresponding reflective field object, if any */
@@ -66,7 +67,7 @@ public class TObjectStreamField
      *          manner as writeUnshared/readUnshared
      * @since   1.4
      */
-    public TObjectStreamField(String name, Class<?> type, boolean unshared) {
+    public TObjectStreamField(String name, TClass<?> type, boolean unshared) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -142,12 +143,11 @@ public class TObjectStreamField
      * @return  a <code>Class</code> object representing the type of the
      *          serializable field
      */
-    @CallerSensitive
     public Class<?> getType() {
         if (System.getSecurityManager() != null) {
-            Class<?> caller = Reflection.getCallerClass();
-            if (ReflectUtil.needsPackageAccessCheck(caller.getClassLoader(), type.getClassLoader())) {
-                ReflectUtil.checkPackageAccess(type);
+            TClass<?> caller = TReflection.getCallerClass();
+            if (TReflectUtil.needsPackageAccessCheck(caller.getClassLoader(), type.getClassLoader())) {
+                TReflectUtil.checkPackageAccess(type);
             }
         }
         return type;

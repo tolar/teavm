@@ -21,6 +21,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TClassLoader;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.security.util.TSecurityConstants;
@@ -123,8 +124,8 @@ public final class TReflectUtil {
         }
     }
 
-    private static boolean isAncestor(ClassLoader var0, ClassLoader var1) {
-        ClassLoader var2 = var1;
+    private static boolean isAncestor(TClassLoader var0, TClassLoader var1) {
+        TClassLoader var2 = var1;
 
         do {
             var2 = var2.getParent();
@@ -136,7 +137,7 @@ public final class TReflectUtil {
         return false;
     }
 
-    public static boolean needsPackageAccessCheck(ClassLoader var0, ClassLoader var1) {
+    public static boolean needsPackageAccessCheck(TClassLoader var0, TClassLoader var1) {
         return var0 != null && var0 != var1?(var1 == null?true:!isAncestor(var0, var1)):false;
     }
 
