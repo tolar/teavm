@@ -50,6 +50,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.ref.TReference;
+import org.teavm.classlib.java.lang.ref.TReferenceQueue;
 import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.reflect.TReflectionFactory;
 import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
@@ -68,9 +71,7 @@ public class TObjectStreamClass implements Serializable {
             NO_FIELDS;
 
     /** reflection factory for obtaining serialization constructors */
-    private static final TReflectionFactory reflFactory =
-            AccessController.doPrivileged(
-                    new ReflectionFactory.GetReflectionFactoryAction());
+    private static final TReflectionFactory reflFactory = new TReflectionFactory.GetReflectionFactoryAction();
 
     private static class Caches {
         /** cache mapping local classes -> descriptors */
@@ -92,7 +93,7 @@ public class TObjectStreamClass implements Serializable {
     /** class associated with this descriptor (if any) */
     private TClass<?> cl;
     /** name of class represented by this descriptor */
-    private String name;
+    private TString name;
     /** serialVersionUID of represented class (null if not computed yet) */
     private volatile Long suid;
 
@@ -220,7 +221,7 @@ public class TObjectStreamClass implements Serializable {
      *
      * @return a string representing the name of the class
      */
-    public String getName() {
+    public TString getName() {
         return name;
     }
 
@@ -252,7 +253,7 @@ public class TObjectStreamClass implements Serializable {
      *
      * @return  the <code>Class</code> instance that this descriptor represents
      */
-    public Class<?> forClass() {
+    public TClass<?> forClass() {
         if (cl == null) {
             return null;
         }
@@ -718,7 +719,7 @@ public class TObjectStreamClass implements Serializable {
     /**
      * Writes non-proxy class descriptor information to given output stream.
      */
-    void writeNonProxy(TObjectOutputStream out) throws IOException {
+    void writeNonProxy(TObjectOutputStream out) throws TIOException {
         out.writeUTF(name);
         out.writeLong(getSerialVersionUID());
 
@@ -2312,11 +2313,11 @@ public class TObjectStreamClass implements Serializable {
      * Removes from the specified map any keys that have been enqueued
      * on the specified reference queue.
      */
-    static void processQueue(ReferenceQueue<Class<?>> queue,
+    static void processQueue(TReferenceQueue<Class<?>> queue,
             ConcurrentMap<? extends
                     WeakReference<Class<?>>, ?> map)
     {
-        Reference<? extends Class<?>> ref;
+        TReference<? extends Class<?>> ref;
         while((ref = queue.poll()) != null) {
             map.remove(ref);
         }

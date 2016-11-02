@@ -108,7 +108,7 @@ public class TObjectInputStream
      * @throws  NullPointerException if <code>in</code> is <code>null</code>
      * @see     TObjectOutputStream#ObjectInputStream()
      * @see     TObjectOutputStream#readFields()
-     * @see     ObjectOutputStream#ObjectOutputStream(OutputStream)
+     * @see     TObjectOutputStream#ObjectOutputStream(OutputStream)
      */
     public TObjectInputStream(InputStream in) throws IOException {
         verifySubclass();
@@ -502,7 +502,7 @@ public class TObjectInputStream
      *                <code>InputStream</code>
      * @throws        ClassNotFoundException if the proxy class or any of the
      *                named interfaces could not be found
-     * @see ObjectOutputStream#annotateProxyClass(Class)
+     * @see TObjectOutputStream#annotateProxyClass(Class)
      * @since 1.3
      */
     protected Class<?> resolveProxyClass(String[] interfaces)

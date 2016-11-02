@@ -87,7 +87,7 @@ public final class TReflectUtil {
         }
     }
 
-    public static void checkPackageAccess(Class<?> var0) {
+    public static void checkPackageAccess(TClass<?> var0) {
         checkPackageAccess(var0.getName());
         if(isNonPublicProxyClass(var0)) {
             checkProxyPackageAccess(var0);

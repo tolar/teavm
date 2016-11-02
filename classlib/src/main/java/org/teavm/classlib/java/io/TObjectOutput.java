@@ -17,6 +17,8 @@ package org.teavm.classlib.java.io;
 
 import java.io.IOException;
 
+import org.teavm.classlib.java.lang.TObject;
+
 public interface TObjectOutput extends TDataOutput, AutoCloseable {
     /**
      * Write an object to the underlying storage or stream.  The
@@ -26,7 +28,7 @@ public interface TObjectOutput extends TDataOutput, AutoCloseable {
      * @param obj the object to be written
      * @exception IOException Any of the usual Input/Output related exceptions.
      */
-    public void writeObject(Object obj)
+    public void writeObject(TObject obj)
             throws IOException;
 
     /**

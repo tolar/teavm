@@ -15,6 +15,8 @@
  */
 package org.teavm.classlib.java.io;
 
+import org.teavm.classlib.java.lang.TString;
+
 public class TNotActiveException extends TObjectStreamException {
 
     private static final long serialVersionUID = -3893467273049808895L;
@@ -24,7 +26,7 @@ public class TNotActiveException extends TObjectStreamException {
      *
      * @param reason  a String describing the reason for the exception.
      */
-    public TNotActiveException(String reason) {
+    public TNotActiveException(TString reason) {
         super(reason);
     }
 

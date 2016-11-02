@@ -17,8 +17,11 @@ package org.teavm.classlib.java.io;
 
 import java.io.NotActiveException;
 
+import org.teavm.classlib.java.lang.TObject;
+import org.teavm.classlib.java.lang.TString;
+
 final class TSerialCallbackContext {
-    private final Object obj;
+    private final TObject obj;
     private final TObjectStreamClass desc;
     /**
      * Thread this context is in use by.
@@ -26,13 +29,13 @@ final class TSerialCallbackContext {
      */
     private Thread thread;
 
-    public TSerialCallbackContext(Object obj, TObjectStreamClass desc) {
+    public TSerialCallbackContext(TObject obj, TObjectStreamClass desc) {
         this.obj = obj;
         this.desc = desc;
         this.thread = Thread.currentThread();
     }
 
-    public Object getObj() throws NotActiveException {
+    public TObject getObj() throws TNotActiveException {
         checkAndSetUsed();
         return obj;
     }
@@ -48,10 +51,10 @@ final class TSerialCallbackContext {
         }
     }
 
-    private void checkAndSetUsed() throws NotActiveException {
+    private void checkAndSetUsed() throws TNotActiveException {
         if (thread != Thread.currentThread()) {
-            throw new NotActiveException(
-                    "not in readObject invocation or fields already read");
+            throw new TNotActiveException(TString.wrap(
+                    "not in readObject invocation or fields already read"));
         }
         thread = null;
     }
