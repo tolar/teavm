@@ -19,15 +19,15 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.teavm.classlib.java.lang.TObject;
+import org.teavm.classlib.java.util.TLinkedHashMap;
+import org.teavm.classlib.java.util.TMap;
 
 class TMemoryCache<K, V> extends TCache<K, V> {
     private static final float LOAD_FACTOR = 0.75F;
     private static final boolean DEBUG = false;
-    private final Map<K, TMemoryCache.CacheEntry<K, V>> cacheMap;
+    private final TMap<K, CacheEntry<K, V>> cacheMap;
     private int maxSize;
     private long lifetime;
     private final ReferenceQueue<V> queue;
@@ -46,7 +46,7 @@ class TMemoryCache<K, V> extends TCache<K, V> {
         }
 
         int var4 = (int)((float)var2 / 0.75F) + 1;
-        this.cacheMap = new LinkedHashMap(var4, 0.75F, true);
+        this.cacheMap = new TLinkedHashMap(var4, 0.75F, true);
     }
 
     private void emptyQueue() {
@@ -144,7 +144,7 @@ class TMemoryCache<K, V> extends TCache<K, V> {
                 this.cacheMap.remove(var1);
                 return null;
             } else {
-                return var2.getValue();
+                return  var2.getValue();
             }
         }
     }

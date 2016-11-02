@@ -29,7 +29,6 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -58,6 +57,8 @@ import org.teavm.classlib.java.security.TSignature;
 import org.teavm.classlib.java.security.TSignatureException;
 import org.teavm.classlib.java.security.cert.TCertificate;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TCertificateExpiredException;
+import org.teavm.classlib.java.security.cert.TCertificateNotYetValidException;
 import org.teavm.classlib.java.security.cert.TCertificateParsingException;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TDate;
@@ -169,7 +170,7 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
                         break;
                     }
 
-                    var5.write(Base64.getMimeDecoder().decode(var3));
+                    var5.write(org.teavm.classlib.impl.Base64.decode(var3.toString()));
                 }
 
                 return var2;
@@ -326,17 +327,17 @@ public class TX509CertImpl extends TX509Certificate implements TDerEncoder {
         this.checkValidity(var1);
     }
 
-    public void checkValidity(TDate var1) throws CertificateExpiredException, CertificateNotYetValidException {
+    public void checkValidity(TDate var1) throws TCertificateExpiredException, TCertificateNotYetValidException {
         TCertificateValidity var2 = null;
 
         try {
             var2 = (TCertificateValidity)this.info.get(TString.wrap("validity"));
         } catch (Exception var4) {
-            throw new CertificateNotYetValidException("Incorrect validity period");
+            throw new TCertificateNotYetValidException(TString.wrap("Incorrect validity period"));
         }
 
         if(var2 == null) {
-            throw new CertificateNotYetValidException("Null validity period");
+            throw new TCertificateNotYetValidException(TString.wrap("Null validity period"));
         } else {
             var2.valid(var1);
         }

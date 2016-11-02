@@ -19,7 +19,6 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TClassLoader;
 import org.teavm.classlib.java.lang.TObject;
@@ -155,7 +154,7 @@ public final class TReflectUtil {
 
     }
 
-    public static void checkProxyPackageAccess(ClassLoader var0, Class... var1) {
+    public static void checkProxyPackageAccess(TClassLoader var0, Class... var1) {
         SecurityManager var2 = System.getSecurityManager();
         if(var2 != null) {
             Class[] var3 = var1;
@@ -163,7 +162,7 @@ public final class TReflectUtil {
 
             for(int var5 = 0; var5 < var4; ++var5) {
                 Class var6 = var3[var5];
-                ClassLoader var7 = var6.getClassLoader();
+                TClassLoader var7 = var6.getClassLoader();
                 if(needsPackageAccessCheck(var0, var7)) {
                     checkPackageAccess(var6);
                 }

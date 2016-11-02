@@ -18,14 +18,10 @@ package org.teavm.classlib.sun.security.pkcs;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.security.Timestamp;
-import java.security.cert.CertPath;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
@@ -35,6 +31,9 @@ import org.teavm.classlib.java.security.TMessageDigest;
 import org.teavm.classlib.java.security.TPrincipal;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.TSignature;
+import org.teavm.classlib.java.security.TTimestamp;
+import org.teavm.classlib.java.security.cert.TCertPath;
+import org.teavm.classlib.java.security.cert.TCertificateFactory;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.sun.misc.THexDumpEncoder;
 import org.teavm.classlib.sun.security.timestamp.TTimestampToken;
@@ -56,7 +55,7 @@ public class TSignerInfo implements TDerEncoder {
     TAlgorithmId digestAlgorithmId;
     TAlgorithmId digestEncryptionAlgorithmId;
     byte[] encryptedDigest;
-    Timestamp timestamp;
+    TTimestamp timestamp;
     private boolean hasTimestamp;
     TPKCS9Attributes authenticatedAttributes;
     TPKCS9Attributes unauthenticatedAttributes;
@@ -308,7 +307,7 @@ public class TSignerInfo implements TDerEncoder {
         return this.unauthenticatedAttributes;
     }
 
-    public Timestamp getTimestamp() throws IOException, NoSuchAlgorithmException, SignatureException,
+    public TTimestamp getTimestamp() throws IOException, NoSuchAlgorithmException, SignatureException,
             CertificateException {
         if(this.timestamp == null && this.hasTimestamp) {
             if(this.unauthenticatedAttributes == null) {
@@ -324,11 +323,11 @@ public class TSignerInfo implements TDerEncoder {
                     byte[] var3 = var2.getContentInfo().getData();
                     TSignerInfo[] var4 = var2.verify(var3);
                     ArrayList var5 = var4[0].getCertificateChain(var2);
-                    CertificateFactory var6 = CertificateFactory.getInstance("X.509");
-                    CertPath var7 = var6.generateCertPath(var5);
+                    TCertificateFactory var6 = TCertificateFactory.getInstance("X.509");
+                    TCertPath var7 = var6.generateCertPath(var5);
                     TTimestampToken var8 = new TTimestampToken(var3);
                     this.verifyTimestamp(var8);
-                    this.timestamp = new Timestamp(var8.getDate(), var7);
+                    this.timestamp = new TTimestamp(var8.getDate(), var7);
                     return this.timestamp;
                 }
             }

@@ -24,7 +24,6 @@ import java.security.cert.CRLException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
-import java.security.cert.PKIXCertPathChecker;
 import java.security.cert.PKIXReason;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509CRL;
@@ -50,7 +49,7 @@ import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 /**
  * Created by vasek on 22. 10. 2016.
  */
-public final class TAlgorithmChecker extends PKIXCertPathChecker {
+public final class TAlgorithmChecker extends TPKIXCertPathChecker {
     private final TAlgorithmConstraints constraints;
     private final TPublicKey trustedPubKey;
     private TPublicKey prevPubKey;
@@ -58,7 +57,7 @@ public final class TAlgorithmChecker extends PKIXCertPathChecker {
     private static final Set<CryptoPrimitive> KU_PRIMITIVE_SET;
     private static final TDisabledAlgorithmConstraints certPathDefaultConstraints;
 
-    public TAlgorithmChecker(TrustAnchor var1) {
+    public TAlgorithmChecker(TTrustAnchor var1) {
         this(var1, certPathDefaultConstraints);
     }
 

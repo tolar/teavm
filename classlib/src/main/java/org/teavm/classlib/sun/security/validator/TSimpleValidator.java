@@ -18,7 +18,6 @@ package org.teavm.classlib.sun.security.validator;
 import java.io.IOException;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
-import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,12 +31,15 @@ import org.teavm.classlib.java.security.TAlgorithmConstraints;
 import org.teavm.classlib.java.security.TGeneralSecurityException;
 import org.teavm.classlib.java.security.TPublicKey;
 import org.teavm.classlib.java.security.cert.TCertificateException;
+import org.teavm.classlib.java.security.cert.TTrustAnchor;
 import org.teavm.classlib.java.security.cert.TX509Certificate;
 import org.teavm.classlib.java.util.TCollection;
 import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TIterator;
 import org.teavm.classlib.java.util.TList;
 import org.teavm.classlib.javax.auth.x500.TX500Principal;
+import org.teavm.classlib.sun.security.provider.certpath.TAlgorithmChecker;
+import org.teavm.classlib.sun.security.provider.certpath.TUntrustedChecker;
 import org.teavm.classlib.sun.security.util.TObjectIdentifier;
 import org.teavm.classlib.sun.security.x509.TX509CertImpl;
 
@@ -88,7 +90,7 @@ public final class TSimpleValidator extends TValidator {
                 var5 = new TDate();
             }
 
-            UntrustedChecker var6 = new UntrustedChecker();
+            TUntrustedChecker var6 = new TUntrustedChecker();
             TX509Certificate var7 = var1[var1.length - 1];
 
             try {
@@ -97,11 +99,11 @@ public final class TSimpleValidator extends TValidator {
                 throw new TValidatorException(TString.wrap("Untrusted certificate: " + var7.getSubjectX500Principal()), ValidatorException.T_UNTRUSTED_CERT, var7, var18);
             }
 
-            TrustAnchor var8 = new TrustAnchor(var7, (byte[])null);
-            AlgorithmChecker var9 = new AlgorithmChecker(var8);
-            AlgorithmChecker var10 = null;
+            TTrustAnchor var8 = new TTrustAnchor(var7, (byte[])null);
+            TAlgorithmChecker var9 = new TAlgorithmChecker(var8);
+            TAlgorithmChecker var10 = null;
             if(var3 != null) {
-                var10 = new AlgorithmChecker(var8, var3);
+                var10 = new TAlgorithmChecker(var8, var3);
             }
 
             int var11 = var1.length - 1;

@@ -100,7 +100,7 @@ public class TX509Key implements TPublicKey {
         TX509EncodedKeySpec var3 = new TX509EncodedKeySpec(var2.toByteArray());
 
         try {
-            TKeyFactory var18 = TKeyFactory.getInstance(TString.wrap(var0.getName()));
+            TKeyFactory var18 = TKeyFactory.getInstance(var0.getName());
             return var18.generatePublic(var3);
         } catch (NoSuchAlgorithmException var15) {
             String var4 = "";
@@ -154,7 +154,7 @@ public class TX509Key implements TPublicKey {
         }
     }
 
-    public String getAlgorithm() {
+    public TString getAlgorithm() {
         return this.algid.getName();
     }
 

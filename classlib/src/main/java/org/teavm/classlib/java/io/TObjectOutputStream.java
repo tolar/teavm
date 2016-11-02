@@ -16,7 +16,9 @@
 package org.teavm.classlib.java.io;
 
 import static org.teavm.classlib.java.io.TObjectStreamClass.processQueue;
-
+import java.io.IOException;
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TEnum;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReferenceQueue;
@@ -323,7 +325,7 @@ public class TObjectOutputStream
         bout.writeDouble(val);
     }
 
-    public void writeBytes(String str) throws TIOException {
+    public void writeBytes(TString str) throws TIOException {
         bout.writeBytes(str);
     }
 
@@ -564,8 +566,8 @@ public class TObjectOutputStream
             } else if (!unshared && (h = handles.lookup(obj)) != -1) {
                 writeHandle(h);
                 return;
-            } else if (obj instanceof Class) {
-                writeClass((Class) obj, unshared);
+            } else if (obj instanceof TClass) {
+                writeClass((TClass) obj, unshared);
                 return;
             } else if (obj instanceof TObjectStreamClass) {
                 writeClassDesc((TObjectStreamClass) obj, unshared);
@@ -609,27 +611,27 @@ public class TObjectOutputStream
                 } else if (obj instanceof Class) {
                     writeClass((Class) obj, unshared);
                     return;
-                } else if (obj instanceof ObjectStreamClass) {
-                    writeClassDesc((ObjectStreamClass) obj, unshared);
+                } else if (obj instanceof TObjectStreamClass) {
+                    writeClassDesc((TObjectStreamClass) obj, unshared);
                     return;
                 }
             }
 
             // remaining cases
-            if (obj instanceof String) {
-                writeString((String) obj, unshared);
+            if (obj instanceof TString) {
+                writeString((TString) obj, unshared);
             } else if (cl.isArray()) {
                 writeArray(obj, desc, unshared);
-            } else if (obj instanceof Enum) {
-                writeEnum((Enum<?>) obj, desc, unshared);
-            } else if (obj instanceof Serializable) {
+            } else if (obj instanceof TEnum) {
+                writeEnum((TEnum<?>) obj, desc, unshared);
+            } else if (obj instanceof TSerializable) {
                 writeOrdinaryObject(obj, desc, unshared);
             } else {
                 if (extendedDebugInfo) {
-                    throw new NotSerializableException(
+                    throw new TNotSerializableException(
                             cl.getName() + "\n" + debugInfoStack.toString());
                 } else {
-                    throw new NotSerializableException(cl.getName());
+                    throw new TNotSerializableException(cl.getName());
                 }
             }
         } finally {
@@ -656,17 +658,17 @@ public class TObjectOutputStream
     /**
      * Writes representation of given class to stream.
      */
-    private void writeClass(Class<?> cl, boolean unshared) throws IOException {
+    private void writeClass(TClass<?> cl, boolean unshared) throws TIOException {
         bout.writeByte(TC_CLASS);
-        writeClassDesc(ObjectStreamClass.lookup(cl, true), false);
+        writeClassDesc(TObjectStreamClass.lookup(cl, true), false);
         handles.assign(unshared ? null : cl);
     }
 
     /**
      * Writes representation of given class descriptor to stream.
      */
-    private void writeClassDesc(ObjectStreamClass desc, boolean unshared)
-            throws IOException
+    private void writeClassDesc(TObjectStreamClass desc, boolean unshared)
+            throws TIOException
     {
         int handle;
         if (desc == null) {
@@ -689,8 +691,8 @@ public class TObjectOutputStream
     /**
      * Writes class descriptor representing a dynamic proxy class to stream.
      */
-    private void writeProxyDesc(ObjectStreamClass desc, boolean unshared)
-            throws IOException
+    private void writeProxyDesc(TObjectStreamClass desc, boolean unshared)
+            throws TIOException
     {
         bout.writeByte(TC_PROXYCLASSDESC);
         handles.assign(unshared ? null : desc);
@@ -964,10 +966,10 @@ public class TObjectOutputStream
      * stream.  The given class descriptor specifies which field values to
      * write, and in which order they should be written.
      */
-    private void defaultWriteFields(Object obj, ObjectStreamClass desc)
-            throws IOException
+    private void defaultWriteFields(TObject obj, TObjectStreamClass desc)
+            throws TIOException
     {
-        Class<?> cl = desc.forClass();
+        TClass<?> cl = desc.forClass();
         if (cl != null && obj != null && !cl.isInstance(obj)) {
             throw new ClassCastException();
         }
@@ -981,7 +983,7 @@ public class TObjectOutputStream
         desc.getPrimFieldValues(obj, primVals);
         bout.write(primVals, 0, primDataSize, false);
 
-        ObjectStreamField[] fields = desc.getFields(false);
+        TObjectStreamField[] fields = desc.getFields(false);
         Object[] objVals = new Object[desc.getNumObjFields()];
         int numPrimFields = fields.length - objVals.length;
         desc.getObjFieldValues(obj, objVals);
@@ -1843,7 +1845,7 @@ public class TObjectOutputStream
          * Looks up and returns replacement for given object.  If no
          * replacement is found, returns the lookup object itself.
          */
-        Object lookup(Object obj) {
+        TObject lookup(TObject obj) {
             int index = htab.lookup(obj);
             return (index >= 0) ? reps[index] : obj;
         }

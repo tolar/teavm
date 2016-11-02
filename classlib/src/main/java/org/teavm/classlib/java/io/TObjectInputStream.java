@@ -15,6 +15,7 @@
  */
 package org.teavm.classlib.java.io;
 
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReferenceQueue;
 import org.teavm.classlib.java.util.THashMap;
 import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
@@ -86,31 +87,9 @@ public class TObjectInputStream
      * object currently being deserialized and descriptor for current class.
      * Null when not during readObject upcall.
      */
-    private SerialCallbackContext curContext;
+    private TSerialCallbackContext curContext;
 
-    /**
-     * Creates an ObjectInputStream that reads from the specified InputStream.
-     * A serialization stream header is read from the stream and verified.
-     * This constructor will block until the corresponding ObjectOutputStream
-     * has written and flushed the header.
-     *
-     * <p>If a security manager is installed, this constructor will check for
-     * the "enableSubclassImplementation" SerializablePermission when invoked
-     * directly or indirectly by the constructor of a subclass which overrides
-     * the ObjectInputStream.readFields or ObjectInputStream.readUnshared
-     * methods.
-     *
-     * @param   in input stream to read from
-     * @throws StreamCorruptedException if the stream header is incorrect
-     * @throws IOException if an I/O error occurs while reading stream header
-     * @throws  SecurityException if untrusted subclass illegally overrides
-     *          security-sensitive methods
-     * @throws  NullPointerException if <code>in</code> is <code>null</code>
-     * @see     TObjectOutputStream#ObjectInputStream()
-     * @see     TObjectOutputStream#readFields()
-     * @see     TObjectOutputStream#ObjectOutputStream(OutputStream)
-     */
-    public TObjectInputStream(InputStream in) throws IOException {
+    public TObjectInputStream(TInputStream in) throws TIOException {
         verifySubclass();
         bin = new TObjectOutputStream.BlockDataInputStream(in);
         handles = new TObjectOutputStream.HandleTable(10);
@@ -120,24 +99,7 @@ public class TObjectInputStream
         bin.setBlockDataMode(true);
     }
 
-    /**
-     * Provide a way for subclasses that are completely reimplementing
-     * ObjectInputStream to not have to allocate private data just used by this
-     * implementation of ObjectInputStream.
-     *
-     * <p>If there is a security manager installed, this method first calls the
-     * security manager's <code>checkPermission</code> method with the
-     * <code>SerializablePermission("enableSubclassImplementation")</code>
-     * permission to ensure it's ok to enable subclassing.
-     *
-     * @throws  SecurityException if a security manager exists and its
-     *          <code>checkPermission</code> method denies enabling
-     *          subclassing.
-     * @throws  IOException if an I/O error occurs while creating this stream
-     * @see SecurityManager#checkPermission
-     * @see java.io.SerializablePermission
-     */
-    protected TObjectInputStream() throws IOException, SecurityException {
+    protected TObjectInputStream() throws TIOException, SecurityException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);
@@ -148,38 +110,8 @@ public class TObjectInputStream
         enableOverride = true;
     }
 
-    /**
-     * Read an object from the ObjectInputStream.  The class of the object, the
-     * signature of the class, and the values of the non-transient and
-     * non-static fields of the class and all of its supertypes are read.
-     * Default deserializing for a class can be overriden using the writeObject
-     * and readObject methods.  Objects referenced by this object are read
-     * transitively so that a complete equivalent graph of objects is
-     * reconstructed by readObject.
-     *
-     * <p>The root object is completely restored when all of its fields and the
-     * objects it references are completely restored.  At this point the object
-     * validation callbacks are executed in order based on their registered
-     * priorities. The callbacks are registered by objects (in the readObject
-     * special methods) as they are individually restored.
-     *
-     * <p>Exceptions are thrown for problems with the InputStream and for
-     * classes that should not be deserialized.  All exceptions are fatal to
-     * the InputStream and leave it in an indeterminate state; it is up to the
-     * caller to ignore or recover the stream state.
-     *
-     * @throws  ClassNotFoundException Class of a serialized object cannot be
-     *          found.
-     * @throws InvalidClassException Something is wrong with a class used by
-     *          serialization.
-     * @throws  StreamCorruptedException Control information in the
-     *          stream is inconsistent.
-     * @throws OptionalDataException Primitive data was found in the
-     *          stream instead of objects.
-     * @throws  IOException Any of the usual Input/Output related exceptions.
-     */
     public final Object readObject()
-            throws IOException, ClassNotFoundException
+            throws TIOException, ClassNotFoundException
     {
         if (enableOverride) {
             return readObjectOverride();
@@ -206,75 +138,13 @@ public class TObjectInputStream
         }
     }
 
-    /**
-     * This method is called by trusted subclasses of ObjectOutputStream that
-     * constructed ObjectOutputStream using the protected no-arg constructor.
-     * The subclass is expected to provide an override method with the modifier
-     * "final".
-     *
-     * @return  the Object read from the stream.
-     * @throws  ClassNotFoundException Class definition of a serialized object
-     *          cannot be found.
-     * @throws  OptionalDataException Primitive data was found in the stream
-     *          instead of objects.
-     * @throws  IOException if I/O errors occurred while reading from the
-     *          underlying stream
-     * @see #TObjectOutputStream()
-     * @see #readObject()
-     * @since 1.2
-     */
     protected Object readObjectOverride()
-            throws IOException, ClassNotFoundException
+            throws TIOException, ClassNotFoundException
     {
         return null;
     }
 
-    /**
-     * Reads an "unshared" object from the ObjectInputStream.  This method is
-     * identical to readObject, except that it prevents subsequent calls to
-     * readObject and readUnshared from returning additional references to the
-     * deserialized instance obtained via this call.  Specifically:
-     * <ul>
-     *   <li>If readUnshared is called to deserialize a back-reference (the
-     *       stream representation of an object which has been written
-     *       previously to the stream), an ObjectStreamException will be
-     *       thrown.
-     *
-     *   <li>If readUnshared returns successfully, then any subsequent attempts
-     *       to deserialize back-references to the stream handle deserialized
-     *       by readUnshared will cause an ObjectStreamException to be thrown.
-     * </ul>
-     * Deserializing an object via readUnshared invalidates the stream handle
-     * associated with the returned object.  Note that this in itself does not
-     * always guarantee that the reference returned by readUnshared is unique;
-     * the deserialized object may define a readResolve method which returns an
-     * object visible to other parties, or readUnshared may return a Class
-     * object or enum constant obtainable elsewhere in the stream or through
-     * external means. If the deserialized object defines a readResolve method
-     * and the invocation of that method returns an array, then readUnshared
-     * returns a shallow clone of that array; this guarantees that the returned
-     * array object is unique and cannot be obtained a second time from an
-     * invocation of readObject or readUnshared on the ObjectInputStream,
-     * even if the underlying data stream has been manipulated.
-     *
-     * <p>ObjectInputStream subclasses which override this method can only be
-     * constructed in security contexts possessing the
-     * "enableSubclassImplementation" SerializablePermission; any attempt to
-     * instantiate such a subclass without this permission will cause a
-     * SecurityException to be thrown.
-     *
-     * @return  reference to deserialized object
-     * @throws  ClassNotFoundException if class of an object to deserialize
-     *          cannot be found
-     * @throws  StreamCorruptedException if control information in the stream
-     *          is inconsistent
-     * @throws ObjectStreamException if object to deserialize has already
-     *          appeared in stream
-     * @throws  OptionalDataException if primitive data is next in stream
-     * @throws  IOException if an I/O error occurs during deserialization
-     * @since   1.4
-     */
-    public Object readUnshared() throws IOException, ClassNotFoundException {
+    public Object readUnshared() throws TIOException, ClassNotFoundException {
         // if nested read, passHandle contains handle of enclosing object
         int outerHandle = passHandle;
         try {
@@ -296,27 +166,15 @@ public class TObjectInputStream
         }
     }
 
-    /**
-     * Read the non-static and non-transient fields of the current class from
-     * this stream.  This may only be called from the readObject method of the
-     * class being deserialized. It will throw the NotActiveException if it is
-     * called otherwise.
-     *
-     * @throws  ClassNotFoundException if the class of a serialized object
-     *          could not be found.
-     * @throws  IOException if an I/O error occurs.
-     * @throws NotActiveException if the stream is not currently reading
-     *          objects.
-     */
     public void defaultReadObject()
-            throws IOException, ClassNotFoundException
+            throws TIOException, ClassNotFoundException
     {
-        SerialCallbackContext ctx = curContext;
+        TSerialCallbackContext ctx = curContext;
         if (ctx == null) {
-            throw new NotActiveException("not in call to readObject");
+            throw new TNotActiveException(TString.wrap("not in call to readObject"));
         }
         Object curObj = ctx.getObj();
-        ObjectStreamClass curDesc = ctx.getDesc();
+        TObjectStreamClass curDesc = ctx.getDesc();
         bin.setBlockDataMode(false);
         defaultReadFields(curObj, curDesc);
         bin.setBlockDataMode(true);

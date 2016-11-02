@@ -463,22 +463,22 @@ public class TPKIXParameters implements TCertPathParameters {
     /**
      * Sets a {@code List} of additional certification path checkers. If
      * the specified {@code List} contains an object that is not a
-     * {@code PKIXCertPathChecker}, it is ignored.
+     * {@code TPKIXCertPathChecker}, it is ignored.
      * <p>
-     * Each {@code PKIXCertPathChecker} specified implements
+     * Each {@code TPKIXCertPathChecker} specified implements
      * additional checks on a certificate. Typically, these are checks to
      * process and verify private extensions contained in certificates.
-     * Each {@code PKIXCertPathChecker} should be instantiated with any
+     * Each {@code TPKIXCertPathChecker} should be instantiated with any
      * initialization parameters needed to execute the check.
      * <p>
      * This method allows sophisticated applications to extend a PKIX
      * {@code CertPathValidator} or {@code CertPathBuilder}.
-     * Each of the specified {@code PKIXCertPathChecker}s will be called,
+     * Each of the specified {@code TPKIXCertPathChecker}s will be called,
      * in turn, by a PKIX {@code CertPathValidator} or
      * {@code CertPathBuilder} for each certificate processed or
      * validated.
      * <p>
-     * Regardless of whether these additional {@code PKIXCertPathChecker}s
+     * Regardless of whether these additional {@code TPKIXCertPathChecker}s
      * are set, a PKIX {@code CertPathValidator} or
      * {@code CertPathBuilder} must perform all of the required PKIX
      * checks on each certificate. The one exception to this rule is if the
@@ -486,14 +486,14 @@ public class TPKIXParameters implements TCertPathParameters {
      * #setRevocationEnabled setRevocationEnabled} method).
      * <p>
      * Note that the {@code List} supplied here is copied and each
-     * {@code PKIXCertPathChecker} in the list is cloned to protect
+     * {@code TPKIXCertPathChecker} in the list is cloned to protect
      * against subsequent modifications.
      *
-     * @param checkers a {@code List} of {@code PKIXCertPathChecker}s.
+     * @param checkers a {@code List} of {@code TPKIXCertPathChecker}s.
      * May be {@code null}, in which case no additional checkers will be
      * used.
      * @throws ClassCastException if any of the elements in the list
-     * are not of type {@code java.security.cert.PKIXCertPathChecker}
+     * are not of type {@code java.security.cert.TPKIXCertPathChecker}
      * @see #getCertPathCheckers
      */
     public void setCertPathCheckers(List<PKIXCertPathChecker> checkers) {
@@ -512,11 +512,11 @@ public class TPKIXParameters implements TCertPathParameters {
     /**
      * Returns the {@code List} of certification path checkers.
      * The returned {@code List} is immutable, and each
-     * {@code PKIXCertPathChecker} in the {@code List} is cloned
+     * {@code TPKIXCertPathChecker} in the {@code List} is cloned
      * to protect against subsequent modifications.
      *
      * @return an immutable {@code List} of
-     * {@code PKIXCertPathChecker}s (may be empty, but not
+     * {@code TPKIXCertPathChecker}s (may be empty, but not
      * {@code null})
      * @see #setCertPathCheckers
      */
@@ -529,14 +529,14 @@ public class TPKIXParameters implements TCertPathParameters {
     }
 
     /**
-     * Adds a {@code PKIXCertPathChecker} to the list of certification
+     * Adds a {@code TPKIXCertPathChecker} to the list of certification
      * path checkers. See the {@link #setCertPathCheckers setCertPathCheckers}
      * method for more details.
      * <p>
-     * Note that the {@code PKIXCertPathChecker} is cloned to protect
+     * Note that the {@code TPKIXCertPathChecker} is cloned to protect
      * against subsequent modifications.
      *
-     * @param checker a {@code PKIXCertPathChecker} to add to the list of
+     * @param checker a {@code TPKIXCertPathChecker} to add to the list of
      * checks. If {@code null}, the checker is ignored (not added to list).
      */
     public void addCertPathChecker(PKIXCertPathChecker checker) {

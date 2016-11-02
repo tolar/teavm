@@ -186,7 +186,7 @@ public class TAlgorithmId implements TSerializable, TDerEncoder {
                 try {
                     TAlgorithmId var2 = parse(new TDerValue(this.getEncodedParams()));
                     TString var3 = var2.getName();
-                    var1 = makeSigAlg(var3, "EC");
+                    var1 = makeSigAlg(var3, TString.wrap("EC"));
                 } catch (TIOException var4) {
                     ;
                 }
@@ -423,38 +423,38 @@ public class TAlgorithmId implements TSerializable, TDerEncoder {
         return TObjectIdentifier.newInternal(var0);
     }
 
-    public static TString makeSigAlg(TString var0, String var1) {
+    public static TString makeSigAlg(TString var0, TString var1) {
         var0 = var0.replace(TString.wrap("-"), TString.wrap(""));
-        if(var1.equalsIgnoreCase("EC")) {
-            var1 = "ECDSA";
+        if(var1.equalsIgnoreCase(TString.wrap("EC"))) {
+            var1 = TString.wrap("ECDSA");
         }
 
         return TString.wrap( var0 + "with" + var1);
     }
 
-    public static String getEncAlgFromSigAlg(String var0) {
+    public static TString getEncAlgFromSigAlg(TString var0) {
         var0 = var0.toUpperCase(Locale.ENGLISH);
-        int var1 = var0.indexOf("WITH");
-        String var2 = null;
+        int var1 = var0.indexOf(TString.wrap("WITH"));
+        TString var2 = null;
         if(var1 > 0) {
-            int var3 = var0.indexOf("AND", var1 + 4);
+            int var3 = var0.indexOf(TString.wrap("AND"), var1 + 4);
             if(var3 > 0) {
                 var2 = var0.substring(var1 + 4, var3);
             } else {
                 var2 = var0.substring(var1 + 4);
             }
 
-            if(var2.equalsIgnoreCase("ECDSA")) {
-                var2 = "EC";
+            if(var2.equalsIgnoreCase(TString.wrap("ECDSA"))) {
+                var2 = TString.wrap("EC");
             }
         }
 
         return var2;
     }
 
-    public static String getDigAlgFromSigAlg(String var0) {
+    public static TString getDigAlgFromSigAlg(TString var0) {
         var0 = var0.toUpperCase(Locale.ENGLISH);
-        int var1 = var0.indexOf("WITH");
+        int var1 = var0.indexOf(TString.wrap("WITH"));
         return var1 > 0?var0.substring(0, var1):null;
     }
 

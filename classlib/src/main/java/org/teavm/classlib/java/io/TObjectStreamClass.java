@@ -46,13 +46,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReference;
 import org.teavm.classlib.java.lang.ref.TReferenceQueue;
+import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
+import org.teavm.classlib.java.util.concurrent.TConcurrentMap;
 import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.reflect.TReflectionFactory;
 import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
@@ -60,7 +60,7 @@ import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
 /**
  * Created by vasek on 29. 10. 2016.
  */
-public class TObjectStreamClass implements Serializable {
+public class TObjectStreamClass extends TObject implements TSerializable {
 
     /** serialPersistentFields value indicating no serializable fields */
     public static final TObjectStreamField[] NO_FIELDS =
@@ -71,23 +71,23 @@ public class TObjectStreamClass implements Serializable {
             NO_FIELDS;
 
     /** reflection factory for obtaining serialization constructors */
-    private static final TReflectionFactory reflFactory = new TReflectionFactory.GetReflectionFactoryAction();
+    private static final TReflectionFactory reflFactory = new TReflectionFactory.GetReflectionFactoryAction().run();
 
     private static class Caches {
         /** cache mapping local classes -> descriptors */
-        static final ConcurrentMap<TObjectStreamClass.WeakClassKey,Reference<?>> localDescs =
-                new ConcurrentHashMap<>();
+        static final TConcurrentMap<TObjectStreamClass.WeakClassKey,Reference<?>> localDescs =
+                new TConcurrentHashMap<>();
 
         /** cache mapping field group/local desc pairs -> field reflectors */
-        static final ConcurrentMap<TObjectStreamClass.FieldReflectorKey,Reference<?>> reflectors =
-                new ConcurrentHashMap<>();
+        static final TConcurrentMap<TObjectStreamClass.FieldReflectorKey,Reference<?>> reflectors =
+                new TConcurrentHashMap<>();
 
         /** queue for WeakReferences to local classes */
-        private static final ReferenceQueue<Class<?>> localDescsQueue =
-                new ReferenceQueue<>();
+        private static final TReferenceQueue<Class<?>> localDescsQueue =
+                new TReferenceQueue<>();
         /** queue for WeakReferences to field reflectors keys */
-        private static final ReferenceQueue<Class<?>> reflectorsQueue =
-                new ReferenceQueue<>();
+        private static final TReferenceQueue<Class<?>> reflectorsQueue =
+                new TReferenceQueue<>();
     }
 
     /** class associated with this descriptor (if any) */
@@ -306,8 +306,8 @@ public class TObjectStreamClass implements Serializable {
      * @param   all if true, return descriptors for all classes; if false, only
      *          return descriptors for serializable classes
      */
-    static TObjectStreamClass lookup(Class<?> cl, boolean all) {
-        if (!(all || Serializable.class.isAssignableFrom(cl))) {
+    static TObjectStreamClass lookup(TClass<?> cl, boolean all) {
+        if (!(all || TSerializable.class.isAssignableFrom(cl))) {
             return null;
         }
         processQueue(TObjectStreamClass.Caches.localDescsQueue, TObjectStreamClass.Caches.localDescs);
@@ -445,7 +445,7 @@ public class TObjectStreamClass implements Serializable {
     /**
      * Creates local class descriptor representing given class.
      */
-    private TObjectStreamClass(final Class<?> cl) {
+    private TObjectStreamClass(final TClass<?> cl) {
         this.cl = cl;
         name = cl.getName();
         isProxy = Proxy.isProxyClass(cl);
@@ -2314,8 +2314,8 @@ public class TObjectStreamClass implements Serializable {
      * on the specified reference queue.
      */
     static void processQueue(TReferenceQueue<Class<?>> queue,
-            ConcurrentMap<? extends
-                    WeakReference<Class<?>>, ?> map)
+            TConcurrentMap<? extends
+                                WeakReference<Class<?>>, ?> map)
     {
         TReference<? extends Class<?>> ref;
         while((ref = queue.poll()) != null) {
@@ -2338,7 +2338,7 @@ public class TObjectStreamClass implements Serializable {
          * Create a new WeakClassKey to the given object, registered
          * with a queue.
          */
-        WeakClassKey(Class<?> cl, ReferenceQueue<Class<?>> refQueue) {
+        WeakClassKey(Class<?> cl, TReferenceQueue<Class<?>> refQueue) {
             super(cl, refQueue);
             hash = System.identityHashCode(cl);
         }

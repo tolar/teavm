@@ -34,6 +34,7 @@ import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.math.TBigInteger;
+import org.teavm.classlib.java.security.TMessageDigest;
 import org.teavm.classlib.java.security.TPrincipal;
 import org.teavm.classlib.java.security.cert.TCRLException;
 import org.teavm.classlib.java.security.cert.TCertificateException;
@@ -628,11 +629,11 @@ public class TPKCS7  {
     }
 
     private static byte[] generateTimestampToken(TTimestamper var0, TString var1, byte[] var2) throws IOException, CertificateException {
-        MessageDigest var3 = null;
+        TMessageDigest var3 = null;
         TTSRequest var4 = null;
 
         try {
-            var3 = MessageDigest.getInstance("SHA-1");
+            var3 = TMessageDigest.getInstance(TString.wrap("SHA-1"));
             var4 = new TTSRequest(var1, var2, var3);
         } catch (NoSuchAlgorithmException var17) {
             ;
