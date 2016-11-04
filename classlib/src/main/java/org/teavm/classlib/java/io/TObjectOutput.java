@@ -29,7 +29,7 @@ public interface TObjectOutput extends TDataOutput, AutoCloseable {
      * @exception IOException Any of the usual Input/Output related exceptions.
      */
     public void writeObject(TObject obj)
-            throws IOException;
+            throws TIOException;
 
     /**
      * Writes a byte. This method will block until the byte is actually

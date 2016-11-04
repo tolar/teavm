@@ -15,8 +15,7 @@
  */
 package org.teavm.classlib.java.io;
 
-import static org.teavm.classlib.java.io.TObjectStreamClass.processQueue;
-
+import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReferenceQueue;
@@ -323,7 +322,7 @@ public class TObjectOutputStream
         bout.writeDouble(val);
     }
 
-    public void writeBytes(String str) throws TIOException {
+    public void writeBytes(TString str) throws TIOException {
         bout.writeBytes(str);
     }
 
@@ -450,7 +449,7 @@ public class TObjectOutputStream
          * are being written, or if the type of the named field is not a
          * reference type
          */
-        public abstract void put(String name, Object val);
+        public abstract void put(String name, TObject val);
 
         @Deprecated
         public abstract void write(TObjectOutput out) throws TIOException;
@@ -486,25 +485,25 @@ public class TObjectOutputStream
      * "enableSubclassImplementation" SerializablePermission is checked.
      */
     private void verifySubclass() {
-        Class<?> cl = getClass();
-        if (cl == TObjectOutputStream.class) {
-            return;
-        }
-        SecurityManager sm = System.getSecurityManager();
-        if (sm == null) {
-            return;
-        }
-        processQueue(TObjectOutputStream.Caches.subclassAuditsQueue, TObjectOutputStream.Caches.subclassAudits);
-        TObjectStreamClass.WeakClassKey key = new TObjectStreamClass.WeakClassKey(cl, TObjectOutputStream.Caches.subclassAuditsQueue);
-        Boolean result = TObjectOutputStream.Caches.subclassAudits.get(key);
-        if (result == null) {
-            result = Boolean.valueOf(auditSubclass(cl));
-            TObjectOutputStream.Caches.subclassAudits.putIfAbsent(key, result);
-        }
-        if (result.booleanValue()) {
-            return;
-        }
-        sm.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);
+//        Class<?> cl = getClass();
+//        if (cl == TObjectOutputStream.class) {
+//            return;
+//        }
+//        SecurityManager sm = System.getSecurityManager();
+//        if (sm == null) {
+//            return;
+//        }
+//        processQueue(TObjectOutputStream.Caches.subclassAuditsQueue, TObjectOutputStream.Caches.subclassAudits);
+//        TObjectStreamClass.WeakClassKey key = new TObjectStreamClass.WeakClassKey(cl, TObjectOutputStream.Caches.subclassAuditsQueue);
+//        Boolean result = TObjectOutputStream.Caches.subclassAudits.get(key);
+//        if (result == null) {
+//            result = Boolean.valueOf(auditSubclass(cl));
+//            TObjectOutputStream.Caches.subclassAudits.putIfAbsent(key, result);
+//        }
+//        if (result.booleanValue()) {
+//            return;
+//        }
+//        sm.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);
     }
 
     /**
@@ -553,102 +552,102 @@ public class TObjectOutputStream
     private void writeObject0(TObject obj, boolean unshared)
             throws TIOException
     {
-        boolean oldMode = bout.setBlockDataMode(false);
-        depth++;
-        try {
+//        boolean oldMode = bout.setBlockDataMode(false);
+//        depth++;
+//        try {
             // handle previously written and non-replaceable objects
-            int h;
-            if ((obj = subs.lookup(obj)) == null) {
-                writeNull();
-                return;
-            } else if (!unshared && (h = handles.lookup(obj)) != -1) {
-                writeHandle(h);
-                return;
-            } else if (obj instanceof Class) {
-                writeClass((Class) obj, unshared);
-                return;
-            } else if (obj instanceof TObjectStreamClass) {
-                writeClassDesc((TObjectStreamClass) obj, unshared);
-                return;
-            }
+//            int h;
+//            if ((obj = subs.lookup(obj)) == null) {
+//                writeNull();
+//                return;
+//            } else if (!unshared && (h = handles.lookup(obj)) != -1) {
+//                writeHandle(h);
+//                return;
+//            } else if (obj instanceof Class) {
+//                writeClass((Class) obj, unshared);
+//                return;
+//            } else if (obj instanceof TObjectStreamClass) {
+//                writeClassDesc((TObjectStreamClass) obj, unshared);
+//                return;
+//            }
 
             // check for replacement object
-            Object orig = obj;
-            Class<?> cl = obj.getClass();
-            TObjectStreamClass desc;
-            for (;;) {
-                // REMIND: skip this check for strings/arrays?
-                Class<?> repCl;
-                desc = TObjectStreamClass.lookup(cl, true);
-                if (!desc.hasWriteReplaceMethod() ||
-                        (obj = desc.invokeWriteReplace(obj)) == null ||
-                        (repCl = obj.getClass()) == cl)
-                {
-                    break;
-                }
-                cl = repCl;
-            }
-            if (enableReplace) {
-                TObject rep = replaceObject(obj);
-                if (rep != obj && rep != null) {
-                    cl = rep.getClass();
-                    desc = TObjectStreamClass.lookup(cl, true);
-                }
-                obj = rep;
-            }
-
-            // if object replaced, run through original checks a second time
-            if (obj != orig) {
-                subs.assign(orig, obj);
-                if (obj == null) {
-                    writeNull();
-                    return;
-                } else if (!unshared && (h = handles.lookup(obj)) != -1) {
-                    writeHandle(h);
-                    return;
-                } else if (obj instanceof Class) {
-                    writeClass((Class) obj, unshared);
-                    return;
-                } else if (obj instanceof ObjectStreamClass) {
-                    writeClassDesc((ObjectStreamClass) obj, unshared);
-                    return;
-                }
-            }
-
-            // remaining cases
-            if (obj instanceof String) {
-                writeString((String) obj, unshared);
-            } else if (cl.isArray()) {
-                writeArray(obj, desc, unshared);
-            } else if (obj instanceof Enum) {
-                writeEnum((Enum<?>) obj, desc, unshared);
-            } else if (obj instanceof Serializable) {
-                writeOrdinaryObject(obj, desc, unshared);
-            } else {
-                if (extendedDebugInfo) {
-                    throw new NotSerializableException(
-                            cl.getName() + "\n" + debugInfoStack.toString());
-                } else {
-                    throw new NotSerializableException(cl.getName());
-                }
-            }
-        } finally {
-            depth--;
-            bout.setBlockDataMode(oldMode);
-        }
+//            Object orig = obj;
+//            Class<?> cl = obj.getClass();
+//            TObjectStreamClass desc;
+//            for (;;) {
+//                // REMIND: skip this check for strings/arrays?
+//                Class<?> repCl;
+//                desc = TObjectStreamClass.lookup(cl, true);
+//                if (!desc.hasWriteReplaceMethod() ||
+//                        (obj = desc.invokeWriteReplace(obj)) == null ||
+//                        (repCl = obj.getClass()) == cl)
+//                {
+//                    break;
+//                }
+//                cl = repCl;
+//            }
+//            if (enableReplace) {
+//                TObject rep = replaceObject(obj);
+//                if (rep != obj && rep != null) {
+//                    cl = rep.getClass();
+//                    desc = TObjectStreamClass.lookup(cl, true);
+//                }
+//                obj = rep;
+//            }
+//
+//            // if object replaced, run through original checks a second time
+//            if (obj != orig) {
+//                subs.assign(orig, obj);
+//                if (obj == null) {
+//                    writeNull();
+//                    return;
+//                } else if (!unshared && (h = handles.lookup(obj)) != -1) {
+//                    writeHandle(h);
+//                    return;
+//                } else if (obj instanceof Class) {
+//                    writeClass((Class) obj, unshared);
+//                    return;
+//                } else if (obj instanceof ObjectStreamClass) {
+//                    writeClassDesc((ObjectStreamClass) obj, unshared);
+//                    return;
+//                }
+//            }
+//
+//            // remaining cases
+//            if (obj instanceof String) {
+//                writeString((String) obj, unshared);
+//            } else if (cl.isArray()) {
+//                writeArray(obj, desc, unshared);
+//            } else if (obj instanceof Enum) {
+//                writeEnum((Enum<?>) obj, desc, unshared);
+//            } else if (obj instanceof Serializable) {
+//                writeOrdinaryObject(obj, desc, unshared);
+//            } else {
+//                if (extendedDebugInfo) {
+//                    throw new NotSerializableException(
+//                            cl.getName() + "\n" + debugInfoStack.toString());
+//                } else {
+//                    throw new NotSerializableException(cl.getName());
+//                }
+//            }
+//        } finally {
+//            depth--;
+//            bout.setBlockDataMode(oldMode);
+//        }
     }
 
     /**
      * Writes null code to stream.
      */
-    private void writeNull() throws IOException {
+    private void writeNull() throws TIOException {
         bout.writeByte(TC_NULL);
     }
 
     /**
      * Writes given object handle to stream.
      */
-    private void writeHandle(int handle) throws IOException {
+    private void writeHandle(int handle) throws TIOException {
         bout.writeByte(TC_REFERENCE);
         bout.writeInt(baseWireHandle + handle);
     }
@@ -656,17 +655,17 @@ public class TObjectOutputStream
     /**
      * Writes representation of given class to stream.
      */
-    private void writeClass(Class<?> cl, boolean unshared) throws IOException {
-        bout.writeByte(TC_CLASS);
-        writeClassDesc(ObjectStreamClass.lookup(cl, true), false);
-        handles.assign(unshared ? null : cl);
+    private void writeClass(Class<?> cl, boolean unshared) throws TIOException {
+//        bout.writeByte(TC_CLASS);
+//        writeClassDesc(TObjectStreamClass.lookup(cl, true), false);
+//        handles.assign(unshared ? null : cl);
     }
 
     /**
      * Writes representation of given class descriptor to stream.
      */
-    private void writeClassDesc(ObjectStreamClass desc, boolean unshared)
-            throws IOException
+    private void writeClassDesc(TObjectStreamClass desc, boolean unshared)
+            throws TIOException
     {
         int handle;
         if (desc == null) {
@@ -689,168 +688,168 @@ public class TObjectOutputStream
     /**
      * Writes class descriptor representing a dynamic proxy class to stream.
      */
-    private void writeProxyDesc(ObjectStreamClass desc, boolean unshared)
-            throws IOException
+    private void writeProxyDesc(TObjectStreamClass desc, boolean unshared)
+            throws TIOException
     {
-        bout.writeByte(TC_PROXYCLASSDESC);
-        handles.assign(unshared ? null : desc);
-
-        Class<?> cl = desc.forClass();
-        Class<?>[] ifaces = cl.getInterfaces();
-        bout.writeInt(ifaces.length);
-        for (int i = 0; i < ifaces.length; i++) {
-            bout.writeUTF(ifaces[i].getName());
-        }
-
-        bout.setBlockDataMode(true);
-        if (cl != null && isCustomSubclass()) {
-            ReflectUtil.checkPackageAccess(cl);
-        }
-        annotateProxyClass(cl);
-        bout.setBlockDataMode(false);
-        bout.writeByte(TC_ENDBLOCKDATA);
-
-        writeClassDesc(desc.getSuperDesc(), false);
+//        bout.writeByte(TC_PROXYCLASSDESC);
+//        handles.assign(unshared ? null : desc);
+//
+//        TClass<?> cl = desc.forClass();
+//        TClass<?>[] ifaces = cl.getInterfaces();
+//        bout.writeInt(ifaces.length);
+//        for (int i = 0; i < ifaces.length; i++) {
+//            bout.writeUTF(ifaces[i].getName());
+//        }
+//
+//        bout.setBlockDataMode(true);
+//        if (cl != null && isCustomSubclass()) {
+//            TReflectUtil.checkPackageAccess(cl);
+//        }
+//        annotateProxyClass(cl);
+//        bout.setBlockDataMode(false);
+//        bout.writeByte(TC_ENDBLOCKDATA);
+//
+//        writeClassDesc(desc.getSuperDesc(), false);
     }
 
     /**
      * Writes class descriptor representing a standard (i.e., not a dynamic
      * proxy) class to stream.
      */
-    private void writeNonProxyDesc(ObjectStreamClass desc, boolean unshared)
-            throws IOException
+    private void writeNonProxyDesc(TObjectStreamClass desc, boolean unshared)
+            throws TIOException
     {
-        bout.writeByte(TC_CLASSDESC);
-        handles.assign(unshared ? null : desc);
-
-        if (protocol == PROTOCOL_VERSION_1) {
-            // do not invoke class descriptor write hook with old protocol
-            desc.writeNonProxy(this);
-        } else {
-            writeClassDescriptor(desc);
-        }
-
-        Class<?> cl = desc.forClass();
-        bout.setBlockDataMode(true);
-        if (cl != null && isCustomSubclass()) {
-            ReflectUtil.checkPackageAccess(cl);
-        }
-        annotateClass(cl);
-        bout.setBlockDataMode(false);
-        bout.writeByte(TC_ENDBLOCKDATA);
-
-        writeClassDesc(desc.getSuperDesc(), false);
+//        bout.writeByte(TC_CLASSDESC);
+//        handles.assign(unshared ? null : desc);
+//
+//        if (protocol == PROTOCOL_VERSION_1) {
+//            // do not invoke class descriptor write hook with old protocol
+//            desc.writeNonProxy(this);
+//        } else {
+//            writeClassDescriptor(desc);
+//        }
+//
+//        TClass<?> cl = desc.forClass();
+//        bout.setBlockDataMode(true);
+//        if (cl != null && isCustomSubclass()) {
+//            TReflectUtil.checkPackageAccess(cl);
+//        }
+//        annotateClass(cl);
+//        bout.setBlockDataMode(false);
+//        bout.writeByte(TC_ENDBLOCKDATA);
+//
+//        writeClassDesc(desc.getSuperDesc(), false);
     }
 
     /**
      * Writes given string to stream, using standard or long UTF format
      * depending on string length.
      */
-    private void writeString(String str, boolean unshared) throws IOException {
-        handles.assign(unshared ? null : str);
-        long utflen = bout.getUTFLength(str);
-        if (utflen <= 0xFFFF) {
-            bout.writeByte(TC_STRING);
-            bout.writeUTF(str, utflen);
-        } else {
-            bout.writeByte(TC_LONGSTRING);
-            bout.writeLongUTF(str, utflen);
-        }
+    private void writeString(String str, boolean unshared) throws TIOException {
+//        handles.assign(unshared ? null : str);
+//        long utflen = bout.getUTFLength(str);
+//        if (utflen <= 0xFFFF) {
+//            bout.writeByte(TC_STRING);
+//            bout.writeUTF(str, utflen);
+//        } else {
+//            bout.writeByte(TC_LONGSTRING);
+//            bout.writeLongUTF(str, utflen);
+//        }
     }
 
     /**
      * Writes given array object to stream.
      */
     private void writeArray(Object array,
-            ObjectStreamClass desc,
+            TObjectStreamClass desc,
             boolean unshared)
-            throws IOException
+            throws TIOException
     {
-        bout.writeByte(TC_ARRAY);
-        writeClassDesc(desc, false);
-        handles.assign(unshared ? null : array);
-
-        Class<?> ccl = desc.forClass().getComponentType();
-        if (ccl.isPrimitive()) {
-            if (ccl == Integer.TYPE) {
-                int[] ia = (int[]) array;
-                bout.writeInt(ia.length);
-                bout.writeInts(ia, 0, ia.length);
-            } else if (ccl == Byte.TYPE) {
-                byte[] ba = (byte[]) array;
-                bout.writeInt(ba.length);
-                bout.write(ba, 0, ba.length, true);
-            } else if (ccl == Long.TYPE) {
-                long[] ja = (long[]) array;
-                bout.writeInt(ja.length);
-                bout.writeLongs(ja, 0, ja.length);
-            } else if (ccl == Float.TYPE) {
-                float[] fa = (float[]) array;
-                bout.writeInt(fa.length);
-                bout.writeFloats(fa, 0, fa.length);
-            } else if (ccl == Double.TYPE) {
-                double[] da = (double[]) array;
-                bout.writeInt(da.length);
-                bout.writeDoubles(da, 0, da.length);
-            } else if (ccl == Short.TYPE) {
-                short[] sa = (short[]) array;
-                bout.writeInt(sa.length);
-                bout.writeShorts(sa, 0, sa.length);
-            } else if (ccl == Character.TYPE) {
-                char[] ca = (char[]) array;
-                bout.writeInt(ca.length);
-                bout.writeChars(ca, 0, ca.length);
-            } else if (ccl == Boolean.TYPE) {
-                boolean[] za = (boolean[]) array;
-                bout.writeInt(za.length);
-                bout.writeBooleans(za, 0, za.length);
-            } else {
-                throw new InternalError();
-            }
-        } else {
-            Object[] objs = (Object[]) array;
-            int len = objs.length;
-            bout.writeInt(len);
-            if (extendedDebugInfo) {
-                debugInfoStack.push(
-                        "array (class \"" + array.getClass().getName() +
-                                "\", size: " + len  + ")");
-            }
-            try {
-                for (int i = 0; i < len; i++) {
-                    if (extendedDebugInfo) {
-                        debugInfoStack.push(
-                                "element of array (index: " + i + ")");
-                    }
-                    try {
-                        writeObject0(objs[i], false);
-                    } finally {
-                        if (extendedDebugInfo) {
-                            debugInfoStack.pop();
-                        }
-                    }
-                }
-            } finally {
-                if (extendedDebugInfo) {
-                    debugInfoStack.pop();
-                }
-            }
-        }
+//        bout.writeByte(TC_ARRAY);
+//        writeClassDesc(desc, false);
+//        handles.assign(unshared ? null : array);
+//
+//        TClass<?> ccl = desc.forClass().getComponentType();
+//        if (ccl.isPrimitive()) {
+//            if (ccl == Integer.TYPE) {
+//                int[] ia = (int[]) array;
+//                bout.writeInt(ia.length);
+//                bout.writeInts(ia, 0, ia.length);
+//            } else if (ccl == Byte.TYPE) {
+//                byte[] ba = (byte[]) array;
+//                bout.writeInt(ba.length);
+//                bout.write(ba, 0, ba.length, true);
+//            } else if (ccl == Long.TYPE) {
+//                long[] ja = (long[]) array;
+//                bout.writeInt(ja.length);
+//                bout.writeLongs(ja, 0, ja.length);
+//            } else if (ccl == Float.TYPE) {
+//                float[] fa = (float[]) array;
+//                bout.writeInt(fa.length);
+//                bout.writeFloats(fa, 0, fa.length);
+//            } else if (ccl == Double.TYPE) {
+//                double[] da = (double[]) array;
+//                bout.writeInt(da.length);
+//                bout.writeDoubles(da, 0, da.length);
+//            } else if (ccl == Short.TYPE) {
+//                short[] sa = (short[]) array;
+//                bout.writeInt(sa.length);
+//                bout.writeShorts(sa, 0, sa.length);
+//            } else if (ccl == Character.TYPE) {
+//                char[] ca = (char[]) array;
+//                bout.writeInt(ca.length);
+//                bout.writeChars(ca, 0, ca.length);
+//            } else if (ccl == Boolean.TYPE) {
+//                boolean[] za = (boolean[]) array;
+//                bout.writeInt(za.length);
+//                bout.writeBooleans(za, 0, za.length);
+//            } else {
+//                throw new InternalError();
+//            }
+//        } else {
+//            Object[] objs = (Object[]) array;
+//            int len = objs.length;
+//            bout.writeInt(len);
+//            if (extendedDebugInfo) {
+//                debugInfoStack.push(
+//                        "array (class \"" + array.getClass().getName() +
+//                                "\", size: " + len  + ")");
+//            }
+//            try {
+//                for (int i = 0; i < len; i++) {
+//                    if (extendedDebugInfo) {
+//                        debugInfoStack.push(
+//                                "element of array (index: " + i + ")");
+//                    }
+//                    try {
+//                        writeObject0(objs[i], false);
+//                    } finally {
+//                        if (extendedDebugInfo) {
+//                            debugInfoStack.pop();
+//                        }
+//                    }
+//                }
+//            } finally {
+//                if (extendedDebugInfo) {
+//                    debugInfoStack.pop();
+//                }
+//            }
+//        }
     }
 
     /**
      * Writes given enum constant to stream.
      */
     private void writeEnum(Enum<?> en,
-            ObjectStreamClass desc,
+            TObjectStreamClass desc,
             boolean unshared)
-            throws IOException
+            throws TIOException
     {
-        bout.writeByte(TC_ENUM);
-        ObjectStreamClass sdesc = desc.getSuperDesc();
-        writeClassDesc((sdesc.forClass() == Enum.class) ? desc : sdesc, false);
-        handles.assign(unshared ? null : en);
-        writeString(en.name(), false);
+//        bout.writeByte(TC_ENUM);
+//        TObjectStreamClass sdesc = desc.getSuperDesc();
+//        writeClassDesc((sdesc.forClass() == Enum.class) ? desc : sdesc, false);
+//        handles.assign(unshared ? null : en);
+//        writeString(en.name(), false);
     }
 
     /**
@@ -859,104 +858,104 @@ public class TObjectOutputStream
      * stream.
      */
     private void writeOrdinaryObject(Object obj,
-            ObjectStreamClass desc,
+            TObjectStreamClass desc,
             boolean unshared)
-            throws IOException
+            throws TIOException
     {
-        if (extendedDebugInfo) {
-            debugInfoStack.push(
-                    (depth == 1 ? "root " : "") + "object (class \"" +
-                            obj.getClass().getName() + "\", " + obj.toString() + ")");
-        }
-        try {
-            desc.checkSerialize();
-
-            bout.writeByte(TC_OBJECT);
-            writeClassDesc(desc, false);
-            handles.assign(unshared ? null : obj);
-            if (desc.isExternalizable() && !desc.isProxy()) {
-                writeExternalData((Externalizable) obj);
-            } else {
-                writeSerialData(obj, desc);
-            }
-        } finally {
-            if (extendedDebugInfo) {
-                debugInfoStack.pop();
-            }
-        }
+//        if (extendedDebugInfo) {
+//            debugInfoStack.push(
+//                    (depth == 1 ? "root " : "") + "object (class \"" +
+//                            obj.getClass().getName() + "\", " + obj.toString() + ")");
+//        }
+//        try {
+//            desc.checkSerialize();
+//
+//            bout.writeByte(TC_OBJECT);
+//            writeClassDesc(desc, false);
+//            handles.assign(unshared ? null : obj);
+//            if (desc.isExternalizable() && !desc.isProxy()) {
+//                writeExternalData((TExternalizable) obj);
+//            } else {
+//                writeSerialData(obj, desc);
+//            }
+//        } finally {
+//            if (extendedDebugInfo) {
+//                debugInfoStack.pop();
+//            }
+//        }
     }
 
     /**
      * Writes externalizable data of given object by invoking its
      * writeExternal() method.
      */
-    private void writeExternalData(Externalizable obj) throws IOException {
-        TObjectOutputStream.PutFieldImpl oldPut = curPut;
-        curPut = null;
-
-        if (extendedDebugInfo) {
-            debugInfoStack.push("writeExternal data");
-        }
-        SerialCallbackContext oldContext = curContext;
-        try {
-            curContext = null;
-            if (protocol == PROTOCOL_VERSION_1) {
-                obj.writeExternal(this);
-            } else {
-                bout.setBlockDataMode(true);
-                obj.writeExternal(this);
-                bout.setBlockDataMode(false);
-                bout.writeByte(TC_ENDBLOCKDATA);
-            }
-        } finally {
-            curContext = oldContext;
-            if (extendedDebugInfo) {
-                debugInfoStack.pop();
-            }
-        }
-
-        curPut = oldPut;
+    private void writeExternalData(TExternalizable obj) throws TIOException {
+//        TObjectOutputStream.PutFieldImpl oldPut = curPut;
+//        curPut = null;
+//
+//        if (extendedDebugInfo) {
+//            debugInfoStack.push("writeExternal data");
+//        }
+//        TSerialCallbackContext oldContext = curContext;
+//        try {
+//            curContext = null;
+//            if (protocol == PROTOCOL_VERSION_1) {
+//                obj.writeExternal(this);
+//            } else {
+//                bout.setBlockDataMode(true);
+//                obj.writeExternal(this);
+//                bout.setBlockDataMode(false);
+//                bout.writeByte(TC_ENDBLOCKDATA);
+//            }
+//        } finally {
+//            curContext = oldContext;
+//            if (extendedDebugInfo) {
+//                debugInfoStack.pop();
+//            }
+//        }
+//
+//        curPut = oldPut;
     }
 
     /**
      * Writes instance data for each serializable class of given object, from
      * superclass to subclass.
      */
-    private void writeSerialData(Object obj, ObjectStreamClass desc)
-            throws IOException
+    private void writeSerialData(Object obj, TObjectStreamClass desc)
+            throws TIOException
     {
-        ObjectStreamClass.ClassDataSlot[] slots = desc.getClassDataLayout();
-        for (int i = 0; i < slots.length; i++) {
-            ObjectStreamClass slotDesc = slots[i].desc;
-            if (slotDesc.hasWriteObjectMethod()) {
-                TObjectOutputStream.PutFieldImpl oldPut = curPut;
-                curPut = null;
-                SerialCallbackContext oldContext = curContext;
-
-                if (extendedDebugInfo) {
-                    debugInfoStack.push(
-                            "custom writeObject data (class \"" +
-                                    slotDesc.getName() + "\")");
-                }
-                try {
-                    curContext = new SerialCallbackContext(obj, slotDesc);
-                    bout.setBlockDataMode(true);
-                    slotDesc.invokeWriteObject(obj, this);
-                    bout.setBlockDataMode(false);
-                    bout.writeByte(TC_ENDBLOCKDATA);
-                } finally {
-                    curContext.setUsed();
-                    curContext = oldContext;
-                    if (extendedDebugInfo) {
-                        debugInfoStack.pop();
-                    }
-                }
-
-                curPut = oldPut;
-            } else {
-                defaultWriteFields(obj, slotDesc);
-            }
-        }
+//        TObjectStreamClass.ClassDataSlot[] slots = desc.getClassDataLayout();
+//        for (int i = 0; i < slots.length; i++) {
+//            TObjectStreamClass slotDesc = slots[i].desc;
+//            if (slotDesc.hasWriteObjectMethod()) {
+//                TObjectOutputStream.PutFieldImpl oldPut = curPut;
+//                curPut = null;
+//                TSerialCallbackContext oldContext = curContext;
+//
+//                if (extendedDebugInfo) {
+//                    debugInfoStack.push(
+//                            "custom writeObject data (class \"" +
+//                                    slotDesc.getName() + "\")");
+//                }
+//                try {
+//                    curContext = new TSerialCallbackContext(obj, slotDesc);
+//                    bout.setBlockDataMode(true);
+//                    slotDesc.invokeWriteObject(obj, this);
+//                    bout.setBlockDataMode(false);
+//                    bout.writeByte(TC_ENDBLOCKDATA);
+//                } finally {
+//                    curContext.setUsed();
+//                    curContext = oldContext;
+//                    if (extendedDebugInfo) {
+//                        debugInfoStack.pop();
+//                    }
+//                }
+//
+//                curPut = oldPut;
+//            } else {
+//                defaultWriteFields(obj, slotDesc);
+//            }
+//        }
     }
 
     /**
@@ -964,10 +963,10 @@ public class TObjectOutputStream
      * stream.  The given class descriptor specifies which field values to
      * write, and in which order they should be written.
      */
-    private void defaultWriteFields(Object obj, ObjectStreamClass desc)
-            throws IOException
+    private void defaultWriteFields(TObject obj, TObjectStreamClass desc)
+            throws TIOException
     {
-        Class<?> cl = desc.forClass();
+        TClass<?> cl = desc.forClass();
         if (cl != null && obj != null && !cl.isInstance(obj)) {
             throw new ClassCastException();
         }
@@ -981,8 +980,8 @@ public class TObjectOutputStream
         desc.getPrimFieldValues(obj, primVals);
         bout.write(primVals, 0, primDataSize, false);
 
-        ObjectStreamField[] fields = desc.getFields(false);
-        Object[] objVals = new Object[desc.getNumObjFields()];
+        TObjectStreamField[] fields = desc.getFields(false);
+        TObject[] objVals = new TObject[desc.getNumObjFields()];
         int numPrimFields = fields.length - objVals.length;
         desc.getObjFieldValues(obj, objVals);
         for (int i = 0; i < objVals.length; i++) {
@@ -1022,7 +1021,7 @@ public class TObjectOutputStream
         boolean oldMode = bout.setBlockDataMode(false);
         try {
             bout.writeByte(TC_EXCEPTION);
-            writeObject0(ex, false);
+            //writeObject0(ex, false);
             clear();
         } finally {
             bout.setBlockDataMode(oldMode);
@@ -1055,7 +1054,7 @@ public class TObjectOutputStream
         /** primitive field values */
         private final byte[] primVals;
         /** object field values */
-        private final Object[] objVals;
+        private final TObject[] objVals;
 
         /**
          * Creates PutFieldImpl object for writing fields defined in given
@@ -1064,7 +1063,7 @@ public class TObjectOutputStream
         PutFieldImpl(TObjectStreamClass desc) {
             this.desc = desc;
             primVals = new byte[desc.getPrimDataSize()];
-            objVals = new Object[desc.getNumObjFields()];
+            objVals = new TObject[desc.getNumObjFields()];
         }
 
         public void put(String name, boolean val) {
@@ -1099,7 +1098,7 @@ public class TObjectOutputStream
             TBits.putDouble(primVals, getFieldOffset(name, Double.TYPE), val);
         }
 
-        public void put(String name, Object val) {
+        public void put(String name, TObject val) {
             objVals[getFieldOffset(name, Object.class)] = val;
         }
 
@@ -1184,7 +1183,7 @@ public class TObjectOutputStream
      * bracketed by block data markers (see object serialization specification
      * for details).
      */
-    private static class BlockDataOutputStream
+    public static class BlockDataOutputStream
             extends TOutputStream implements TDataOutput
     {
         /** maximum data block length */
@@ -1419,7 +1418,7 @@ public class TObjectOutputStream
             }
         }
 
-        public void writeBytes(String s) throws TIOException {
+        public void writeBytes(TString s) throws TIOException {
             int endoff = s.length();
             int cpos = 0;
             int csize = 0;
@@ -1580,7 +1579,7 @@ public class TObjectOutputStream
         /**
          * Returns the length in bytes of the UTF encoding of the given string.
          */
-        long getUTFLength(String s) {
+        long getUTFLength(TString s) {
             int len = s.length();
             long utflen = 0;
             for (int off = 0; off < len; ) {
@@ -1624,7 +1623,7 @@ public class TObjectOutputStream
          * identical to standard UTF, except that it uses an 8 byte header
          * (instead of the standard 2 bytes) to convey the UTF encoding length.
          */
-        void writeLongUTF(String s) throws TIOException {
+        void writeLongUTF(TString s) throws TIOException {
             writeLongUTF(s, getUTFLength(s));
         }
 
@@ -1632,7 +1631,7 @@ public class TObjectOutputStream
          * Writes given string in "long" UTF format, where the UTF encoding
          * length of the string is already known.
          */
-        void writeLongUTF(String s, long utflen) throws TIOException {
+        void writeLongUTF(TString s, long utflen) throws TIOException {
             writeLong(utflen);
             if (utflen == (long) s.length()) {
                 writeBytes(s);
@@ -1688,7 +1687,7 @@ public class TObjectOutputStream
      * Lightweight identity hash table which maps objects to integer handles,
      * assigned in ascending order.
      */
-    private static class HandleTable {
+    public static class HandleTable {
 
         /* number of mappings in table/next available handle */
         private int size;
@@ -1813,7 +1812,7 @@ public class TObjectOutputStream
      * Lightweight identity hash table which maps objects to replacement
      * objects.
      */
-    private static class ReplaceTable {
+    public static class ReplaceTable {
 
         /* maps object -> index */
         private final TObjectOutputStream.HandleTable htab;
@@ -1877,7 +1876,7 @@ public class TObjectOutputStream
      * Stack to keep debug information about the state of the
      * serialization process, for embedding in exception messages.
      */
-    private static class DebugTraceInfoStack {
+    public static class DebugTraceInfoStack {
         private final TList<String> stack;
 
         DebugTraceInfoStack() {

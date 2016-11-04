@@ -15,7 +15,20 @@
  */
 package org.teavm.classlib.java.io;
 
+import static org.teavm.classlib.java.io.TObjectStreamClass.processQueue;
+
+import java.security.PrivilegedActionException;
+
+import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TEnum;
+import org.teavm.classlib.java.lang.TObject;
+import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReferenceQueue;
+import org.teavm.classlib.java.lang.reflect.TModifier;
+import org.teavm.classlib.java.security.TAccessControlContext;
+import org.teavm.classlib.java.security.TAccessController;
+import org.teavm.classlib.java.security.TPrivilegedExceptionAction;
+import org.teavm.classlib.java.util.TArrays;
 import org.teavm.classlib.java.util.THashMap;
 import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
 import org.teavm.classlib.java.util.concurrent.TConcurrentMap;
@@ -58,16 +71,16 @@ public class TObjectInputStream
     }
 
     /** filter stream for handling block data conversion */
-    private final TObjectOutputStream.BlockDataInputStream bin;
+    private final BlockDataInputStream bin;
     /** validation callback list */
-    private final TObjectOutputStream.ValidationList vlist;
+    private final ValidationList vlist;
     /** recursion depth */
     private int depth;
     /** whether stream is closed */
     private boolean closed;
 
     /** wire handle -> obj/exception map */
-    private final TObjectOutputStream.HandleTable handles;
+    private final HandleTable handles;
     /** scratch field for passing handle values up/down call stack */
     private int passHandle = NULL_HANDLE;
     /** flag set when at end of field value block with no TC_ENDBLOCKDATA */
@@ -86,58 +99,20 @@ public class TObjectInputStream
      * object currently being deserialized and descriptor for current class.
      * Null when not during readObject upcall.
      */
-    private SerialCallbackContext curContext;
+    private TSerialCallbackContext curContext;
 
-    /**
-     * Creates an ObjectInputStream that reads from the specified InputStream.
-     * A serialization stream header is read from the stream and verified.
-     * This constructor will block until the corresponding ObjectOutputStream
-     * has written and flushed the header.
-     *
-     * <p>If a security manager is installed, this constructor will check for
-     * the "enableSubclassImplementation" SerializablePermission when invoked
-     * directly or indirectly by the constructor of a subclass which overrides
-     * the ObjectInputStream.readFields or ObjectInputStream.readUnshared
-     * methods.
-     *
-     * @param   in input stream to read from
-     * @throws StreamCorruptedException if the stream header is incorrect
-     * @throws IOException if an I/O error occurs while reading stream header
-     * @throws  SecurityException if untrusted subclass illegally overrides
-     *          security-sensitive methods
-     * @throws  NullPointerException if <code>in</code> is <code>null</code>
-     * @see     TObjectOutputStream#ObjectInputStream()
-     * @see     TObjectOutputStream#readFields()
-     * @see     TObjectOutputStream#ObjectOutputStream(OutputStream)
-     */
-    public TObjectInputStream(InputStream in) throws IOException {
+    public TObjectInputStream(TInputStream in) throws TIOException {
         verifySubclass();
-        bin = new TObjectOutputStream.BlockDataInputStream(in);
-        handles = new TObjectOutputStream.HandleTable(10);
-        vlist = new TObjectOutputStream.ValidationList();
+        bin = new BlockDataInputStream(in);
+        handles = new HandleTable(10);
+        vlist = new ValidationList();
         enableOverride = false;
         readStreamHeader();
         bin.setBlockDataMode(true);
     }
 
-    /**
-     * Provide a way for subclasses that are completely reimplementing
-     * ObjectInputStream to not have to allocate private data just used by this
-     * implementation of ObjectInputStream.
-     *
-     * <p>If there is a security manager installed, this method first calls the
-     * security manager's <code>checkPermission</code> method with the
-     * <code>SerializablePermission("enableSubclassImplementation")</code>
-     * permission to ensure it's ok to enable subclassing.
-     *
-     * @throws  SecurityException if a security manager exists and its
-     *          <code>checkPermission</code> method denies enabling
-     *          subclassing.
-     * @throws  IOException if an I/O error occurs while creating this stream
-     * @see SecurityManager#checkPermission
-     * @see java.io.SerializablePermission
-     */
-    protected TObjectInputStream() throws IOException, SecurityException {
+
+    protected TObjectInputStream() throws TIOException, SecurityException {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);
@@ -148,38 +123,8 @@ public class TObjectInputStream
         enableOverride = true;
     }
 
-    /**
-     * Read an object from the ObjectInputStream.  The class of the object, the
-     * signature of the class, and the values of the non-transient and
-     * non-static fields of the class and all of its supertypes are read.
-     * Default deserializing for a class can be overriden using the writeObject
-     * and readObject methods.  Objects referenced by this object are read
-     * transitively so that a complete equivalent graph of objects is
-     * reconstructed by readObject.
-     *
-     * <p>The root object is completely restored when all of its fields and the
-     * objects it references are completely restored.  At this point the object
-     * validation callbacks are executed in order based on their registered
-     * priorities. The callbacks are registered by objects (in the readObject
-     * special methods) as they are individually restored.
-     *
-     * <p>Exceptions are thrown for problems with the InputStream and for
-     * classes that should not be deserialized.  All exceptions are fatal to
-     * the InputStream and leave it in an indeterminate state; it is up to the
-     * caller to ignore or recover the stream state.
-     *
-     * @throws  ClassNotFoundException Class of a serialized object cannot be
-     *          found.
-     * @throws InvalidClassException Something is wrong with a class used by
-     *          serialization.
-     * @throws  StreamCorruptedException Control information in the
-     *          stream is inconsistent.
-     * @throws OptionalDataException Primitive data was found in the
-     *          stream instead of objects.
-     * @throws  IOException Any of the usual Input/Output related exceptions.
-     */
     public final Object readObject()
-            throws IOException, ClassNotFoundException
+            throws TIOException, ClassNotFoundException
     {
         if (enableOverride) {
             return readObjectOverride();
@@ -206,75 +151,13 @@ public class TObjectInputStream
         }
     }
 
-    /**
-     * This method is called by trusted subclasses of ObjectOutputStream that
-     * constructed ObjectOutputStream using the protected no-arg constructor.
-     * The subclass is expected to provide an override method with the modifier
-     * "final".
-     *
-     * @return  the Object read from the stream.
-     * @throws  ClassNotFoundException Class definition of a serialized object
-     *          cannot be found.
-     * @throws  OptionalDataException Primitive data was found in the stream
-     *          instead of objects.
-     * @throws  IOException if I/O errors occurred while reading from the
-     *          underlying stream
-     * @see #TObjectOutputStream()
-     * @see #readObject()
-     * @since 1.2
-     */
     protected Object readObjectOverride()
-            throws IOException, ClassNotFoundException
+            throws TIOException, ClassNotFoundException
     {
         return null;
     }
 
-    /**
-     * Reads an "unshared" object from the ObjectInputStream.  This method is
-     * identical to readObject, except that it prevents subsequent calls to
-     * readObject and readUnshared from returning additional references to the
-     * deserialized instance obtained via this call.  Specifically:
-     * <ul>
-     *   <li>If readUnshared is called to deserialize a back-reference (the
-     *       stream representation of an object which has been written
-     *       previously to the stream), an ObjectStreamException will be
-     *       thrown.
-     *
-     *   <li>If readUnshared returns successfully, then any subsequent attempts
-     *       to deserialize back-references to the stream handle deserialized
-     *       by readUnshared will cause an ObjectStreamException to be thrown.
-     * </ul>
-     * Deserializing an object via readUnshared invalidates the stream handle
-     * associated with the returned object.  Note that this in itself does not
-     * always guarantee that the reference returned by readUnshared is unique;
-     * the deserialized object may define a readResolve method which returns an
-     * object visible to other parties, or readUnshared may return a Class
-     * object or enum constant obtainable elsewhere in the stream or through
-     * external means. If the deserialized object defines a readResolve method
-     * and the invocation of that method returns an array, then readUnshared
-     * returns a shallow clone of that array; this guarantees that the returned
-     * array object is unique and cannot be obtained a second time from an
-     * invocation of readObject or readUnshared on the ObjectInputStream,
-     * even if the underlying data stream has been manipulated.
-     *
-     * <p>ObjectInputStream subclasses which override this method can only be
-     * constructed in security contexts possessing the
-     * "enableSubclassImplementation" SerializablePermission; any attempt to
-     * instantiate such a subclass without this permission will cause a
-     * SecurityException to be thrown.
-     *
-     * @return  reference to deserialized object
-     * @throws  ClassNotFoundException if class of an object to deserialize
-     *          cannot be found
-     * @throws  StreamCorruptedException if control information in the stream
-     *          is inconsistent
-     * @throws ObjectStreamException if object to deserialize has already
-     *          appeared in stream
-     * @throws  OptionalDataException if primitive data is next in stream
-     * @throws  IOException if an I/O error occurs during deserialization
-     * @since   1.4
-     */
-    public Object readUnshared() throws IOException, ClassNotFoundException {
+    public Object readUnshared() throws TIOException, ClassNotFoundException {
         // if nested read, passHandle contains handle of enclosing object
         int outerHandle = passHandle;
         try {
@@ -296,27 +179,15 @@ public class TObjectInputStream
         }
     }
 
-    /**
-     * Read the non-static and non-transient fields of the current class from
-     * this stream.  This may only be called from the readObject method of the
-     * class being deserialized. It will throw the NotActiveException if it is
-     * called otherwise.
-     *
-     * @throws  ClassNotFoundException if the class of a serialized object
-     *          could not be found.
-     * @throws  IOException if an I/O error occurs.
-     * @throws NotActiveException if the stream is not currently reading
-     *          objects.
-     */
     public void defaultReadObject()
-            throws IOException, ClassNotFoundException
+            throws TIOException, ClassNotFoundException
     {
-        SerialCallbackContext ctx = curContext;
+        TSerialCallbackContext ctx = curContext;
         if (ctx == null) {
-            throw new NotActiveException("not in call to readObject");
+            throw new TNotActiveException(TString.wrap("not in call to readObject"));
         }
         Object curObj = ctx.getObj();
-        ObjectStreamClass curDesc = ctx.getDesc();
+        TObjectStreamClass curDesc = ctx.getDesc();
         bin.setBlockDataMode(false);
         defaultReadFields(curObj, curDesc);
         bin.setBlockDataMode(true);
@@ -334,30 +205,17 @@ public class TObjectInputStream
         }
     }
 
-    /**
-     * Reads the persistent fields from the stream and makes them available by
-     * name.
-     *
-     * @return  the <code>GetField</code> object representing the persistent
-     *          fields of the object being deserialized
-     * @throws  ClassNotFoundException if the class of a serialized object
-     *          could not be found.
-     * @throws  IOException if an I/O error occurs.
-     * @throws  NotActiveException if the stream is not currently reading
-     *          objects.
-     * @since 1.2
-     */
-    public TObjectOutputStream.GetField readFields()
-            throws IOException, ClassNotFoundException
+    public TObjectInputStream.GetField readFields()
+            throws TIOException, ClassNotFoundException
     {
-        SerialCallbackContext ctx = curContext;
+        TSerialCallbackContext ctx = curContext;
         if (ctx == null) {
-            throw new NotActiveException("not in call to readObject");
+            throw new TNotActiveException(TString.wrap("not in call to readObject"));
         }
         Object curObj = ctx.getObj();
-        ObjectStreamClass curDesc = ctx.getDesc();
+        TObjectStreamClass curDesc = ctx.getDesc();
         bin.setBlockDataMode(false);
-        TObjectOutputStream.GetFieldImpl getField = new TObjectOutputStream.GetFieldImpl(curDesc);
+        TObjectInputStream.GetFieldImpl getField = new TObjectInputStream.GetFieldImpl(curDesc);
         getField.readFields();
         bin.setBlockDataMode(true);
         if (!curDesc.hasWriteObjectData()) {
@@ -372,80 +230,23 @@ public class TObjectInputStream
         return getField;
     }
 
-    /**
-     * Register an object to be validated before the graph is returned.  While
-     * similar to resolveObject these validations are called after the entire
-     * graph has been reconstituted.  Typically, a readObject method will
-     * register the object with the stream so that when all of the objects are
-     * restored a final set of validations can be performed.
-     *
-     * @param   obj the object to receive the validation callback.
-     * @param   prio controls the order of callbacks;zero is a good default.
-     *          Use higher numbers to be called back earlier, lower numbers for
-     *          later callbacks. Within a priority, callbacks are processed in
-     *          no particular order.
-     * @throws  NotActiveException The stream is not currently reading objects
-     *          so it is invalid to register a callback.
-     * @throws InvalidObjectException The validation object is null.
-     */
-    public void registerValidation(ObjectInputValidation obj, int prio)
-            throws NotActiveException, InvalidObjectException
+    public void registerValidation(TObjectInputValidation obj, int prio)
+            throws TNotActiveException, TInvalidObjectException
     {
         if (depth == 0) {
-            throw new NotActiveException("stream inactive");
+            throw new TNotActiveException(TString.wrap("stream inactive"));
         }
         vlist.register(obj, prio);
     }
 
-    /**
-     * Load the local class equivalent of the specified stream class
-     * description.  Subclasses may implement this method to allow classes to
-     * be fetched from an alternate source.
-     *
-     * <p>The corresponding method in <code>ObjectOutputStream</code> is
-     * <code>annotateClass</code>.  This method will be invoked only once for
-     * each unique class in the stream.  This method can be implemented by
-     * subclasses to use an alternate loading mechanism but must return a
-     * <code>Class</code> object. Once returned, if the class is not an array
-     * class, its serialVersionUID is compared to the serialVersionUID of the
-     * serialized class, and if there is a mismatch, the deserialization fails
-     * and an {@link InvalidClassException} is thrown.
-     *
-     * <p>The default implementation of this method in
-     * <code>ObjectInputStream</code> returns the result of calling
-     * <pre>
-     *     Class.forName(desc.getName(), false, loader)
-     * </pre>
-     * where <code>loader</code> is determined as follows: if there is a
-     * method on the current thread's stack whose declaring class was
-     * defined by a user-defined class loader (and was not a generated to
-     * implement reflective invocations), then <code>loader</code> is class
-     * loader corresponding to the closest such method to the currently
-     * executing frame; otherwise, <code>loader</code> is
-     * <code>null</code>. If this call results in a
-     * <code>ClassNotFoundException</code> and the name of the passed
-     * <code>ObjectStreamClass</code> instance is the Java language keyword
-     * for a primitive type or void, then the <code>Class</code> object
-     * representing that primitive type or void will be returned
-     * (e.g., an <code>ObjectStreamClass</code> with the name
-     * <code>"int"</code> will be resolved to <code>Integer.TYPE</code>).
-     * Otherwise, the <code>ClassNotFoundException</code> will be thrown to
-     * the caller of this method.
-     *
-     * @param   desc an instance of class <code>ObjectStreamClass</code>
-     * @return  a <code>Class</code> object corresponding to <code>desc</code>
-     * @throws  IOException any of the usual Input/Output exceptions.
-     * @throws  ClassNotFoundException if class of a serialized object cannot
-     *          be found.
-     */
-    protected Class<?> resolveClass(ObjectStreamClass desc)
-            throws IOException, ClassNotFoundException
+    protected TClass<?> resolveClass(TObjectStreamClass desc)
+            throws TIOException, ClassNotFoundException
     {
-        String name = desc.getName();
+        TString name = desc.getName();
         try {
-            return Class.forName(name, false, latestUserDefinedLoader());
+            return TClass.forName(name, false, latestUserDefinedLoader());
         } catch (ClassNotFoundException ex) {
-            Class<?> cl = primClasses.get(name);
+            TClass<?> cl = primClasses.get(name);
             if (cl != null) {
                 return cl;
             } else {
@@ -454,59 +255,8 @@ public class TObjectInputStream
         }
     }
 
-    /**
-     * Returns a proxy class that implements the interfaces named in a proxy
-     * class descriptor; subclasses may implement this method to read custom
-     * data from the stream along with the descriptors for dynamic proxy
-     * classes, allowing them to use an alternate loading mechanism for the
-     * interfaces and the proxy class.
-     *
-     * <p>This method is called exactly once for each unique proxy class
-     * descriptor in the stream.
-     *
-     * <p>The corresponding method in <code>ObjectOutputStream</code> is
-     * <code>annotateProxyClass</code>.  For a given subclass of
-     * <code>ObjectInputStream</code> that overrides this method, the
-     * <code>annotateProxyClass</code> method in the corresponding subclass of
-     * <code>ObjectOutputStream</code> must write any data or objects read by
-     * this method.
-     *
-     * <p>The default implementation of this method in
-     * <code>ObjectInputStream</code> returns the result of calling
-     * <code>Proxy.getProxyClass</code> with the list of <code>Class</code>
-     * objects for the interfaces that are named in the <code>interfaces</code>
-     * parameter.  The <code>Class</code> object for each interface name
-     * <code>i</code> is the value returned by calling
-     * <pre>
-     *     Class.forName(i, false, loader)
-     * </pre>
-     * where <code>loader</code> is that of the first non-<code>null</code>
-     * class loader up the execution stack, or <code>null</code> if no
-     * non-<code>null</code> class loaders are on the stack (the same class
-     * loader choice used by the <code>resolveClass</code> method).  Unless any
-     * of the resolved interfaces are non-public, this same value of
-     * <code>loader</code> is also the class loader passed to
-     * <code>Proxy.getProxyClass</code>; if non-public interfaces are present,
-     * their class loader is passed instead (if more than one non-public
-     * interface class loader is encountered, an
-     * <code>IllegalAccessError</code> is thrown).
-     * If <code>Proxy.getProxyClass</code> throws an
-     * <code>IllegalArgumentException</code>, <code>resolveProxyClass</code>
-     * will throw a <code>ClassNotFoundException</code> containing the
-     * <code>IllegalArgumentException</code>.
-     *
-     * @param interfaces the list of interface names that were
-     *                deserialized in the proxy class descriptor
-     * @return  a proxy class for the specified interfaces
-     * @throws        IOException any exception thrown by the underlying
-     *                <code>InputStream</code>
-     * @throws        ClassNotFoundException if the proxy class or any of the
-     *                named interfaces could not be found
-     * @see TObjectOutputStream#annotateProxyClass(Class)
-     * @since 1.3
-     */
     protected Class<?> resolveProxyClass(String[] interfaces)
-            throws IOException, ClassNotFoundException
+            throws TIOException, ClassNotFoundException
     {
         ClassLoader latestLoader = latestUserDefinedLoader();
         ClassLoader nonPublicLoader = null;
@@ -516,7 +266,7 @@ public class TObjectInputStream
         Class<?>[] classObjs = new Class<?>[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
             Class<?> cl = Class.forName(interfaces[i], false, latestLoader);
-            if ((cl.getModifiers() & Modifier.PUBLIC) == 0) {
+            if ((cl.getModifiers() & TModifier.PUBLIC) == 0) {
                 if (hasNonPublicInterface) {
                     if (nonPublicLoader != cl.getClassLoader()) {
                         throw new IllegalAccessError(
@@ -530,42 +280,16 @@ public class TObjectInputStream
             classObjs[i] = cl;
         }
         try {
-            return Proxy.getProxyClass(
-                    hasNonPublicInterface ? nonPublicLoader : latestLoader,
-                    classObjs);
+//            return Proxy.getProxyClass(
+//                    hasNonPublicInterface ? nonPublicLoader : latestLoader,
+//                    classObjs);
+            return null;
         } catch (IllegalArgumentException e) {
             throw new ClassNotFoundException(null, e);
         }
     }
 
-    /**
-     * This method will allow trusted subclasses of ObjectInputStream to
-     * substitute one object for another during deserialization. Replacing
-     * objects is disabled until enableResolveObject is called. The
-     * enableResolveObject method checks that the stream requesting to resolve
-     * object can be trusted. Every reference to serializable objects is passed
-     * to resolveObject.  To insure that the private state of objects is not
-     * unintentionally exposed only trusted streams may use resolveObject.
-     *
-     * <p>This method is called after an object has been read but before it is
-     * returned from readObject.  The default resolveObject method just returns
-     * the same object.
-     *
-     * <p>When a subclass is replacing objects it must insure that the
-     * substituted object is compatible with every field where the reference
-     * will be stored.  Objects whose type is not a subclass of the type of the
-     * field or array element abort the serialization by raising an exception
-     * and the object is not be stored.
-     *
-     * <p>This method is called only once when each object is first
-     * encountered.  All subsequent references to the object will be redirected
-     * to the new object.
-     *
-     * @param   obj object to be substituted
-     * @return  the substituted object
-     * @throws  IOException Any of the usual Input/Output exceptions.
-     */
-    protected Object resolveObject(Object obj) throws IOException {
+    protected Object resolveObject(Object obj) throws TIOException {
         return obj;
     }
 
@@ -606,76 +330,30 @@ public class TObjectInputStream
         return !enableResolve;
     }
 
-    /**
-     * The readStreamHeader method is provided to allow subclasses to read and
-     * verify their own stream headers. It reads and verifies the magic number
-     * and version number.
-     *
-     * @throws  IOException if there are I/O errors while reading from the
-     *          underlying <code>InputStream</code>
-     * @throws  StreamCorruptedException if control information in the stream
-     *          is inconsistent
-     */
     protected void readStreamHeader()
-            throws IOException, StreamCorruptedException
+            throws TIOException, TStreamCorruptedException
     {
         short s0 = bin.readShort();
         short s1 = bin.readShort();
         if (s0 != STREAM_MAGIC || s1 != STREAM_VERSION) {
-            throw new StreamCorruptedException(
-                    String.format("invalid stream header: %04X%04X", s0, s1));
+            throw new TStreamCorruptedException(
+                    TString.wrap(String.format("invalid stream header: %04X%04X", s0, s1)));
         }
     }
 
-    /**
-     * Read a class descriptor from the serialization stream.  This method is
-     * called when the ObjectInputStream expects a class descriptor as the next
-     * item in the serialization stream.  Subclasses of ObjectInputStream may
-     * override this method to read in class descriptors that have been written
-     * in non-standard formats (by subclasses of ObjectOutputStream which have
-     * overridden the <code>writeClassDescriptor</code> method).  By default,
-     * this method reads class descriptors according to the format defined in
-     * the Object Serialization specification.
-     *
-     * @return  the class descriptor read
-     * @throws  IOException If an I/O error has occurred.
-     * @throws  ClassNotFoundException If the Class of a serialized object used
-     *          in the class descriptor representation cannot be found
-     * @see java.io.ObjectOutputStream#writeClassDescriptor(java.io.ObjectStreamClass)
-     * @since 1.3
-     */
-    protected ObjectStreamClass readClassDescriptor()
-            throws IOException, ClassNotFoundException
+    protected TObjectStreamClass readClassDescriptor()
+            throws TIOException, ClassNotFoundException
     {
-        ObjectStreamClass desc = new ObjectStreamClass();
+        TObjectStreamClass desc = new TObjectStreamClass();
         desc.readNonProxy(this);
         return desc;
     }
 
-    /**
-     * Reads a byte of data. This method will block if no input is available.
-     *
-     * @return  the byte read, or -1 if the end of the stream is reached.
-     * @throws  IOException If an I/O error has occurred.
-     */
-    public int read() throws IOException {
+    public int read() throws TIOException {
         return bin.read();
     }
 
-    /**
-     * Reads into an array of bytes.  This method will block until some input
-     * is available. Consider using java.io.DataInputStream.readFully to read
-     * exactly 'length' bytes.
-     *
-     * @param   buf the buffer into which the data is read
-     * @param   off the start offset of the data
-     * @param   len the maximum number of bytes read
-     * @return  the actual number of bytes read, -1 is returned when the end of
-     *          the stream is reached.
-     * @throws  IOException If an I/O error has occurred.
-     * @see java.io.DataInputStream#readFully(byte[],int,int)
-     */
-    public int read(byte[] buf, int off, int len) throws IOException {
+    public int read(byte[] buf, int off, int len) throws TIOException {
         if (buf == null) {
             throw new NullPointerException();
         }
@@ -686,24 +364,11 @@ public class TObjectInputStream
         return bin.read(buf, off, len, false);
     }
 
-    /**
-     * Returns the number of bytes that can be read without blocking.
-     *
-     * @return  the number of available bytes.
-     * @throws  IOException if there are I/O errors while reading from the
-     *          underlying <code>InputStream</code>
-     */
-    public int available() throws IOException {
+    public int available() throws TIOException {
         return bin.available();
     }
 
-    /**
-     * Closes the input stream. Must be called to release any resources
-     * associated with the stream.
-     *
-     * @throws  IOException If an I/O error has occurred.
-     */
-    public void close() throws IOException {
+    public void close() throws TIOException {
         /*
          * Even if stream already closed, propagate redundant close to
          * underlying stream to stay consistent with previous implementations.
@@ -715,137 +380,62 @@ public class TObjectInputStream
         bin.close();
     }
 
-    /**
-     * Reads in a boolean.
-     *
-     * @return  the boolean read.
-     * @throws EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public boolean readBoolean() throws IOException {
+
+    public boolean readBoolean() throws TIOException {
         return bin.readBoolean();
     }
 
-    /**
-     * Reads an 8 bit byte.
-     *
-     * @return  the 8 bit byte read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public byte readByte() throws IOException  {
+
+    public byte readByte() throws TIOException  {
         return bin.readByte();
     }
 
-    /**
-     * Reads an unsigned 8 bit byte.
-     *
-     * @return  the 8 bit byte read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public int readUnsignedByte()  throws IOException {
+
+    public int readUnsignedByte()  throws TIOException {
         return bin.readUnsignedByte();
     }
 
-    /**
-     * Reads a 16 bit char.
-     *
-     * @return  the 16 bit char read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public char readChar()  throws IOException {
+
+    public char readChar()  throws TIOException {
         return bin.readChar();
     }
 
-    /**
-     * Reads a 16 bit short.
-     *
-     * @return  the 16 bit short read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public short readShort()  throws IOException {
+
+    public short readShort()  throws TIOException {
         return bin.readShort();
     }
 
-    /**
-     * Reads an unsigned 16 bit short.
-     *
-     * @return  the 16 bit short read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public int readUnsignedShort() throws IOException {
+
+    public int readUnsignedShort() throws TIOException {
         return bin.readUnsignedShort();
     }
 
-    /**
-     * Reads a 32 bit int.
-     *
-     * @return  the 32 bit integer read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public int readInt()  throws IOException {
+
+    public int readInt()  throws TIOException {
         return bin.readInt();
     }
 
-    /**
-     * Reads a 64 bit long.
-     *
-     * @return  the read 64 bit long.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public long readLong()  throws IOException {
+
+    public long readLong()  throws TIOException {
         return bin.readLong();
     }
 
-    /**
-     * Reads a 32 bit float.
-     *
-     * @return  the 32 bit float read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public float readFloat() throws IOException {
+
+    public float readFloat() throws TIOException {
         return bin.readFloat();
     }
 
-    /**
-     * Reads a 64 bit double.
-     *
-     * @return  the 64 bit double read.
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public double readDouble() throws IOException {
+
+    public double readDouble() throws TIOException {
         return bin.readDouble();
     }
 
-    /**
-     * Reads bytes, blocking until all bytes are read.
-     *
-     * @param   buf the buffer into which the data is read
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public void readFully(byte[] buf) throws IOException {
+
+    public void readFully(byte[] buf) throws TIOException {
         bin.readFully(buf, 0, buf.length, false);
     }
 
-    /**
-     * Reads bytes, blocking until all bytes are read.
-     *
-     * @param   buf the buffer into which the data is read
-     * @param   off the start offset of the data
-     * @param   len the maximum number of bytes to read
-     * @throws  EOFException If end of file is reached.
-     * @throws  IOException If other I/O error has occurred.
-     */
-    public void readFully(byte[] buf, int off, int len) throws IOException {
+    public void readFully(byte[] buf, int off, int len) throws TIOException {
         int endoff = off + len;
         if (off < 0 || len < 0 || endoff > buf.length || endoff < 0) {
             throw new IndexOutOfBoundsException();
@@ -853,43 +443,16 @@ public class TObjectInputStream
         bin.readFully(buf, off, len, false);
     }
 
-    /**
-     * Skips bytes.
-     *
-     * @param   len the number of bytes to be skipped
-     * @return  the actual number of bytes skipped.
-     * @throws  IOException If an I/O error has occurred.
-     */
-    public int skipBytes(int len) throws IOException {
+    public int skipBytes(int len) throws TIOException {
         return bin.skipBytes(len);
     }
 
-    /**
-     * Reads in a line that has been terminated by a \n, \r, \r\n or EOF.
-     *
-     * @return  a String copy of the line.
-     * @throws  IOException if there are I/O errors while reading from the
-     *          underlying <code>InputStream</code>
-     * @deprecated This method does not properly convert bytes to characters.
-     *          see DataInputStream for the details and alternatives.
-     */
     @Deprecated
-    public String readLine() throws IOException {
+    public TString readLine() throws TIOException {
         return bin.readLine();
     }
 
-    /**
-     * Reads a String in
-     * <a href="DataInput.html#modified-utf-8">modified UTF-8</a>
-     * format.
-     *
-     * @return  the String.
-     * @throws  IOException if there are I/O errors while reading from the
-     *          underlying <code>InputStream</code>
-     * @throws UTFDataFormatException if read bytes do not represent a valid
-     *          modified UTF-8 encoding of a string
-     */
-    public String readUTF() throws IOException {
+    public TString readUTF() throws TIOException {
         return bin.readUTF();
     }
 
@@ -903,147 +466,28 @@ public class TObjectInputStream
          *
          * @return  the descriptor class that describes the serializable fields
          */
-        public abstract ObjectStreamClass getObjectStreamClass();
+        public abstract TObjectStreamClass getObjectStreamClass();
 
-        /**
-         * Return true if the named field is defaulted and has no value in this
-         * stream.
-         *
-         * @param  name the name of the field
-         * @return true, if and only if the named field is defaulted
-         * @throws IOException if there are I/O errors while reading from
-         *         the underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if <code>name</code> does not
-         *         correspond to a serializable field
-         */
-        public abstract boolean defaulted(String name) throws IOException;
+        public abstract boolean defaulted(String name) throws TIOException;
 
-        /**
-         * Get the value of the named boolean field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>boolean</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
         public abstract boolean get(String name, boolean val)
-                throws IOException;
+                throws TIOException;
 
-        /**
-         * Get the value of the named byte field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>byte</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract byte get(String name, byte val) throws IOException;
+        public abstract byte get(String name, byte val) throws TIOException;
 
-        /**
-         * Get the value of the named char field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>char</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract char get(String name, char val) throws IOException;
+        public abstract char get(String name, char val) throws TIOException;
 
-        /**
-         * Get the value of the named short field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>short</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract short get(String name, short val) throws IOException;
+        public abstract short get(String name, short val) throws TIOException;
 
-        /**
-         * Get the value of the named int field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>int</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract int get(String name, int val) throws IOException;
+        public abstract int get(String name, int val) throws TIOException;
 
-        /**
-         * Get the value of the named long field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>long</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract long get(String name, long val) throws IOException;
+        public abstract long get(String name, long val) throws TIOException;
 
-        /**
-         * Get the value of the named float field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>float</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract float get(String name, float val) throws IOException;
+        public abstract float get(String name, float val) throws TIOException;
 
-        /**
-         * Get the value of the named double field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>double</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract double get(String name, double val) throws IOException;
+        public abstract double get(String name, double val) throws TIOException;
 
-        /**
-         * Get the value of the named Object field from the persistent field.
-         *
-         * @param  name the name of the field
-         * @param  val the default value to use if <code>name</code> does not
-         *         have a value
-         * @return the value of the named <code>Object</code> field
-         * @throws IOException if there are I/O errors while reading from the
-         *         underlying <code>InputStream</code>
-         * @throws IllegalArgumentException if type of <code>name</code> is
-         *         not serializable or if the field type is incorrect
-         */
-        public abstract Object get(String name, Object val) throws IOException;
+        public abstract Object get(String name, Object val) throws TIOException;
     }
 
     /**
@@ -1061,12 +505,12 @@ public class TObjectInputStream
         if (sm == null) {
             return;
         }
-        processQueue(TObjectOutputStream.Caches.subclassAuditsQueue, TObjectOutputStream.Caches.subclassAudits);
-        ObjectStreamClass.WeakClassKey key = new ObjectStreamClass.WeakClassKey(cl, TObjectOutputStream.Caches.subclassAuditsQueue);
-        Boolean result = TObjectOutputStream.Caches.subclassAudits.get(key);
+        processQueue(TObjectInputStream.Caches.subclassAuditsQueue, TObjectInputStream.Caches.subclassAudits);
+        TObjectStreamClass.WeakClassKey key = new TObjectStreamClass.WeakClassKey(cl, TObjectInputStream.Caches.subclassAuditsQueue);
+        Boolean result = TObjectInputStream.Caches.subclassAudits.get(key);
         if (result == null) {
             result = Boolean.valueOf(auditSubclass(cl));
-            TObjectOutputStream.Caches.subclassAudits.putIfAbsent(key, result);
+            TObjectInputStream.Caches.subclassAudits.putIfAbsent(key, result);
         }
         if (result.booleanValue()) {
             return;
@@ -1080,30 +524,31 @@ public class TObjectInputStream
      * is "safe", false otherwise.
      */
     private static boolean auditSubclass(final Class<?> subcl) {
-        Boolean result = AccessController.doPrivileged(
-                new PrivilegedAction<Boolean>() {
-                    public Boolean run() {
-                        for (Class<?> cl = subcl;
-                             cl != TObjectOutputStream.class;
-                             cl = cl.getSuperclass())
-                        {
-                            try {
-                                cl.getDeclaredMethod(
-                                        "readUnshared", (Class[]) null);
-                                return Boolean.FALSE;
-                            } catch (NoSuchMethodException ex) {
-                            }
-                            try {
-                                cl.getDeclaredMethod("readFields", (Class[]) null);
-                                return Boolean.FALSE;
-                            } catch (NoSuchMethodException ex) {
-                            }
-                        }
-                        return Boolean.TRUE;
-                    }
-                }
-        );
-        return result.booleanValue();
+//        Boolean result = AccessController.doPrivileged(
+//                new PrivilegedAction<Boolean>() {
+//                    public Boolean run() {
+//                        for (Class<?> cl = subcl;
+//                             cl != TObjectOutputStream.class;
+//                             cl = cl.getSuperclass())
+//                        {
+//                            try {
+//                                cl.getDeclaredMethod(
+//                                        "readUnshared", (Class[]) null);
+//                                return Boolean.FALSE;
+//                            } catch (NoSuchMethodException ex) {
+//                            }
+//                            try {
+//                                cl.getDeclaredMethod("readFields", (Class[]) null);
+//                                return Boolean.FALSE;
+//                            } catch (NoSuchMethodException ex) {
+//                            }
+//                        }
+//                        return Boolean.TRUE;
+//                    }
+//                }
+//        );
+//        return result.booleanValue();
+        return true;
     }
 
     /**
@@ -1117,12 +562,12 @@ public class TObjectInputStream
     /**
      * Underlying readObject implementation.
      */
-    private Object readObject0(boolean unshared) throws IOException {
+    private Object readObject0(boolean unshared) throws TIOException {
         boolean oldMode = bin.getBlockDataMode();
         if (oldMode) {
             int remain = bin.currentBlockRemaining();
             if (remain > 0) {
-                throw new OptionalDataException(remain);
+                throw new TOptionalDataException(remain);
             } else if (defaultDataEnd) {
                 /*
                  * Fix for 4360508: stream is currently at the end of a field
@@ -1130,7 +575,7 @@ public class TObjectInputStream
                  * is no terminating TC_ENDBLOCKDATA tag, simulate
                  * end-of-custom-data behavior explicitly.
                  */
-                throw new OptionalDataException(true);
+                throw new TOptionalDataException(true);
             }
             bin.setBlockDataMode(false);
         }
@@ -1171,7 +616,7 @@ public class TObjectInputStream
                     return checkResolve(readOrdinaryObject(unshared));
 
                 case TC_EXCEPTION:
-                    IOException ex = readFatalException();
+                    TIOException ex = readFatalException();
                     throw new WriteAbortedException("writing aborted", ex);
 
                 case TC_BLOCKDATA:
@@ -1179,24 +624,24 @@ public class TObjectInputStream
                     if (oldMode) {
                         bin.setBlockDataMode(true);
                         bin.peek();             // force header read
-                        throw new OptionalDataException(
+                        throw new TOptionalDataException(
                                 bin.currentBlockRemaining());
                     } else {
-                        throw new StreamCorruptedException(
-                                "unexpected block data");
+                        throw new TStreamCorruptedException(
+                                TString.wrap("unexpected block data"));
                     }
 
                 case TC_ENDBLOCKDATA:
                     if (oldMode) {
-                        throw new OptionalDataException(true);
+                        throw new TOptionalDataException(true);
                     } else {
-                        throw new StreamCorruptedException(
-                                "unexpected end of block data");
+                        throw new TStreamCorruptedException(
+                                TString.wrap("unexpected end of block data"));
                     }
 
                 default:
-                    throw new StreamCorruptedException(
-                            String.format("invalid type code: %02X", tc));
+                    throw new TStreamCorruptedException(
+                            TString.wrap(String.format("invalid type code: %02X", tc)));
             }
         } finally {
             depth--;
@@ -1212,7 +657,7 @@ public class TObjectInputStream
      * occurred.  Expects that passHandle is set to given object's handle prior
      * to calling this method.
      */
-    private Object checkResolve(Object obj) throws IOException {
+    private Object checkResolve(Object obj) throws TIOException {
         if (!enableResolve || handles.lookupException(passHandle) != null) {
             return obj;
         }
@@ -1227,7 +672,7 @@ public class TObjectInputStream
      * Reads string without allowing it to be replaced in stream.  Called from
      * within ObjectStreamClass.read().
      */
-    String readTypeString() throws IOException {
+    String readTypeString() throws TIOException {
         int oldHandle = passHandle;
         try {
             byte tc = bin.peekByte();
@@ -1243,8 +688,8 @@ public class TObjectInputStream
                     return readString(false);
 
                 default:
-                    throw new StreamCorruptedException(
-                            String.format("invalid type code: %02X", tc));
+                    throw new TStreamCorruptedException(
+                            TString.wrap(String.format("invalid type code: %02X", tc)));
             }
         } finally {
             passHandle = oldHandle;
@@ -1254,7 +699,7 @@ public class TObjectInputStream
     /**
      * Reads in null code, sets passHandle to NULL_HANDLE and returns null.
      */
-    private Object readNull() throws IOException {
+    private Object readNull() throws TIOException {
         if (bin.readByte() != TC_NULL) {
             throw new InternalError();
         }
@@ -1266,27 +711,27 @@ public class TObjectInputStream
      * Reads in object handle, sets passHandle to the read handle, and returns
      * object associated with the handle.
      */
-    private Object readHandle(boolean unshared) throws IOException {
+    private Object readHandle(boolean unshared) throws TIOException {
         if (bin.readByte() != TC_REFERENCE) {
             throw new InternalError();
         }
         passHandle = bin.readInt() - baseWireHandle;
         if (passHandle < 0 || passHandle >= handles.size()) {
-            throw new StreamCorruptedException(
-                    String.format("invalid handle value: %08X", passHandle +
-                            baseWireHandle));
+            throw new TStreamCorruptedException(
+                    TString.wrap(String.format("invalid handle value: %08X", passHandle +
+                            baseWireHandle)));
         }
         if (unshared) {
             // REMIND: what type of exception to throw here?
-            throw new InvalidObjectException(
-                    "cannot read back reference as unshared");
+            throw new TInvalidObjectException(TString.wrap(
+                    "cannot read back reference as unshared"));
         }
 
         Object obj = handles.lookupObject(passHandle);
         if (obj == unsharedMarker) {
             // REMIND: what type of exception to throw here?
-            throw new InvalidObjectException(
-                    "cannot read back reference to unshared object");
+            throw new TInvalidObjectException(TString.wrap(
+                    "cannot read back reference to unshared object"));
         }
         return obj;
     }
@@ -1297,11 +742,11 @@ public class TObjectInputStream
      * ClassNotFoundException will be associated with the class' handle in the
      * handle table).
      */
-    private Class<?> readClass(boolean unshared) throws IOException {
+    private Class<?> readClass(boolean unshared) throws TIOException {
         if (bin.readByte() != TC_CLASS) {
             throw new InternalError();
         }
-        ObjectStreamClass desc = readClassDesc(false);
+        TObjectStreamClass desc = readClassDesc(false);
         Class<?> cl = desc.forClass();
         passHandle = handles.assign(unshared ? unsharedMarker : cl);
 
@@ -1320,16 +765,16 @@ public class TObjectInputStream
      * resolved to a class in the local VM, a ClassNotFoundException is
      * associated with the class descriptor's handle.
      */
-    private ObjectStreamClass readClassDesc(boolean unshared)
-            throws IOException
+    private TObjectStreamClass readClassDesc(boolean unshared)
+            throws TIOException
     {
         byte tc = bin.peekByte();
         switch (tc) {
             case TC_NULL:
-                return (ObjectStreamClass) readNull();
+                return (TObjectStreamClass) readNull();
 
             case TC_REFERENCE:
-                return (ObjectStreamClass) readHandle(unshared);
+                return (TObjectStreamClass) readHandle(unshared);
 
             case TC_PROXYCLASSDESC:
                 return readProxyDesc(unshared);
@@ -1338,8 +783,8 @@ public class TObjectInputStream
                 return readNonProxyDesc(unshared);
 
             default:
-                throw new StreamCorruptedException(
-                        String.format("invalid type code: %02X", tc));
+                throw new TStreamCorruptedException(
+                        TString.wrap(String.format("invalid type code: %02X", tc)));
         }
     }
 
@@ -1355,49 +800,50 @@ public class TObjectInputStream
      * descriptor cannot be resolved to a class in the local VM, a
      * ClassNotFoundException is associated with the descriptor's handle.
      */
-    private ObjectStreamClass readProxyDesc(boolean unshared)
-            throws IOException
+    private TObjectStreamClass readProxyDesc(boolean unshared)
+            throws TIOException
     {
-        if (bin.readByte() != TC_PROXYCLASSDESC) {
-            throw new InternalError();
-        }
+//        if (bin.readByte() != TC_PROXYCLASSDESC) {
+//            throw new InternalError();
+//        }
+//
+//        TObjectStreamClass desc = new TObjectStreamClass();
+//        int descHandle = handles.assign(unshared ? unsharedMarker : desc);
+//        passHandle = NULL_HANDLE;
+//
+//        int numIfaces = bin.readInt();
+//        TString[] ifaces = new TString[numIfaces];
+//        for (int i = 0; i < numIfaces; i++) {
+//            ifaces[i] = bin.readUTF();
+//        }
+//
+//        Class<?> cl = null;
+//        ClassNotFoundException resolveEx = null;
+//        bin.setBlockDataMode(true);
+//        try {
+//            if ((cl = resolveProxyClass(ifaces)) == null) {
+//                resolveEx = new ClassNotFoundException("null class");
+//            } else if (!Proxy.isProxyClass(cl)) {
+//                throw new TInvalidClassException("Not a proxy");
+//            } else {
+//                // ReflectUtil.checkProxyPackageAccess makes a test
+//                // equivalent to isCustomSubclass so there's no need
+//                // to condition this call to isCustomSubclass == true here.
+//                ReflectUtil.checkProxyPackageAccess(
+//                        getClass().getClassLoader(),
+//                        cl.getInterfaces());
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            resolveEx = ex;
+//        }
+//        skipCustomData();
+//
+//        desc.initProxy(cl, resolveEx, readClassDesc(false));
 
-        ObjectStreamClass desc = new ObjectStreamClass();
-        int descHandle = handles.assign(unshared ? unsharedMarker : desc);
-        passHandle = NULL_HANDLE;
-
-        int numIfaces = bin.readInt();
-        String[] ifaces = new String[numIfaces];
-        for (int i = 0; i < numIfaces; i++) {
-            ifaces[i] = bin.readUTF();
-        }
-
-        Class<?> cl = null;
-        ClassNotFoundException resolveEx = null;
-        bin.setBlockDataMode(true);
-        try {
-            if ((cl = resolveProxyClass(ifaces)) == null) {
-                resolveEx = new ClassNotFoundException("null class");
-            } else if (!Proxy.isProxyClass(cl)) {
-                throw new InvalidClassException("Not a proxy");
-            } else {
-                // ReflectUtil.checkProxyPackageAccess makes a test
-                // equivalent to isCustomSubclass so there's no need
-                // to condition this call to isCustomSubclass == true here.
-                ReflectUtil.checkProxyPackageAccess(
-                        getClass().getClassLoader(),
-                        cl.getInterfaces());
-            }
-        } catch (ClassNotFoundException ex) {
-            resolveEx = ex;
-        }
-        skipCustomData();
-
-        desc.initProxy(cl, resolveEx, readClassDesc(false));
-
-        handles.finish(descHandle);
-        passHandle = descHandle;
-        return desc;
+//        handles.finish(descHandle);
+//        passHandle = descHandle;
+//        return desc;
+        return null;
     }
 
     /**
@@ -1406,53 +852,54 @@ public class TObjectInputStream
      * class descriptor cannot be resolved to a class in the local VM, a
      * ClassNotFoundException is associated with the descriptor's handle.
      */
-    private ObjectStreamClass readNonProxyDesc(boolean unshared)
-            throws IOException
+    private TObjectStreamClass readNonProxyDesc(boolean unshared)
+            throws TIOException
     {
         if (bin.readByte() != TC_CLASSDESC) {
             throw new InternalError();
         }
 
-        ObjectStreamClass desc = new ObjectStreamClass();
-        int descHandle = handles.assign(unshared ? unsharedMarker : desc);
-        passHandle = NULL_HANDLE;
-
-        ObjectStreamClass readDesc = null;
-        try {
-            readDesc = readClassDescriptor();
-        } catch (ClassNotFoundException ex) {
-            throw (IOException) new InvalidClassException(
-                    "failed to read class descriptor").initCause(ex);
-        }
-
-        Class<?> cl = null;
-        ClassNotFoundException resolveEx = null;
-        bin.setBlockDataMode(true);
-        final boolean checksRequired = isCustomSubclass();
-        try {
-            if ((cl = resolveClass(readDesc)) == null) {
-                resolveEx = new ClassNotFoundException("null class");
-            } else if (checksRequired) {
-                ReflectUtil.checkPackageAccess(cl);
-            }
-        } catch (ClassNotFoundException ex) {
-            resolveEx = ex;
-        }
-        skipCustomData();
-
-        desc.initNonProxy(readDesc, cl, resolveEx, readClassDesc(false));
-
-        handles.finish(descHandle);
-        passHandle = descHandle;
-        return desc;
+//        TObjectStreamClass desc = new TObjectStreamClass();
+//        int descHandle = handles.assign(unshared ? unsharedMarker : desc);
+//        passHandle = NULL_HANDLE;
+//
+//        TObjectStreamClass readDesc = null;
+//        try {
+//            readDesc = readClassDescriptor();
+//        } catch (ClassNotFoundException ex) {
+//            throw (TIOException) new TInvalidClassException(
+//                    TString.wrap("failed to read class descriptor")).initCause(ex);
+//        }
+//
+//        Class<?> cl = null;
+//        ClassNotFoundException resolveEx = null;
+//        bin.setBlockDataMode(true);
+//        final boolean checksRequired = isCustomSubclass();
+//        try {
+//            if ((cl = resolveClass(readDesc)) == null) {
+//                resolveEx = new ClassNotFoundException("null class");
+//            } else if (checksRequired) {
+//                TReflectUtil.checkPackageAccess(cl);
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            resolveEx = ex;
+//        }
+//        skipCustomData();
+//
+//        desc.initNonProxy(readDesc, cl, resolveEx, readClassDesc(false));
+//
+//        handles.finish(descHandle);
+//        passHandle = descHandle;
+//        return desc;
+        return null;
     }
 
     /**
      * Reads in and returns new string.  Sets passHandle to new string's
      * assigned handle.
      */
-    private String readString(boolean unshared) throws IOException {
-        String str;
+    private TString readString(boolean unshared) throws TIOException {
+        TString str;
         byte tc = bin.readByte();
         switch (tc) {
             case TC_STRING:
@@ -1464,8 +911,8 @@ public class TObjectInputStream
                 break;
 
             default:
-                throw new StreamCorruptedException(
-                        String.format("invalid type code: %02X", tc));
+                throw new TStreamCorruptedException(
+                        TString.wrap(String.format("invalid type code: %02X", tc)));
         }
         passHandle = handles.assign(unshared ? unsharedMarker : str);
         handles.finish(passHandle);
@@ -1476,76 +923,78 @@ public class TObjectInputStream
      * Reads in and returns array object, or null if array class is
      * unresolvable.  Sets passHandle to array's assigned handle.
      */
-    private Object readArray(boolean unshared) throws IOException {
-        if (bin.readByte() != TC_ARRAY) {
-            throw new InternalError();
-        }
+    private Object readArray(boolean unshared) throws TIOException {
+//        if (bin.readByte() != TC_ARRAY) {
+//            throw new InternalError();
+//        }
+//
+//        TObjectStreamClass desc = readClassDesc(false);
+//        int len = bin.readInt();
+//
+//        Object array = null;
+//        Class<?> cl, ccl = null;
+//        if ((cl = desc.forClass()) != null) {
+//            ccl = cl.getComponentType();
+//            array = TArray.newInstance(ccl, len);
+//        }
+//
+//        int arrayHandle = handles.assign(unshared ? unsharedMarker : array);
+//        ClassNotFoundException resolveEx = desc.getResolveException();
+//        if (resolveEx != null) {
+//            handles.markException(arrayHandle, resolveEx);
+//        }
+//
+//        if (ccl == null) {
+//            for (int i = 0; i < len; i++) {
+//                readObject0(false);
+//            }
+//        } else if (ccl.isPrimitive()) {
+//            if (ccl == Integer.TYPE) {
+//                bin.readInts((int[]) array, 0, len);
+//            } else if (ccl == Byte.TYPE) {
+//                bin.readFully((byte[]) array, 0, len, true);
+//            } else if (ccl == Long.TYPE) {
+//                bin.readLongs((long[]) array, 0, len);
+//            } else if (ccl == Float.TYPE) {
+//                bin.readFloats((float[]) array, 0, len);
+//            } else if (ccl == Double.TYPE) {
+//                bin.readDoubles((double[]) array, 0, len);
+//            } else if (ccl == Short.TYPE) {
+//                bin.readShorts((short[]) array, 0, len);
+//            } else if (ccl == Character.TYPE) {
+//                bin.readChars((char[]) array, 0, len);
+//            } else if (ccl == Boolean.TYPE) {
+//                bin.readBooleans((boolean[]) array, 0, len);
+//            } else {
+//                throw new InternalError();
+//            }
+//        } else {
+//            Object[] oa = (Object[]) array;
+//            for (int i = 0; i < len; i++) {
+//                oa[i] = readObject0(false);
+//                handles.markDependency(arrayHandle, passHandle);
+//            }
+//        }
+//
+//        handles.finish(arrayHandle);
+//        passHandle = arrayHandle;
+//        return array;
 
-        ObjectStreamClass desc = readClassDesc(false);
-        int len = bin.readInt();
-
-        Object array = null;
-        Class<?> cl, ccl = null;
-        if ((cl = desc.forClass()) != null) {
-            ccl = cl.getComponentType();
-            array = Array.newInstance(ccl, len);
-        }
-
-        int arrayHandle = handles.assign(unshared ? unsharedMarker : array);
-        ClassNotFoundException resolveEx = desc.getResolveException();
-        if (resolveEx != null) {
-            handles.markException(arrayHandle, resolveEx);
-        }
-
-        if (ccl == null) {
-            for (int i = 0; i < len; i++) {
-                readObject0(false);
-            }
-        } else if (ccl.isPrimitive()) {
-            if (ccl == Integer.TYPE) {
-                bin.readInts((int[]) array, 0, len);
-            } else if (ccl == Byte.TYPE) {
-                bin.readFully((byte[]) array, 0, len, true);
-            } else if (ccl == Long.TYPE) {
-                bin.readLongs((long[]) array, 0, len);
-            } else if (ccl == Float.TYPE) {
-                bin.readFloats((float[]) array, 0, len);
-            } else if (ccl == Double.TYPE) {
-                bin.readDoubles((double[]) array, 0, len);
-            } else if (ccl == Short.TYPE) {
-                bin.readShorts((short[]) array, 0, len);
-            } else if (ccl == Character.TYPE) {
-                bin.readChars((char[]) array, 0, len);
-            } else if (ccl == Boolean.TYPE) {
-                bin.readBooleans((boolean[]) array, 0, len);
-            } else {
-                throw new InternalError();
-            }
-        } else {
-            Object[] oa = (Object[]) array;
-            for (int i = 0; i < len; i++) {
-                oa[i] = readObject0(false);
-                handles.markDependency(arrayHandle, passHandle);
-            }
-        }
-
-        handles.finish(arrayHandle);
-        passHandle = arrayHandle;
-        return array;
+        return null;
     }
 
     /**
      * Reads in and returns enum constant, or null if enum type is
      * unresolvable.  Sets passHandle to enum constant's assigned handle.
      */
-    private Enum<?> readEnum(boolean unshared) throws IOException {
+    private TEnum<?> readEnum(boolean unshared) throws TIOException {
         if (bin.readByte() != TC_ENUM) {
             throw new InternalError();
         }
 
-        ObjectStreamClass desc = readClassDesc(false);
+        TObjectStreamClass desc = readClassDesc(false);
         if (!desc.isEnum()) {
-            throw new InvalidClassException("non-enum class: " + desc);
+            throw new TInvalidClassException(TString.wrap("non-enum class: " + desc));
         }
 
         int enumHandle = handles.assign(unshared ? unsharedMarker : null);
@@ -1554,18 +1003,18 @@ public class TObjectInputStream
             handles.markException(enumHandle, resolveEx);
         }
 
-        String name = readString(false);
-        Enum<?> result = null;
-        Class<?> cl = desc.forClass();
+        TString name = readString(false);
+        TEnum<?> result = null;
+        TClass<?> cl = desc.forClass();
         if (cl != null) {
             try {
                 @SuppressWarnings("unchecked")
-                Enum<?> en = Enum.valueOf((Class)cl, name);
+                TEnum<?> en = TEnum.valueOf((TClass)cl, name);
                 result = en;
             } catch (IllegalArgumentException ex) {
-                throw (IOException) new InvalidObjectException(
+                throw (TIOException) new TInvalidObjectException(TString.wrap(
                         "enum constant " + name + " does not exist in " +
-                                cl).initCause(ex);
+                                cl)).initCause(ex);
             }
             if (!unshared) {
                 handles.setObject(enumHandle, result);
@@ -1585,28 +1034,28 @@ public class TObjectInputStream
      * handle.
      */
     private Object readOrdinaryObject(boolean unshared)
-            throws IOException
+            throws TIOException
     {
         if (bin.readByte() != TC_OBJECT) {
             throw new InternalError();
         }
 
-        ObjectStreamClass desc = readClassDesc(false);
+        TObjectStreamClass desc = readClassDesc(false);
         desc.checkDeserialize();
 
-        Class<?> cl = desc.forClass();
-        if (cl == String.class || cl == Class.class
-                || cl == ObjectStreamClass.class) {
-            throw new InvalidClassException("invalid class descriptor");
-        }
+        TClass<?> cl = desc.forClass();
+//        if (cl == String.class || cl == Class.class
+//                || cl == TObjectStreamClass.class) {
+//            throw new TInvalidClassException(TString.wrap("invalid class descriptor"));
+//        }
 
         Object obj;
         try {
             obj = desc.isInstantiable() ? desc.newInstance() : null;
         } catch (Exception ex) {
-            throw (IOException) new InvalidClassException(
+            throw (TIOException) new TInvalidClassException(
                     desc.forClass().getName(),
-                    "unable to create instance").initCause(ex);
+                    TString.wrap("unable to create instance")).initCause(ex);
         }
 
         passHandle = handles.assign(unshared ? unsharedMarker : obj);
@@ -1616,7 +1065,7 @@ public class TObjectInputStream
         }
 
         if (desc.isExternalizable()) {
-            readExternalData((Externalizable) obj, desc);
+            readExternalData((TExternalizable) obj, desc);
         } else {
             readSerialData(obj, desc);
         }
@@ -1645,10 +1094,10 @@ public class TObjectInputStream
      * Expects that passHandle is set to obj's handle before this method is
      * called.
      */
-    private void readExternalData(Externalizable obj, ObjectStreamClass desc)
-            throws IOException
+    private void readExternalData(TExternalizable obj, TObjectStreamClass desc)
+            throws TIOException
     {
-        SerialCallbackContext oldContext = curContext;
+        TSerialCallbackContext oldContext = curContext;
         if (oldContext != null)
             oldContext.check();
         curContext = null;
@@ -1699,18 +1148,18 @@ public class TObjectInputStream
      * object in stream, from superclass to subclass.  Expects that passHandle
      * is set to obj's handle before this method is called.
      */
-    private void readSerialData(Object obj, ObjectStreamClass desc)
-            throws IOException
+    private void readSerialData(Object obj, TObjectStreamClass desc)
+            throws TIOException
     {
-        ObjectStreamClass.ClassDataSlot[] slots = desc.getClassDataLayout();
+        TObjectStreamClass.ClassDataSlot[] slots = desc.getClassDataLayout();
         for (int i = 0; i < slots.length; i++) {
-            ObjectStreamClass slotDesc = slots[i].desc;
+            TObjectStreamClass slotDesc = slots[i].desc;
 
             if (slots[i].hasData) {
                 if (obj == null || handles.lookupException(passHandle) != null) {
                     defaultReadFields(null, slotDesc); // skip field values
                 } else if (slotDesc.hasReadObjectMethod()) {
-                    SerialCallbackContext oldContext = curContext;
+                    TSerialCallbackContext oldContext = curContext;
                     if (oldContext != null)
                         oldContext.check();
                     try {
@@ -1764,7 +1213,7 @@ public class TObjectInputStream
      * Skips over all block data and objects until TC_ENDBLOCKDATA is
      * encountered.
      */
-    private void skipCustomData() throws IOException {
+    private void skipCustomData() throws TIOException {
         int oldHandle = passHandle;
         for (;;) {
             if (bin.getBlockDataMode()) {
@@ -1794,8 +1243,8 @@ public class TObjectInputStream
      * descriptor.  If obj is non-null, sets field values in obj.  Expects that
      * passHandle is set to obj's handle before this method is called.
      */
-    private void defaultReadFields(Object obj, ObjectStreamClass desc)
-            throws IOException
+    private void defaultReadFields(Object obj, TObjectStreamClass desc)
+            throws TIOException
     {
         Class<?> cl = desc.forClass();
         if (cl != null && obj != null && !cl.isInstance(obj)) {
@@ -1812,11 +1261,11 @@ public class TObjectInputStream
         }
 
         int objHandle = passHandle;
-        ObjectStreamField[] fields = desc.getFields(false);
+        TObjectStreamField[] fields = desc.getFields(false);
         Object[] objVals = new Object[desc.getNumObjFields()];
         int numPrimFields = fields.length - objVals.length;
         for (int i = 0; i < objVals.length; i++) {
-            ObjectStreamField f = fields[numPrimFields + i];
+            TObjectStreamField f = fields[numPrimFields + i];
             objVals[i] = readObject0(f.isUnshared());
             if (f.getField() != null) {
                 handles.markDependency(objHandle, passHandle);
@@ -1833,12 +1282,12 @@ public class TObjectInputStream
      * All stream state is discarded prior to reading in fatal exception.  Sets
      * passHandle to fatal exception's handle.
      */
-    private IOException readFatalException() throws IOException {
+    private TIOException readFatalException() throws TIOException {
         if (bin.readByte() != TC_EXCEPTION) {
             throw new InternalError();
         }
         clear();
-        return (IOException) readObject0(false);
+        return (TIOException) readObject0(false);
     }
 
     /**
@@ -1846,10 +1295,10 @@ public class TObjectInputStream
      * throws a StreamCorruptedException.  This method is called when a
      * TC_RESET typecode is encountered.
      */
-    private void handleReset() throws StreamCorruptedException {
+    private void handleReset() throws TStreamCorruptedException {
         if (depth > 0) {
-            throw new StreamCorruptedException(
-                    "unexpected reset; recursion depth: " + depth);
+            throw new TStreamCorruptedException(
+                    TString.wrap("unexpected reset; recursion depth: " + depth));
         }
         clear();
     }
@@ -1888,10 +1337,10 @@ public class TObjectInputStream
     /**
      * Default GetField implementation.
      */
-    private class GetFieldImpl extends TObjectOutputStream.GetField {
+    private class GetFieldImpl extends TObjectInputStream.GetField {
 
         /** class descriptor describing serializable fields */
-        private final ObjectStreamClass desc;
+        private final TObjectStreamClass desc;
         /** primitive field values */
         private final byte[] primVals;
         /** object field values */
@@ -1903,62 +1352,62 @@ public class TObjectInputStream
          * Creates GetFieldImpl object for reading fields defined in given
          * class descriptor.
          */
-        GetFieldImpl(ObjectStreamClass desc) {
+        GetFieldImpl(TObjectStreamClass desc) {
             this.desc = desc;
             primVals = new byte[desc.getPrimDataSize()];
             objVals = new Object[desc.getNumObjFields()];
             objHandles = new int[objVals.length];
         }
 
-        public ObjectStreamClass getObjectStreamClass() {
+        public TObjectStreamClass getObjectStreamClass() {
             return desc;
         }
 
-        public boolean defaulted(String name) throws IOException {
+        public boolean defaulted(String name) throws TIOException {
             return (getFieldOffset(name, null) < 0);
         }
 
-        public boolean get(String name, boolean val) throws IOException {
+        public boolean get(String name, boolean val) throws TIOException {
             int off = getFieldOffset(name, Boolean.TYPE);
-            return (off >= 0) ? Bits.getBoolean(primVals, off) : val;
+            return (off >= 0) ? TBits.getBoolean(primVals, off) : val;
         }
 
-        public byte get(String name, byte val) throws IOException {
+        public byte get(String name, byte val) throws TIOException {
             int off = getFieldOffset(name, Byte.TYPE);
             return (off >= 0) ? primVals[off] : val;
         }
 
-        public char get(String name, char val) throws IOException {
+        public char get(String name, char val) throws TIOException {
             int off = getFieldOffset(name, Character.TYPE);
-            return (off >= 0) ? Bits.getChar(primVals, off) : val;
+            return (off >= 0) ? TBits.getChar(primVals, off) : val;
         }
 
-        public short get(String name, short val) throws IOException {
+        public short get(String name, short val) throws TIOException {
             int off = getFieldOffset(name, Short.TYPE);
-            return (off >= 0) ? Bits.getShort(primVals, off) : val;
+            return (off >= 0) ? TBits.getShort(primVals, off) : val;
         }
 
-        public int get(String name, int val) throws IOException {
+        public int get(String name, int val) throws TIOException {
             int off = getFieldOffset(name, Integer.TYPE);
-            return (off >= 0) ? Bits.getInt(primVals, off) : val;
+            return (off >= 0) ? TBits.getInt(primVals, off) : val;
         }
 
-        public float get(String name, float val) throws IOException {
+        public float get(String name, float val) throws TIOException {
             int off = getFieldOffset(name, Float.TYPE);
-            return (off >= 0) ? Bits.getFloat(primVals, off) : val;
+            return (off >= 0) ? TBits.getFloat(primVals, off) : val;
         }
 
-        public long get(String name, long val) throws IOException {
+        public long get(String name, long val) throws TIOException {
             int off = getFieldOffset(name, Long.TYPE);
-            return (off >= 0) ? Bits.getLong(primVals, off) : val;
+            return (off >= 0) ? TBits.getLong(primVals, off) : val;
         }
 
-        public double get(String name, double val) throws IOException {
+        public double get(String name, double val) throws TIOException {
             int off = getFieldOffset(name, Double.TYPE);
-            return (off >= 0) ? Bits.getDouble(primVals, off) : val;
+            return (off >= 0) ? TBits.getDouble(primVals, off) : val;
         }
 
-        public Object get(String name, Object val) throws IOException {
+        public Object get(String name, Object val) throws TIOException {
             int off = getFieldOffset(name, Object.class);
             if (off >= 0) {
                 int objHandle = objHandles[off];
@@ -1973,11 +1422,11 @@ public class TObjectInputStream
         /**
          * Reads primitive and object field values from stream.
          */
-        void readFields() throws IOException {
+        void readFields() throws TIOException {
             bin.readFully(primVals, 0, primVals.length, false);
 
             int oldHandle = passHandle;
-            ObjectStreamField[] fields = desc.getFields(false);
+            TObjectStreamField[] fields = desc.getFields(false);
             int numPrimFields = fields.length - objVals.length;
             for (int i = 0; i < objVals.length; i++) {
                 objVals[i] =
@@ -1997,7 +1446,7 @@ public class TObjectInputStream
          * neither incoming nor local class descriptor contains a match.
          */
         private int getFieldOffset(String name, Class<?> type) {
-            ObjectStreamField field = desc.getField(name, type);
+            TObjectStreamField field = desc.getField(name, type);
             if (field != null) {
                 return field.getOffset();
             } else if (desc.getLocalDesc().getField(name, type) != null) {
@@ -2016,13 +1465,13 @@ public class TObjectInputStream
     private static class ValidationList {
 
         private static class Callback {
-            final ObjectInputValidation obj;
+            final TObjectInputValidation obj;
             final int priority;
-            TObjectOutputStream.ValidationList.Callback next;
-            final AccessControlContext acc;
+            TObjectInputStream.ValidationList.Callback next;
+            final TAccessControlContext acc;
 
-            Callback(ObjectInputValidation obj, int priority, TObjectOutputStream.ValidationList.Callback next,
-                    AccessControlContext acc)
+            Callback(TObjectInputValidation obj, int priority, TObjectInputStream.ValidationList.Callback next,
+                    TAccessControlContext acc)
             {
                 this.obj = obj;
                 this.priority = priority;
@@ -2032,7 +1481,7 @@ public class TObjectInputStream
         }
 
         /** linked list of callbacks */
-        private TObjectOutputStream.ValidationList.Callback list;
+        private TObjectInputStream.ValidationList.Callback list;
 
         /**
          * Creates new (empty) ValidationList.
@@ -2044,23 +1493,23 @@ public class TObjectInputStream
          * Registers callback.  Throws InvalidObjectException if callback
          * object is null.
          */
-        void register(ObjectInputValidation obj, int priority)
-                throws InvalidObjectException
+        void register(TObjectInputValidation obj, int priority)
+                throws TInvalidObjectException
         {
             if (obj == null) {
-                throw new InvalidObjectException("null callback");
+                throw new TInvalidObjectException(TString.wrap("null callback"));
             }
 
-            TObjectOutputStream.ValidationList.Callback prev = null, cur = list;
+            TObjectInputStream.ValidationList.Callback prev = null, cur = list;
             while (cur != null && priority < cur.priority) {
                 prev = cur;
                 cur = cur.next;
             }
-            AccessControlContext acc = AccessController.getContext();
+            TAccessControlContext acc = TAccessController.getContext();
             if (prev != null) {
-                prev.next = new TObjectOutputStream.ValidationList.Callback(obj, priority, cur, acc);
+                prev.next = new TObjectInputStream.ValidationList.Callback(obj, priority, cur, acc);
             } else {
-                list = new TObjectOutputStream.ValidationList.Callback(obj, priority, list, acc);
+                list = new TObjectInputStream.ValidationList.Callback(obj, priority, list, acc);
             }
         }
 
@@ -2071,13 +1520,13 @@ public class TObjectInputStream
          * throws an InvalidObjectException, the callback process is terminated
          * and the exception propagated upwards.
          */
-        void doCallbacks() throws InvalidObjectException {
+        void doCallbacks() throws TInvalidObjectException {
             try {
                 while (list != null) {
-                    AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<Void>()
+                    TAccessController.doPrivileged(
+                            new TPrivilegedExceptionAction<Void>()
                             {
-                                public Void run() throws InvalidObjectException {
+                                public Void run() throws TInvalidObjectException {
                                     list.obj.validateObject();
                                     return null;
                                 }
@@ -2086,7 +1535,7 @@ public class TObjectInputStream
                 }
             } catch (PrivilegedActionException ex) {
                 list = null;
-                throw (InvalidObjectException) ex.getException();
+                throw (TInvalidObjectException) ex.getException();
             }
         }
 
@@ -2101,17 +1550,17 @@ public class TObjectInputStream
     /**
      * Input stream supporting single-byte peek operations.
      */
-    private static class PeekInputStream extends InputStream {
+    private static class PeekInputStream extends TInputStream {
 
         /** underlying stream */
-        private final InputStream in;
+        private final TInputStream in;
         /** peeked byte */
         private int peekb = -1;
 
         /**
          * Creates new PeekInputStream on top of given underlying stream.
          */
-        PeekInputStream(InputStream in) {
+        PeekInputStream(TInputStream in) {
             this.in = in;
         }
 
@@ -2119,11 +1568,11 @@ public class TObjectInputStream
          * Peeks at next byte value in stream.  Similar to read(), except
          * that it does not consume the read value.
          */
-        int peek() throws IOException {
+        int peek() throws TIOException {
             return (peekb >= 0) ? peekb : (peekb = in.read());
         }
 
-        public int read() throws IOException {
+        public int read() throws TIOException {
             if (peekb >= 0) {
                 int v = peekb;
                 peekb = -1;
@@ -2133,7 +1582,7 @@ public class TObjectInputStream
             }
         }
 
-        public int read(byte[] b, int off, int len) throws IOException {
+        public int read(byte[] b, int off, int len) throws TIOException {
             if (len == 0) {
                 return 0;
             } else if (peekb < 0) {
@@ -2147,18 +1596,18 @@ public class TObjectInputStream
             }
         }
 
-        void readFully(byte[] b, int off, int len) throws IOException {
+        void readFully(byte[] b, int off, int len) throws TIOException {
             int n = 0;
             while (n < len) {
                 int count = read(b, off + n, len - n);
                 if (count < 0) {
-                    throw new EOFException();
+                    throw new TEOFException();
                 }
                 n += count;
             }
         }
 
-        public long skip(long n) throws IOException {
+        public long skip(long n) throws TIOException {
             if (n <= 0) {
                 return 0;
             }
@@ -2171,11 +1620,11 @@ public class TObjectInputStream
             return skipped + skip(n);
         }
 
-        public int available() throws IOException {
+        public int available() throws TIOException {
             return in.available() + ((peekb >= 0) ? 1 : 0);
         }
 
-        public void close() throws IOException {
+        public void close() throws TIOException {
             in.close();
         }
     }
@@ -2189,7 +1638,7 @@ public class TObjectInputStream
      * for the current data block is read in at once (and buffered).
      */
     private class BlockDataInputStream
-            extends InputStream implements DataInput
+            extends TInputStream implements TDataInput
     {
         /** maximum data block length */
         private static final int MAX_BLOCK_SIZE = 1024;
@@ -2219,17 +1668,17 @@ public class TObjectInputStream
         private int unread = 0;
 
         /** underlying stream (wrapped in peekable filter stream) */
-        private final TObjectOutputStream.PeekInputStream in;
+        private final TObjectInputStream.PeekInputStream in;
         /** loopback stream (for data reads that span data blocks) */
-        private final DataInputStream din;
+        private final TDataInputStream din;
 
         /**
          * Creates new BlockDataInputStream on top of given underlying stream.
          * Block data mode is turned off by default.
          */
-        BlockDataInputStream(InputStream in) {
-            this.in = new TObjectOutputStream.PeekInputStream(in);
-            din = new DataInputStream(this);
+        BlockDataInputStream(TInputStream in) {
+            this.in = new TObjectInputStream.PeekInputStream(in);
+            din = new TDataInputStream(this);
         }
 
         /**
@@ -2239,7 +1688,7 @@ public class TObjectInputStream
          * block data mode is being switched from on to off while unconsumed
          * block data is still present in the stream.
          */
-        boolean setBlockDataMode(boolean newmode) throws IOException {
+        boolean setBlockDataMode(boolean newmode) throws TIOException {
             if (blkmode == newmode) {
                 return blkmode;
             }
@@ -2267,7 +1716,7 @@ public class TObjectInputStream
          * blocks (but does not unset block data mode).  If not in block data
          * mode, throws an IllegalStateException.
          */
-        void skipBlockData() throws IOException {
+        void skipBlockData() throws TIOException {
             if (!blkmode) {
                 throw new IllegalStateException("not in block data mode");
             }
@@ -2283,7 +1732,7 @@ public class TObjectInputStream
          * stream is a block data header, returns the block data length
          * specified by the header, else returns -1.
          */
-        private int readBlockHeader(boolean canBlock) throws IOException {
+        private int readBlockHeader(boolean canBlock) throws TIOException {
             if (defaultDataEnd) {
                 /*
                  * Fix for 4360508: stream is currently at the end of a field
@@ -2314,11 +1763,11 @@ public class TObjectInputStream
                                 return HEADER_BLOCKED;
                             }
                             in.readFully(hbuf, 0, 5);
-                            int len = Bits.getInt(hbuf, 1);
+                            int len = TBits.getInt(hbuf, 1);
                             if (len < 0) {
-                                throw new StreamCorruptedException(
-                                        "illegal block data header length: " +
-                                                len);
+                                throw new TStreamCorruptedException(
+                                        TString.wrap("illegal block data header length: " +
+                                                len));
                             }
                             return len;
 
@@ -2335,16 +1784,16 @@ public class TObjectInputStream
 
                         default:
                             if (tc >= 0 && (tc < TC_BASE || tc > TC_MAX)) {
-                                throw new StreamCorruptedException(
+                                throw new TStreamCorruptedException(TString.wrap(
                                         String.format("invalid type code: %02X",
-                                                tc));
+                                                tc)));
                             }
                             return -1;
                     }
                 }
-            } catch (EOFException ex) {
-                throw new StreamCorruptedException(
-                        "unexpected EOF while reading block data header");
+            } catch (TEOFException ex) {
+                throw new TStreamCorruptedException(TString.wrap(
+                        "unexpected EOF while reading block data header"));
             }
         }
 
@@ -2355,7 +1804,7 @@ public class TObjectInputStream
          * the next element in the stream is not a data block, sets pos and
          * unread to 0 and end to -1.
          */
-        private void refill() throws IOException {
+        private void refill() throws TIOException {
             try {
                 do {
                     pos = 0;
@@ -2366,8 +1815,8 @@ public class TObjectInputStream
                             end = n;
                             unread -= n;
                         } else {
-                            throw new StreamCorruptedException(
-                                    "unexpected EOF in middle of data block");
+                            throw new TStreamCorruptedException(TString.wrap(
+                                    "unexpected EOF in middle of data block"));
                         }
                     } else {
                         int n = readBlockHeader(true);
@@ -2380,7 +1829,7 @@ public class TObjectInputStream
                         }
                     }
                 } while (pos == end);
-            } catch (IOException ex) {
+            } catch (TIOException ex) {
                 pos = 0;
                 end = -1;
                 unread = 0;
@@ -2406,7 +1855,7 @@ public class TObjectInputStream
          * the stream, or -1 if the end of the stream/block data (if in block
          * data mode) has been reached.
          */
-        int peek() throws IOException {
+        int peek() throws TIOException {
             if (blkmode) {
                 if (pos == end) {
                     refill();
@@ -2422,10 +1871,10 @@ public class TObjectInputStream
          * the stream, or throws EOFException if end of stream/block data has
          * been reached.
          */
-        byte peekByte() throws IOException {
+        byte peekByte() throws TIOException {
             int val = peek();
             if (val < 0) {
-                throw new EOFException();
+                throw new TEOFException();
             }
             return (byte) val;
         }
@@ -2439,7 +1888,7 @@ public class TObjectInputStream
          * mode.
          */
 
-        public int read() throws IOException {
+        public int read() throws TIOException {
             if (blkmode) {
                 if (pos == end) {
                     refill();
@@ -2450,11 +1899,11 @@ public class TObjectInputStream
             }
         }
 
-        public int read(byte[] b, int off, int len) throws IOException {
+        public int read(byte[] b, int off, int len) throws TIOException {
             return read(b, off, len, false);
         }
 
-        public long skip(long len) throws IOException {
+        public long skip(long len) throws TIOException {
             long remain = len;
             while (remain > 0) {
                 if (blkmode) {
@@ -2478,7 +1927,7 @@ public class TObjectInputStream
             return len - remain;
         }
 
-        public int available() throws IOException {
+        public int available() throws TIOException {
             if (blkmode) {
                 if ((pos == end) && (unread == 0)) {
                     int n;
@@ -2508,7 +1957,7 @@ public class TObjectInputStream
             }
         }
 
-        public void close() throws IOException {
+        public void close() throws TIOException {
             if (blkmode) {
                 pos = 0;
                 end = -1;
@@ -2524,7 +1973,7 @@ public class TObjectInputStream
          * buffer before copying them to b (to avoid exposing a reference to
          * b).
          */
-        int read(byte[] b, int off, int len, boolean copy) throws IOException {
+        int read(byte[] b, int off, int len, boolean copy) throws TIOException {
             if (len == 0) {
                 return 0;
             } else if (blkmode) {
@@ -2557,145 +2006,145 @@ public class TObjectInputStream
          * data mode.
          */
 
-        public void readFully(byte[] b) throws IOException {
+        public void readFully(byte[] b) throws TIOException {
             readFully(b, 0, b.length, false);
         }
 
-        public void readFully(byte[] b, int off, int len) throws IOException {
+        public void readFully(byte[] b, int off, int len) throws TIOException {
             readFully(b, off, len, false);
         }
 
         public void readFully(byte[] b, int off, int len, boolean copy)
-                throws IOException
+                throws TIOException
         {
             while (len > 0) {
                 int n = read(b, off, len, copy);
                 if (n < 0) {
-                    throw new EOFException();
+                    throw new TEOFException();
                 }
                 off += n;
                 len -= n;
             }
         }
 
-        public int skipBytes(int n) throws IOException {
+        public int skipBytes(int n) throws TIOException {
             return din.skipBytes(n);
         }
 
-        public boolean readBoolean() throws IOException {
+        public boolean readBoolean() throws TIOException {
             int v = read();
             if (v < 0) {
-                throw new EOFException();
+                throw new TEOFException();
             }
             return (v != 0);
         }
 
-        public byte readByte() throws IOException {
+        public byte readByte() throws TIOException {
             int v = read();
             if (v < 0) {
-                throw new EOFException();
+                throw new TEOFException();
             }
             return (byte) v;
         }
 
-        public int readUnsignedByte() throws IOException {
+        public int readUnsignedByte() throws TIOException {
             int v = read();
             if (v < 0) {
-                throw new EOFException();
+                throw new TEOFException();
             }
             return v;
         }
 
-        public char readChar() throws IOException {
+        public char readChar() throws TIOException {
             if (!blkmode) {
                 pos = 0;
                 in.readFully(buf, 0, 2);
             } else if (end - pos < 2) {
                 return din.readChar();
             }
-            char v = Bits.getChar(buf, pos);
+            char v = TBits.getChar(buf, pos);
             pos += 2;
             return v;
         }
 
-        public short readShort() throws IOException {
+        public short readShort() throws TIOException {
             if (!blkmode) {
                 pos = 0;
                 in.readFully(buf, 0, 2);
             } else if (end - pos < 2) {
                 return din.readShort();
             }
-            short v = Bits.getShort(buf, pos);
+            short v = TBits.getShort(buf, pos);
             pos += 2;
             return v;
         }
 
-        public int readUnsignedShort() throws IOException {
+        public int readUnsignedShort() throws TIOException {
             if (!blkmode) {
                 pos = 0;
                 in.readFully(buf, 0, 2);
             } else if (end - pos < 2) {
                 return din.readUnsignedShort();
             }
-            int v = Bits.getShort(buf, pos) & 0xFFFF;
+            int v = TBits.getShort(buf, pos) & 0xFFFF;
             pos += 2;
             return v;
         }
 
-        public int readInt() throws IOException {
+        public int readInt() throws TIOException {
             if (!blkmode) {
                 pos = 0;
                 in.readFully(buf, 0, 4);
             } else if (end - pos < 4) {
                 return din.readInt();
             }
-            int v = Bits.getInt(buf, pos);
+            int v = TBits.getInt(buf, pos);
             pos += 4;
             return v;
         }
 
-        public float readFloat() throws IOException {
+        public float readFloat() throws TIOException {
             if (!blkmode) {
                 pos = 0;
                 in.readFully(buf, 0, 4);
             } else if (end - pos < 4) {
                 return din.readFloat();
             }
-            float v = Bits.getFloat(buf, pos);
+            float v = TBits.getFloat(buf, pos);
             pos += 4;
             return v;
         }
 
-        public long readLong() throws IOException {
+        public long readLong() throws TIOException {
             if (!blkmode) {
                 pos = 0;
                 in.readFully(buf, 0, 8);
             } else if (end - pos < 8) {
                 return din.readLong();
             }
-            long v = Bits.getLong(buf, pos);
+            long v = TBits.getLong(buf, pos);
             pos += 8;
             return v;
         }
 
-        public double readDouble() throws IOException {
+        public double readDouble() throws TIOException {
             if (!blkmode) {
                 pos = 0;
                 in.readFully(buf, 0, 8);
             } else if (end - pos < 8) {
                 return din.readDouble();
             }
-            double v = Bits.getDouble(buf, pos);
+            double v = TBits.getDouble(buf, pos);
             pos += 8;
             return v;
         }
 
-        public String readUTF() throws IOException {
+        public TString readUTF() throws TIOException {
             return readUTFBody(readUnsignedShort());
         }
 
         @SuppressWarnings("deprecation")
-        public String readLine() throws IOException {
+        public TString readLine() throws TIOException {
             return din.readLine();      // deprecated, not worth optimizing
         }
 
@@ -2707,7 +2156,7 @@ public class TObjectInputStream
          * of primitive data values more efficiently.
          */
 
-        void readBooleans(boolean[] v, int off, int len) throws IOException {
+        void readBooleans(boolean[] v, int off, int len) throws TIOException {
             int stop, endoff = off + len;
             while (off < endoff) {
                 if (!blkmode) {
@@ -2723,12 +2172,12 @@ public class TObjectInputStream
                 }
 
                 while (off < stop) {
-                    v[off++] = Bits.getBoolean(buf, pos++);
+                    v[off++] = TBits.getBoolean(buf, pos++);
                 }
             }
         }
 
-        void readChars(char[] v, int off, int len) throws IOException {
+        void readChars(char[] v, int off, int len) throws TIOException {
             int stop, endoff = off + len;
             while (off < endoff) {
                 if (!blkmode) {
@@ -2744,13 +2193,13 @@ public class TObjectInputStream
                 }
 
                 while (off < stop) {
-                    v[off++] = Bits.getChar(buf, pos);
+                    v[off++] = TBits.getChar(buf, pos);
                     pos += 2;
                 }
             }
         }
 
-        void readShorts(short[] v, int off, int len) throws IOException {
+        void readShorts(short[] v, int off, int len) throws TIOException {
             int stop, endoff = off + len;
             while (off < endoff) {
                 if (!blkmode) {
@@ -2766,13 +2215,13 @@ public class TObjectInputStream
                 }
 
                 while (off < stop) {
-                    v[off++] = Bits.getShort(buf, pos);
+                    v[off++] = TBits.getShort(buf, pos);
                     pos += 2;
                 }
             }
         }
 
-        void readInts(int[] v, int off, int len) throws IOException {
+        void readInts(int[] v, int off, int len) throws TIOException {
             int stop, endoff = off + len;
             while (off < endoff) {
                 if (!blkmode) {
@@ -2788,13 +2237,13 @@ public class TObjectInputStream
                 }
 
                 while (off < stop) {
-                    v[off++] = Bits.getInt(buf, pos);
+                    v[off++] = TBits.getInt(buf, pos);
                     pos += 4;
                 }
             }
         }
 
-        void readFloats(float[] v, int off, int len) throws IOException {
+        void readFloats(float[] v, int off, int len) throws TIOException {
             int span, endoff = off + len;
             while (off < endoff) {
                 if (!blkmode) {
@@ -2814,7 +2263,7 @@ public class TObjectInputStream
             }
         }
 
-        void readLongs(long[] v, int off, int len) throws IOException {
+        void readLongs(long[] v, int off, int len) throws TIOException {
             int stop, endoff = off + len;
             while (off < endoff) {
                 if (!blkmode) {
@@ -2830,13 +2279,13 @@ public class TObjectInputStream
                 }
 
                 while (off < stop) {
-                    v[off++] = Bits.getLong(buf, pos);
+                    v[off++] = TBits.getLong(buf, pos);
                     pos += 8;
                 }
             }
         }
 
-        void readDoubles(double[] v, int off, int len) throws IOException {
+        void readDoubles(double[] v, int off, int len) throws TIOException {
             int span, endoff = off + len;
             while (off < endoff) {
                 if (!blkmode) {
@@ -2861,7 +2310,7 @@ public class TObjectInputStream
          * identical to standard UTF, except that it uses an 8 byte header
          * (instead of the standard 2 bytes) to convey the UTF encoding length.
          */
-        String readLongUTF() throws IOException {
+        TString readLongUTF() throws TIOException {
             return readUTFBody(readLong());
         }
 
@@ -2870,7 +2319,7 @@ public class TObjectInputStream
          * or 8-byte length header) of a UTF encoding, which occupies the next
          * utflen bytes.
          */
-        private String readUTFBody(long utflen) throws IOException {
+        private TString readUTFBody(long utflen) throws TIOException {
             StringBuilder sbuf = new StringBuilder();
             if (!blkmode) {
                 end = pos = 0;
@@ -2896,7 +2345,7 @@ public class TObjectInputStream
                 }
             }
 
-            return sbuf.toString();
+            return TString.wrap(sbuf.toString());
         }
 
         /**
@@ -2906,7 +2355,7 @@ public class TObjectInputStream
          * sbuf.  Returns the number of bytes consumed.
          */
         private long readUTFSpan(StringBuilder sbuf, long utflen)
-                throws IOException
+                throws TIOException
         {
             int cpos = 0;
             int start = pos;
@@ -2935,7 +2384,7 @@ public class TObjectInputStream
                         case 13:  // 2 byte format: 110xxxxx 10xxxxxx
                             b2 = buf[pos++];
                             if ((b2 & 0xC0) != 0x80) {
-                                throw new UTFDataFormatException();
+                                throw new TUTFDataFormatException();
                             }
                             cbuf[cpos++] = (char) (((b1 & 0x1F) << 6) |
                                     ((b2 & 0x3F) << 0));
@@ -2946,7 +2395,7 @@ public class TObjectInputStream
                             b2 = buf[pos + 0];
                             pos += 2;
                             if ((b2 & 0xC0) != 0x80 || (b3 & 0xC0) != 0x80) {
-                                throw new UTFDataFormatException();
+                                throw new TUTFDataFormatException();
                             }
                             cbuf[cpos++] = (char) (((b1 & 0x0F) << 12) |
                                     ((b2 & 0x3F) << 6) |
@@ -2954,7 +2403,7 @@ public class TObjectInputStream
                             break;
 
                         default:  // 10xx xxxx, 1111 xxxx
-                            throw new UTFDataFormatException();
+                            throw new TUTFDataFormatException();
                     }
                 }
             } catch (ArrayIndexOutOfBoundsException ex) {
@@ -2967,7 +2416,7 @@ public class TObjectInputStream
                      * string, only consume the expected number of utf bytes.
                      */
                     pos = start + (int) utflen;
-                    throw new UTFDataFormatException();
+                    throw new TUTFDataFormatException();
                 }
             }
 
@@ -2983,7 +2432,7 @@ public class TObjectInputStream
          * straddle block-data boundaries.
          */
         private int readUTFChar(StringBuilder sbuf, long utflen)
-                throws IOException
+                throws TIOException
         {
             int b1, b2, b3;
             b1 = readByte() & 0xFF;
@@ -3002,11 +2451,11 @@ public class TObjectInputStream
                 case 12:
                 case 13:    // 2 byte format: 110xxxxx 10xxxxxx
                     if (utflen < 2) {
-                        throw new UTFDataFormatException();
+                        throw new TUTFDataFormatException();
                     }
                     b2 = readByte();
                     if ((b2 & 0xC0) != 0x80) {
-                        throw new UTFDataFormatException();
+                        throw new TUTFDataFormatException();
                     }
                     sbuf.append((char) (((b1 & 0x1F) << 6) |
                             ((b2 & 0x3F) << 0)));
@@ -3017,12 +2466,12 @@ public class TObjectInputStream
                         if (utflen == 2) {
                             readByte();         // consume remaining byte
                         }
-                        throw new UTFDataFormatException();
+                        throw new TUTFDataFormatException();
                     }
                     b2 = readByte();
                     b3 = readByte();
                     if ((b2 & 0xC0) != 0x80 || (b3 & 0xC0) != 0x80) {
-                        throw new UTFDataFormatException();
+                        throw new TUTFDataFormatException();
                     }
                     sbuf.append((char) (((b1 & 0x0F) << 12) |
                             ((b2 & 0x3F) << 6) |
@@ -3030,7 +2479,7 @@ public class TObjectInputStream
                     return 3;
 
                 default:   // 10xx xxxx, 1111 xxxx
-                    throw new UTFDataFormatException();
+                    throw new TUTFDataFormatException();
             }
         }
     }
@@ -3074,9 +2523,9 @@ public class TObjectInputStream
         /** array mapping handle -> object status */
         byte[] status;
         /** array mapping handle -> object/exception (depending on status) */
-        Object[] entries;
+        TObject[] entries;
         /** array mapping handle -> list of dependent handles (if any) */
-        TObjectOutputStream.HandleTable.HandleList[] deps;
+        TObjectInputStream.HandleTable.HandleList[] deps;
         /** lowest unresolved dependency */
         int lowDep = -1;
         /** number of handles in table */
@@ -3087,8 +2536,8 @@ public class TObjectInputStream
          */
         HandleTable(int initialCapacity) {
             status = new byte[initialCapacity];
-            entries = new Object[initialCapacity];
-            deps = new TObjectOutputStream.HandleTable.HandleList[initialCapacity];
+            entries = new TObject[initialCapacity];
+            deps = new TObjectInputStream.HandleTable.HandleList[initialCapacity];
         }
 
         /**
@@ -3133,7 +2582,7 @@ public class TObjectInputStream
                         case STATUS_UNKNOWN:
                             // add to dependency list of target
                             if (deps[target] == null) {
-                                deps[target] = new TObjectOutputStream.HandleTable.HandleList();
+                                deps[target] = new TObjectInputStream.HandleTable.HandleList();
                             }
                             deps[target].add(dependent);
 
@@ -3169,7 +2618,7 @@ public class TObjectInputStream
                     entries[handle] = ex;
 
                     // propagate exception to dependents
-                    TObjectOutputStream.HandleTable.HandleList dlist = deps[handle];
+                    TObjectInputStream.HandleTable.HandleList dlist = deps[handle];
                     if (dlist != null) {
                         int ndeps = dlist.size();
                         for (int i = 0; i < ndeps; i++) {
@@ -3271,9 +2720,9 @@ public class TObjectInputStream
          * Resets table to its initial state.
          */
         void clear() {
-            Arrays.fill(status, 0, size, (byte) 0);
-            Arrays.fill(entries, 0, size, null);
-            Arrays.fill(deps, 0, size, null);
+            TArrays.fill(status, 0, size, (byte) 0);
+            TArrays.fill(entries, 0, size, null);
+            TArrays.fill(deps, 0, size, null);
             lowDep = -1;
             size = 0;
         }
@@ -3292,8 +2741,8 @@ public class TObjectInputStream
             int newCapacity = (entries.length << 1) + 1;
 
             byte[] newStatus = new byte[newCapacity];
-            Object[] newEntries = new Object[newCapacity];
-            TObjectOutputStream.HandleTable.HandleList[] newDeps = new TObjectOutputStream.HandleTable.HandleList[newCapacity];
+            TObject[] newEntries = new TObject[newCapacity];
+            TObjectInputStream.HandleTable.HandleList[] newDeps = new TObjectInputStream.HandleTable.HandleList[newCapacity];
 
             System.arraycopy(status, 0, newStatus, 0, size);
             System.arraycopy(entries, 0, newEntries, 0, size);

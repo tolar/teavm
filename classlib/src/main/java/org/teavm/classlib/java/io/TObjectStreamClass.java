@@ -50,9 +50,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReference;
 import org.teavm.classlib.java.lang.ref.TReferenceQueue;
+import org.teavm.classlib.java.util.concurrent.TConcurrentMap;
+import org.teavm.classlib.sun.misc.TUnsafe;
 import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.reflect.TReflectionFactory;
 import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
@@ -60,7 +63,7 @@ import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
 /**
  * Created by vasek on 29. 10. 2016.
  */
-public class TObjectStreamClass implements Serializable {
+public class TObjectStreamClass extends TObject implements Serializable {
 
     /** serialPersistentFields value indicating no serializable fields */
     public static final TObjectStreamField[] NO_FIELDS =
@@ -83,11 +86,11 @@ public class TObjectStreamClass implements Serializable {
                 new ConcurrentHashMap<>();
 
         /** queue for WeakReferences to local classes */
-        private static final ReferenceQueue<Class<?>> localDescsQueue =
-                new ReferenceQueue<>();
+        private static final TReferenceQueue<Class<?>> localDescsQueue =
+                new TReferenceQueue<>();
         /** queue for WeakReferences to field reflectors keys */
-        private static final ReferenceQueue<Class<?>> reflectorsQueue =
-                new ReferenceQueue<>();
+        private static final TReferenceQueue<Class<?>> reflectorsQueue =
+                new TReferenceQueue<>();
     }
 
     /** class associated with this descriptor (if any) */
@@ -122,10 +125,10 @@ public class TObjectStreamClass implements Serializable {
      * TObjectStreamClass instances.
      */
     private static class ExceptionInfo {
-        private final String className;
-        private final String message;
+        private final TString className;
+        private final TString message;
 
-        ExceptionInfo(String cn, String msg) {
+        ExceptionInfo(TString cn, TString msg) {
             className = cn;
             message = msg;
         }
@@ -135,8 +138,8 @@ public class TObjectStreamClass implements Serializable {
          * from the information in this object, suitable for being thrown by
          * the caller.
          */
-        InvalidClassException newInvalidClassException() {
-            return new InvalidClassException(className, message);
+        TInvalidClassException newInvalidClassException() {
+            return new TInvalidClassException(className, message);
         }
     }
 
@@ -198,7 +201,7 @@ public class TObjectStreamClass implements Serializable {
      * @param   cl class for which to get the descriptor
      * @return  the class descriptor for the specified class
      */
-    public static TObjectStreamClass lookup(Class<?> cl) {
+    public static TObjectStreamClass lookup(TClass<?> cl) {
         return lookup(cl, false);
     }
 
@@ -210,7 +213,7 @@ public class TObjectStreamClass implements Serializable {
      * @return       the class descriptor for the specified class
      * @since 1.6
      */
-    public static TObjectStreamClass lookupAny(Class<?> cl) {
+    public static TObjectStreamClass lookupAny(TClass<?> cl) {
         return lookup(cl, true);
     }
 
@@ -306,76 +309,77 @@ public class TObjectStreamClass implements Serializable {
      * @param   all if true, return descriptors for all classes; if false, only
      *          return descriptors for serializable classes
      */
-    static TObjectStreamClass lookup(Class<?> cl, boolean all) {
-        if (!(all || Serializable.class.isAssignableFrom(cl))) {
-            return null;
-        }
-        processQueue(TObjectStreamClass.Caches.localDescsQueue, TObjectStreamClass.Caches.localDescs);
-        TObjectStreamClass.WeakClassKey
-                key = new TObjectStreamClass.WeakClassKey(cl, TObjectStreamClass.Caches.localDescsQueue);
-        Reference<?> ref = TObjectStreamClass.Caches.localDescs.get(key);
-        Object entry = null;
-        if (ref != null) {
-            entry = ref.get();
-        }
-        TObjectStreamClass.EntryFuture future = null;
-        if (entry == null) {
-            TObjectStreamClass.EntryFuture newEntry = new TObjectStreamClass.EntryFuture();
-            Reference<?> newRef = new SoftReference<>(newEntry);
-            do {
-                if (ref != null) {
-                    TObjectStreamClass.Caches.localDescs.remove(key, ref);
-                }
-                ref = TObjectStreamClass.Caches.localDescs.putIfAbsent(key, newRef);
-                if (ref != null) {
-                    entry = ref.get();
-                }
-            } while (ref != null && entry == null);
-            if (entry == null) {
-                future = newEntry;
-            }
-        }
-
-        if (entry instanceof TObjectStreamClass) {  // check common case first
-            return (TObjectStreamClass) entry;
-        }
-        if (entry instanceof TObjectStreamClass.EntryFuture) {
-            future = (TObjectStreamClass.EntryFuture) entry;
-            if (future.getOwner() == Thread.currentThread()) {
-                /*
-                 * Handle nested call situation described by 4803747: waiting
-                 * for future value to be set by a lookup() call further up the
-                 * stack will result in deadlock, so calculate and set the
-                 * future value here instead.
-                 */
-                entry = null;
-            } else {
-                entry = future.get();
-            }
-        }
-        if (entry == null) {
-            try {
-                entry = new TObjectStreamClass(cl);
-            } catch (Throwable th) {
-                entry = th;
-            }
-            if (future.set(entry)) {
-                TObjectStreamClass.Caches.localDescs.put(key, new SoftReference<Object>(entry));
-            } else {
-                // nested lookup call already set future
-                entry = future.get();
-            }
-        }
-
-        if (entry instanceof TObjectStreamClass) {
-            return (TObjectStreamClass) entry;
-        } else if (entry instanceof RuntimeException) {
-            throw (RuntimeException) entry;
-        } else if (entry instanceof Error) {
-            throw (Error) entry;
-        } else {
-            throw new InternalError("unexpected entry: " + entry);
-        }
+    static TObjectStreamClass lookup(TClass<?> cl, boolean all) {
+        return null;
+//        if (!(all || TSerializable.class.isAssignableFrom(cl))) {
+//            return null;
+//        }
+//        processQueue(TObjectStreamClass.Caches.localDescsQueue, TObjectStreamClass.Caches.localDescs);
+//        TObjectStreamClass.WeakClassKey
+//                key = new TObjectStreamClass.WeakClassKey(cl, TObjectStreamClass.Caches.localDescsQueue);
+//        Reference<?> ref = TObjectStreamClass.Caches.localDescs.get(key);
+//        Object entry = null;
+//        if (ref != null) {
+//            entry = ref.get();
+//        }
+//        TObjectStreamClass.EntryFuture future = null;
+//        if (entry == null) {
+//            TObjectStreamClass.EntryFuture newEntry = new TObjectStreamClass.EntryFuture();
+//            Reference<?> newRef = new SoftReference<>(newEntry);
+//            do {
+//                if (ref != null) {
+//                    TObjectStreamClass.Caches.localDescs.remove(key, ref);
+//                }
+//                ref = TObjectStreamClass.Caches.localDescs.putIfAbsent(key, newRef);
+//                if (ref != null) {
+//                    entry = ref.get();
+//                }
+//            } while (ref != null && entry == null);
+//            if (entry == null) {
+//                future = newEntry;
+//            }
+//        }
+//
+//        if (entry instanceof TObjectStreamClass) {  // check common case first
+//            return (TObjectStreamClass) entry;
+//        }
+//        if (entry instanceof TObjectStreamClass.EntryFuture) {
+//            future = (TObjectStreamClass.EntryFuture) entry;
+//            if (future.getOwner() == Thread.currentThread()) {
+//                /*
+//                 * Handle nested call situation described by 4803747: waiting
+//                 * for future value to be set by a lookup() call further up the
+//                 * stack will result in deadlock, so calculate and set the
+//                 * future value here instead.
+//                 */
+//                entry = null;
+//            } else {
+//                entry = future.get();
+//            }
+//        }
+//        if (entry == null) {
+//            try {
+//                entry = new TObjectStreamClass(cl);
+//            } catch (Throwable th) {
+//                entry = th;
+//            }
+//            if (future.set(entry)) {
+//                TObjectStreamClass.Caches.localDescs.put(key, new SoftReference<Object>(entry));
+//            } else {
+//                // nested lookup call already set future
+//                entry = future.get();
+//            }
+//        }
+//
+//        if (entry instanceof TObjectStreamClass) {
+//            return (TObjectStreamClass) entry;
+//        } else if (entry instanceof RuntimeException) {
+//            throw (RuntimeException) entry;
+//        } else if (entry instanceof Error) {
+//            throw (Error) entry;
+//        } else {
+//            throw new InternalError("unexpected entry: " + entry);
+//        }
     }
 
     /**
@@ -445,87 +449,91 @@ public class TObjectStreamClass implements Serializable {
     /**
      * Creates local class descriptor representing given class.
      */
-    private TObjectStreamClass(final Class<?> cl) {
+    private TObjectStreamClass(final TClass<?> cl) {
         this.cl = cl;
         name = cl.getName();
-        isProxy = Proxy.isProxyClass(cl);
-        isEnum = Enum.class.isAssignableFrom(cl);
-        serializable = Serializable.class.isAssignableFrom(cl);
-        externalizable = Externalizable.class.isAssignableFrom(cl);
+        //isProxy = Proxy.isProxyClass(cl);
+        isProxy = false;
+        //isEnum = TEnum.class.isAssignableFrom(cl);
+        isEnum = false;
+        //serializable = TSerializable.class.isAssignableFrom(cl);
+        serializable = false;
+        //externalizable = TExternalizable.class.isAssignableFrom(cl);
+        externalizable = false;
 
-        Class<?> superCl = cl.getSuperclass();
+        TClass<?> superCl = cl.getSuperclass();
         superDesc = (superCl != null) ? lookup(superCl, false) : null;
         localDesc = this;
 
-        if (serializable) {
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                public Void run() {
-                    if (isEnum) {
-                        suid = Long.valueOf(0);
-                        fields = NO_FIELDS;
-                        return null;
-                    }
-                    if (cl.isArray()) {
-                        fields = NO_FIELDS;
-                        return null;
-                    }
-
-                    suid = getDeclaredSUID(cl);
-                    try {
-                        fields = getSerialFields(cl);
-                        computeFieldOffsets();
-                    } catch (InvalidClassException e) {
-                        serializeEx = deserializeEx =
-                                new TObjectStreamClass.ExceptionInfo(e.classname, e.getMessage());
-                        fields = NO_FIELDS;
-                    }
-
-                    if (externalizable) {
-                        cons = getExternalizableConstructor(cl);
-                    } else {
-                        cons = getSerializableConstructor(cl);
-                        writeObjectMethod = getPrivateMethod(cl, "writeObject",
-                                new Class<?>[] { ObjectOutputStream.class },
-                                Void.TYPE);
-                        readObjectMethod = getPrivateMethod(cl, "readObject",
-                                new Class<?>[] { ObjectInputStream.class },
-                                Void.TYPE);
-                        readObjectNoDataMethod = getPrivateMethod(
-                                cl, "readObjectNoData", null, Void.TYPE);
-                        hasWriteObjectData = (writeObjectMethod != null);
-                    }
-                    writeReplaceMethod = getInheritableMethod(
-                            cl, "writeReplace", null, Object.class);
-                    readResolveMethod = getInheritableMethod(
-                            cl, "readResolve", null, Object.class);
-                    return null;
-                }
-            });
-        } else {
-            suid = Long.valueOf(0);
-            fields = NO_FIELDS;
-        }
-
-        try {
-            fieldRefl = getReflector(fields, this);
-        } catch (InvalidClassException ex) {
-            // field mismatches impossible when matching local fields vs. self
-            throw new InternalError(ex);
-        }
-
-        if (deserializeEx == null) {
-            if (isEnum) {
-                deserializeEx = new TObjectStreamClass.ExceptionInfo(name, "enum type");
-            } else if (cons == null) {
-                deserializeEx = new TObjectStreamClass.ExceptionInfo(name, "no valid constructor");
-            }
-        }
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i].getField() == null) {
-                defaultSerializeEx = new TObjectStreamClass.ExceptionInfo(
-                        name, "unmatched serializable field(s) declared");
-            }
-        }
+//        if (serializable) {
+//            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+//                public Void run() {
+//                    if (isEnum) {
+//                        suid = Long.valueOf(0);
+//                        fields = NO_FIELDS;
+//                        return null;
+//                    }
+//                    if (cl.isArray()) {
+//                        fields = NO_FIELDS;
+//                        return null;
+//                    }
+//
+//                    suid = getDeclaredSUID(cl);
+//                    try {
+//                        fields = getSerialFields(cl);
+//                        computeFieldOffsets();
+//                    } catch (InvalidClassException e) {
+//                        serializeEx = deserializeEx =
+//                                new TObjectStreamClass.ExceptionInfo(e.classname, e.getMessage());
+//                        fields = NO_FIELDS;
+//                    }
+//
+//                    if (externalizable) {
+//                        cons = getExternalizableConstructor(cl);
+//                    } else {
+//                        cons = getSerializableConstructor(cl);
+//                        writeObjectMethod = getPrivateMethod(cl, "writeObject",
+//                                new Class<?>[] { ObjectOutputStream.class },
+//                                Void.TYPE);
+//                        readObjectMethod = getPrivateMethod(cl, "readObject",
+//                                new Class<?>[] { ObjectInputStream.class },
+//                                Void.TYPE);
+//                        readObjectNoDataMethod = getPrivateMethod(
+//                                cl, "readObjectNoData", null, Void.TYPE);
+//                        hasWriteObjectData = (writeObjectMethod != null);
+//                    }
+//                    writeReplaceMethod = getInheritableMethod(
+//                            cl, "writeReplace", null, Object.class);
+//                    readResolveMethod = getInheritableMethod(
+//                            cl, "readResolve", null, Object.class);
+//                    return null;
+//                }
+//            });
+//        } else {
+//            suid = Long.valueOf(0);
+//            fields = NO_FIELDS;
+//        }
+//
+//        try {
+//            fieldRefl = getReflector(fields, this);
+//        } catch (InvalidClassException ex) {
+//            // field mismatches impossible when matching local fields vs. self
+//            throw new InternalError(ex);
+//        }
+//
+//        if (deserializeEx == null) {
+//            if (isEnum) {
+//                deserializeEx = new TObjectStreamClass.ExceptionInfo(name, "enum type");
+//            } else if (cons == null) {
+//                deserializeEx = new TObjectStreamClass.ExceptionInfo(name, "no valid constructor");
+//            }
+//        }
+//        for (int i = 0; i < fields.length; i++) {
+//            if (fields[i].getField() == null) {
+//                defaultSerializeEx = new TObjectStreamClass.ExceptionInfo(
+//                        name, "unmatched serializable field(s) declared");
+//            }
+//        }
         initialized = true;
     }
 
@@ -539,7 +547,7 @@ public class TObjectStreamClass implements Serializable {
     /**
      * Initializes class descriptor representing a proxy class.
      */
-    void initProxy(Class<?> cl,
+    void initProxy(TClass<?> cl,
             ClassNotFoundException resolveEx,
             TObjectStreamClass superDesc)
             throws InvalidClassException
@@ -576,7 +584,7 @@ public class TObjectStreamClass implements Serializable {
      * Initializes class descriptor representing a non-proxy class.
      */
     void initNonProxy(TObjectStreamClass model,
-            Class<?> cl,
+            TClass<?> cl,
             ClassNotFoundException resolveEx,
             TObjectStreamClass superDesc)
             throws InvalidClassException
@@ -598,17 +606,17 @@ public class TObjectStreamClass implements Serializable {
             if (model.serializable == osc.serializable &&
                     !cl.isArray() &&
                     suid != osc.getSerialVersionUID()) {
-                throw new InvalidClassException(osc.name,
-                        "local class incompatible: " +
+                throw new TInvalidClassException(osc.name,
+                        TString.wrap("local class incompatible: " +
                                 "stream classdesc serialVersionUID = " + suid +
                                 ", local class serialVersionUID = " +
-                                osc.getSerialVersionUID());
+                                osc.getSerialVersionUID()));
             }
 
             if (!classNamesEqual(model.name, osc.name)) {
-                throw new InvalidClassException(osc.name,
-                        "local class name incompatible with stream class " +
-                                "name \"" + model.name + "\"");
+                throw new TInvalidClassException(osc.name,
+                        TString.wrap("local class name incompatible with stream class " +
+                                "name \"" + model.name + "\""));
             }
 
             if (!model.isEnum) {
@@ -773,7 +781,7 @@ public class TObjectStreamClass implements Serializable {
      * class descriptor should not be allowed to deserialize.  This method does
      * not apply to deserialization of enum constants.
      */
-    void checkDeserialize() throws InvalidClassException {
+    void checkDeserialize() throws TInvalidClassException {
         requireInitialized();
         if (deserializeEx != null) {
             throw deserializeEx.newInvalidClassException();
@@ -785,7 +793,7 @@ public class TObjectStreamClass implements Serializable {
      * this descriptor should not be allowed to serialize.  This method does
      * not apply to serialization of enum constants.
      */
-    void checkSerialize() throws InvalidClassException {
+    void checkSerialize() throws TInvalidClassException {
         requireInitialized();
         if (serializeEx != null) {
             throw serializeEx.newInvalidClassException();
@@ -799,7 +807,7 @@ public class TObjectStreamClass implements Serializable {
      * to actual fields, and hence must use the GetField API).  This method
      * does not apply to deserialization of enum constants.
      */
-    void checkDefaultSerialize() throws InvalidClassException {
+    void checkDefaultSerialize() throws TInvalidClassException {
         requireInitialized();
         if (defaultSerializeEx != null) {
             throw defaultSerializeEx.newInvalidClassException();
@@ -1129,7 +1137,7 @@ public class TObjectStreamClass implements Serializable {
      * non-serializable or does not define readResolve.
      */
     Object invokeReadResolve(Object obj)
-            throws IOException, UnsupportedOperationException
+            throws TIOException, UnsupportedOperationException
     {
         requireInitialized();
         if (readResolveMethod != null) {
@@ -1137,8 +1145,8 @@ public class TObjectStreamClass implements Serializable {
                 return readResolveMethod.invoke(obj, (Object[]) null);
             } catch (InvocationTargetException ex) {
                 Throwable th = ex.getTargetException();
-                if (th instanceof ObjectStreamException) {
-                    throw (ObjectStreamException) th;
+                if (th instanceof TObjectStreamException) {
+                    throw (TObjectStreamException) th;
                 } else {
                     throwMiscException(th);
                     throw new InternalError(th);  // never reached
@@ -1178,7 +1186,7 @@ public class TObjectStreamClass implements Serializable {
      * containing "higher" superclasses appearing first.  The final
      * ClassDataSlot contains a reference to this descriptor.
      */
-    TObjectStreamClass.ClassDataSlot[] getClassDataLayout() throws InvalidClassException {
+    TObjectStreamClass.ClassDataSlot[] getClassDataLayout() throws TInvalidClassException {
         // REMIND: synchronize instead of relying on volatile?
         if (dataLayout == null) {
             dataLayout = getClassDataLayout0();
@@ -1187,7 +1195,7 @@ public class TObjectStreamClass implements Serializable {
     }
 
     private TObjectStreamClass.ClassDataSlot[] getClassDataLayout0()
-            throws InvalidClassException
+            throws TInvalidClassException
     {
         ArrayList<TObjectStreamClass.ClassDataSlot> slots = new ArrayList<>();
         Class<?> start = cl, end = cl;
@@ -1498,7 +1506,7 @@ public class TObjectStreamClass implements Serializable {
      * Compares class names for equality, ignoring package names.  Returns true
      * if class names equal, false otherwise.
      */
-    private static boolean classNamesEqual(String name1, String name2) {
+    private static boolean classNamesEqual(TString name1, TString name2) {
         name1 = name1.substring(name1.lastIndexOf('.') + 1);
         name2 = name2.substring(name2.lastIndexOf('.') + 1);
         return name1.equals(name2);
@@ -1562,13 +1570,13 @@ public class TObjectStreamClass implements Serializable {
      * RuntimeException, Error, or of some unexpected type (in which case it is
      * wrapped inside an IOException).
      */
-    private static void throwMiscException(Throwable th) throws IOException {
+    private static void throwMiscException(Throwable th) throws TIOException {
         if (th instanceof RuntimeException) {
             throw (RuntimeException) th;
         } else if (th instanceof Error) {
             throw (Error) th;
         } else {
-            IOException ex = new IOException("unexpected exception type");
+            TIOException ex = new TIOException(TString.wrap("unexpected exception type"));
             ex.initCause(th);
             throw ex;
         }
@@ -1932,10 +1940,10 @@ public class TObjectStreamClass implements Serializable {
                 TObjectStreamField f = fields[i];
                 Field rf = f.getField();
                 long key = (rf != null) ?
-                        unsafe.objectFieldOffset(rf) : Unsafe.INVALID_FIELD_OFFSET;
+                        unsafe.objectFieldOffset(rf) : TUnsafe.INVALID_FIELD_OFFSET;
                 readKeys[i] = key;
                 writeKeys[i] = usedKeys.add(key) ?
-                        key : Unsafe.INVALID_FIELD_OFFSET;
+                        key : TUnsafe.INVALID_FIELD_OFFSET;
                 offsets[i] = f.getOffset();
                 typeCodes[i] = f.getTypeCode();
                 if (!f.isPrimitive()) {
@@ -2314,8 +2322,8 @@ public class TObjectStreamClass implements Serializable {
      * on the specified reference queue.
      */
     static void processQueue(TReferenceQueue<Class<?>> queue,
-            ConcurrentMap<? extends
-                    WeakReference<Class<?>>, ?> map)
+            TConcurrentMap<? extends
+                                WeakReference<Class<?>>, ?> map)
     {
         TReference<? extends Class<?>> ref;
         while((ref = queue.poll()) != null) {
