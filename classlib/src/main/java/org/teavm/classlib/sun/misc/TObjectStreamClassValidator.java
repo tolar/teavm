@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Alexey Andreev.
+ *  Copyright 2016 vasek.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,15 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.teavm.classlib.java.lang;
+package org.teavm.classlib.sun.misc;
 
-import org.teavm.classlib.java.util.TIterator;
+import java.io.ObjectStreamClass;
 
 /**
- *
- * @author Alexey Andreev
- * @param <T> type this collection returns.
+ * Created by vasek on 29. 10. 2016.
  */
-public interface TIterable<T> extends Iterable<T> {
-    TIterator<T> iterator();
+public interface TObjectStreamClassValidator {
+    void validateDescriptor(ObjectStreamClass var1);
 }

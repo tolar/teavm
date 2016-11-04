@@ -21,6 +21,8 @@ import java.util.Date;
 import org.teavm.classlib.java.io.TIOException;
 import org.teavm.classlib.java.io.TOutputStream;
 import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.security.cert.TCertificateExpiredException;
+import org.teavm.classlib.java.security.cert.TCertificateNotYetValidException;
 import org.teavm.classlib.java.util.TDate;
 import org.teavm.classlib.java.util.TEnumeration;
 import org.teavm.classlib.sun.security.util.TDerInputStream;
@@ -175,11 +177,11 @@ public class TCertificateValidity implements TCertAttrSet<String> {
         this.valid(var1);
     }
 
-    public void valid(TDate var1) throws CertificateNotYetValidException, CertificateExpiredException {
+    public void valid(TDate var1) throws TCertificateNotYetValidException, TCertificateExpiredException {
         if(this.notBefore.after(var1)) {
-            throw new CertificateNotYetValidException("NotBefore: " + this.notBefore.toString());
+            throw new TCertificateNotYetValidException(TString.wrap("NotBefore: " + this.notBefore.toString()));
         } else if(this.notAfter.before(var1)) {
-            throw new CertificateExpiredException("NotAfter: " + this.notAfter.toString());
+            throw new TCertificateExpiredException(TString.wrap("NotAfter: " + this.notAfter.toString()));
         }
     }
 }

@@ -398,7 +398,7 @@ public abstract class TProvider extends TProperties {
          */
         public Service(TProvider provider, String type, String algorithm,
                 String className, TList<TString> aliases,
-                TMap<String,String> attributes) {
+                TMap<TString,TString> attributes) {
             if ((provider == null) || (type == null) ||
                     (algorithm == null) || (className == null)) {
                 throw new NullPointerException();

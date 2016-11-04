@@ -15,6 +15,8 @@
  */
 package org.teavm.classlib.java.security;
 
+import org.teavm.classlib.java.lang.TString;
+
 public interface TKey {
 
     /**
@@ -34,7 +36,7 @@ public interface TKey {
      *
      * @return the name of the algorithm associated with this key.
      */
-    public String getAlgorithm();
+    public TString getAlgorithm();
 
     /**
      * Returns the name of the primary encoding format of this key,
