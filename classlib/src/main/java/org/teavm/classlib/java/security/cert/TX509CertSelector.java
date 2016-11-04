@@ -1842,7 +1842,7 @@ public class TX509CertSelector implements TCertSelector {
             if (ext == null) {
                 return false;
             }
-            List<TPolicyInformation> policies = ext.get(TCertificatePoliciesExtension.POLICIES);
+            List<TPolicyInformation> policies = ext.get(TString.wrap(TCertificatePoliciesExtension.POLICIES));
             /*
              * Convert the Vector of PolicyInformation to a Vector
              * of CertificatePolicyIds for easier comparison.

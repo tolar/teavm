@@ -20,6 +20,7 @@ import static org.teavm.classlib.java.io.TObjectStreamClass.processQueue;
 import java.security.PrivilegedActionException;
 
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TClassNotFoundException;
 import org.teavm.classlib.java.lang.TEnum;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
@@ -2546,7 +2547,7 @@ public class TObjectInputStream
          * dependencies on other objects identified), the handle should be
          * "closed" by passing it to finish().
          */
-        int assign(Object obj) {
+        int assign(TObject obj) {
             if (size >= entries.length) {
                 grow();
             }
@@ -2576,7 +2577,7 @@ public class TObjectInputStream
                         case STATUS_EXCEPTION:
                             // eagerly propagate exception
                             markException(dependent,
-                                    (ClassNotFoundException) entries[target]);
+                                    /*(ClassNotFoundException) */entries[target]);
                             break;
 
                         case STATUS_UNKNOWN:
@@ -2611,11 +2612,11 @@ public class TObjectInputStream
          * referencing objects as appropriate.  The specified handle must be
          * "open" (i.e., assigned, but not finished yet).
          */
-        void markException(int handle, ClassNotFoundException ex) {
+        void markException(int handle, TClassNotFoundException ex) {
             switch (status[handle]) {
                 case STATUS_UNKNOWN:
                     status[handle] = STATUS_EXCEPTION;
-                    entries[handle] = ex;
+                    entries[handle] = TObject.wrap(ex);
 
                     // propagate exception to dependents
                     TObjectInputStream.HandleTable.HandleList dlist = deps[handle];
@@ -2683,7 +2684,7 @@ public class TObjectInputStream
             switch (status[handle]) {
                 case STATUS_UNKNOWN:
                 case STATUS_OK:
-                    entries[handle] = obj;
+                    entries[handle] = TObject.wrap(obj);
                     break;
 
                 case STATUS_EXCEPTION:

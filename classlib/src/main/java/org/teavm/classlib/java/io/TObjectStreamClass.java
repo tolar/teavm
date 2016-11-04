@@ -54,6 +54,7 @@ import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
 import org.teavm.classlib.java.lang.ref.TReference;
 import org.teavm.classlib.java.lang.ref.TReferenceQueue;
+import org.teavm.classlib.java.util.concurrent.TConcurrentHashMap;
 import org.teavm.classlib.java.util.concurrent.TConcurrentMap;
 import org.teavm.classlib.sun.misc.TUnsafe;
 import org.teavm.classlib.sun.reflect.TReflection;
@@ -82,8 +83,8 @@ public class TObjectStreamClass extends TObject implements Serializable {
                 new ConcurrentHashMap<>();
 
         /** cache mapping field group/local desc pairs -> field reflectors */
-        static final ConcurrentMap<TObjectStreamClass.FieldReflectorKey,Reference<?>> reflectors =
-                new ConcurrentHashMap<>();
+        static final TConcurrentMap<TObjectStreamClass.FieldReflectorKey,Reference<?>> reflectors =
+                new TConcurrentHashMap<>();
 
         /** queue for WeakReferences to local classes */
         private static final TReferenceQueue<Class<?>> localDescsQueue =
@@ -622,15 +623,15 @@ public class TObjectStreamClass extends TObject implements Serializable {
             if (!model.isEnum) {
                 if ((model.serializable == osc.serializable) &&
                         (model.externalizable != osc.externalizable)) {
-                    throw new InvalidClassException(osc.name,
-                            "Serializable incompatible with Externalizable");
+                    throw new TInvalidClassException(osc.name,
+                            TString.wrap("Serializable incompatible with Externalizable"));
                 }
 
                 if ((model.serializable != osc.serializable) ||
                         (model.externalizable != osc.externalizable) ||
                         !(model.serializable || model.externalizable)) {
                     deserializeEx = new TObjectStreamClass.ExceptionInfo(
-                            osc.name, "class invalid for deserialization");
+                            osc.name, TString.wrap("class invalid for deserialization"));
                 }
             }
         }
@@ -1901,7 +1902,7 @@ public class TObjectStreamClass extends TObject implements Serializable {
     private static class FieldReflector {
 
         /** handle for performing unsafe operations */
-        private static final Unsafe unsafe = Unsafe.getUnsafe();
+        private static final TUnsafe unsafe = TUnsafe.getUnsafe();
 
         /** fields to operate on */
         private final TObjectStreamField[] fields;
@@ -2031,7 +2032,7 @@ public class TObjectStreamClass extends TObject implements Serializable {
             }
             for (int i = 0; i < numPrimFields; i++) {
                 long key = writeKeys[i];
-                if (key == Unsafe.INVALID_FIELD_OFFSET) {
+                if (key == TUnsafe.INVALID_FIELD_OFFSET) {
                     continue;           // discard value
                 }
                 int off = offsets[i];
@@ -2113,7 +2114,7 @@ public class TObjectStreamClass extends TObject implements Serializable {
             }
             for (int i = numPrimFields; i < fields.length; i++) {
                 long key = writeKeys[i];
-                if (key == Unsafe.INVALID_FIELD_OFFSET) {
+                if (key == TUnsafe.INVALID_FIELD_OFFSET) {
                     continue;           // discard value
                 }
                 switch (typeCodes[i]) {

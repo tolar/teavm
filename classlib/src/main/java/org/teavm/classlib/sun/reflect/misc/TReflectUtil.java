@@ -19,8 +19,11 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TClassLoader;
+import org.teavm.classlib.java.lang.TIllegalAccessException;
+import org.teavm.classlib.java.lang.TInstantiationException;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.security.util.TSecurityConstants;
@@ -39,7 +42,7 @@ public final class TReflectUtil {
         return Class.forName(var0);
     }
 
-    public static Object newInstance(Class<?> var0) throws InstantiationException, IllegalAccessException {
+    public static Object newInstance(TClass<?> var0) throws TInstantiationException, TIllegalAccessException {
         checkPackageAccess(var0);
         return var0.newInstance();
     }
