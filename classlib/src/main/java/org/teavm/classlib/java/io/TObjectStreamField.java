@@ -17,8 +17,9 @@ package org.teavm.classlib.java.io;
 
 import java.io.ObjectStreamClass;
 import java.lang.reflect.Field;
-
 import org.teavm.classlib.java.lang.TClass;
+import org.teavm.classlib.java.lang.TString;
+import org.teavm.classlib.java.lang.reflect.TField;
 import org.teavm.classlib.sun.reflect.TReflection;
 import org.teavm.classlib.sun.reflect.misc.TReflectUtil;
 
@@ -27,15 +28,15 @@ public class TObjectStreamField
 {
 
     /** field name */
-    private final String name;
+    private final TString name;
     /** canonical JVM signature of field type */
-    private final String signature;
+    private final TString signature;
     /** field type (Object.class if unknown non-primitive type) */
     private final TClass<?> type;
     /** whether or not to (de)serialize field values as unshared */
     private final boolean unshared;
     /** corresponding reflective field object, if any */
-    private final Field field;
+    private final TField field;
     /** offset of field value in enclosing field group */
     private int offset = 0;
 
@@ -46,7 +47,7 @@ public class TObjectStreamField
      * @param   name the name of the serializable field
      * @param   type the <code>Class</code> object of the serializable field
      */
-    public TObjectStreamField(String name, Class<?> type) {
+    public TObjectStreamField(TString name, TClass<?> type) {
         this(name, type, false);
     }
 
@@ -67,7 +68,7 @@ public class TObjectStreamField
      *          manner as writeUnshared/readUnshared
      * @since   1.4
      */
-    public TObjectStreamField(String name, TClass<?> type, boolean unshared) {
+    public TObjectStreamField(TString name, TClass<?> type, boolean unshared) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -82,7 +83,7 @@ public class TObjectStreamField
      * Creates an TObjectStreamField representing a field with the given name,
      * signature and unshared setting.
      */
-    TObjectStreamField(String name, String signature, boolean unshared) {
+    TObjectStreamField(TString name, TString signature, boolean unshared) {
         if (name == null) {
             throw new NullPointerException();
         }
@@ -265,14 +266,14 @@ public class TObjectStreamField
      * Returns JVM type signature of field (similar to getTypeString, except
      * that signature strings are returned for primitive fields as well).
      */
-    String getSignature() {
+    TString getSignature() {
         return signature;
     }
 
     /**
      * Returns JVM type signature for given class.
      */
-    private static String getClassSignature(Class<?> cl) {
+    private static String getClassSignature(TClass<?> cl) {
         StringBuilder sbuf = new StringBuilder();
         while (cl.isArray()) {
             sbuf.append('[');
