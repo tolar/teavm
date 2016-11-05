@@ -54,7 +54,7 @@ class TMemoryCache<K, V> extends TCache<K, V> {
             int var1 = this.cacheMap.size();
 
             while(true) {
-                TMemoryCache.CacheEntry var2 = (TMemoryCache.CacheEntry)this.queue.poll();
+                TMemoryCache.CacheEntry<TObject, TObject> var2 = (TMemoryCache.CacheEntry)this.queue.poll();
                 if(var2 == null) {
                     return;
                 }

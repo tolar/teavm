@@ -48,7 +48,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import org.teavm.classlib.java.lang.TClass;
 import org.teavm.classlib.java.lang.TObject;
 import org.teavm.classlib.java.lang.TString;
@@ -75,7 +74,7 @@ public class TObjectStreamClass extends TObject implements Serializable {
             NO_FIELDS;
 
     /** reflection factory for obtaining serialization constructors */
-    private static final TReflectionFactory reflFactory = new TReflectionFactory.GetReflectionFactoryAction();
+    private static final TReflectionFactory reflFactory = new TReflectionFactory.GetReflectionFactoryAction().run();
 
     private static class Caches {
         /** cache mapping local classes -> descriptors */
@@ -676,7 +675,7 @@ public class TObjectStreamClass extends TObject implements Serializable {
      * used as input to the ObjectInputStream.resolveClass() and
      * TObjectStreamClass.initNonProxy() methods.
      */
-    void readNonProxy(TObjectOutputStream in)
+    void readNonProxy(TObjectInputStream in)
             throws IOException, ClassNotFoundException
     {
         name = in.readUTF();
@@ -693,33 +692,33 @@ public class TObjectStreamClass extends TObject implements Serializable {
         boolean sflag =
                 ((flags & ObjectStreamConstants.SC_SERIALIZABLE) != 0);
         if (externalizable && sflag) {
-            throw new InvalidClassException(
-                    name, "serializable and externalizable flags conflict");
+            throw new TInvalidClassException(
+                    name, TString.wrap("serializable and externalizable flags conflict"));
         }
         serializable = externalizable || sflag;
         isEnum = ((flags & ObjectStreamConstants.SC_ENUM) != 0);
         if (isEnum && suid.longValue() != 0L) {
-            throw new InvalidClassException(name,
-                    "enum descriptor has non-zero serialVersionUID: " + suid);
+            throw new TInvalidClassException(name,
+                    TString.wrap("enum descriptor has non-zero serialVersionUID: " + suid));
         }
 
         int numFields = in.readShort();
         if (isEnum && numFields != 0) {
-            throw new InvalidClassException(name,
-                    "enum descriptor has non-zero field count: " + numFields);
+            throw new TInvalidClassException(name,
+                    TString.wrap("enum descriptor has non-zero field count: " + numFields));
         }
         fields = (numFields > 0) ?
                 new TObjectStreamField[numFields] : NO_FIELDS;
         for (int i = 0; i < numFields; i++) {
             char tcode = (char) in.readByte();
-            String fname = in.readUTF();
+            TString fname = in.readUTF();
             String signature = ((tcode == 'L') || (tcode == '[')) ?
                     in.readTypeString() : new String(new char[] { tcode });
             try {
                 fields[i] = new TObjectStreamField(fname, signature, false);
             } catch (RuntimeException e) {
-                throw (IOException) new InvalidClassException(name,
-                        "invalid descriptor for field " + fname).initCause(e);
+                throw (IOException) new TInvalidClassException(name,
+                        TString.wrap("invalid descriptor for field " + fname)).initCause(e);
             }
         }
         computeFieldOffsets();

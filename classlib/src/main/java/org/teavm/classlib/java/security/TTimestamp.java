@@ -15,8 +15,8 @@
  */
 package org.teavm.classlib.java.security;
 
-import java.io.ObjectInputStream;
 import org.teavm.classlib.java.io.TIOException;
+import org.teavm.classlib.java.io.TObjectInputStream;
 import org.teavm.classlib.java.io.TSerializable;
 import org.teavm.classlib.java.security.cert.TCertPath;
 import org.teavm.classlib.java.security.cert.TCertificate;
@@ -136,7 +136,7 @@ public final class TTimestamp implements TSerializable {
     }
 
     // Explicitly reset hash code value to -1
-    private void readObject(ObjectInputStream ois)
+    private void readObject(TObjectInputStream ois)
             throws TIOException, ClassNotFoundException {
         ois.defaultReadObject();
         myhash = -1;

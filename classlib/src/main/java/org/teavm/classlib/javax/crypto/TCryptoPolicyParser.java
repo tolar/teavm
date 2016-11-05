@@ -174,7 +174,7 @@ final class TCryptoPolicyParser {
             TClass[] var4 = new TClass[var1.length];
 
             for(int var5 = 0; var5 < var1.length; ++var5) {
-                var4[var5] = Integer.TYPE;
+                var4[var5] = TClass.forName(TString.wrap(Integer.class.getName()));
             }
 
             TConstructor var7 = var3.getConstructor(var4);
